@@ -28,18 +28,174 @@ in
     "flakes"
   ];
 
-  # ── Homebrew (GUI apps only) ───────────────────────────────────────────
+  # ── Homebrew (GUI apps & fonts not in nixpkgs) ────────────────────────
   homebrew = {
     enable = true;
     onActivation.autoUpdate = true;
+    onActivation.cleanup = "zap";
+
+    taps = [
+      "nikitabobko/tap" # aerospace
+      "krtirtho/apps" # spotube
+      "neved4/tap" # pear
+    ];
+
     casks = [
-      "ghostty"
-      "zed"
-      "visual-studio-code"
-      "slack"
-      "discord"
+      # browsers
+      "arc"
       "firefox"
+      "firefox@developer-edition"
+      "firefox@nightly"
+      "floorp"
       "google-chrome"
+      "google-chrome@canary"
+      "helium-browser"
+      "orion"
+      "safari-technology-preview"
+      "thebrowsercompany-dia"
+      "vivaldi"
+      "vivaldi@snapshot"
+      "zen"
+      "zen@twilight"
+
+      # dev tools
+      "docker-desktop"
+      "ghostty"
+      "jetbrains-toolbox"
+      "visual-studio-code"
+      "xcodes-app"
+      "zed"
+
+      # communication
+      "discord"
+      "element"
+      "microsoft-teams"
+      "signal"
+      "slack"
+      "vesktop"
+      "wechat"
+      "zoom"
+
+      # productivity
+      "chatgpt"
+      "chatgpt-atlas"
+      "claude"
+      "claude-code"
+      "codex"
+      "copilot-cli"
+      "obsidian"
+      "notesnook"
+
+      # media
+      "audacity"
+      "handbrake-app"
+      "iina"
+      "musicbrainz-picard"
+      "plex"
+      "plex-htpc"
+      "pocket-casts"
+      "spotify"
+      "spotube"
+      "vlc"
+
+      # utilities
+      "1password"
+      "1password-cli"
+      "activitywatch"
+      "aerospace"
+      "applite"
+      "batfi"
+      "betterdisplay"
+      "daisydisk"
+      "grandperspective"
+      "imageoptim"
+      "jordanbaird-ice"
+      "keepingyouawake"
+      "keyboardcleantool"
+      "keyclu"
+      "linearmouse"
+      "lookaway"
+      "loop"
+      "maccy"
+      "macs-fan-control"
+      "mullvad-vpn"
+      "netnewswire"
+      "ollama-app"
+      "onyx@beta"
+      "oversight"
+      "pearcleaner"
+      "pika"
+      "shottr"
+      "stats"
+      "syntax-highlight"
+      "transnomino"
+      "utm"
+
+      # terminals
+      "alacritty"
+      "iterm2"
+      "kitty"
+
+      # editors / writing
+      "codexbar"
+      "db-browser-for-sqlite"
+      "lapce"
+      "nvalt"
+
+      # creative / design
+      "figma"
+      "fontforge-app"
+      "fontlab"
+      "icon-composer"
+      "inkscape"
+      "monodraw"
+
+      # gaming
+      "league-of-legends"
+      "minecraft"
+      "openemu"
+      "osu"
+      "prismlauncher"
+      "steam"
+
+      # science / education
+      "anki"
+      "calibre"
+      "libreoffice"
+      "mactex"
+      "praat"
+      "racket"
+      "zotero"
+
+      # system / network
+      "chatterino"
+      "crystalfetch"
+      "folding-at-home"
+      "google-drive"
+      "microsoft-auto-update"
+      "multipatch"
+      "pear"
+      "powershell"
+      "qbittorrent"
+      "rustdesk"
+      "sabnzbd"
+      "sf-symbols"
+      "tabtab"
+      "teamspeak-client"
+      "thunderbird"
+
+      # crypto
+      "bluewallet"
+
+      # misc
+      "antigravity"
+      "handy"
+
+      # fonts (not in nixpkgs — Apple proprietary or missing)
+      "font-iosevka-aile"
+      "font-iosevka-etoile"
+      "font-sf-mono"
+      "font-sf-pro"
     ];
   };
 
