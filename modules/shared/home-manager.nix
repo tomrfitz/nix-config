@@ -46,7 +46,7 @@
     wxGTK32
 
     # python tools
-    poetry
+    # poetry  # broken on aarch64-darwin (rapidfuzz atomics failure) — revisit later
     virtualenv
 
     # nix tooling
