@@ -1,6 +1,7 @@
 {
   config,
   pkgs,
+  agenix,
   ...
 }:
 let
@@ -18,7 +19,10 @@ in
 
   # ── Nix ────────────────────────────────────────────────────────────────
   nixpkgs.config.allowUnfree = true;
-  environment.systemPackages = with pkgs; [ nix ];
+  environment.systemPackages = with pkgs; [
+    nix
+    agenix.packages.aarch64-darwin.default
+  ];
   nix.settings.experimental-features = [
     "nix-command"
     "flakes"

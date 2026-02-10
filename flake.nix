@@ -11,6 +11,10 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    agenix = {
+      url = "github:ryantm/agenix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -19,6 +23,7 @@
       nixpkgs,
       nix-darwin,
       home-manager,
+      agenix,
     }:
     let
       user = "tomrfitz";
@@ -26,6 +31,7 @@
     {
       darwinConfigurations.tomrfitz = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
+        specialArgs = { inherit agenix; };
         modules = [
           ./hosts/darwin
           home-manager.darwinModules.home-manager
@@ -36,6 +42,7 @@
               backupFileExtension = "hm-backup";
               users.${user} = {
                 imports = [
+                  agenix.homeManagerModules.default
                   ./modules/shared/home-manager.nix
                   ./modules/darwin/home-manager.nix
                 ];
@@ -57,6 +64,7 @@
               backupFileExtension = "hm-backup";
               users.${user} = {
                 imports = [
+                  agenix.homeManagerModules.default
                   ./modules/shared/home-manager.nix
                   ./modules/nixos/home-manager.nix
                 ];
