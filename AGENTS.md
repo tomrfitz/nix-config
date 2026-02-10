@@ -13,9 +13,11 @@ sudo nix run nix-darwin -- switch --flake .#tomrfitz
 
 Rollback: `sudo darwin-rebuild switch --rollback`
 
+Make use of static analysis tools and formatters before making commits.
+
 ## Repository Structure
 
-```
+```text
 flake.nix                       # Entry point: darwinConfigurations + nixosConfigurations
 hosts/
   darwin/default.nix            # macOS system-level config (brew casks, nix settings, users)
@@ -98,7 +100,7 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 
 ### Style Notes
 
-- Use section headers with box-drawing characters (` # ── Section ──`) for visual separation in nix files
+- Use section headers with box-drawing characters (`# ── Section ──`) for visual separation in nix files
 - Keep nix files well-organized with clear sections
 - Prefer structured `programs.*.settings` over raw `home.file` text blocks
 - When adding a new tool: first check if a `programs.*` module exists in home-manager before falling back to `home.file` or `xdg.configFile`
