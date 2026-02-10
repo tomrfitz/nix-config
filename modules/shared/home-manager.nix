@@ -111,6 +111,18 @@
     pipes
     # cava  # broken on aarch64-darwin (unity-test build failure) — revisit later
     mufetch
+
+    # fonts (migrated from Homebrew casks)
+    aporetic
+    atkinson-hyperlegible-mono
+    fira-code
+    nerd-fonts.hack
+    iosevka-bin
+    nerd-fonts.iosevka-term
+    nerd-fonts.jetbrains-mono
+    maple-mono.NF
+    monaspace
+    nerd-fonts.symbols-only
   ];
 
   # ── Session environment ────────────────────────────────────────────────
