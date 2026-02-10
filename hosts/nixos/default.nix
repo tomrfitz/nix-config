@@ -1,5 +1,8 @@
-{ config, pkgs, ... }:
-
+{
+  config,
+  pkgs,
+  ...
+}:
 {
   imports = [ ];
 
@@ -8,13 +11,19 @@
 
   system.stateVersion = "24.11";
 
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  nix.settings.experimental-features = [
+    "nix-command"
+    "flakes"
+  ];
 
   nixpkgs.config.allowUnfree = true;
 
   users.users.tomrfitz = {
     isNormalUser = true;
-    extraGroups = [ "wheel" "networkmanager" ];
+    extraGroups = [
+      "wheel"
+      "networkmanager"
+    ];
     shell = pkgs.zsh;
   };
 
