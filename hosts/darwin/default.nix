@@ -43,7 +43,6 @@ in
     casks = [
       # browsers
       "arc"
-      "firefox"
       "firefox@developer-edition"
       "firefox@nightly"
       "floorp"
@@ -62,7 +61,6 @@ in
       "docker-desktop"
       "ghostty"
       "jetbrains-toolbox"
-      "visual-studio-code"
       "xcodes-app"
       "zed"
 
@@ -100,7 +98,6 @@ in
 
       # utilities
       "1password"
-      "1password-cli"
       "activitywatch"
       "aerospace"
       "applite"
@@ -132,9 +129,7 @@ in
       "utm"
 
       # terminals
-      "alacritty"
       "iterm2"
-      "kitty"
 
       # editors / writing
       "codexbar"
@@ -162,7 +157,6 @@ in
       "anki"
       "calibre"
       "libreoffice"
-      "mactex"
       "praat"
       "racket"
       "zotero"
@@ -175,7 +169,6 @@ in
       "microsoft-auto-update"
       "multipatch"
       "pear"
-      "powershell"
       "qbittorrent"
       "rustdesk"
       "sabnzbd"

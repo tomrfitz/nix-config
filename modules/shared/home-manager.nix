@@ -56,6 +56,7 @@
     alejandra
 
     # utilities
+    _1password-cli
     coreutils
     findutils
     curl
@@ -94,12 +95,13 @@
     todo-txt-cli
     timewarrior
     taskwarrior-tui
-    texlivePackages.latexindent
+    texlive.combined.scheme-full
     gtypist
     ncspot
     spotifyd
     mailsy
     gemini-cli
+    powershell
     # gossip  # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
 
     # fun
@@ -335,9 +337,12 @@
   };
 
   # ── Other programs with native modules ─────────────────────────────────
+  programs.alacritty.enable = true;
   programs.bat.enable = true;
   programs.eza.enable = true;
   programs.fd.enable = true;
+  programs.firefox.enable = true;
+  programs.kitty.enable = true;
   programs.ripgrep.enable = true;
   programs.jq.enable = true;
   programs.btop.enable = true;
@@ -349,6 +354,7 @@
   programs.lazygit.enable = true;
   programs.helix.enable = true;
   programs.neovim.enable = true;
+  programs.vscode.enable = true;
 
   # ── Fastfetch ──────────────────────────────────────────────────────────
   programs.fastfetch = {
