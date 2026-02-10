@@ -123,6 +123,14 @@
     };
   };
 
+  # ── SSH: macOS-specific (1Password agent socket) ─────────────────────
+  programs.ssh.matchBlocks."*" = {
+    extraOptions = {
+      AddKeysToAgent = "yes";
+      IdentityAgent = "\"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock\"";
+    };
+  };
+
   # ── Ghostty: macOS-specific overrides (installed via brew cask) ────────
   programs.ghostty = {
     package = null;
