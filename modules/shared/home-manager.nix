@@ -1,5 +1,9 @@
-{ config, pkgs, lib, ... }:
-
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
 {
   home.stateVersion = "24.11";
 
@@ -124,7 +128,7 @@
       {
         name = "zsh-fast-syntax-highlighting";
         src = pkgs.zsh-fast-syntax-highlighting;
-        file = "share/zsh/site-functions/fast-syntax-highlighting.plugin.zsh";
+        file = "share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh";
       }
     ];
   };
@@ -148,7 +152,10 @@
       format = "ssh";
     };
 
-    ignores = [ ".DS_Store" ".vscode" ];
+    ignores = [
+      ".DS_Store"
+      ".vscode"
+    ];
 
     settings = {
       user = {
