@@ -37,6 +37,8 @@
     XDG_CACHE_HOME = "$HOME/.cache";
     XDG_DATA_HOME = "$HOME/.local/share";
     XDG_STATE_HOME = "$HOME/.local/state";
+    EZA_CONFIG_DIR = "$HOME/.config/eza/";
+    VCPKG_ROOT = "$HOME/vcpkg";
     OLLAMA_GPU_LAYERS = "-1";
     OLLAMA_KEEP_ALIVE = "5m";
     PYTORCH_ENABLE_MPS_FALLBACK = "1";
@@ -55,11 +57,18 @@
 
     shellAliases = {
       ls = "eza --group-directories-first --icons --hyperlink --time-style=long-iso";
+      sa = "source ~/.zshrc && echo \"ZSH aliases sourced.\"";
       histrg = "cat ~/.zsh_history | grep";
     };
 
     envExtra = ''
       [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
+    '';
+
+    profileExtra = ''
+      if [[ "$TERM_PROGRAM" != "vscode" && "$TERM_PROGRAM" != "zed" ]]; then
+        command -v fastfetch &>/dev/null && fastfetch
+      fi
     '';
 
     completionInit = ''
@@ -79,11 +88,22 @@
       '')
 
       ''
+        # JJ completions (after compinit)
+        if command -v jj &>/dev/null; then
+          source <(COMPLETE=zsh jj)
+        fi
+
+        # Docker completions
+        [ -d "$HOME/.docker/completions" ] && fpath=("$HOME/.docker/completions" ''${fpath[@]})
+
         # uv completions
         if command -v uv &>/dev/null; then
           eval "$(uv generate-shell-completion zsh)"
           eval "$(uvx --generate-shell-completion zsh)"
         fi
+
+        # Mole shell completion
+        if output="$(mole completion zsh 2>/dev/null)"; then eval "$output"; fi
 
         # Source custom environment file if it exists
         [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
@@ -194,6 +214,26 @@
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+  };
+
+  # ── Ghostty ────────────────────────────────────────────────────────────
+  programs.ghostty = {
+    enable = true;
+    enableZshIntegration = true;
+    settings = {
+      theme = "light:Flexoki Light,dark:Flexoki Dark";
+      quit-after-last-window-closed = false;
+      clipboard-read = "allow";
+      clipboard-write = "allow";
+      window-padding-balance = true;
+      window-theme = "system";
+      window-height = 36;
+      window-width = 130;
+      bold-is-bright = true;
+      cursor-style = "bar";
+      font-thicken = true;
+      font-family = "Atkinson Hyperlegible Mono";
+    };
   };
 
   # ── Other programs with native modules ─────────────────────────────────

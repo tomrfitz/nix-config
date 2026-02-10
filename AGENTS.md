@@ -54,6 +54,7 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 ### Migration Status
 
 #### Done
+
 - [x] nix-darwin + home-manager installed and working
 - [x] Zsh config (aliases, env vars, PATH, completions, plugins, functions)
 - [x] Git config (signing, delta, LFS, credential helpers)
@@ -67,6 +68,7 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 - [x] Chezmoi-managed dotfiles fully replaced (zshrc, zprofile, zshenv, gitconfig, starship.toml)
 
 #### Next Steps (priority order)
+
 - [ ] macOS system defaults (dock layout/size, keyboard repeat rate, trackpad settings, Finder preferences, NSGlobalDomain) — these are one-time declarations in `hosts/darwin/default.nix` via `system.defaults`
 - [ ] Migrate remaining Homebrew CLI formulae to nix `home.packages` — run `brew leaves` to find what's not yet declared
 - [ ] SSH config via `programs.ssh` in home-manager
@@ -81,6 +83,7 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 - [ ] Retire chezmoi entirely (remove from packages, delete `~/.local/share/chezmoi`)
 
 #### Hard Boundaries (can't fully nix-ify)
+
 - Apple ID / iCloud / Google Drive sign-in (account state, not config)
 - App Store apps require Apple ID login first (mas can install declaratively after)
 - 1Password vault content

@@ -7,8 +7,6 @@
   home.sessionVariables = {
     OBSD = "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian/";
     SCRNSHT = "$HOME/Documents/Screenshots/";
-    EZA_CONFIG_DIR = "$HOME/.config/eza/";
-    VCPKG_ROOT = "$HOME/vcpkg";
     NVM_DIR = "$HOME/.nvm";
   };
 
@@ -26,12 +24,11 @@
   programs.zsh = {
     shellAliases = {
       regossip = "cd ~/gossip && git pull && RUSTFLAGS=\"-C target-cpu=native --cfg tokio_unstable\" cargo build --release --features=lang-cjk && strip ./target/release/gossip && ./target/release/gossip";
-      sa = "source ~/.zshrc && echo \"ZSH aliases sourced.\"";
       code = "open -b com.microsoft.vscode";
       ytm = "z pear && pnpm start";
     };
 
-    profileExtra = ''
+    profileExtra = lib.mkAfter ''
       if [[ -x /opt/homebrew/bin/brew ]]; then
         eval "$(/opt/homebrew/bin/brew shellenv)"
       elif command -v brew &>/dev/null; then
@@ -42,35 +39,20 @@
       path+=("$HOME/Library/Application Support/JetBrains/Toolbox/scripts")
       path+=("$HOME/Library/Application Support/Coursier/bin")
       export PATH
-
-      if [[ "$TERM_PROGRAM" != "vscode" && "$TERM_PROGRAM" != "zed" ]]; then
-        command -v fastfetch &>/dev/null && fastfetch
-      fi
     '';
 
     initContent = ''
       # Bun completions
       [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
 
-      # Docker completions
-      [ -d "$HOME/.docker/completions" ] && fpath=("$HOME/.docker/completions" ''${fpath[@]})
-
-      # JJ completions (after compinit)
-      if command -v jj &>/dev/null; then
-        source <(COMPLETE=zsh jj)
-      fi
-
       # NVM
       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
       [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-      # Mole shell completion
-      if output="$(mole completion zsh 2>/dev/null)"; then eval "$output"; fi
-
       # Dynamic PATH (yarn)
       path+=("$(yarn global bin 2>/dev/null || echo "")")
 
-      # Journal note function
+      # Journal note function (syncs to Obsidian on macOS)
       jn() {
         local ts fn
         ts="## [$(date +%H:%M:%S)]"
@@ -106,7 +88,7 @@
     '';
   };
 
-  # ── Git: macOS-specific (1Password SSH signing) ────────────────────────
+  # ── Git: macOS-specific (1Password SSH signing, brew gh credential) ────
   programs.git.settings = {
     gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
     credential = {
@@ -125,30 +107,16 @@
     };
   };
 
-  # ── Ghostty (native HM module, installed via brew cask) ────────────────
+  # ── Ghostty: macOS-specific overrides (installed via brew cask) ────────
   programs.ghostty = {
-    enable = true;
     package = null;
-    enableZshIntegration = true;
     settings = {
-      theme = "light:Flexoki Light,dark:Flexoki Dark";
-      quit-after-last-window-closed = false;
       quick-terminal-position = "center";
       custom-shader-animation = true;
-      clipboard-read = "allow";
-      clipboard-write = "allow";
-      window-padding-balance = true;
-      window-theme = "system";
-      window-height = 36;
-      window-width = 130;
       window-padding-y = 5;
       window-position-y = 150;
       window-position-x = 175;
       window-step-resize = true;
-      bold-is-bright = true;
-      cursor-style = "bar";
-      font-thicken = true;
-      font-family = "Atkinson Hyperlegible Mono";
       keybind = [
         "global:shift+ctrl+backquote=new_window"
         "global:ctrl+backquote=toggle_quick_terminal"
