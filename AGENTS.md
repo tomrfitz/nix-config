@@ -24,10 +24,12 @@ hosts/
   nixos/default.nix             # NixOS system-level config (stub — no target machine yet)
 modules/
   shared/home-manager.nix       # Cross-platform user config (the bulk of everything)
-  darwin/home-manager.nix       # macOS-specific user config (brew shellenv, 1Password, ghostty macOS keys)
+  darwin/home-manager.nix       # macOS-specific user config (brew shellenv, 1Password, ghostty macOS keys, SSH agent)
   nixos/home-manager.nix        # NixOS-specific user config (stub)
 config/
   starship.toml                 # Starship prompt config (imported via lib.importTOML)
+  helix-flexoki-dark.toml       # Helix Flexoki Dark theme (imported via lib.importTOML)
+  helix-flexoki-light.toml      # Helix Flexoki Light theme (imported via lib.importTOML)
 secrets/
   secrets.nix                   # Agenix public key mapping (read by CLI, not imported into system config)
   test-secret.age               # Encrypted test secret (verifies agenix pipeline)
@@ -85,19 +87,27 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 - [x] Agenix secrets management (flake input, HM module, test secret verified)
 - [x] Fonts managed via nix `home.packages` (nerd fonts, iosevka, fira-code, etc.)
 - [x] All Homebrew casks declared — `homebrew.onActivation.cleanup = "zap"` enabled
+- [x] SSH config via `programs.ssh` (1Password agent on darwin, GitHub ControlMaster multiplexing)
+- [x] Tmux via `programs.tmux` (mouse, vi keys, 50k history, base-index 1)
+- [x] Helix via `programs.helix` (Flexoki dark/light themes via lib.importTOML)
+- [x] Neovim via `programs.neovim` (minimal initLua, viAlias/vimAlias)
+- [x] Firefox via `programs.firefox` (38 extensions via policies, privacy hardening)
+- [x] Topgrade config via `xdg.configFile` (nix-darwin rebuild as custom command)
+- [x] Additional cask-to-nix migrations: alacritty, kitty, vscode, firefox, 1password-cli, powershell, mactex
 
 #### Next Steps (priority order)
 
-- [ ] SSH config via `programs.ssh` in home-manager
-- [ ] Editor configs: Zed, Neovim, Helix — via their respective HM modules
-- [ ] Additional app configs as HM modules exist (tmux, mpv, etc.)
+- [ ] Editor configs: Zed — settings via HM module; Helix language servers; Neovim deeper config if needed
+- [ ] Configure alacritty and kitty settings (currently just `.enable = true`)
 - [ ] Real secrets via agenix (API tokens, SSH keys — currently only a test secret)
 - [ ] Desktop wallpaper (nix-darwin can manage this)
 - [ ] Auto-update via launchd agent (nix flake update + rebuild on schedule)
 - [ ] NixOS host config when a target Linux machine is available
 - [ ] Retire chezmoi entirely (remove from packages, delete `~/.local/share/chezmoi`)
 - [ ] Remove old `~/.gitconfig` (HM-managed config at `~/.config/git/config` is authoritative)
+- [ ] Clean up old dotfiles (LazyVim at `~/.config/nvim/`, topgrade backup, helix `.hm-backup` files)
 - [ ] Uninstall leftover Homebrew CLI formulae that are now nix packages (`brew leaves` still shows ~127)
+- [ ] Migrate topgrade binary to nix (currently at `~/.local/bin/topgrade`)
 
 #### Hard Boundaries (can't fully nix-ify)
 
@@ -113,6 +123,8 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 - The flake currently pins `nixpkgs-unstable`. This is intentional for access to latest packages.
 - Apple-proprietary fonts (SF Mono, SF Pro) remain as Homebrew casks since they're not in nixpkgs.
 - Some upstream nixpkgs packages are currently broken on aarch64-darwin and commented out: `cava` (unity-test build failure), `poetry` (rapidfuzz atomics failure), `gossip` (SDL2/CMake conflict). Revisit after `nix flake update`.
+- Firefox extensions are managed declaratively via `policies.ExtensionSettings` (38 extensions). Browser profiles/bookmarks are not managed.
+- Topgrade binary is at `~/.local/bin/topgrade` (not nix-managed); its config is HM-managed via `xdg.configFile`.
 
 ### Style Notes
 
