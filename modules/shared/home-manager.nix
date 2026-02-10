@@ -634,31 +634,42 @@
   programs.home-manager.enable = true;
 
   # ── Topgrade ──────────────────────────────────────────────────────────
-  xdg.configFile."topgrade.toml".text = ''
-    [misc]
-    pre_sudo = false
-    ignore_failures = []
-    cleanup = true
-    skip_notify = true
-    no_retry = true
-    no_self_update = false
-
-    [commands]
-    "Nix Flake Update + Darwin Rebuild" = "cd ~/nixos-config && nix flake update && sudo darwin-rebuild switch --flake .#tomrfitz"
-
-    [brew]
-    greedy_latest = true
-    greedy_auto_updates = true
-    autoremove = true
-    fetch_head = true
-
-    [git]
-    max_concurrency = 2
-    repos = ["~/Developer/*", "~/.config/*"]
-
-    [containers]
-    ignored_containers = ["flixor-backend:latest", "flixor-frontend:latest"]
-  '';
+  programs.topgrade = {
+    enable = true;
+    settings = {
+      misc = {
+        pre_sudo = false;
+        ignore_failures = [ ];
+        cleanup = true;
+        skip_notify = true;
+        no_retry = true;
+        no_self_update = false;
+      };
+      commands = {
+        "Nix Flake Update + Darwin Rebuild" =
+          "cd ~/nixos-config && nix flake update && sudo darwin-rebuild switch --flake .#tomrfitz";
+      };
+      brew = {
+        greedy_latest = true;
+        greedy_auto_updates = true;
+        autoremove = true;
+        fetch_head = true;
+      };
+      git = {
+        max_concurrency = 2;
+        repos = [
+          "~/Developer/*"
+          "~/.config/*"
+        ];
+      };
+      containers = {
+        ignored_containers = [
+          "flixor-backend:latest"
+          "flixor-frontend:latest"
+        ];
+      };
+    };
+  };
 
   # ── Agenix secrets ───────────────────────────────────────────────────
   age.identityPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519_agenix" ];

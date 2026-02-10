@@ -92,7 +92,7 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 - [x] Helix via `programs.helix` (Flexoki dark/light themes via lib.importTOML)
 - [x] Neovim via `programs.neovim` (minimal initLua, viAlias/vimAlias)
 - [x] Firefox via `programs.firefox` (38 extensions via policies, privacy hardening)
-- [x] Topgrade config via `xdg.configFile` (nix-darwin rebuild as custom command)
+- [x] Topgrade config via `programs.topgrade` (native HM module, nix-darwin rebuild as custom command)
 - [x] Additional cask-to-nix migrations: alacritty, kitty, vscode, firefox, 1password-cli, powershell, mactex
 
 #### Next Steps (priority order)
@@ -107,7 +107,6 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 - [ ] Remove old `~/.gitconfig` (HM-managed config at `~/.config/git/config` is authoritative)
 - [ ] Clean up old dotfiles (LazyVim at `~/.config/nvim/`, topgrade backup, helix `.hm-backup` files)
 - [ ] Uninstall leftover Homebrew CLI formulae that are now nix packages (`brew leaves` still shows ~127)
-- [ ] Migrate topgrade binary to nix (currently at `~/.local/bin/topgrade`)
 
 #### Hard Boundaries (can't fully nix-ify)
 
@@ -124,7 +123,6 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 - Apple-proprietary fonts (SF Mono, SF Pro) remain as Homebrew casks since they're not in nixpkgs.
 - Some upstream nixpkgs packages are currently broken on aarch64-darwin and commented out: `cava` (unity-test build failure), `poetry` (rapidfuzz atomics failure), `gossip` (SDL2/CMake conflict). Revisit after `nix flake update`.
 - Firefox extensions are managed declaratively via `policies.ExtensionSettings` (38 extensions). Browser profiles/bookmarks are not managed.
-- Topgrade binary is at `~/.local/bin/topgrade` (not nix-managed); its config is HM-managed via `xdg.configFile`.
 
 ### Style Notes
 
