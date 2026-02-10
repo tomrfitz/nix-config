@@ -20,18 +20,29 @@ Make use of static analysis tools and formatters before making commits.
 ```text
 flake.nix                       # Entry point: darwinConfigurations + nixosConfigurations
 hosts/
-  darwin/default.nix            # macOS system-level config (brew casks, nix settings, users)
+  darwin/default.nix            # macOS system-level config (brew casks, system defaults, nix settings, users)
   nixos/default.nix             # NixOS system-level config (stub — no target machine yet)
 modules/
   shared/home-manager.nix       # Cross-platform user config (the bulk of everything)
   darwin/home-manager.nix       # macOS-specific user config (brew shellenv, 1Password, ghostty macOS keys)
   nixos/home-manager.nix        # NixOS-specific user config (stub)
-starship.toml                   # Starship prompt config (imported via lib.importTOML)
-fastfetch.jsonc                 # Fastfetch config (JSONC, managed via xdg.configFile)
-atuin.toml                      # Reference copy of atuin config (not imported — settings are inline)
+config/
+  starship.toml                 # Starship prompt config (imported via lib.importTOML)
+secrets/
+  secrets.nix                   # Agenix public key mapping (read by CLI, not imported into system config)
+  test-secret.age               # Encrypted test secret (verifies agenix pipeline)
 ```
 
 The key design principle: **`modules/shared/` should contain as much as possible.** Platform-specific modules should only contain things that genuinely differ between macOS and Linux (paths, package sources, platform-specific app settings).
+
+## Package Source Priority
+
+When deciding where to install something, prefer in this order:
+
+1. **Cross-platform nixpkg** (in `modules/shared/`) — best for reproducibility
+2. **Darwin-only nixpkg** (in `modules/darwin/`) — when the package only makes sense on macOS
+3. **Homebrew cask** (in `hosts/darwin/`) — for macOS GUI apps not in nixpkgs
+4. **Mac App Store via mas** — for apps only available there
 
 ## Project Goals
 
@@ -45,7 +56,7 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 
 2. **Minimize platform-specific config** — anything that can be expressed identically on both OSes belongs in `modules/shared/`. Platform modules should be thin.
 
-3. **Nix replaces other package managers** — CLI tools should come from nixpkgs, not brew/yay/etc. Homebrew is only for macOS GUI apps (casks) that aren't in nixpkgs. The goal is to eventually declare all brew casks in `hosts/darwin/default.nix` and enable `homebrew.onActivation.cleanup = "zap"` to make brew fully declarative.
+3. **Nix replaces other package managers** — CLI tools should come from nixpkgs, not brew/yay/etc. Homebrew is only for macOS GUI apps (casks) that aren't in nixpkgs. All brew casks are declared in `hosts/darwin/default.nix` with `homebrew.onActivation.cleanup = "zap"` so brew is fully declarative.
 
 4. **Nix replaces topgrade and manual updates** — `nix flake update` + `darwin-rebuild switch` is the single update path. This can be automated via a launchd agent.
 
@@ -60,29 +71,33 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 - [x] nix-darwin + home-manager installed and working
 - [x] Zsh config (aliases, env vars, PATH, completions, plugins, functions)
 - [x] Git config (signing, delta, LFS, credential helpers)
-- [x] Starship prompt (full config via lib.importTOML)
-- [x] Atuin shell history (native module)
+- [x] Starship prompt (full config via lib.importTOML from config/starship.toml)
+- [x] Atuin shell history (native module, inline settings)
 - [x] Zoxide (native module)
 - [x] Fzf (native module)
 - [x] Ghostty terminal (native module, platform-aware)
 - [x] CLI tools via native modules: bat, eza, fd, ripgrep, jq, btop, htop, gh, lazygit, helix, neovim, fastfetch, jujutsu, delta
 - [x] Zsh plugins (autosuggestions, fast-syntax-highlighting) sourced from nixpkgs instead of brew
 - [x] Chezmoi-managed dotfiles fully replaced (zshrc, zprofile, zshenv, gitconfig, starship.toml)
+- [x] macOS system defaults (dock, trackpad, Finder, screenshot, menu bar, NSGlobalDomain)
+- [x] Homebrew CLI formulae migrated to nix `home.packages`
+- [x] Fastfetch config inlined via `programs.fastfetch.settings`
+- [x] Agenix secrets management (flake input, HM module, test secret verified)
+- [x] Fonts managed via nix `home.packages` (nerd fonts, iosevka, fira-code, etc.)
+- [x] All Homebrew casks declared — `homebrew.onActivation.cleanup = "zap"` enabled
 
 #### Next Steps (priority order)
 
-- [ ] macOS system defaults (dock layout/size, keyboard repeat rate, trackpad settings, Finder preferences, NSGlobalDomain) — these are one-time declarations in `hosts/darwin/default.nix` via `system.defaults`
-- [ ] Migrate remaining Homebrew CLI formulae to nix `home.packages` — run `brew leaves` to find what's not yet declared
 - [ ] SSH config via `programs.ssh` in home-manager
-- [ ] Declare all Homebrew casks — then enable `homebrew.onActivation.cleanup = "zap"`
-- [ ] Secrets management (agenix or sops-nix) for SSH keys, API tokens
 - [ ] Editor configs: Zed, Neovim, Helix — via their respective HM modules
 - [ ] Additional app configs as HM modules exist (tmux, mpv, etc.)
+- [ ] Real secrets via agenix (API tokens, SSH keys — currently only a test secret)
 - [ ] Desktop wallpaper (nix-darwin can manage this)
-- [ ] Fonts (declarative via home-manager or nix-darwin)
 - [ ] Auto-update via launchd agent (nix flake update + rebuild on schedule)
 - [ ] NixOS host config when a target Linux machine is available
 - [ ] Retire chezmoi entirely (remove from packages, delete `~/.local/share/chezmoi`)
+- [ ] Remove old `~/.gitconfig` (HM-managed config at `~/.config/git/config` is authoritative)
+- [ ] Uninstall leftover Homebrew CLI formulae that are now nix packages (`brew leaves` still shows ~127)
 
 #### Hard Boundaries (can't fully nix-ify)
 
@@ -93,10 +108,11 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 
 ### Important Context
 
-- The old `.gitconfig` at `~/.gitconfig` still exists alongside the HM-managed `~/.config/git/config`. Git reads both. It should be removed once the user is confident in the nix config.
-- `atuin.toml` in the repo root is a reference copy. The actual atuin config is generated by `programs.atuin.settings` in the shared module. The reference file can be removed once no longer needed.
+- The old `.gitconfig` at `~/.gitconfig` still exists alongside the HM-managed `~/.config/git/config`. Git reads both. It should be removed once confident in the nix config.
 - Ghostty is installed via Homebrew cask on macOS (so `package = null` in the HM module) but would be installed via nixpkgs on NixOS.
 - The flake currently pins `nixpkgs-unstable`. This is intentional for access to latest packages.
+- Apple-proprietary fonts (SF Mono, SF Pro) remain as Homebrew casks since they're not in nixpkgs.
+- Some upstream nixpkgs packages are currently broken on aarch64-darwin and commented out: `cava` (unity-test build failure), `poetry` (rapidfuzz atomics failure), `gossip` (SDL2/CMake conflict). Revisit after `nix flake update`.
 
 ### Style Notes
 
