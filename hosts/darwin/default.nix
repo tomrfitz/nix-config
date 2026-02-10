@@ -132,7 +132,6 @@ in
       "iterm2"
 
       # editors / writing
-      "codexbar"
       "db-browser-for-sqlite"
       "lapce"
       "nvalt"
