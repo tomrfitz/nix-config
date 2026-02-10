@@ -109,7 +109,7 @@
     figlet
     fortune
     pipes
-    cava
+    # cava  # broken on aarch64-darwin (unity-test build failure) — revisit later
     mufetch
   ];
 
