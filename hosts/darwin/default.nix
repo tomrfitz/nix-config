@@ -2,11 +2,9 @@
   config,
   pkgs,
   agenix,
+  user,
   ...
 }:
-let
-  user = "tomrfitz";
-in
 {
   system.stateVersion = 5;
   system.primaryUser = user;

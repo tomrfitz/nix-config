@@ -28,12 +28,9 @@
 
   home.sessionPath = [
     "$HOME/.juliaup/bin"
-    "$HOME/flutter/bin"
     "$HOME/.config/emacs/bin"
-    "$HOME/.atuin/bin"
     "$HOME/vcpkg"
     "$HOME/.cache/.bun/bin"
-    "$HOME/.opencode/bin"
   ];
 
   # ── macOS-specific zsh config ──────────────────────────────────────────
@@ -104,20 +101,20 @@
     '';
   };
 
-  # ── Git: macOS-specific (1Password SSH signing, brew gh credential) ────
+  # ── Git: macOS-specific (1Password SSH signing, gh credential) ──────
   programs.git.settings = {
     gpg.ssh.program = "/Applications/1Password.app/Contents/MacOS/op-ssh-sign";
     credential = {
       "https://github.com" = {
         helper = [
           ""
-          "!/opt/homebrew/bin/gh auth git-credential"
+          "!${pkgs.gh}/bin/gh auth git-credential"
         ];
       };
       "https://gist.github.com" = {
         helper = [
           ""
-          "!/opt/homebrew/bin/gh auth git-credential"
+          "!${pkgs.gh}/bin/gh auth git-credential"
         ];
       };
     };
@@ -128,6 +125,20 @@
     extraOptions = {
       AddKeysToAgent = "yes";
       IdentityAgent = "\"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock\"";
+    };
+  };
+
+  # ── Topgrade: macOS-specific (brew, nix-darwin rebuild) ────────────────
+  programs.topgrade.settings = {
+    commands = {
+      "Nix Flake Update + Darwin Rebuild" =
+        "cd ~/nixos-config && nix flake update && sudo darwin-rebuild switch --flake .#tomrfitz";
+    };
+    brew = {
+      greedy_latest = true;
+      greedy_auto_updates = true;
+      autoremove = true;
+      fetch_head = true;
     };
   };
 

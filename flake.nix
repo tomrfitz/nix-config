@@ -31,7 +31,7 @@
     {
       darwinConfigurations.tomrfitz = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
-        specialArgs = { inherit agenix; };
+        specialArgs = { inherit agenix user; };
         modules = [
           ./hosts/darwin
           home-manager.darwinModules.home-manager

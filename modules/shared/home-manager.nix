@@ -47,6 +47,10 @@
 
     # python tools
     # poetry  # broken on aarch64-darwin (rapidfuzz atomics failure) — revisit later
+    ruff
+    ty
+    beets
+    termdown
     virtualenv
 
     # nix tooling
@@ -101,6 +105,8 @@
     mailsy
     gemini-cli
     powershell
+    cargo-update
+    cargo-cache
     # gossip  # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
 
     # fun
@@ -133,7 +139,6 @@
     XDG_CACHE_HOME = "$HOME/.cache";
     XDG_DATA_HOME = "$HOME/.local/share";
     XDG_STATE_HOME = "$HOME/.local/state";
-    EZA_CONFIG_DIR = "$HOME/.config/eza/";
     VCPKG_ROOT = "$HOME/vcpkg";
     OLLAMA_GPU_LAYERS = "-1";
     OLLAMA_KEEP_ALIVE = "5m";
@@ -256,7 +261,6 @@
       };
       init.defaultBranch = "main";
       core = {
-        excludesfile = "~/.gitignore";
         preloadindex = true;
         fscache = true;
       };
@@ -631,6 +635,9 @@
     };
   };
 
+  # Ensure the SSH ControlPath directory exists
+  home.file.".ssh/sockets/.keep".text = "";
+
   programs.home-manager.enable = true;
 
   # ── Topgrade ──────────────────────────────────────────────────────────
@@ -643,23 +650,12 @@
         cleanup = true;
         skip_notify = true;
         no_retry = true;
-        no_self_update = false;
-      };
-      commands = {
-        "Nix Flake Update + Darwin Rebuild" =
-          "cd ~/nixos-config && nix flake update && sudo darwin-rebuild switch --flake .#tomrfitz";
-      };
-      brew = {
-        greedy_latest = true;
-        greedy_auto_updates = true;
-        autoremove = true;
-        fetch_head = true;
+        no_self_update = true;
       };
       git = {
         max_concurrency = 2;
         repos = [
           "~/Developer/*"
-          "~/.config/*"
         ];
       };
       containers = {

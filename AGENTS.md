@@ -105,8 +105,9 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 - [ ] NixOS host config when a target Linux machine is available
 - [ ] Retire chezmoi entirely (remove from packages, delete `~/.local/share/chezmoi`)
 - [ ] Remove old `~/.gitconfig` (HM-managed config at `~/.config/git/config` is authoritative)
-- [ ] Clean up old dotfiles (LazyVim at `~/.config/nvim/`, topgrade backup, helix `.hm-backup` files)
+- [ ] Clean up old dotfiles (topgrade backup, helix `.hm-backup` files)
 - [ ] Uninstall leftover Homebrew CLI formulae that are now nix packages (`brew leaves` still shows ~127)
+- [ ] Rename repo from `nixos-config` to `nix-config` (it's primarily nix-darwin, not NixOS)
 
 #### Hard Boundaries (can't fully nix-ify)
 
