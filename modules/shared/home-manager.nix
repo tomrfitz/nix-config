@@ -100,7 +100,7 @@
     spotifyd
     mailsy
     gemini-cli
-    gossip
+    # gossip  # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
 
     # fun
     _2048-in-terminal
