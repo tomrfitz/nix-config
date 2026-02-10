@@ -7,6 +7,18 @@
 {
   home.homeDirectory = lib.mkForce "/Users/tomrfitz";
 
+  # ── macOS-specific packages ────────────────────────────────────────────
+  home.packages = with pkgs; [
+    emacs
+    mas
+    swiftformat
+    swiftlint
+    bun
+    opencode
+    turso
+    container
+  ];
+
   # ── macOS-specific session variables ───────────────────────────────────
   home.sessionVariables = {
     OBSD = "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian/";

@@ -15,16 +15,45 @@
     nodejs
     python3
     deno
+    dart
+    elixir
+    lua
+    php
+    zig
+    vlang
+    c3c
+    openjdk
+    typst
+    nasm
 
     # build tools
     cmake
     gnumake
     ninja
     bear
+    automake
+    autoconf-archive
+    ccache
+    clang-tools
+    cppcheck
+    doxygen
+    boost
+    rapidjson
+    raylib
+    libffi
+    gst_all_1.gstreamer
+    qt6Packages.qtbase
+    wxGTK32
+
+    # python tools
+    poetry
+    virtualenv
 
     # nix tooling
     nixd
     nil
+    nixfmt
+    alejandra
 
     # utilities
     coreutils
@@ -32,6 +61,56 @@
     curl
     wget
     tree
+    gnused
+    gnutar
+    gnugrep
+    gawk
+    aria2
+    duf
+    dust
+    git-filter-repo
+    iperf3
+    inetutils
+    pandoc
+    pass
+    pdfgrep
+    shellcheck
+    shfmt
+    silver-searcher
+    speedtest-cli
+    stow
+    streamlink
+    texinfo
+    tldr
+    tmux
+    ansifilter
+    fontforge
+    termshot
+    lf
+    lsd
+    micro
+    kakoune
+    witr
+    todo-txt-cli
+    timewarrior
+    taskwarrior-tui
+    texlivePackages.latexindent
+    gtypist
+    ncspot
+    spotifyd
+    mailsy
+    gemini-cli
+    gossip
+
+    # fun
+    _2048-in-terminal
+    cbonsai
+    cowsay
+    figlet
+    fortune
+    pipes
+    cava
+    mufetch
   ];
 
   # ── Session environment ────────────────────────────────────────────────
