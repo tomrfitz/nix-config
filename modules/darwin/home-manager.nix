@@ -7,6 +7,10 @@
 {
   home.homeDirectory = lib.mkForce "/Users/tomrfitz";
 
+  # ── Copy .app bundles so Spotlight can index them ────────────────────
+  targets.darwin.linkApps.enable = false;
+  targets.darwin.copyApps.enable = true;
+
   # ── macOS-specific packages ────────────────────────────────────────────
   home.packages = with pkgs; [
     emacs
@@ -36,7 +40,7 @@
   # ── macOS-specific zsh config ──────────────────────────────────────────
   programs.zsh = {
     shellAliases = {
-      regossip = "cd ~/gossip && git pull && RUSTFLAGS=\"-C target-cpu=native --cfg tokio_unstable\" cargo build --release --features=lang-cjk && strip ./target/release/gossip && ./target/release/gossip";
+      regossip = "mkdir -p ~/gossip && cd ~/gossip && git pull && RUSTFLAGS=\"-C target-cpu=native --cfg tokio_unstable\" cargo build --release --features=lang-cjk && strip ./target/release/gossip && ./target/release/gossip";
       code = "open -b com.microsoft.vscode";
       ytm = "z pear && pnpm start";
     };
@@ -130,9 +134,15 @@
 
   # ── Topgrade: macOS-specific (brew, nix-darwin rebuild) ────────────────
   programs.topgrade.settings = {
+    pre_commands = {
+      "Snapshot current system" = "readlink -f /run/current-system > /tmp/.nix-pre-update-system";
+    };
     commands = {
       "Nix Flake Update + Darwin Rebuild" =
-        "cd ~/nixos-config && nix flake update && sudo darwin-rebuild switch --flake .#tomrfitz";
+        "cd ~/nix-config && nix flake update && sudo darwin-rebuild switch --flake .#tomrfitz";
+    };
+    post_commands = {
+      "Nix package diff" = "nvd diff $(cat /tmp/.nix-pre-update-system) /run/current-system; rm -f /tmp/.nix-pre-update-system";
     };
     brew = {
       greedy_latest = true;

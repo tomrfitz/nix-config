@@ -7,7 +7,7 @@ Thomas FitzGerald (`tomrfitz`) — macOS (aarch64-darwin), with plans for NixOS 
 ## Build & Apply
 
 ```sh
-cd ~/nixos-config
+cd ~/nix-config
 sudo nix run nix-darwin -- switch --flake .#tomrfitz
 ```
 
@@ -43,7 +43,7 @@ When deciding where to install something, prefer in this order:
 
 1. **Cross-platform nixpkg** (in `modules/shared/`) — best for reproducibility
 2. **Darwin-only nixpkg** (in `modules/darwin/`) — when the package only makes sense on macOS
-3. **Homebrew cask** (in `hosts/darwin/`) — for macOS GUI apps not in nixpkgs
+3. **cask** (in `hosts/darwin/`) — for macOS GUI apps not in nixpkgs
 4. **Mac App Store via mas** — for apps only available there
 
 ## Project Goals
@@ -107,7 +107,7 @@ A single nix flake that fully declares the user environment for both macOS (nix-
 - [ ] Remove old `~/.gitconfig` (HM-managed config at `~/.config/git/config` is authoritative)
 - [ ] Clean up old dotfiles (topgrade backup, helix `.hm-backup` files)
 - [ ] Uninstall leftover Homebrew CLI formulae that are now nix packages (`brew leaves` still shows ~127)
-- [ ] Rename repo from `nixos-config` to `nix-config` (it's primarily nix-darwin, not NixOS)
+- [x] Rename repo from `nixos-config` to `nix-config` (it's primarily nix-darwin, not NixOS)
 
 #### Hard Boundaries (can't fully nix-ify)
 
