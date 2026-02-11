@@ -4,6 +4,10 @@
   lib,
   ...
 }:
+let
+  fullName = "Thomas FitzGerald";
+  email = "tomrfitz@gmail.com";
+in
 {
   # ── Git ────────────────────────────────────────────────────────────────
   programs.git = {
@@ -24,8 +28,8 @@
 
     settings = {
       user = {
-        name = "Thomas FitzGerald";
-        email = "tomrfitz@gmail.com";
+        name = fullName;
+        inherit email;
       };
       init.defaultBranch = "main";
       core = {
@@ -69,8 +73,8 @@
     enable = true;
     settings = {
       user = {
-        name = "Thomas FitzGerald";
-        email = "tomrfitz@gmail.com";
+        name = fullName;
+        inherit email;
       };
     };
   };

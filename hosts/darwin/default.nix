@@ -9,6 +9,10 @@
   system.stateVersion = 5;
   system.primaryUser = user;
 
+  networking.hostName = "trfmbp";
+  networking.localHostName = "trfmbp";
+  networking.computerName = "trfmbp";
+
   users.users.${user} = {
     name = user;
     home = "/Users/${user}";
@@ -29,13 +33,18 @@
   # ── Homebrew (GUI apps & fonts not in nixpkgs) ────────────────────────
   homebrew = {
     enable = true;
-    onActivation.autoUpdate = true;
-    onActivation.cleanup = "zap";
+    onActivation.autoUpdate = false;
+    onActivation.upgrade = false;
+    onActivation.cleanup = "uninstall";
 
     taps = [
       "nikitabobko/tap" # aerospace
       "krtirtho/apps" # spotube
       "neved4/tap" # pear
+    ];
+
+    brews = [
+      "mole"
     ];
 
     casks = [
@@ -60,7 +69,6 @@
       "ghostty"
       "jetbrains-toolbox"
       "xcodes-app"
-      "zed"
 
       # communication
       "discord"

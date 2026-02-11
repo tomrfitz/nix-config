@@ -122,6 +122,8 @@
     # fonts (migrated from Homebrew casks)
     aporetic
     atkinson-hyperlegible-mono
+    atkinson-hyperlegible
+    atkinson-hyperlegible-next
     fira-code
     nerd-fonts.hack
     iosevka-bin
