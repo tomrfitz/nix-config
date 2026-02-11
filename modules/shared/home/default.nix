@@ -12,6 +12,7 @@
     ./firefox.nix
     ./fastfetch.nix
     ./editors.nix
+    ./ghostty.nix
   ];
 
   home.stateVersion = "24.11";
@@ -34,26 +35,6 @@
     "$HOME/.local/bin"
     "$HOME/go/bin"
   ];
-
-  # ── Ghostty ────────────────────────────────────────────────────────────
-  programs.ghostty = {
-    enable = true;
-    enableZshIntegration = true;
-    settings = {
-      theme = "light:Flexoki Light,dark:Flexoki Dark";
-      quit-after-last-window-closed = false;
-      clipboard-read = "allow";
-      clipboard-write = "allow";
-      window-padding-balance = true;
-      window-theme = "system";
-      window-height = 36;
-      window-width = 130;
-      bold-is-bright = true;
-      cursor-style = "bar";
-      font-thicken = true;
-      font-family = "Atkinson Hyperlegible Mono";
-    };
-  };
 
   # ── Other programs with native modules ─────────────────────────────────
   programs.alacritty.enable = true;
@@ -126,6 +107,6 @@
   # ── Agenix secrets ───────────────────────────────────────────────────
   age.identityPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519_agenix" ];
   age.secrets = {
-    test-secret.file = ../../secrets/test-secret.age;
+    test-secret.file = ../../../secrets/test-secret.age;
   };
 }

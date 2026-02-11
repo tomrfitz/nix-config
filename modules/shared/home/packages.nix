@@ -7,6 +7,8 @@
 {
   # ── Packages (things without a dedicated programs.* module) ────────────
   home.packages = with pkgs; [
+    opencode
+
     # dev toolchains
     rustup
     go
@@ -20,9 +22,12 @@
     zig
     vlang
     c3c
+    c3-lsp
     openjdk
     typst
     nasm
+    bun
+    turso
 
     # build tools
     cmake
@@ -84,6 +89,8 @@
     speedtest-cli
     stow
     streamlink
+    swiftlint
+    swiftformat
     texinfo
     tldr
     ansifilter
@@ -100,13 +107,11 @@
     texlive.combined.scheme-full
     gtypist
     ncspot
-    spotifyd
     mailsy
     gemini-cli
     powershell
     cargo-update
     cargo-cache
-    zed-editor
     # gossip  # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
 
     # fun
