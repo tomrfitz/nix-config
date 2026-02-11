@@ -31,53 +31,54 @@
     }:
     let
       user = "tomrfitz";
+
+      mkHM = hmModules: {
+        home-manager = {
+          useGlobalPkgs = true;
+          useUserPackages = true;
+          backupFileExtension = "hm-backup";
+          extraSpecialArgs = { inherit ghostty; };
+          users.${user}.imports = [ agenix.homeManagerModules.default ] ++ hmModules;
+        };
+      };
     in
     {
       darwinConfigurations.trfmbp = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
         specialArgs = { inherit agenix ghostty user; };
         modules = [
-          ./hosts/darwin
+          ./hosts/trfmbp
           home-manager.darwinModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              backupFileExtension = "hm-backup";
-              extraSpecialArgs = { inherit ghostty; };
-              users.${user} = {
-                imports = [
-                  agenix.homeManagerModules.default
-                  ./modules/shared/home-manager.nix
-                  ./modules/darwin/home-manager.nix
-                ];
-              };
-            };
-          }
+          (mkHM [
+            ./modules/shared/home
+            ./modules/darwin/home
+          ])
         ];
       };
 
       nixosConfigurations.trfnix = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
-        specialArgs = { inherit ghostty; };
+        specialArgs = { inherit ghostty user; };
         modules = [
-          ./hosts/nixos
+          ./hosts/trfnix
           home-manager.nixosModules.home-manager
-          {
-            home-manager = {
-              useGlobalPkgs = true;
-              useUserPackages = true;
-              backupFileExtension = "hm-backup";
-              extraSpecialArgs = { inherit ghostty; };
-              users.${user} = {
-                imports = [
-                  agenix.homeManagerModules.default
-                  ./modules/shared/home-manager.nix
-                  ./modules/nixos/home-manager.nix
-                ];
-              };
-            };
-          }
+          (mkHM [
+            ./modules/shared/home
+            ./modules/nixos/home
+          ])
+        ];
+      };
+
+      nixosConfigurations.trfhomelab = nixpkgs.lib.nixosSystem {
+        system = "x86_64-linux";
+        specialArgs = { inherit ghostty user; };
+        modules = [
+          ./hosts/trfhomelab
+          home-manager.nixosModules.home-manager
+          (mkHM [
+            ./modules/shared/home
+            ./modules/nixos/home
+          ])
         ];
       };
     };
