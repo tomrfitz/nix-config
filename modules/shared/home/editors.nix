@@ -220,6 +220,9 @@
         toggle_on_modifiers_press.shift = true;
       };
       languages = {
+        Markdown = {
+          soft_wrap = "none";
+        };
         Nix = {
           preferred_line_length = 100;
           tab_size = 2;
