@@ -8,7 +8,7 @@ Thomas FitzGerald (`tomrfitz`) — macOS (aarch64-darwin), with plans for NixOS 
 
 ```sh
 cd ~/nix-config
-sudo nix run nix-darwin -- switch --flake .#tomrfitz
+sudo darwin-rebuild switch
 ```
 
 Rollback: `sudo darwin-rebuild switch --rollback`

@@ -15,6 +15,9 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    ghostty = {
+      url = "github:ghostty-org/ghostty";
+    };
   };
 
   outputs =
@@ -24,14 +27,15 @@
       nix-darwin,
       home-manager,
       agenix,
+      ghostty,
     }:
     let
       user = "tomrfitz";
     in
     {
-      darwinConfigurations.tomrfitz = nix-darwin.lib.darwinSystem {
+      darwinConfigurations.trfmbp = nix-darwin.lib.darwinSystem {
         system = "aarch64-darwin";
-        specialArgs = { inherit agenix user; };
+        specialArgs = { inherit agenix ghostty user; };
         modules = [
           ./hosts/darwin
           home-manager.darwinModules.home-manager
@@ -40,6 +44,7 @@
               useGlobalPkgs = true;
               useUserPackages = true;
               backupFileExtension = "hm-backup";
+              extraSpecialArgs = { inherit ghostty; };
               users.${user} = {
                 imports = [
                   agenix.homeManagerModules.default
@@ -52,8 +57,9 @@
         ];
       };
 
-      nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
+      nixosConfigurations.trfnix = nixpkgs.lib.nixosSystem {
         system = "x86_64-linux";
+        specialArgs = { inherit ghostty; };
         modules = [
           ./hosts/nixos
           home-manager.nixosModules.home-manager
@@ -62,6 +68,7 @@
               useGlobalPkgs = true;
               useUserPackages = true;
               backupFileExtension = "hm-backup";
+              extraSpecialArgs = { inherit ghostty; };
               users.${user} = {
                 imports = [
                   agenix.homeManagerModules.default

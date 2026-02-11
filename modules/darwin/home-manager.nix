@@ -139,7 +139,7 @@
     };
     commands = {
       "Nix Flake Update + Darwin Rebuild" =
-        "cd ~/nix-config && nix flake update && sudo darwin-rebuild switch --flake .#tomrfitz";
+        "cd ~/nix-config && nix flake update && sudo darwin-rebuild switch";
     };
     post_commands = {
       "Nix package diff" = "nvd diff $(cat /tmp/.nix-pre-update-system) /run/current-system; rm -f /tmp/.nix-pre-update-system";
