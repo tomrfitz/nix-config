@@ -15,31 +15,31 @@
 
 ### Mac App Store
 
-| App       | MAS ID     | Notes                    |
-| --------- | ---------- | ------------------------ |
-| Axonium   | 6756084985 | Add to masApps           |
-| Xcode     | 497799835  | Add to masApps           |
-| iA Writer | ?          | Check MAS ID and add     |
+| App   | MAS ID    | Notes          |
+| ----- | --------- | -------------- |
+| Xcode | 497799835 | Add to masApps |
+
+- [ ] Look into using xcodes to manage xcode versions declaratively. I only need the most recent major version
 
 ### /Applications (not in casks, MAS, or nix)
 
-| App                                  | Source          | Action                                                        |
-| ------------------------------------ | --------------- | ------------------------------------------------------------- |
-| FlixorMac.app                        | Unknown         | Add to casks or remove                                        |
-| Google Docs/Sheets/Slides            | Chrome PWAs     | No action needed                                              |
-| Subway Builder.app                   | Unknown         | Add to casks or remove                                        |
-| Pear Desktop.app (fka YouTube Music) | Manual install  | No cask available — renamed for legal reasons, brew cask gone |
+| App                                  | Source         | Action                                                        |
+| ------------------------------------ | -------------- | ------------------------------------------------------------- |
+| FlixorMac.app                        | Unknown        | Add to casks or remove                                        |
+| Google Docs/Sheets/Slides            | Chrome PWAs    | No action needed                                              |
+| Subway Builder.app                   | Unknown        | Add to casks or remove                                        |
+| Pear Desktop.app (fka YouTube Music) | Manual install | No cask available — renamed for legal reasons, brew cask gone |
 
 ## Launch Agents / Daemons
 
 ### User Launch Agents (`~/Library/LaunchAgents/`)
 
-| Agent                                    | Status    | Notes                                                           |
-| ---------------------------------------- | --------- | --------------------------------------------------------------- |
+| Agent                                    | Status    | Notes                                                               |
+| ---------------------------------------- | --------- | ------------------------------------------------------------------- |
 | `Handy`                                  | Running   | Starts `/Applications/Handy.app` at login. Could use launchd.agents |
-| `com.riot.riotclient.checkinstalls`      | Installed | Riot/League auto-updater — app-managed, leave as-is             |
-| `com.valvesoftware.steamclean`           | Installed | Steam cleanup — app-managed, leave as-is                        |
-| `org.nix-community.home.activate-agenix` | Installed | Managed by HM agenix module — leave as-is                      |
+| `com.riot.riotclient.checkinstalls`      | Installed | Riot/League auto-updater — app-managed, leave as-is                 |
+| `com.valvesoftware.steamclean`           | Installed | Steam cleanup — app-managed, leave as-is                            |
+| `org.nix-community.home.activate-agenix` | Installed | Managed by HM agenix module — leave as-is                           |
 
 ### Login Items (macOS System Settings)
 
