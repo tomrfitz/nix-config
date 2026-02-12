@@ -28,6 +28,7 @@
     nasm
     bun
     turso
+    xcodes
 
     # build tools
     cmake
@@ -47,6 +48,17 @@
     gst_all_1.gstreamer
     qt6Packages.qtbase
     wxGTK32
+
+    # go tools
+    delve
+    gopls
+    gotests
+    impl
+    go-tools # staticcheck
+
+    # node tools
+    nodePackages.prettier
+    nodePackages.yarn
 
     # python tools
     # poetry  # broken on aarch64-darwin (rapidfuzz atomics failure) — revisit later

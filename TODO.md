@@ -9,26 +9,25 @@
 - [ ] Auto-update via launchd agent (nix flake update + rebuild on schedule)
 - [ ] NixOS host config when a target Linux machine is available
 - [ ] Login items — investigate declaring startup apps via `launchd.agents`
-- [ ] Uninstall leftover Homebrew CLI formulae (`brew leaves` to audit)
+- [ ] Audit imperatively installed cargo packages (`rana`, `sgram-tui`) — package in nix or keep in cargo
 
 ## Undeclared Apps
 
-### Mac App Store
-
-| App   | MAS ID    | Notes          |
-| ----- | --------- | -------------- |
-| Xcode | 497799835 | Add to masApps |
-
-- [ ] Look into using xcodes to manage xcode versions declaratively. I only need the most recent major version
-
 ### /Applications (not in casks, MAS, or nix)
 
-| App                                  | Source         | Action                                                        |
-| ------------------------------------ | -------------- | ------------------------------------------------------------- |
-| FlixorMac.app                        | Unknown        | Add to casks or remove                                        |
-| Google Docs/Sheets/Slides            | Chrome PWAs    | No action needed                                              |
-| Subway Builder.app                   | Unknown        | Add to casks or remove                                        |
-| Pear Desktop.app (fka YouTube Music) | Manual install | No cask available — renamed for legal reasons, brew cask gone |
+| App                                         | Source         | Action                                                        |
+| ------------------------------------------- | -------------- | ------------------------------------------------------------- |
+| FlixorMac.app                               | Unknown        | Add to casks or remove                                        |
+| Google Docs/Sheets/Slides                   | Chrome PWAs    | No action needed                                              |
+| Subway Builder.app                          | Unknown        | Add to casks or remove                                        |
+| Pear Desktop.app (fka YouTube Music)        | Manual install | No cask available — renamed for legal reasons, brew cask gone |
+| TinkerTool.app / BresinkSoftwareUpdater.app | Manual install | No cask available — manual install only                       |
+
+### Post-Bootstrap Manual Steps
+
+- [ ] Install Xcode via `xcodes install --latest` (requires Apple ID auth, can't be fully declarative)
+- [ ] Sign into Apple ID for Mac App Store apps
+- [ ] Sign into 1Password, Google Drive, iCloud
 
 ## Launch Agents / Daemons
 
@@ -92,3 +91,10 @@ declared via `launchd.agents` in home-manager instead.
 - [x] Removed stale apps (TickTick, Surf, Surf 2)
 - [x] Removed Warp from login items
 - [x] PATH cleanup (removed broken yarn segment, consolidated sessionPath)
+- [x] Brew leaves audited — all are emacs-plus build deps, not leftovers
+- [x] Go tools declared in nix (delve, gopls, gotests, impl, go-tools)
+- [x] Node tools declared in nix (prettier, yarn)
+- [x] Mist and Microsoft Office added to casks
+- [x] xcodes CLI added to nix packages (Xcode managed via `xcodes install`)
+- [x] Axonium, iA Writer dropped (not needed)
+- [x] Imperative install audit complete

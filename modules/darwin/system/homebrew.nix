@@ -58,8 +58,9 @@
       "claude-code"
       "codex"
       "copilot-cli"
-      "obsidian"
+      "microsoft-office"
       "notesnook"
+      "obsidian"
 
       # media
       "audacity"
@@ -92,6 +93,7 @@
       "loop"
       "maccy"
       "macs-fan-control"
+      "mist"
       "mullvad-vpn"
       "netnewswire"
       "ollama-app"
