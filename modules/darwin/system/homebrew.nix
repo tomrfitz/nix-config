@@ -14,7 +14,6 @@
     ];
 
     brews = [
-      "emacs-plus@31"
       "mole"
     ];
 
@@ -40,6 +39,7 @@
       "ghostty"
       "jetbrains-toolbox"
       "xcodes-app"
+      "emacs-plus-app"
 
       # communication
       "discord"
