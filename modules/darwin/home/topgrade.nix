@@ -2,11 +2,8 @@
 {
   programs.topgrade.settings = {
     pre_commands = {
-      "Snapshot current system" = "readlink -f /run/current-system > /tmp/.nix-pre-update-system";
-    };
-    commands = {
       "Nix Flake Update + Darwin Rebuild" =
-        "nix flake update --flake ~/nix-config && sudo darwin-rebuild switch";
+        "readlink -f /run/current-system > /tmp/.nix-pre-update-system && nix flake update --flake ~/nix-config && sudo darwin-rebuild switch";
     };
     post_commands = {
       "Nix package diff" =
