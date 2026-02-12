@@ -80,7 +80,7 @@
         inactive_opacity = 1.0;
         border_size = 0.0;
       };
-      use_system_window_tabs = false;
+      use_system_window_tabs = true;
       soft_wrap = "preferred_line_length";
       preferred_line_length = 80;
       lsp_document_colors = "inlay";
