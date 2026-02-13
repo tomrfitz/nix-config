@@ -1,14 +1,12 @@
 {
   pkgs,
-  ghostty,
   ...
 }:
 {
   programs.ghostty = {
     enable = true;
     enableZshIntegration = true;
-    package =
-      if pkgs.stdenv.isDarwin then null else ghostty.packages.${pkgs.stdenv.hostPlatform.system}.default;
+    package = if pkgs.stdenv.isDarwin then null else pkgs.ghostty;
     settings = {
       theme = "light:Flexoki Light,dark:Flexoki Dark";
       quit-after-last-window-closed = false;
