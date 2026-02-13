@@ -30,38 +30,33 @@
       [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
       [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
-      # Journal note function (syncs to Obsidian on macOS)
+      # Journal note function (writes directly to Obsidian vault)
       jn() {
         local ts fn
         ts="## [$(date +%H:%M:%S)]"
         fn="$(date +%F).md"
 
-        local local_file="$HOME/notes/$fn"
-        local obsidian_dir="$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian/Journal/Daily"
+        local obsidian_dir="''${OBSD}Journal/Daily"
         local obsidian_file="$obsidian_dir/$fn"
 
-        mkdir -p "$HOME/notes" "$obsidian_dir"
+        mkdir -p "$obsidian_dir"
 
         if [ $# -gt 0 ]; then
           {
             echo -e "$ts"
             echo "$*"
             echo
-          } >>"$local_file"
+          } >>"$obsidian_file"
         else
           echo "Start typing your note. Press Ctrl+D when finished:"
           {
             echo -e "$ts"
             cat
             echo
-          } >>"$local_file"
+          } >>"$obsidian_file"
         fi
 
-        if rsync -a "$local_file" "$obsidian_file"; then
-          echo "Saved to $local_file and synced to Obsidian."
-        else
-          echo "⚠️  Saved locally, but sync to Obsidian failed."
-        fi
+        echo "Saved to $obsidian_file"
       }
     '';
   };
