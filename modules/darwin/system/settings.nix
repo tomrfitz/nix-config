@@ -8,10 +8,13 @@
       AppleMeasurementUnits = "Centimeters";
       AppleMetricUnits = 1;
       AppleTemperatureUnit = "Celsius";
+      AppleWindowTabbingMode = "always";
       NSAutomaticCapitalizationEnabled = true;
       NSAutomaticPeriodSubstitutionEnabled = true;
       NSTableViewDefaultSizeMode = 2;
       "com.apple.sound.beep.feedback" = 1;
+      "com.apple.springing.delay" = 0.5;
+      "com.apple.springing.enabled" = true;
       "com.apple.trackpad.forceClick" = true;
     };
 
@@ -26,6 +29,21 @@
       mru-spaces = false;
       orientation = "bottom";
       show-recents = true;
+      showAppExposeGestureEnabled = true;
+      showhidden = true;
+
+      persistent-apps = [
+        { app = "/System/Applications/Apps.app"; }
+        { app = "/System/Applications/System Settings.app"; }
+        { app = "/Users/${user}/Applications/Home Manager Apps/Zotero.app"; }
+        { app = "/Users/${user}/Applications/Home Manager Apps/Obsidian.app"; }
+        { app = "/Users/${user}/Applications/Home Manager Apps/YouTube Music.app"; }
+        { app = "/System/Applications/Messages.app"; }
+        { app = "/System/Applications/Mail.app"; }
+        { app = "/Applications/Twilight.app"; }
+        { app = "/Applications/Ghostty.app"; }
+        { app = "/Users/${user}/Applications/Home Manager Apps/Zed.app"; }
+      ];
 
       # Hot corners
       # 5 = Start Screen Saver, 12 = Notification Center, 14 = Quick Note
@@ -38,6 +56,7 @@
     finder = {
       _FXShowPosixPathInTitle = true;
       FXPreferredViewStyle = "clmv";
+      FXRemoveOldTrashItems = true;
       ShowExternalHardDrivesOnDesktop = true;
       ShowHardDrivesOnDesktop = false;
       ShowMountedServersOnDesktop = true;
@@ -82,14 +101,63 @@
       ShowSeconds = true;
     };
 
-    # ── .DS_Store on network drives ──────────────────────────────────────
+    # ── Universal access ──────────────────────────────────────────────────
+    universalaccess = {
+      closeViewScrollWheelToggle = true; # Ctrl+scroll to zoom
+    };
+
+    # ── Custom preferences (no typed nix-darwin options) ─────────────────
     CustomUserPreferences = {
+      # Extra NSGlobalDomain keys without typed nix-darwin options
+      NSGlobalDomain = {
+        AppleLanguages = [
+          "en-US"
+          "it-US"
+          "ko-US"
+          "fr-US"
+          "es-US"
+          "zh-Hans-US"
+        ];
+        AppleLocale = "en_US@calendar=iso8601";
+        AppleFirstWeekday = {
+          gregorian = 2;
+        }; # Monday
+        AppleICUDateFormatStrings = {
+          "1" = "yyyy-MM-dd";
+          "2" = "yyyy-MM-dd 'Week' W";
+          "3" = "yyyy-MM-dd 'Week' W, EEEE";
+          "4" = "yyyy-MM-dd'T'HH:mm:ss";
+        };
+      };
+      "com.apple.dock" = {
+        "recent-count" = 5;
+      };
       "com.apple.desktopservices" = {
         DSDontWriteNetworkStores = true;
       };
       "com.apple.controlcenter" = {
         # 1 = In Full Screen Only
         AutoHideMenuBarOption = 1;
+      };
+      "com.apple.WindowManager" = {
+        EnableTiledWindowMargins = false; # No gaps between tiled windows
+        HideDesktop = true; # Hide desktop when clicking wallpaper
+        AppWindowGroupingBehavior = true; # Group windows by app
+      };
+      "com.apple.Safari" = {
+        AutoFillFromAddressBook = false;
+        AutoFillPasswords = false;
+        AutoFillFromiCloudKeychain = false;
+        AutoFillMiscellaneousForms = false;
+        EnableNarrowTabs = true; # Compact tab bar
+        SearchProviderShortName = "Google";
+        ShowSidebarInNewWindows = false;
+      };
+      "com.apple.finder" = {
+        ShowSidebar = true;
+      };
+      "com.apple.spaces" = {
+        "spans-displays" = false; # Independent spaces per display
       };
     };
   };

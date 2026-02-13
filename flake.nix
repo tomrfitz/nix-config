@@ -15,6 +15,10 @@
       url = "github:ryantm/agenix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    defaults2nix = {
+      url = "github:joshryandavis/defaults2nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -24,6 +28,7 @@
       nix-darwin,
       home-manager,
       agenix,
+      defaults2nix,
     }:
     let
       user = "tomrfitz";
@@ -75,6 +80,11 @@
             ./modules/nixos/home
           ])
         ];
+      };
+
+      # ── Dev shell (defaults2nix for macOS settings snapshots) ────────
+      devShells.aarch64-darwin.default = nixpkgs.legacyPackages.aarch64-darwin.mkShell {
+        packages = [ defaults2nix.packages.aarch64-darwin.default ];
       };
     };
 }
