@@ -63,6 +63,7 @@
       "tombi"
       "toml"
       "typst"
+      "powershell"
     ];
 
     userSettings = {
