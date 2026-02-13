@@ -10,7 +10,6 @@
       "d12frosted/emacs-plus" # emacs-plus
       "nikitabobko/tap" # aerospace
       "krtirtho/apps" # spotube
-      "neved4/tap" # pear
     ];
 
     brews = [
@@ -20,10 +19,7 @@
     casks = [
       # browsers
       "arc"
-      "firefox@developer-edition"
       "firefox@nightly"
-      "floorp"
-      "google-chrome"
       "google-chrome@canary"
       "helium-browser"
       "orion"
@@ -42,11 +38,9 @@
       "emacs-plus-app"
 
       # communication
-      "discord"
       "element"
       "microsoft-teams"
       "signal"
-      "slack"
       "wechat"
       "zoom"
 
@@ -58,14 +52,11 @@
       "codex"
       "copilot-cli"
       "microsoft-office"
-      "notesnook"
-      # obsidian — installed via nix (cross-platform) in shared/home/packages.nix
 
       # media
-      "audacity"
+      "musicbrainz-picard"
       "handbrake-app"
       "iina"
-      "musicbrainz-picard"
       "plex"
       "plex-htpc"
       "pocket-casts"
@@ -110,8 +101,6 @@
       "iterm2"
 
       # editors / writing
-      "db-browser-for-sqlite"
-      "lapce"
       "nvalt"
 
       # creative / design
@@ -119,7 +108,6 @@
       "fontforge-app"
       "fontlab"
       "icon-composer"
-      "inkscape"
       "monodraw"
 
       # gaming
@@ -127,32 +115,24 @@
       "minecraft"
       "openemu"
       "osu"
-      "prismlauncher"
       "steam"
 
       # science / education
-      "anki"
       "calibre"
       "libreoffice"
-      "praat"
-      "racket"
-      "zotero"
 
       # system / network
-      "chatterino"
+      "rustdesk"
       "crystalfetch"
       "folding-at-home"
       "google-drive"
       "microsoft-auto-update"
       "multipatch"
-      "pear"
-      "qbittorrent"
-      "rustdesk"
+      # "pear" — moved to nix (pear-desktop in shared/home/packages.nix)
       "sabnzbd"
       "sf-symbols"
       "tabtab"
       "teamspeak-client"
-      "thunderbird"
 
       # crypto
       "bluewallet"
@@ -161,9 +141,7 @@
       "antigravity"
       "handy"
 
-      # fonts (not in nixpkgs — Apple proprietary or missing)
-      "font-iosevka-aile"
-      "font-iosevka-etoile"
+      # fonts (not in nixpkgs — Apple proprietary)
       "font-sf-mono"
       "font-sf-pro"
     ];
