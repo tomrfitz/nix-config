@@ -82,7 +82,7 @@
         border_size = 0.0;
       };
       use_system_window_tabs = true;
-      soft_wrap = "preferred_line_length";
+      soft_wrap = "bounded";
       preferred_line_length = 80;
       lsp_document_colors = "inlay";
       colorize_brackets = false;
@@ -222,7 +222,7 @@
       };
       languages = {
         Markdown = {
-          soft_wrap = "none";
+          soft_wrap = "editor_width";
         };
         Nix = {
           preferred_line_length = 100;
