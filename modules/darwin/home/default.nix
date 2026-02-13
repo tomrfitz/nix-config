@@ -22,6 +22,7 @@
   home.packages = with pkgs; [
     mas
     container
+    iina
   ];
 
   # ── macOS-specific session variables ───────────────────────────────────
