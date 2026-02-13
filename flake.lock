@@ -45,6 +45,45 @@
         "type": "github"
       }
     },
+    "defaults2nix": {
+      "inputs": {
+        "flake-parts": "flake-parts",
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1765743509,
+        "narHash": "sha256-kRMki9tNmMdtBX6VscUosWJ0Hai52sGRUNS7qPMg0S8=",
+        "owner": "joshryandavis",
+        "repo": "defaults2nix",
+        "rev": "7108dac0740619d66efbafc00ce34f4622edee8f",
+        "type": "github"
+      },
+      "original": {
+        "owner": "joshryandavis",
+        "repo": "defaults2nix",
+        "type": "github"
+      }
+    },
+    "flake-parts": {
+      "inputs": {
+        "nixpkgs-lib": "nixpkgs-lib"
+      },
+      "locked": {
+        "lastModified": 1765495779,
+        "narHash": "sha256-MhA7wmo/7uogLxiewwRRmIax70g6q1U/YemqTGoFHlM=",
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "rev": "5635c32d666a59ec9a55cab87e898889869f7b71",
+        "type": "github"
+      },
+      "original": {
+        "owner": "hercules-ci",
+        "repo": "flake-parts",
+        "type": "github"
+      }
+    },
     "home-manager": {
       "inputs": {
         "nixpkgs": [
@@ -73,11 +112,11 @@
         ]
       },
       "locked": {
-        "lastModified": 1770936159,
-        "narHash": "sha256-INksKY2oo1hDNrDYh0r+uK0Fd4hBxkQwD4qQAl8lYyg=",
+        "lastModified": 1771014882,
+        "narHash": "sha256-M9t6MOoxVhOHDqDP+Ok8TKNN31G+6IR1m+ZAqWc1acE=",
         "owner": "nix-community",
         "repo": "home-manager",
-        "rev": "9bdb6938109884cb8b6a79ab79ba18e7b585a881",
+        "rev": "b3258dece8af087fd471a4ca6b106d02c330dd37",
         "type": "github"
       },
       "original": {
@@ -122,9 +161,25 @@
         "type": "github"
       }
     },
+    "nixpkgs-lib": {
+      "locked": {
+        "lastModified": 1761765539,
+        "narHash": "sha256-b0yj6kfvO8ApcSE+QmA6mUfu8IYG6/uU28OFn4PaC8M=",
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "rev": "719359f4562934ae99f5443f20aa06c2ffff91fc",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nix-community",
+        "repo": "nixpkgs.lib",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "agenix": "agenix",
+        "defaults2nix": "defaults2nix",
         "home-manager": "home-manager_2",
         "nix-darwin": "nix-darwin",
         "nixpkgs": "nixpkgs"
