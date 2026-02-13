@@ -47,7 +47,6 @@
       "microsoft-teams"
       "signal"
       "slack"
-      "vesktop"
       "wechat"
       "zoom"
 
