@@ -26,7 +26,6 @@
 
   # ── macOS-specific session variables ───────────────────────────────────
   home.sessionVariables = {
-    OBSD = "$HOME/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian/";
     SCRNSHT = "$HOME/Documents/Screenshots/";
     NVM_DIR = "$HOME/.nvm";
   };

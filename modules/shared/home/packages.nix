@@ -8,6 +8,7 @@
   # ── Packages (things without a dedicated programs.* module) ────────────
   home.packages = with pkgs; [
     opencode
+    obsidian
 
     # dev toolchains
     rustup

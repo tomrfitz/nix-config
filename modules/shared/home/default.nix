@@ -13,6 +13,8 @@
     ./fastfetch.nix
     ./editors.nix
     ./ghostty.nix
+    ./vesktop.nix
+    ./obsidian.nix
   ];
 
   home.stateVersion = "24.11";
@@ -80,6 +82,9 @@
 
   # Ensure the SSH ControlPath directory exists
   home.file.".ssh/sockets/.keep".text = "";
+
+  # ── Global AGENTS.md ─────────────────────────────────────────────────
+  home.file.".config/AGENTS.md".source = ../../../config/agents.md;
 
   programs.home-manager.enable = true;
 

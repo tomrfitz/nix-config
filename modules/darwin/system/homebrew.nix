@@ -60,7 +60,7 @@
       "copilot-cli"
       "microsoft-office"
       "notesnook"
-      "obsidian"
+      # obsidian — installed via nix (cross-platform) in shared/home/packages.nix
 
       # media
       "audacity"
