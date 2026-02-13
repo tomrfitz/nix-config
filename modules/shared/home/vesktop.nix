@@ -33,8 +33,14 @@
           MessageEventsAPI.enabled = true;
           UserSettingsAPI.enabled = true;
           BadgeAPI.enabled = true;
-          NoTrack = { enabled = true; disableAnalytics = true; };
-          Settings = { enabled = true; settingsLocation = "aboveNitro"; };
+          NoTrack = {
+            enabled = true;
+            disableAnalytics = true;
+          };
+          Settings = {
+            enabled = true;
+            settingsLocation = "aboveNitro";
+          };
           DisableDeepLinks.enabled = true;
           SupportHelper.enabled = true;
           WebContextMenus.enabled = true;
@@ -65,15 +71,24 @@
             sidebarAnim = true;
           };
           BetterGifAltText.enabled = true;
-          CallTimer = { enabled = true; format = "stopwatch"; };
+          CallTimer = {
+            enabled = true;
+            format = "stopwatch";
+          };
           ClearURLs.enabled = true;
           DontRoundMyTimestamps.enabled = true;
           FixSpotifyEmbeds.enabled = true;
           FixYoutubeEmbeds.enabled = true;
           ForceOwnerCrown.enabled = true;
           FriendsSince.enabled = true;
-          MemberCount = { enabled = true; toolTip = true; };
-          MentionAvatars = { enabled = true; showAtSymbol = true; };
+          MemberCount = {
+            enabled = true;
+            toolTip = true;
+          };
+          MentionAvatars = {
+            enabled = true;
+            showAtSymbol = true;
+          };
           NewGuildSettings = {
             enabled = true;
             guild = true;
@@ -84,7 +99,10 @@
             events = true;
             showAllChannels = true;
           };
-          OnePingPerDM = { enabled = true; channelToAffect = "both_dms"; };
+          OnePingPerDM = {
+            enabled = true;
+            channelToAffect = "both_dms";
+          };
           RoleColorEverywhere = {
             enabled = true;
             chatMentions = true;
