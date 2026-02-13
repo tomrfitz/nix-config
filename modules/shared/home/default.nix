@@ -13,7 +13,7 @@
     ./fastfetch.nix
     ./editors.nix
     ./ghostty.nix
-    ./vesktop.nix
+    # ./vesktop.nix
     ./obsidian.nix
   ];
 
