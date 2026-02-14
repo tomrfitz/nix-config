@@ -1,22 +1,22 @@
 name: Check
 
 on:
-  push:
-    branches: [main]
-  pull_request:
+    push:
+        branches: [main]
+    pull_request:
 
 jobs:
-  check:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    check:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
 
-      - uses: DeterminateSystems/nix-installer-action@main
-        with:
-          extra-conf: accept-flake-config = true
+            - uses: DeterminateSystems/nix-installer-action@main
+              with:
+                  extra-conf: accept-flake-config = true
 
-      - name: Evaluate darwin configuration
-        run: nix eval .#darwinConfigurations.trfmbp.system --raw
+            - name: Evaluate darwin configuration
+              run: nix eval .#darwinConfigurations.trfmbp.system --raw
 
-      - name: Check formatting
-        run: nix build .#checks.x86_64-linux.formatting --no-link
+            - name: Check formatting
+              run: nix build .#checks.x86_64-linux.formatting --no-link

@@ -37,7 +37,10 @@
     }:
     let
       user = "tomrfitz";
-      systems = [ "aarch64-darwin" "x86_64-linux" ];
+      systems = [
+        "aarch64-darwin"
+        "x86_64-linux"
+      ];
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
       treefmtEval = forAllSystems (pkgs: treefmt-nix.lib.evalModule pkgs ./treefmt.nix);
 
@@ -106,7 +109,8 @@
             pkgs.nixd
             pkgs.nvd
             pkgs.just
-          ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+          ]
+          ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             defaults2nix.packages.${pkgs.system}.default
           ];
         };

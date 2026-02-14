@@ -14,10 +14,11 @@ Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md
 - Prefer modern CLI tools: `rg` over `grep`, `fd` over `find`, `bat` over `cat`, `dust`/`duf` over `du`/`df`
 - Pay attention to LSP and linter output — trust tools like clangd, ruff, nixd
 - Capture full command output to temp files rather than piping through `head`/`tail`:
-  ```sh
-  cmd > /tmp/out.txt 2>&1; ec=$?
-  if [ $ec -ne 0 ]; then cat /tmp/out.txt; fi
-  ```
+
+    ```sh
+    cmd > /tmp/out.txt 2>&1; ec=$?
+    if [ $ec -ne 0 ]; then cat /tmp/out.txt; fi
+    ```
 
 ### Language-specific
 

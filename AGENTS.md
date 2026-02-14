@@ -36,7 +36,7 @@ just snapshot NAME # take macOS defaults snapshot
 
 ### Module organization
 
-```
+```text
 modules/
   shared/          # Cross-platform (maximized — put everything here first)
     system/nix.nix # Flakes, unfree, nix-command
@@ -53,17 +53,17 @@ modules/
 
 ### Common edit locations
 
-| Task | File |
-|------|------|
-| Add/remove nix packages | `modules/shared/home/packages.nix` |
-| Add/remove macOS casks | `modules/darwin/system/homebrew.nix` |
-| Change macOS system settings | `modules/darwin/system/settings.nix` |
-| Shell aliases/functions (cross-platform) | `modules/shared/home/shell.nix` |
-| Shell aliases/functions (macOS-only) | `modules/darwin/home/zsh.nix` |
-| Configure editors | `modules/shared/home/editors.nix` |
-| Firefox extensions | `modules/shared/home/firefox.nix` |
-| Git settings (shared) | `modules/shared/home/git.nix` |
-| Git settings (1Password signing) | `modules/darwin/home/git.nix` |
+| Task                                     | File                                 |
+| ---------------------------------------- | ------------------------------------ |
+| Add/remove nix packages                  | `modules/shared/home/packages.nix`   |
+| Add/remove macOS casks                   | `modules/darwin/system/homebrew.nix` |
+| Change macOS system settings             | `modules/darwin/system/settings.nix` |
+| Shell aliases/functions (cross-platform) | `modules/shared/home/shell.nix`      |
+| Shell aliases/functions (macOS-only)     | `modules/darwin/home/zsh.nix`        |
+| Configure editors                        | `modules/shared/home/editors.nix`    |
+| Firefox extensions                       | `modules/shared/home/firefox.nix`    |
+| Git settings (shared)                    | `modules/shared/home/git.nix`        |
+| Git settings (1Password signing)         | `modules/darwin/home/git.nix`        |
 
 ### Key design rules
 

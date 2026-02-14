@@ -18,7 +18,10 @@
   # tombi with --offline for nix sandbox compatibility
   settings.formatter.tombi = {
     command = "${pkgs.tombi}/bin/tombi";
-    options = [ "format" "--offline" ];
+    options = [
+      "format"
+      "--offline"
+    ];
     includes = [ "*.toml" ];
   };
 }

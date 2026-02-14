@@ -20,7 +20,7 @@ _snapshot-gen:
 
 # Update flake inputs and rebuild
 update:
-    nix flake update --flake {{flake}}
+    nix flake update --flake {{ flake }}
     sudo darwin-rebuild switch
 
 # Show what changed since the last _snapshot-gen
@@ -45,11 +45,11 @@ eval:
 
 # Take a macOS defaults snapshot
 snapshot name:
-    nix develop --command ./scripts/snapshot-defaults.sh snapshot {{name}}
+    nix develop --command ./scripts/snapshot-defaults.sh snapshot {{ name }}
 
 # Diff two macOS defaults snapshots
 snapshot-diff before after:
-    ./scripts/snapshot-defaults.sh diff {{before}} {{after}}
+    ./scripts/snapshot-defaults.sh diff {{ before }} {{ after }}
 
 # Show what packages changed between current and previous generation
 diff:
