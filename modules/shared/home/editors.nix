@@ -222,7 +222,7 @@
       };
       languages = {
         Markdown = {
-          soft_wrap = "editor_width";
+          soft_wrap = "none";
         };
         Nix = {
           preferred_line_length = 100;
