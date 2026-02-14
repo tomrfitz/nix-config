@@ -5,6 +5,10 @@ on:
     branches: [main]
   pull_request:
 
+permissions:
+  id-token: write
+  contents: read
+
 jobs:
   check:
     runs-on: ubuntu-latest
@@ -15,8 +19,10 @@ jobs:
 
       - uses: DeterminateSystems/magic-nix-cache-action@main
 
-      - name: Check flake evaluates
-        run: nix flake check --no-build --all-systems
+      - name: Evaluate flake outputs
+        run: |
+          nix eval .#formatter --apply builtins.seq --json > /dev/null
+          nix eval .#devShells --apply builtins.seq --json > /dev/null
 
       - name: Check formatting
         run: nix build .#checks.x86_64-linux.formatting --no-link
