@@ -227,6 +227,10 @@
         Nix = {
           preferred_line_length = 100;
           tab_size = 2;
+          language_servers = [
+            "nixd"
+            "!nil"
+          ];
           formatter.external = {
             command = "nixfmt";
             arguments = [
