@@ -15,10 +15,10 @@
     ];
   };
 
-  # tombi: schema-aware TOML formatter (successor to taplo)
+  # tombi with --offline for nix sandbox compatibility
   settings.formatter.tombi = {
     command = "${pkgs.tombi}/bin/tombi";
-    options = [ "format" ];
+    options = [ "format" "--offline" ];
     includes = [ "*.toml" ];
   };
 }
