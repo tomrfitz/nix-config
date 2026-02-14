@@ -253,6 +253,9 @@
         TOML = {
           formatter.language_server.name = "tombi";
         };
+        YAML = {
+          formatter = "language_server";
+        };
         Java = {
           formatter.external = {
             command = "clang-format";
