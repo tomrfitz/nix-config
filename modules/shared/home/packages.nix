@@ -76,10 +76,9 @@
 
       # nix tooling
       nixd
-      nil
       nixfmt
-      alejandra
       nvd
+      just
 
       # utilities
       _1password-cli
