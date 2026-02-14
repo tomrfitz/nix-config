@@ -30,11 +30,9 @@ fmt:
 fmt-check:
     nix fmt -- --ci
 
-# Evaluate flake outputs (catches syntax/eval errors without building)
+# Evaluate darwin config (catches syntax/eval errors without building)
 eval:
-    nix eval .#formatter --apply builtins.seq --json > /dev/null
-    nix eval .#devShells --apply builtins.seq --json > /dev/null
-    nix eval .#darwinConfigurations --apply builtins.seq --json > /dev/null
+    nix eval .#darwinConfigurations.trfmbp.system --raw
 
 # Take a macOS defaults snapshot
 snapshot name:
