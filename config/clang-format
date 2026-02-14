@@ -1,0 +1,62 @@
+BasedOnStyle: LLVM
+# Indentation
+IndentWidth: 4
+UseTab: Never
+TabWidth: 4
+
+# Line Length
+ColumnLimit: 80
+
+# Empty Lines - separate code blocks
+MaxEmptyLinesToKeep: 1
+KeepEmptyLinesAtTheStartOfBlocks: true
+SeparateDefinitionBlocks: Always
+
+BreakTemplateDeclarations: Yes
+
+# Include Sorting - C++ libs, then using namespace std, then C libs
+SortUsingDeclarations: Lexicographic
+SortIncludes: CaseSensitive
+IncludeBlocks: Regroup
+IncludeCategories:
+    - Regex: "^<(chrono|compare|complex|coroutine|concepts)>$" # C++ libs starting with 'c'
+      Priority: 1
+    - Regex: "^<[^c.>][^.>]*>$" # Other C++ stdlib (no .h, not starting with 'c')
+      Priority: 1
+    - Regex: "^<c[a-z]+>$" # C standard library (c prefix: cmath, cstdlib, etc.)
+      Priority: 2
+    - Regex: '^".*"$' # Project headers
+      Priority: 3
+
+# Alignment
+AlignTrailingComments:
+    Kind: Always
+    OverEmptyLines: 2
+AlignConsecutiveDeclarations:
+    Enabled: true
+    AcrossEmptyLines: false
+    # AlignFunctionPointers: true
+    # AlignFunctionDeclarations: true
+AlignConsecutiveShortCaseStatements:
+    Enabled: true
+    AcrossEmptyLines: false
+    AcrossComments: true
+    AlignCaseColons: true
+AlignConsecutiveAssignments:
+    Enabled: true
+    AcrossEmptyLines: false
+    AlignCompound: true
+    PadOperators: true
+AlignArrayOfStructures: Right
+
+# East const style: qualifiers after type
+QualifierAlignment: Custom
+QualifierOrder:
+    [inline, static, constexpr, friend, type, const, volatile, restrict]
+# Simple formatting preferences
+# AllowShortIfStatementsOnASingleLine: true
+# AllowShortLoopsOnASingleLine: true
+# AllowShortFunctionsOnASingleLine: true
+# AllowShortBlocksOnASingleLine: true
+AllowShortCaseExpressionOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
