@@ -6,9 +6,9 @@ flake := "~/nix-config"
 rebuild:
     sudo darwin-rebuild switch
 
-# Dry-run to check for errors without applying
+# Build the system closure without activating
 check:
-    sudo darwin-rebuild switch --dry-run
+    darwin-rebuild build
 
 # Rollback to the previous generation
 rollback:
