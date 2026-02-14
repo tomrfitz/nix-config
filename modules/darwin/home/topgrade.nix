@@ -2,7 +2,11 @@
 {
   programs.topgrade.settings = {
     pre_commands = {
+      "Snapshot current generation" = "just -f ~/nix-config/justfile _snapshot-gen";
       "Nix Flake Update + Darwin Rebuild" = "just -f ~/nix-config/justfile update";
+    };
+    post_commands = {
+      "Nix package diff" = "just -f ~/nix-config/justfile nvd";
     };
     brew = {
       greedy_latest = true;

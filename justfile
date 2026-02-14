@@ -14,13 +14,22 @@ check:
 rollback:
     sudo darwin-rebuild switch --rollback
 
+# Snapshot current system generation (for nvd diff later)
+_snapshot-gen:
+    readlink -f /run/current-system > /tmp/.nix-pre-update-system
+
 # Update flake inputs and rebuild
 update:
-    readlink -f /run/current-system > /tmp/.nix-pre-update-system
     nix flake update --flake {{flake}}
     sudo darwin-rebuild switch
+
+# Show what changed since the last _snapshot-gen
+nvd:
     nvd diff $(cat /tmp/.nix-pre-update-system) /run/current-system
     rm -f /tmp/.nix-pre-update-system
+
+# Update + diff in one shot (for standalone use)
+upgrade: _snapshot-gen update nvd
 
 # Format all files (nix, toml, shell, json, md, yaml, justfile)
 fmt:
