@@ -113,6 +113,9 @@
           ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
             defaults2nix.packages.${pkgs.system}.default
           ];
+          shellHook = ''
+            git config core.hooksPath .githooks
+          '';
         };
       });
     };

@@ -1,0 +1,9 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if ! nix fmt -- --ci 2>/dev/null; then
+    echo ""
+    echo "Pre-commit: files are not formatted."
+    echo "Run 'just fmt' (or 'nix fmt') and restage your changes."
+    exit 1
+fi
