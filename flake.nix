@@ -19,6 +19,10 @@
       url = "github:joshryandavis/defaults2nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    treefmt-nix = {
+      url = "github:numtide/treefmt-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -29,9 +33,13 @@
       home-manager,
       agenix,
       defaults2nix,
+      treefmt-nix,
     }:
     let
       user = "tomrfitz";
+      systems = [ "aarch64-darwin" "x86_64-linux" ];
+      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
+      treefmtEval = forAllSystems (pkgs: treefmt-nix.lib.evalModule pkgs ./treefmt.nix);
 
       mkHM = hmModules: {
         home-manager = {
@@ -82,9 +90,26 @@
         ];
       };
 
-      # ── Dev shell (defaults2nix for macOS settings snapshots) ────────
-      devShells.aarch64-darwin.default = nixpkgs.legacyPackages.aarch64-darwin.mkShell {
-        packages = [ defaults2nix.packages.aarch64-darwin.default ];
-      };
+      # ── Formatter (nix fmt — runs all formatters via treefmt) ─────────
+      formatter = forAllSystems (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
+
+      # ── Checks (CI formatting validation) ───────────────────────────
+      checks = forAllSystems (pkgs: {
+        formatting = treefmtEval.${pkgs.system}.config.build.check self;
+      });
+
+      # ── Dev shell (tools for working on this config) ────────────────
+      devShells = forAllSystems (pkgs: {
+        default = pkgs.mkShell {
+          packages = [
+            pkgs.nixfmt
+            pkgs.nixd
+            pkgs.nvd
+            pkgs.just
+          ] ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+            defaults2nix.packages.${pkgs.system}.default
+          ];
+        };
+      });
     };
 }
