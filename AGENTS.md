@@ -1,138 +1,96 @@
-# Nix Configuration — Agent Guide
+# AGENTS.md
 
-## Owner
+Repo-specific guidance for AI agents working on this nix-config. See also `~/.config/AGENTS.md` for global, project-agnostic conventions.
 
-Thomas FitzGerald (`tomrfitz`) — macOS (aarch64-darwin), with plans for NixOS (x86_64-linux).
+## What This Is
 
-## Build & Apply
+A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tracks on nixpkgs-unstable. The primary active machine is `trfmbp` (aarch64-darwin M1 Pro MacBook Pro). Two NixOS hosts (`trfnix`, `trfhomelab`) exist as stubs.
 
-```sh
-cd ~/nix-config
-sudo darwin-rebuild switch
+## Commands
+
+All common workflows are in the `justfile` (requires `just`, available via `nix develop`):
+
+```bash
+just rebuild       # sudo darwin-rebuild switch
+just check         # dry-run (catches errors without applying)
+just update        # flake update + rebuild + nvd diff
+just fmt           # nix fmt (nixfmt)
+just fmt-check     # check formatting without modifying
+just eval          # nix flake check (eval errors only)
+just rollback      # switch to previous generation
+just diff          # nvd diff between last two generations
+just snapshot NAME # take macOS defaults snapshot
 ```
 
-Rollback: `sudo darwin-rebuild switch --rollback`
+**Validation:** There are no tests. Correctness = `just check` (dry-run) or `just eval` succeeding. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
 
-Make use of static analysis tools and formatters before making commits.
+## Architecture
 
-## Repository Structure
+### Flake structure
 
-```text
-flake.nix                            # Entry point with mkHM helper (DRY home-manager config)
-hosts/
-  trfmbp/default.nix                 # macOS laptop — thin wiring (hostname, user, system packages)
-  trfnix/default.nix                 # NixOS laptop — thin wiring (stub)
-  trfhomelab/default.nix             # NixOS home server — placeholder
+`flake.nix` defines three machines and a `mkHM` helper that wires home-manager with agenix for each host. Inputs: nixpkgs (unstable), nix-darwin, home-manager, agenix, defaults2nix.
+
+### Hosts are thin wiring
+
+`hosts/<machine>/default.nix` files only set hostname, user, and import system modules. All real configuration lives in `modules/`.
+
+### Module organization
+
+```
 modules/
-  shared/
-    system/
-      nix.nix                        # nixpkgs + flakes settings (imported by all hosts)
-    home/
-      default.nix                    # HM aggregator (session vars, tmux, ssh, topgrade, agenix)
-      packages.nix                   # home.packages (CLI tools, dev toolchains, fonts)
-      shell.nix                      # Zsh, starship, atuin, zoxide, fzf
-      git.nix                        # Git, delta, jujutsu
-      ghostty.nix                    # Ghostty (platform-conditional package via isDarwin)
-      firefox.nix                    # Firefox policies + extensions
-      fastfetch.nix                  # Fastfetch config
-      editors.nix                    # Helix, neovim, vscode, zed
-  darwin/
-    system/
-      default.nix                    # Aggregator (imports homebrew, settings, security)
-      homebrew.nix                   # Taps, brews, casks, masApps
-      settings.nix                   # macOS system.defaults (dock, trackpad, finder, etc.)
-      security.nix                   # Touch ID for sudo
-    home/
-      default.nix                    # Aggregator + macOS basics (packages, paths, session vars, emacs-plus build.yml)
-      zsh.nix                        # macOS-specific shell (brew shellenv, bun, nvm, jn function, zed alias)
-      git.nix                        # 1Password SSH signing, gh credential helpers
-      ssh.nix                        # 1Password agent socket
-      topgrade.nix                   # Darwin rebuild, brew settings, nvd diff
-  nixos/
-    system/
-      default.nix                    # NixOS system basics (zsh enable)
-    home/
-      default.nix                    # Aggregator (homeDirectory, nixos-only packages)
-config/
-  starship.toml                      # Starship prompt config (imported via lib.importTOML)
-  helix-flexoki-dark.toml            # Helix Flexoki Dark theme (imported via lib.importTOML)
-  helix-flexoki-light.toml           # Helix Flexoki Light theme (imported via lib.importTOML)
-secrets/
-  secrets.nix                        # Agenix public key mapping
-  test-secret.age                    # Encrypted test secret
+  shared/          # Cross-platform (maximized — put everything here first)
+    system/nix.nix # Flakes, unfree, nix-command
+    home/          # Focused modules: packages, shell, git, editors, firefox, etc.
+  darwin/          # macOS-only
+    system/        # homebrew.nix, settings.nix (system.defaults), security.nix
+    home/          # zsh.nix, git.nix (1Password signing), ssh.nix, topgrade.nix
+  nixos/           # Linux-only (minimal stubs)
+    system/        # Just enables zsh
+    home/          # homeDirectory, 1password-gui, emacs
 ```
 
-### Design principles
+`default.nix` files are aggregators — mostly import lists.
 
-- **Hosts are machines, not OSes** — `hosts/trfmbp/`, not `hosts/darwin/`. The machine is the stable identity.
-- **Host files are thin wiring** — hostname, user, system packages, and imports. All logic lives in modules.
-- **`modules/shared/` contains as much as possible** — platform modules only hold things that genuinely differ between macOS and Linux.
-- **`default.nix` files are aggregators** — mostly `imports = [...]` lists. Business logic lives in focused single-concern modules.
-- **`flake.nix` uses a `mkHM` helper** — DRYs the repeated home-manager configuration block across all hosts.
+### Common edit locations
 
-## Package Source Priority
+| Task | File |
+|------|------|
+| Add/remove nix packages | `modules/shared/home/packages.nix` |
+| Add/remove macOS casks | `modules/darwin/system/homebrew.nix` |
+| Change macOS system settings | `modules/darwin/system/settings.nix` |
+| Shell aliases/functions (cross-platform) | `modules/shared/home/shell.nix` |
+| Shell aliases/functions (macOS-only) | `modules/darwin/home/zsh.nix` |
+| Configure editors | `modules/shared/home/editors.nix` |
+| Firefox extensions | `modules/shared/home/firefox.nix` |
+| Git settings (shared) | `modules/shared/home/git.nix` |
+| Git settings (1Password signing) | `modules/darwin/home/git.nix` |
 
-When deciding where to install something, prefer in this order:
+### Key design rules
 
-1. **Cross-platform nixpkg** (in `modules/shared/`) — best for reproducibility
-2. **Darwin-only nixpkg** (in `modules/darwin/`) — when the package only makes sense on macOS
-3. **Homebrew cask** (in `modules/darwin/system/homebrew.nix`) — for macOS GUI apps not in nixpkgs
-4. **Mac App Store via mas** — for apps only available there
+- **Maximize `modules/shared/`** — platform-specific modules only for genuine differences (e.g., 1Password SSH agent path, homebrew, macOS system.defaults)
+- **Prefer native home-manager modules** (`programs.*`) over `home.file` when available
+- **Package source priority:** nixpkgs shared → nixpkgs platform-specific → homebrew casks → Mac App Store (mas)
+- **Brew-preferred exceptions:** 1Password, Emacs (macOS native patches), Ghostty, Zed (need keychain/native integration)
 
-### Brew-preferred packages (system integration)
+### Platform-conditional pattern
 
-Some packages work better via brew on macOS due to keychain access, code signing, system entitlements, or custom build features. These use nix on NixOS but brew on darwin:
+When a package needs different sources per platform, use `pkgs.stdenv.isDarwin` in a shared module rather than duplicating across platform modules:
 
-- **1Password** — SSH agent socket, browser extension, Touch ID require brew cask. `_1password-gui` is nixos-only in `modules/nixos/home/default.nix`.
-- **Emacs** — emacs-plus@31 via `d12frosted/emacs-plus` tap for macOS-native patches and custom icon. Build config managed via HM (`xdg.configFile."emacs-plus/build.yml"`). Vanilla `emacs` is nixos-only.
-- **Ghostty** — brew cask on macOS (`package = null`), flake package on NixOS. Platform selection handled automatically via `pkgs.stdenv.isDarwin` in `modules/shared/home/ghostty.nix`.
-- **Zed** — installed via nix `programs.zed-editor` for config management, but the `zed` shell alias in `modules/darwin/home/zsh.nix` points to the stable `~/Applications/Home Manager Apps/Zed.app/Contents/MacOS/cli` to preserve keychain access across rebuilds.
+```nix
+# package = null means "installed outside nix" (e.g., via brew cask on macOS)
+package = if pkgs.stdenv.isDarwin then null else pkgs.ghostty;
+```
 
-## Project Goals
+For packages that only exist on one platform, use `lib.optionals`:
 
-### Vision
+```nix
+home.packages = [ ... ] ++ lib.optionals (!pkgs.stdenv.isDarwin) [ pkgs.element-desktop ];
+```
 
-A single nix flake that fully declares the user environment for macOS (nix-darwin), NixOS workstation, and NixOS home server. Running `darwin-rebuild switch` or `nixos-rebuild switch` on a fresh machine should reproduce the entire working environment with zero (or near-zero) manual steps.
+### Secrets
 
-### Design Principles
+Agenix manages encrypted secrets in `secrets/`. Public keys mapped in `secrets/secrets.nix`.
 
-1. **Maximize native home-manager modules** — use `programs.*` options over raw `home.file` wherever a module exists. This gives better integration (shell integration flags, proper config generation, etc.)
+### Config files
 
-2. **Minimize platform-specific config** — anything that can be expressed identically on both OSes belongs in `modules/shared/`. Platform modules should be thin. Use `pkgs.stdenv.isDarwin` / `pkgs.stdenv.isLinux` for platform-conditional values within shared modules where it keeps things concise.
-
-3. **Nix replaces other package managers** — CLI tools should come from nixpkgs, not brew/yay/etc. Homebrew is only for macOS GUI apps (casks) that aren't in nixpkgs, or apps that need macOS system integration (see "Brew-preferred packages" above). All brew entries are declared in `modules/darwin/system/homebrew.nix` with `homebrew.onActivation.cleanup` so brew is fully declarative.
-
-4. **Config should be stable** — once set up, the config should rarely need commits except when adopting new tools or when upstream nix modules add new capabilities worth using.
-
-5. **Never break the live machine** — this is the user's primary work machine. All changes are additive. The `backupFileExtension = "hm-backup"` setting preserves originals. Test with `--dry-run` when uncertain.
-
-### Important Context
-
-- The flake pins `nixpkgs-unstable`. This is intentional for access to latest packages.
-- Apple-proprietary fonts (SF Mono, SF Pro) remain as Homebrew casks since they're not in nixpkgs.
-- Some upstream nixpkgs packages are currently broken on aarch64-darwin and commented out in `packages.nix`: `cava`, `poetry`, `gossip`. Revisit after `nix flake update`.
-- Firefox extensions are managed declaratively via `policies.ExtensionSettings`. Browser profiles/bookmarks are not managed.
-
-### Hard Boundaries (can't fully nix-ify)
-
-- Apple ID / iCloud / Google Drive sign-in (account state, not config)
-- App Store apps require Apple ID login first (mas can install declaratively after)
-- 1Password vault content
-- Browser profiles / bookmarks (partial — extensions can be managed for Firefox)
-
-### Problem-Solving Approach
-
-When implementing new features or restructuring, **design for the final state from the start**. Don't build incrementally toward a structure you can already foresee — lay the foundation correctly and fill it in. Specifically:
-
-1. **Think about where things will live at scale** — if a module will eventually need splitting, split it now rather than cramming everything into one file and refactoring later.
-2. **Name things for what they are, not what category they happen to fall into today** — e.g., hosts should be named for the machine (`trfmbp`), not the OS (`darwin`), because the machine is the stable identity.
-3. **DRY from the start** — if you can see that a pattern will be repeated (e.g., home-manager boilerplate for each host), extract a helper immediately rather than copy-pasting and planning to refactor later.
-4. **Keep aggregator files thin** — `default.nix` files should mostly be `imports = [...]` lists. Business logic belongs in focused, single-concern modules.
-5. **Match directory structure to mental model** — the repo structure should mirror how you think about the system (hosts → machines, modules → features), not implementation details.
-
-### Style Notes
-
-- Use section headers with box-drawing characters (`# ── Section ──`) for visual separation in nix files
-- Keep nix files well-organized with clear sections
-- Prefer structured `programs.*.settings` over raw `home.file` text blocks
-- When adding a new tool: first check if a `programs.*` module exists in home-manager before falling back to `home.file` or `xdg.configFile`
+`config/` holds imported TOML/YAML configs (Starship prompt, Helix themes). Referenced via `lib.importTOML` in modules. `config/agents.md` is the global agent instructions file deployed to home directories.

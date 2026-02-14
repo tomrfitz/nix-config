@@ -83,8 +83,13 @@
   # Ensure the SSH ControlPath directory exists
   home.file.".ssh/sockets/.keep".text = "";
 
-  # ── Global AGENTS.md ─────────────────────────────────────────────────
+  # ── Agent instructions (config/agents.md is the single source of truth) ──
   home.file.".config/AGENTS.md".source = ../../../config/agents.md;
+  home.file.".claude/CLAUDE.md".source = ../../../config/agents.md;
+
+  # ── Dotfiles managed via config/ ────────────────────────────────────────
+  home.file.".clang-format".source = ../../../config/clang-format;
+  home.file.".editorconfig".source = ../../../config/editorconfig;
 
   programs.home-manager.enable = true;
 
