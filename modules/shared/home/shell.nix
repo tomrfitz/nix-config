@@ -21,7 +21,7 @@
     '';
 
     profileExtra = ''
-      if [[ "$TERM_PROGRAM" != "vscode" && "$TERM_PROGRAM" != "zed" ]]; then
+      if [[ -o interactive && "$TERM_PROGRAM" != "vscode" && "$TERM_PROGRAM" != "zed" ]]; then
         command -v fastfetch &>/dev/null && fastfetch
       fi
     '';
