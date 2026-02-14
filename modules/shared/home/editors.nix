@@ -235,6 +235,17 @@
             ];
           };
         };
+        "Shell Script" = {
+          formatter.external = {
+            command = "shfmt";
+            arguments = [
+              "--filename"
+              "{buffer_path}"
+              "--indent"
+              "4"
+            ];
+          };
+        };
         TOML = {
           formatter.language_server.name = "tombi";
         };
