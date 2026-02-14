@@ -55,9 +55,9 @@
     in
     {
       darwinConfigurations.trfmbp = nix-darwin.lib.darwinSystem {
-        system = "aarch64-darwin";
         specialArgs = { inherit agenix user; };
         modules = [
+          { nixpkgs.hostPlatform = "aarch64-darwin"; }
           ./hosts/trfmbp
           home-manager.darwinModules.home-manager
           (mkHM [
@@ -68,9 +68,9 @@
       };
 
       nixosConfigurations.trfnix = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
         specialArgs = { inherit user; };
         modules = [
+          { nixpkgs.hostPlatform = "x86_64-linux"; }
           ./hosts/trfnix
           home-manager.nixosModules.home-manager
           (mkHM [
@@ -81,9 +81,9 @@
       };
 
       nixosConfigurations.trfhomelab = nixpkgs.lib.nixosSystem {
-        system = "x86_64-linux";
         specialArgs = { inherit user; };
         modules = [
+          { nixpkgs.hostPlatform = "x86_64-linux"; }
           ./hosts/trfhomelab
           home-manager.nixosModules.home-manager
           (mkHM [
