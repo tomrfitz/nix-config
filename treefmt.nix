@@ -3,7 +3,10 @@
   projectRootFile = "flake.nix";
 
   programs.nixfmt.enable = true;
-  programs.shfmt.enable = true;
+  programs.shfmt = {
+    enable = true;
+    indent_size = 4;
+  };
   programs.just.enable = true;
   programs.prettier = {
     enable = true;
