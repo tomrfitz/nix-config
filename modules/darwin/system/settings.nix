@@ -38,6 +38,7 @@
         { app = "/Users/${user}/Applications/Home Manager Apps/Zotero.app"; }
         { app = "/Users/${user}/Applications/Home Manager Apps/Obsidian.app"; }
         { app = "/Users/${user}/Applications/Home Manager Apps/YouTube Music.app"; }
+        { app = "/Users/${user}/Applications/Home Manager Apps/Vesktop.app"; }
         { app = "/System/Applications/Messages.app"; }
         { app = "/System/Applications/Mail.app"; }
         { app = "/Applications/Twilight.app"; }
