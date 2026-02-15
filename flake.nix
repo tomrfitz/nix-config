@@ -62,7 +62,10 @@
       darwinConfigurations.trfmbp = nix-darwin.lib.darwinSystem {
         specialArgs = { inherit agenix user; };
         modules = [
-          { nixpkgs.hostPlatform = "aarch64-darwin"; }
+          {
+            nixpkgs.hostPlatform = "aarch64-darwin";
+            nixpkgs.overlays = [ (import ./overlays/vesktop-darwin.nix) ];
+          }
           ./hosts/trfmbp
           home-manager.darwinModules.home-manager
           (mkHM [
