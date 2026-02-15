@@ -171,6 +171,7 @@
       maple-mono.NF
       monaspace
       nerd-fonts.symbols-only
+      noto-fonts-color-emoji
     ]
     ++ lib.optionals (!pkgs.stdenv.isDarwin) [
       picard # brew cask "musicbrainz-picard" on darwin (qtwayland dep)

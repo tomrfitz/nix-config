@@ -15,6 +15,7 @@
     ./ghostty.nix
     ./vesktop.nix
     ./obsidian.nix
+    ./stylix.nix
   ];
 
   home.stateVersion = "24.11";

@@ -23,6 +23,10 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    stylix = {
+      url = "github:nix-community/stylix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -34,6 +38,7 @@
       agenix,
       defaults2nix,
       treefmt-nix,
+      stylix,
     }:
     let
       user = "tomrfitz";
@@ -64,6 +69,7 @@
             ./modules/shared/home
             ./modules/darwin/home
           ])
+          stylix.darwinModules.stylix
         ];
       };
 
@@ -77,6 +83,7 @@
             ./modules/shared/home
             ./modules/nixos/home
           ])
+          stylix.nixosModules.stylix
         ];
       };
 
@@ -90,6 +97,7 @@
             ./modules/shared/home
             ./modules/nixos/home
           ])
+          stylix.nixosModules.stylix
         ];
       };
 

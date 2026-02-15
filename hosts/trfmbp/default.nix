@@ -7,6 +7,7 @@
 {
   imports = [
     ../../modules/shared/system/nix.nix
+    ../../modules/shared/system/stylix.nix
     ../../modules/darwin/system
   ];
 
