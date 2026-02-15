@@ -195,6 +195,7 @@
 
   # ── Dotfiles managed via config/ ────────────────────────────────────────
   home.file.".clang-format".source = ../../../config/clang-format;
+
   home.file.".editorconfig".source = ../../../config/editorconfig;
 
   programs.home-manager.enable = true;
