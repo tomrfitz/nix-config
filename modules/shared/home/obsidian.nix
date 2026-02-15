@@ -39,5 +39,12 @@ in
 
     # Ensure worktree is configured
     run ${pkgs.git}/bin/git --git-dir="$GIT_DIR" config core.worktree "$VAULT_PATH"
+
+    # Symlink shared markdownlint config into vault root
+    MDLINT_SRC="${config.home.homeDirectory}/.markdownlint-cli2.jsonc"
+    MDLINT_DST="$VAULT_PATH/.markdownlint-cli2.jsonc"
+    if [ -f "$MDLINT_SRC" ]; then
+      ln -sf "$MDLINT_SRC" "$MDLINT_DST"
+    fi
   '';
 }

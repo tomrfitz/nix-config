@@ -12,10 +12,15 @@
     enable = true;
     includes = [
       "*.json"
-      "*.md"
       "*.yaml"
       "*.yml"
     ];
+  };
+
+  settings.formatter.markdownlint = {
+    command = "${pkgs.markdownlint-cli2}/bin/markdownlint-cli2";
+    options = [ "--fix" ];
+    includes = [ "*.md" ];
   };
 
   # tombi with --offline for nix sandbox compatibility

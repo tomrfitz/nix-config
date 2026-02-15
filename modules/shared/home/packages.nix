@@ -64,6 +64,7 @@
       go-tools # staticcheck
 
       # node tools
+      markdownlint-cli2
       nodePackages.prettier
       nodePackages.yarn
 

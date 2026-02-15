@@ -197,6 +197,7 @@
   home.file.".clang-format".source = ../../../config/clang-format;
 
   home.file.".editorconfig".source = ../../../config/editorconfig;
+  home.file.".markdownlint-cli2.jsonc".source = ../../../config/markdownlint-cli2.jsonc;
 
   programs.home-manager.enable = true;
 

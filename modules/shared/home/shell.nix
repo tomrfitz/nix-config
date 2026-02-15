@@ -14,6 +14,8 @@
       ls = "eza --group-directories-first --icons --hyperlink --time-style=long-iso";
       sa = "source ~/.zshrc && echo \"ZSH aliases sourced.\"";
       histrg = "cat ~/.zsh_history | grep";
+      mdlint = "markdownlint-cli2";
+      mdfix = "markdownlint-cli2 --fix";
     };
 
     envExtra = ''

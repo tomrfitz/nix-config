@@ -96,9 +96,6 @@
             "-vv"
           ];
         };
-        markdownlint = {
-          settings.MD013 = false;
-        };
         tinymist = {
           settings.exportPdf = "onSave";
           initialization_options.preview.background.enabled = true;
