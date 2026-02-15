@@ -11,6 +11,7 @@
     [
       opencode
       obsidian
+      (callPackage ../../../pkgs/mdbase-tasknotes { })
 
       docker
       dockerfmt
