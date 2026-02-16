@@ -4,7 +4,7 @@ Repo-specific guidance for AI agents working on this nix-config. See also `~/.co
 
 ## What This Is
 
-A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tracks on nixpkgs-unstable. The primary active machine is `trfmbp` (aarch64-darwin M1 Pro MacBook Pro). Two NixOS hosts (`trfnix`, `trfhomelab`) exist as stubs.
+A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tracks on nixpkgs-unstable. The primary active machine is `trfmbp` (aarch64-darwin M1 Pro MacBook Pro). Two NixOS hosts (`trfnix`, `trfhomelab`) exist as stubs — do not invest effort in their configs.
 
 ## Commands
 
@@ -23,6 +23,8 @@ just snapshot NAME # take macOS defaults snapshot
 ```
 
 **Validation:** There are no tests. Correctness = `just check` (dry-run) or `just eval` succeeding. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
+
+**Important:** Nix flakes only see files tracked by git. When adding new files referenced by the flake (e.g., config files used in `home.file` or `source`), you must `git add` them before `just eval` or `just check` will work.
 
 ## Architecture
 
@@ -94,3 +96,21 @@ Agenix manages encrypted secrets in `secrets/`. Public keys mapped in `secrets/s
 ### Config files
 
 `config/` holds imported TOML/YAML configs (Starship prompt, Helix themes). Referenced via `lib.importTOML` in modules. `config/agents.md` is the global agent instructions file deployed to home directories.
+
+## Theming
+
+- **Palette:** Flexoki (dark + light variants) across Ghostty, Zed, Helix, Vesktop
+- **Fonts:** Atkinson Hyperlegible (sans + mono)
+- **Stylix:** added to flake, single polarity (dark) for now; auto-switching via launchd + specialisations planned separately
+- **Exclude from Stylix:** Ghostty and Zed have native system-responsive theming
+
+## Custom packages
+
+- **`pkgs/mdbase-tasknotes/`** — npm CLI packaged via `buildNpmPackage` + `fetchurl` from npm registry
+  - Requires a locally-generated `package-lock.json` stored in repo (npm tarballs lack lockfiles)
+  - Version bump workflow: update `version`, `hash` (via `nix-prefetch-url`), and `npmDepsHash` (let builder error tell you the correct hash)
+  - Monitor for GitHub releases with prebuilt binaries — could simplify packaging
+
+## Active overlays
+
+- **`overlays/vesktop-darwin.nix`** — fixes codesign failure on macOS; remove when NixOS/nixpkgs#489725 merges
