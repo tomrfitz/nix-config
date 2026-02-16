@@ -2,6 +2,7 @@
 {
   programs.topgrade.settings = {
     pre_commands = {
+      "SSH ControlMaster warmup" = "ssh -T git@github.com || true";
       "Nix Flake Update + Darwin Rebuild" =
         "just -f ~/nix-config/justfile _snapshot-gen && just -f ~/nix-config/justfile update";
     };
