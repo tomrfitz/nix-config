@@ -180,7 +180,7 @@
         extraOptions = {
           ControlMaster = "auto";
           ControlPath = "~/.ssh/sockets/%r@%h-%p";
-          ControlPersist = "600";
+          ControlPersist = "3600";
         };
       };
     };
