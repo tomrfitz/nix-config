@@ -192,6 +192,7 @@
   # ── Agent instructions (config/agents.md is the single source of truth) ──
   home.file.".config/AGENTS.md".source = ../../../config/agents.md;
   home.file.".claude/CLAUDE.md".source = ../../../config/agents.md;
+  home.file.".claude/settings.json".source = ../../../config/claude-settings.json;
 
   # ── Dotfiles managed via config/ ────────────────────────────────────────
   home.file.".clang-format".source = ../../../config/clang-format;
