@@ -1,2 +1,6 @@
-.claude/
+# Ignore .claude/ contents except project config
+.claude/*
+!.claude/settings.json
+!.claude/hooks/
+!.claude/skills/
 result
