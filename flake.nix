@@ -64,7 +64,10 @@
         modules = [
           {
             nixpkgs.hostPlatform = "aarch64-darwin";
-            nixpkgs.overlays = [ (import ./overlays/vesktop-darwin.nix) ];
+            nixpkgs.overlays = [
+              (import ./overlays/vesktop-darwin.nix)
+              (import ./overlays/zed-editor-darwin.nix)
+            ];
           }
           ./hosts/trfmbp
           home-manager.darwinModules.home-manager
