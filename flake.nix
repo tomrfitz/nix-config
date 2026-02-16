@@ -46,8 +46,8 @@
         "aarch64-darwin"
         "x86_64-linux"
       ];
-      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
-      treefmtEval = forAllSystems (pkgs: treefmt-nix.lib.evalModule pkgs ./treefmt.nix);
+      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system nixpkgs.legacyPackages.${system});
+      treefmtEval = forAllSystems (_system: pkgs: treefmt-nix.lib.evalModule pkgs ./treefmt.nix);
 
       mkHM = hmModules: {
         home-manager = {
@@ -108,29 +108,33 @@
       };
 
       # ── Formatter (nix fmt — runs all formatters via treefmt) ─────────
-      formatter = forAllSystems (pkgs: treefmtEval.${pkgs.system}.config.build.wrapper);
+      formatter = forAllSystems (system: _pkgs: treefmtEval.${system}.config.build.wrapper);
 
       # ── Checks (CI formatting validation) ───────────────────────────
-      checks = forAllSystems (pkgs: {
-        formatting = treefmtEval.${pkgs.system}.config.build.check self;
-      });
+      checks = forAllSystems (
+        system: _pkgs: {
+          formatting = treefmtEval.${system}.config.build.check self;
+        }
+      );
 
       # ── Dev shell (tools for working on this config) ────────────────
-      devShells = forAllSystems (pkgs: {
-        default = pkgs.mkShell {
-          packages = [
-            pkgs.nixfmt
-            pkgs.nixd
-            pkgs.nvd
-            pkgs.just
-          ]
-          ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
-            defaults2nix.packages.${pkgs.system}.default
-          ];
-          shellHook = ''
-            git config core.hooksPath .githooks
-          '';
-        };
-      });
+      devShells = forAllSystems (
+        system: pkgs: {
+          default = pkgs.mkShell {
+            packages = [
+              pkgs.nixfmt
+              pkgs.nixd
+              pkgs.nvd
+              pkgs.just
+            ]
+            ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+              defaults2nix.packages.${system}.default
+            ];
+            shellHook = ''
+              git config core.hooksPath .githooks
+            '';
+          };
+        }
+      );
     };
 }
