@@ -38,6 +38,7 @@
       xcodes
 
       # build tools
+      nixpkgs-review
       cmake
       gnumake
       ninja
