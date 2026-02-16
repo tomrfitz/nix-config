@@ -25,6 +25,26 @@ Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md
 - **Nix:** format with `nixfmt`, use `nixd` as LSP
 - **Python:** use astral's suite (`uv`, `ruff`, `ty`)
 
+## Validation & side effects
+
+- Prefer dry-run/check before apply; never mutate live systems without explicit request
+- Understand which commands are idempotent (read-only queries, formatting checks) vs stateful (installs, deployments, database migrations)
+- When a validation step exists, run it before and after changes
+
+## Code organization
+
+- Maximize shared/common code; platform- or environment-specific only for genuine differences
+- Entry points (hosts, main files, routers) wire things together — they don't contain logic
+- Prefer framework-native modules over manual file/config management
+
 ## Problem-solving
 
-When implementing new features or restructuring, design for the final state from the start. Don't build incrementally toward a structure you can already foresee.
+- When implementing new features or restructuring, design for the final state from the start. Don't build incrementally toward a structure you can already foresee.
+- Distinguish "not implemented yet" from "doesn't exist" when exploring APIs/options
+- Check official docs first; save significant research findings for future reference
+- Document assumptions when information is incomplete
+
+## Communication
+
+- When multiple valid approaches exist, present tradeoffs rather than choosing silently
+- Keep explanations concise — body/detail only when it adds context beyond the obvious

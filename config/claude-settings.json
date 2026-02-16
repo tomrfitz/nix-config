@@ -1,0 +1,8 @@
+{
+    "model": "opus",
+    "enabledPlugins": {
+        "github@claude-plugins-official": true
+    },
+    "syntaxHighlightingDisabled": false,
+    "effortLevel": "medium"
+}
