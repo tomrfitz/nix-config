@@ -1,0 +1,138 @@
+@-moz-document url("about:home"), url("about:newtab") {
+  .floorp-backdrop-blur-enable .top-site-outer {
+    backdrop-filter: none !important;
+  }
+
+  body {
+    width: 100%;
+    height: 100vh;
+    position: relative !important;
+    overflow: hidden !important;
+  }
+
+  /* .has-weather.no-search .outer-wrapper {
+    padding-top: 0 !important;
+  } */
+
+  /* media (min-width: 610px) {
+    .has-weather.no-search .outer-wrapper {
+      padding-top: 0 !important;
+    }
+  } */
+
+  :is(.random_image, .selected_folder, .selected_image) > #background {
+    opacity: 0.6 !important;
+  }
+
+  .top-site-outer .context-menu-button {
+    background-clip: padding-box !important;
+    background-color: var(--newtab-background-color-secondary) !important;
+    background-image: url("chrome://global/skin/icons/more.svg") !important;
+    background-position: 55% !important;
+    border: 1px solid var(--newtab-border-color) !important;
+    box-shadow: 0 2px rgba(12, 12, 13, 0.1) !important;
+    cursor: pointer;
+    fill: var(--newtab-text-primary-color) !important;
+    height: 27px !important;
+    inset-inline-end: -13.5px !important;
+    opacity: 0 !important;
+    position: absolute !important;
+    top: -13.5px !important;
+    transform: scale(0.25) !important;
+    transition-duration: 150ms !important;
+    transition-property: transform, opacity !important;
+    width: 27px !important;
+  }
+
+  .top-site-outer:is(:hover, :focus, .active):not(.placeholder)
+    .context-menu-button {
+    opacity: 1 !important;
+    transform: scale(1) !important;
+    transition-delay: 333ms !important;
+  }
+
+  .card-outer .context-menu-button {
+    border-radius: 4px;
+  }
+
+  .top-site-outer {
+    width: 120px;
+    border-radius: 8px;
+    display: inline-block;
+    z-index: 1;
+    border: none !important;
+    background-color: transparent !important;
+    margin-block-end: 0 !important;
+  }
+
+  .top-site-outer .top-site-icon {
+    background-color: transparent !important;
+  }
+
+  .top-site-outer .tile {
+    background-color: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .top-site-outer:is(.active, :focus, :hover) {
+    /*Remove dark-gray mouse hover box*/
+    box-shadow: none !important;
+    background: transparent !important;
+    border-color: var(--newtab-primary-action-background) !important;
+  }
+
+  .top-site-inner:is(.active, :focus, :hover) {
+    border-color: var(--newtab-primary-action-background) !important;
+  }
+
+  .top-site-outer .default-icon {
+    background-size: auto !important;
+    height: 100% !important;
+    width: 100% !important;
+  }
+
+  /* .main {
+    display: block !important;
+    justify-content: start !important;
+  } */
+
+  /* .top-site-outer .top-site-inner > a {
+    padding: 0 !important;
+    color: inherit;
+    display: block;
+    outline: none;
+  } */
+
+  /* .outer-wrapper {
+    display: block !important;
+  } */
+
+  main section {
+    margin-bottom: 0px;
+  }
+
+  .top-site-outer .title {
+    padding-top: 0px !important;
+  }
+
+  .top-site-outer .title span {
+    text-overflow: "" !important;
+  }
+}
+
+@-moz-document url("about:home"), url("about:newtab") {
+  .logo-and-wordmark {
+    display: none !important;
+  }
+
+  body {
+    --newtab-search-icon: url("chrome://global/skin/icons/search-glass.svg") !important;
+  }
+
+  @-moz-document url("about:home"), url("about:newtab") {
+    .search-wrapper .search-inner-wrapper {
+      display: none !important;
+      /* padding: 0 !important; */
+    }
+  }
+}

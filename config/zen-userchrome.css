@@ -1,0 +1,43 @@
+/* hide divider line between pins + essentials and regular tabs */
+
+div#vertical-pinned-tabs-container-separator {
+    display: none !important;
+}
+
+/* turn off rounded corners in full screen. works with No Gaps mod to eliminate dead space when in shift cmd f fullscreen */
+
+/* :root:not([inDOMFullscreen='true']):not([chromehidden~='location']):not([chromehidden~='toolbar']) {
+  & #tabbrowser-tabbox #tabbrowser-tabpanels .browserSidebarContainer {
+
+    border-radius: 0 !important;
+    }
+  }
+} */
+
+/* .titlebar-buttonbox-container {
+   display: none !important;
+} */
+
+#nav-bar-overflow-button {
+    display: none !important;
+}
+
+#navigator-toolbox:not([animate="true"]) #titlebar::before {
+    outline: 0px !important;
+}
+
+/* .tab-context-line {
+  display: none !important;
+} */
+/*
+  #tabbrowser-tabs .tabbrowser-tab[usercontextid] .tab-background {
+    background-color: color-mix(
+      in srgb,
+      var(--identity-icon-color) 30%,
+      transparent 70%
+    ) !important;
+    opacity: 0.5 !important;
+  }
+  #tabbrowser-tabs .tabbrowser-tab[usercontextid][selected] .tab-background {
+    opacity: 0.8 !important;
+  } */
