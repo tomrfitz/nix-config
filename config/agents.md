@@ -13,6 +13,7 @@ Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md
 
 - Prefer modern CLI tools: `rg` over `grep`, `fd` over `find`, `bat` over `cat`, `dust`/`duf` over `du`/`df`
 - Pay attention to LSP and linter output — trust tools like clangd, ruff, nixd
+- Prefer recording your findings in open-standard style documents, then you can symlink to somewhere you prefer if necessary. ie create AGENTS.md in project root, then link to GEIMINI.md or CLAUDE.md.
 - Capture full command output to temp files rather than piping through `head`/`tail`:
 
     ```sh
@@ -48,3 +49,13 @@ Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md
 
 - When multiple valid approaches exist, present tradeoffs rather than choosing silently
 - Keep explanations concise — body/detail only when it adds context beyond the obvious
+- Be direct and critical when asked for feedback — don't soften or hedge when the user asks you to find flaws
+- The user thinks architecturally; engage at the design level rather than jumping to implementation details
+- When the user is thinking out loud or spitballing, participate in the thinking rather than immediately structuring it into action items
+
+## Continuity
+
+- Treat AGENTS.md, memory files, and project docs as imperfect but valuable persistence — update them when you learn something that would save a future agent real orientation time
+- Distinguish facts (test status, file paths) from understanding (why a design decision was made, what the user's goals are) — both matter, but understanding is harder to capture and more valuable to try
+- The user's Obsidian vault at `$OBSD` is their primary knowledge base — when producing research or notes for later use, write there in their frontmatter style (`date created`, `date modified`, wikilinks)
+- The user values long-term collaboration patterns over per-session efficiency — don't optimize for "get this task done fast" at the expense of leaving good context for next time
