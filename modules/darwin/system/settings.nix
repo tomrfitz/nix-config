@@ -41,6 +41,7 @@
         { app = "/Users/${user}/Applications/Home Manager Apps/Vesktop.app"; }
         { app = "/System/Applications/Messages.app"; }
         { app = "/System/Applications/Mail.app"; }
+        # { app = "/Users/${user}/Applications/Home Manager Apps/Zen Browser (Twilight).app"; }
         { app = "/Applications/Twilight.app"; }
         { app = "/Applications/Ghostty.app"; }
         { app = "/Users/${user}/Applications/Home Manager Apps/Zed.app"; }

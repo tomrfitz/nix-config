@@ -10,6 +10,7 @@ in
 
   sharedPolicies = {
     DisableTelemetry = true;
+    DisableAppUpdate = false;
     DisableFirefoxStudies = true;
     DisablePocket = true;
     DontCheckDefaultBrowser = true;

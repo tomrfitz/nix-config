@@ -27,7 +27,6 @@
       "thebrowsercompany-dia"
       "vivaldi"
       "vivaldi@snapshot"
-      "zen"
       "zen@twilight"
 
       # dev tools
@@ -101,7 +100,6 @@
       "iterm2"
 
       # editors / writing
-      "nvalt"
 
       # creative / design
       "figma"
