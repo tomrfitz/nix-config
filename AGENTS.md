@@ -20,6 +20,7 @@ just eval          # nix flake check (eval errors only)
 just rollback      # switch to previous generation
 just diff          # nvd diff between last two generations
 just snapshot NAME # take macOS defaults snapshot
+just rekey         # re-encrypt secrets for all recipients
 ```
 
 **Validation:** There are no tests. Correctness = `just check` (dry-run) or `just eval` succeeding. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
@@ -91,7 +92,7 @@ home.packages = [ ... ] ++ lib.optionals (!pkgs.stdenv.isDarwin) [ pkgs.element-
 
 ### Secrets
 
-Agenix manages encrypted secrets in `secrets/`. Public keys mapped in `secrets/secrets.nix`.
+Agenix manages encrypted secrets in `secrets/`. Public keys mapped in `secrets/secrets.nix`. Each machine has a dedicated passphrase-less ed25519 key at `~/.ssh/id_ed25519_agenix` for decryption — generated automatically by the bootstrap script.
 
 ### Config files
 
@@ -110,6 +111,26 @@ Agenix manages encrypted secrets in `secrets/`. Public keys mapped in `secrets/s
   - Requires a locally-generated `package-lock.json` stored in repo (npm tarballs lack lockfiles)
   - Version bump workflow: update `version`, `hash` (via `nix-prefetch-url`), and `npmDepsHash` (let builder error tell you the correct hash)
   - Monitor for GitHub releases with prebuilt binaries — could simplify packaging
+
+## Bootstrap
+
+Fresh machine setup (darwin or NixOS):
+
+```bash
+bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/main/scripts/bootstrap.sh)
+```
+
+The script handles: Xcode CLT (darwin), Nix installation, repo clone, agenix key generation, and first `darwin-rebuild`/`nixos-rebuild`. The only manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
+
+### Adding a new machine to agenix
+
+After bootstrapping, the new machine's agenix key can't decrypt existing secrets yet. From an existing machine:
+
+1. Copy the pubkey printed by the bootstrap script
+2. Add it to `secrets/secrets.nix` in the `allKeys` list
+3. Run `just rekey` (re-encrypts all secrets for the new recipient set)
+4. Commit and push
+5. Pull on the new machine and rebuild
 
 ## Active overlays
 
