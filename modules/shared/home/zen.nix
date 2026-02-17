@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   ...
@@ -11,9 +12,10 @@ in
     enable = true;
     policies = sharedPolicies;
 
-    darwinDefaultsId = lib.mkIf pkgs.stdenv.isDarwin "dev.zen-browser.twilight";
-
-    profiles.default = {
+    profiles.twilight = {
+      id = 0;
+      name = "default";
+      path = "owckmgyi.Default (twilight)";
       isDefault = true;
 
       settings = {
@@ -43,9 +45,28 @@ in
 
       search = {
         force = true;
-        default = "ddg";
-        privateDefault = "ddg";
+        default = "Kagi";
+        privateDefault = "Kagi";
+        engines.Kagi = {
+          urls = [ { template = "https://kagi.com/search?q={searchTerms}"; } ];
+          icon = "https://kagi.com/favicon.ico";
+          definedAliases = [ "@k" ];
+        };
       };
     };
   };
+
+  # Zen Browser requires write access to profiles.ini (to store install hashes
+  # and lock flags). Home-manager deploys it as a read-only nix store symlink,
+  # which causes Zen to loop on "Changes not saved". Replace the symlink with a
+  # mutable copy after link generation so Zen can update it freely.
+  home.activation.makeZenProfilesMutable = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+    zenProfiles="${config.home.homeDirectory}/Library/Application Support/zen/profiles.ini"
+    if [ -L "$zenProfiles" ]; then
+      realPath=$(readlink "$zenProfiles")
+      rm "$zenProfiles"
+      cp "$realPath" "$zenProfiles"
+      chmod u+w "$zenProfiles"
+    fi
+  '';
 }

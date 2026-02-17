@@ -27,6 +27,11 @@
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    zen-browser = {
+      url = "github:0xc000022070/zen-browser-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   outputs =
@@ -39,6 +44,7 @@
       defaults2nix,
       treefmt-nix,
       stylix,
+      zen-browser,
     }:
     let
       user = "tomrfitz";
@@ -54,7 +60,11 @@
           useGlobalPkgs = true;
           useUserPackages = true;
           backupFileExtension = "hm-backup";
-          users.${user}.imports = [ agenix.homeManagerModules.default ] ++ hmModules;
+          users.${user}.imports = [
+            agenix.homeManagerModules.default
+            zen-browser.homeModules.twilight
+          ]
+          ++ hmModules;
         };
       };
     in

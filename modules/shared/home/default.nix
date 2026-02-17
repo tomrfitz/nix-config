@@ -10,6 +10,7 @@
     ./shell.nix
     ./git.nix
     ./firefox.nix
+    ./zen.nix
     ./fastfetch.nix
     ./editors.nix
     ./ghostty.nix

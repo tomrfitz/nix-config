@@ -9,8 +9,9 @@
     # Already has Flexoki via Vencord theme links + custom CSS
     vesktop.enable = false;
 
-    # No HM-managed profiles defined — nothing for Stylix to theme
+    # Browser theming handled manually (Flexoki)
     firefox.enable = false;
     floorp.enable = false;
+    zen-browser.enable = false;
   };
 }
