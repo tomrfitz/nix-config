@@ -9,13 +9,13 @@
     ./packages.nix
     ./shell.nix
     ./git.nix
-    ./firefox.nix
-    ./zen.nix
+    # ./firefox.nix # heavy — re-enable before darwin rebuild
+    # ./zen.nix # heavy — re-enable before darwin rebuild
     ./fastfetch.nix
     ./editors.nix
-    ./ghostty.nix
-    ./vesktop.nix
-    ./obsidian.nix
+    # ./ghostty.nix # heavy — re-enable before darwin rebuild
+    # ./vesktop.nix # heavy — re-enable before darwin rebuild
+    # ./obsidian.nix # heavy — re-enable before darwin rebuild
     ./stylix.nix
   ];
 

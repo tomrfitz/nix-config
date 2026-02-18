@@ -8,6 +8,6 @@
 
   home.packages = with pkgs; [
     _1password-gui
-    emacs
+    # emacs # heavy — re-enable before darwin rebuild
   ];
 }
