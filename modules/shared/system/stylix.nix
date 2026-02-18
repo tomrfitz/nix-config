@@ -7,6 +7,13 @@
     base16Scheme = "${pkgs.base16-schemes}/share/themes/flexoki-dark.yaml";
     polarity = "dark";
 
+    fonts.sizes = {
+      applications = 12;
+      desktop = 12;
+      popups = 12;
+      terminal = 12;
+    };
+
     fonts = {
       sansSerif = {
         package = pkgs.atkinson-hyperlegible-next;
