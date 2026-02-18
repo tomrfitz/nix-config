@@ -42,6 +42,22 @@
   # Backlight control for unprivileged users
   programs.light.enable = true;
 
+  # ── SSH ───────────────────────────────────────────────────────────────
+  services.openssh = {
+    enable = true;
+    settings = {
+      PasswordAuthentication = false;
+      PermitRootLogin = "no";
+    };
+  };
+
+  # ── 1Password ─────────────────────────────────────────────────────────
+  programs._1password.enable = true;
+  programs._1password-gui = {
+    enable = true;
+    polkitPolicyOwners = [ "tomrfitz" ];
+  };
+
   # ── Face authentication (howdy) ───────────────────────────────────────
   services.linux-enable-ir-emitter.enable = true;
   services.howdy = {

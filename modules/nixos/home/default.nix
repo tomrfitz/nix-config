@@ -4,10 +4,14 @@
   ...
 }:
 {
+  imports = [
+    ./ssh.nix
+  ];
+
   home.homeDirectory = lib.mkForce "/home/tomrfitz";
 
   home.packages = with pkgs; [
-    _1password-gui
+    # 1password installed via programs._1password-gui in system config
     # emacs # heavy — re-enable later
     foot # lightweight Wayland terminal
     wofi # app launcher
