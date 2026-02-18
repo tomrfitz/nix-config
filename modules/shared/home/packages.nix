@@ -34,7 +34,6 @@
       nasm
       bun
       turso
-      xcodes
 
       # build tools
       nixpkgs-review
@@ -109,8 +108,6 @@
       speedtest-cli
       stow
       streamlink
-      swiftlint
-      swiftformat
       texinfo
       tldr
       ansifilter
@@ -175,6 +172,11 @@
       monaspace
       nerd-fonts.symbols-only
       noto-fonts-color-emoji
+    ]
+    ++ lib.optionals pkgs.stdenv.isDarwin [
+      swiftlint
+      swiftformat
+      xcodes
     ]
     ++ lib.optionals (!pkgs.stdenv.isDarwin) [
       picard # brew cask "musicbrainz-picard" on darwin (qtwayland dep)
