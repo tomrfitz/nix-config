@@ -76,6 +76,7 @@
       virtualenv
 
       # nix tooling
+      claude-code
       dix
       nh
       nixd
