@@ -8,52 +8,52 @@
   home.packages =
     with pkgs;
     [
-      opencode
-      obsidian
-      (callPackage ../../../pkgs/mdbase-tasknotes { })
+      # opencode # heavy — re-enable before darwin rebuild
+      # obsidian # heavy — re-enable before darwin rebuild
+      # (callPackage ../../../pkgs/mdbase-tasknotes { })
 
-      docker
-      dockerfmt
+      # docker # heavy — re-enable before darwin rebuild
+      # dockerfmt
 
       # dev toolchains
-      rustup
+      # rustup # heavy — re-enable before darwin rebuild
       go
       nodejs
       python3
-      deno
-      dart
-      elixir
+      # deno # heavy — re-enable before darwin rebuild
+      # dart # heavy — re-enable before darwin rebuild
+      # elixir # heavy — re-enable before darwin rebuild
       lua
-      php
-      zig
-      vlang
-      c3c
-      c3-lsp
-      openjdk
-      typst
+      # php # heavy — re-enable before darwin rebuild
+      # zig # heavy — re-enable before darwin rebuild
+      # vlang # heavy — re-enable before darwin rebuild
+      # c3c # heavy — re-enable before darwin rebuild
+      # c3-lsp # heavy — re-enable before darwin rebuild
+      # openjdk # heavy — re-enable before darwin rebuild
+      # typst # heavy — re-enable before darwin rebuild
       nasm
       bun
-      turso
+      # turso
 
       # build tools
       nixpkgs-review
       cmake
       gnumake
       ninja
-      bear
-      automake
-      autoconf-archive
+      # bear
+      # automake
+      # autoconf-archive
       ccache
-      clang-tools
-      cppcheck
-      doxygen
-      boost
-      rapidjson
-      raylib
-      libffi
-      gst_all_1.gstreamer
-      qt6Packages.qtbase
-      wxGTK32
+      # clang-tools # heavy — re-enable before darwin rebuild
+      # cppcheck
+      # doxygen
+      # boost # heavy — re-enable before darwin rebuild
+      # rapidjson
+      # raylib # heavy — re-enable before darwin rebuild
+      # libffi
+      # gst_all_1.gstreamer # heavy — re-enable before darwin rebuild
+      # qt6Packages.qtbase # heavy — re-enable before darwin rebuild
+      # wxGTK32 # heavy — re-enable before darwin rebuild
 
       # go tools
       delve
@@ -71,7 +71,7 @@
       uv
       ruff
       ty
-      beets
+      # beets # heavy — re-enable before darwin rebuild
       termdown
       virtualenv
 
@@ -107,11 +107,11 @@
       silver-searcher
       speedtest-cli
       stow
-      streamlink
+      # streamlink
       texinfo
       tldr
       ansifilter
-      fontforge
+      # fontforge # heavy — re-enable before darwin rebuild
       termshot
       lf
       lsd
@@ -121,33 +121,33 @@
       todo-txt-cli
       timewarrior
       taskwarrior-tui
-      texlive.combined.scheme-full
+      # texlive.combined.scheme-full # very heavy — re-enable before darwin rebuild
       gtypist
-      ncspot
-      mailsy
-      gemini-cli
-      powershell
+      # ncspot
+      # mailsy
+      # gemini-cli
+      # powershell # heavy — re-enable before darwin rebuild
       cargo-update
       cargo-cache
       # gossip # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
 
       # apps (migrated from Homebrew casks)
-      discord
-      slack
-      thunderbird
-      notesnook
-      audacity
-      sqlitebrowser
-      lapce
-      inkscape
-      prismlauncher
-      anki
-      chatterino2
-      qbittorrent
+      # discord # heavy — re-enable before darwin rebuild
+      # slack # heavy — re-enable before darwin rebuild
+      # thunderbird # heavy — re-enable before darwin rebuild
+      # notesnook # heavy — re-enable before darwin rebuild
+      # audacity # heavy — re-enable before darwin rebuild
+      # sqlitebrowser # heavy — re-enable before darwin rebuild
+      # lapce # heavy — re-enable before darwin rebuild
+      # inkscape # heavy — re-enable before darwin rebuild
+      # prismlauncher # heavy — re-enable before darwin rebuild
+      # anki # heavy — re-enable before darwin rebuild
+      # chatterino2 # heavy — re-enable before darwin rebuild
+      # qbittorrent # heavy — re-enable before darwin rebuild
 
       # fun
-      pear-desktop
-      zotero
+      # pear-desktop # heavy — re-enable before darwin rebuild
+      # zotero # heavy — re-enable before darwin rebuild
       _2048-in-terminal
       cbonsai
       cowsay
@@ -179,9 +179,9 @@
       xcodes
     ]
     ++ lib.optionals (!pkgs.stdenv.isDarwin) [
-      picard # brew cask "musicbrainz-picard" on darwin (qtwayland dep)
-      rustdesk # brew cask on darwin (badPlatforms)
-      element-desktop # brew cask on darwin (actool/Xcode build dep)
-      praat # linux-only
+      # picard # heavy — re-enable before darwin rebuild
+      # rustdesk # heavy — re-enable before darwin rebuild
+      # element-desktop # heavy — re-enable before darwin rebuild
+      # praat # heavy — re-enable before darwin rebuild
     ];
 }
