@@ -1,12 +1,14 @@
 # nix-config task runner
 
+flake := "~/nix-config"
+
 # Apply the current configuration
 rebuild:
-    nh darwin switch
+    nh darwin switch {{ flake }}
 
 # Build the system closure without activating
 check:
-    nh darwin build
+    nh darwin build {{ flake }}
 
 # Rollback to the previous generation
 rollback:
@@ -14,7 +16,7 @@ rollback:
 
 # Update flake inputs and rebuild
 update:
-    nh darwin switch --update
+    nh darwin switch --update {{ flake }}
 
 # Format all files (nix, toml, shell, json, md, yaml, justfile)
 fmt:
