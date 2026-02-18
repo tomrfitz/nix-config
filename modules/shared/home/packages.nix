@@ -77,10 +77,10 @@
       virtualenv
 
       # nix tooling
+      dix
       nh
       nixd
       nixfmt
-      nvd
       just
 
       # utilities

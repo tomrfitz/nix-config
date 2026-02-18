@@ -38,7 +38,7 @@ snapshot-diff before after:
 
 # Show what packages changed between current and previous generation
 diff:
-    nvd diff $(ls -d1 /nix/var/nix/profiles/system-*-link | tail -2 | head -1) /run/current-system
+    dix $(ls -d1 /nix/var/nix/profiles/system-*-link | tail -2 | head -1) /run/current-system
 
 # Re-encrypt all secrets for the current set of recipients
 rekey:
