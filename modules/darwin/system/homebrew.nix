@@ -47,7 +47,6 @@
       "chatgpt"
       "chatgpt-atlas"
       "claude"
-      "claude-code"
       "codex"
       "copilot-cli"
       "microsoft-office"
