@@ -42,6 +42,9 @@
   # Backlight control for unprivileged users
   programs.light.enable = true;
 
+  # ── Tailscale ──────────────────────────────────────────────────────────
+  services.tailscale.enable = true;
+
   # ── SSH ───────────────────────────────────────────────────────────────
   services.openssh = {
     enable = true;

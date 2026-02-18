@@ -84,6 +84,7 @@
       "macs-fan-control"
       "mist"
       "mullvad-vpn"
+      "tailscale"
       "netnewswire"
       "ollama-app"
       "onyx@beta"
