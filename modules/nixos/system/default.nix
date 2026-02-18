@@ -20,14 +20,40 @@
     };
   };
 
-  # Audio
+  # ── Audio ─────────────────────────────────────────────────────────────
   services.pipewire = {
     enable = true;
     alsa.enable = true;
     pulse.enable = true;
   };
 
-  # Needed for sway
+  # ── Hardware ──────────────────────────────────────────────────────────
   security.polkit.enable = true;
   hardware.graphics.enable = true;
+  hardware.enableRedistributableFirmware = true;
+  hardware.bluetooth.enable = true;
+  hardware.sensor.iio.enable = true; # accelerometer (auto-rotate)
+
+  # ── Power management ──────────────────────────────────────────────────
+  services.thermald.enable = true;
+  services.tlp.enable = true;
+  services.acpid.enable = true;
+
+  # Backlight control for unprivileged users
+  programs.light.enable = true;
+
+  # ── Face authentication (howdy) ───────────────────────────────────────
+  services.linux-enable-ir-emitter.enable = true;
+  services.howdy = {
+    enable = true;
+    settings.video = {
+      # Verify with: v4l2-ctl --list-devices (find the IR camera)
+      device_path = "/dev/video2";
+    };
+  };
+  security.pam.services = {
+    sudo.howdy.enable = true;
+    login.howdy.enable = true;
+    swaylock.howdy.enable = true;
+  };
 }
