@@ -8,52 +8,52 @@
   home.packages =
     with pkgs;
     [
-      # opencode # heavy — re-enable before darwin rebuild
-      # obsidian # heavy — re-enable before darwin rebuild
-      # (callPackage ../../../pkgs/mdbase-tasknotes { })
+      opencode
+      obsidian
+      (callPackage ../../../pkgs/mdbase-tasknotes { })
 
-      # docker # heavy — re-enable before darwin rebuild
-      # dockerfmt
+      docker
+      dockerfmt
 
       # dev toolchains
-      # rustup # heavy — re-enable before darwin rebuild
+      rustup
       go
       nodejs
       python3
-      # deno # heavy — re-enable before darwin rebuild
-      # dart # heavy — re-enable before darwin rebuild
-      # elixir # heavy — re-enable before darwin rebuild
+      deno
+      dart
+      elixir
       lua
-      # php # heavy — re-enable before darwin rebuild
-      # zig # heavy — re-enable before darwin rebuild
-      # vlang # heavy — re-enable before darwin rebuild
-      # c3c # heavy — re-enable before darwin rebuild
-      # c3-lsp # heavy — re-enable before darwin rebuild
-      # openjdk # heavy — re-enable before darwin rebuild
-      # typst # heavy — re-enable before darwin rebuild
+      php
+      zig
+      vlang
+      c3c
+      c3-lsp
+      openjdk
+      typst
       nasm
       bun
-      # turso
+      turso
 
       # build tools
       nixpkgs-review
       cmake
       gnumake
       ninja
-      # bear
-      # automake
-      # autoconf-archive
+      bear
+      automake
+      autoconf-archive
       ccache
-      # clang-tools # heavy — re-enable before darwin rebuild
-      # cppcheck
-      # doxygen
-      # boost # heavy — re-enable before darwin rebuild
-      # rapidjson
-      # raylib # heavy — re-enable before darwin rebuild
-      # libffi
-      # gst_all_1.gstreamer # heavy — re-enable before darwin rebuild
-      # qt6Packages.qtbase # heavy — re-enable before darwin rebuild
-      # wxGTK32 # heavy — re-enable before darwin rebuild
+      clang-tools
+      cppcheck
+      doxygen
+      boost
+      rapidjson
+      raylib
+      libffi
+      gst_all_1.gstreamer
+      qt6Packages.qtbase
+      wxGTK32
 
       # go tools
       delve
@@ -71,7 +71,7 @@
       uv
       ruff
       ty
-      # beets # heavy — re-enable before darwin rebuild
+      beets
       termdown
       virtualenv
 
@@ -107,11 +107,11 @@
       silver-searcher
       speedtest-cli
       stow
-      # streamlink
+      streamlink
       texinfo
       tldr
       ansifilter
-      # fontforge # heavy — re-enable before darwin rebuild
+      fontforge
       termshot
       lf
       lsd
@@ -121,33 +121,33 @@
       todo-txt-cli
       timewarrior
       taskwarrior-tui
-      # texlive.combined.scheme-full # very heavy — re-enable before darwin rebuild
+      texlive.combined.scheme-full
       gtypist
-      # ncspot
-      # mailsy
-      # gemini-cli
-      # powershell # heavy — re-enable before darwin rebuild
+      ncspot
+      mailsy
+      gemini-cli
+      powershell
       cargo-update
       cargo-cache
       # gossip # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
 
       # apps (migrated from Homebrew casks)
-      # discord # heavy — re-enable before darwin rebuild
-      # slack # heavy — re-enable before darwin rebuild
-      # thunderbird # heavy — re-enable before darwin rebuild
-      # notesnook # heavy — re-enable before darwin rebuild
-      # audacity # heavy — re-enable before darwin rebuild
-      # sqlitebrowser # heavy — re-enable before darwin rebuild
-      # lapce # heavy — re-enable before darwin rebuild
-      # inkscape # heavy — re-enable before darwin rebuild
-      # prismlauncher # heavy — re-enable before darwin rebuild
-      # anki # heavy — re-enable before darwin rebuild
-      # chatterino2 # heavy — re-enable before darwin rebuild
-      # qbittorrent # heavy — re-enable before darwin rebuild
+      # discord # heavy — re-enable later
+      # slack # heavy — re-enable later
+      # thunderbird # heavy — re-enable later
+      # notesnook # heavy — re-enable later
+      # audacity # heavy — re-enable later
+      # sqlitebrowser # heavy — re-enable later
+      # lapce # heavy — re-enable later
+      # inkscape # heavy — re-enable later
+      # prismlauncher # heavy — re-enable later
+      # anki # heavy — re-enable later
+      # chatterino2 # heavy — re-enable later
+      # qbittorrent # heavy — re-enable later
 
       # fun
-      # pear-desktop # heavy — re-enable before darwin rebuild
-      # zotero # heavy — re-enable before darwin rebuild
+      # pear-desktop # heavy — re-enable later
+      # zotero # heavy — re-enable later
       _2048-in-terminal
       cbonsai
       cowsay
@@ -179,9 +179,9 @@
       xcodes
     ]
     ++ lib.optionals (!pkgs.stdenv.isDarwin) [
-      # picard # heavy — re-enable before darwin rebuild
-      # rustdesk # heavy — re-enable before darwin rebuild
-      # element-desktop # heavy — re-enable before darwin rebuild
-      # praat # heavy — re-enable before darwin rebuild
+      picard # brew cask "musicbrainz-picard" on darwin (qtwayland dep)
+      rustdesk # brew cask on darwin (badPlatforms)
+      element-desktop # brew cask on darwin (actool/Xcode build dep)
+      praat # linux-only
     ];
 }
