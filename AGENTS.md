@@ -11,9 +11,9 @@ A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tra
 All common workflows are in the `justfile` (requires `just`, available via `nix develop`):
 
 ```bash
-just rebuild       # sudo darwin-rebuild switch
-just check         # dry-run (catches errors without applying)
-just update        # flake update + rebuild + nvd diff
+just rebuild       # nh darwin switch (builds + activates with diff)
+just check         # nh darwin build (dry-run with diff)
+just update        # nh darwin switch --update (flake update + rebuild)
 just fmt           # nix fmt (nixfmt)
 just fmt-check     # check formatting without modifying
 just eval          # nix flake check (eval errors only)
@@ -81,7 +81,7 @@ When a package needs different sources per platform, use `pkgs.stdenv.isDarwin` 
 
 ```nix
 # package = null means "installed outside nix" (e.g., via brew cask on macOS)
-package = if pkgs.stdenv.isDarwin then null else pkgs.ghostty;
+package = lib.mkIf pkgs.stdenv.isDarwin null;
 ```
 
 For packages that only exist on one platform, use `lib.optionals`:

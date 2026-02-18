@@ -6,18 +6,19 @@
 }:
 let
   inherit (import ./browser-policies.nix) sharedPolicies;
-  profile = config.programs.zen-browser.profiles.twilight;
+  profile = config.programs.zen-browser.profiles.default;
 in
 {
   programs.zen-browser = {
     enable = true;
     package = lib.mkIf pkgs.stdenv.isDarwin null;
+    suppressXdgMigrationWarning = true;
     policies = sharedPolicies;
 
-    profiles.twilight = {
+    profiles.default = {
       id = 0;
       name = "default";
-      path = "owckmgyi.Default (twilight)";
+      path = "default";
       isDefault = true;
 
       # ── Settings ─────────────────────────────────────────────────────
@@ -463,7 +464,7 @@ in
         };
 
       # ── Keyboard shortcuts ─────────────────────────────────────────
-      keyboardShortcutsVersion = 14;
+      keyboardShortcutsVersion = 16;
       keyboardShortcuts = [
         {
           id = "zen-compact-mode-toggle";
