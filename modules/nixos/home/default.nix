@@ -60,6 +60,8 @@
           "${mod}+Shift+s" = "exec ${pkgs.grim}/bin/grim -g \"$(${pkgs.slurp}/bin/slurp)\" - | wl-copy";
         };
 
+      output."*".scale = "1.5";
+
       input = {
         "type:touchpad" = {
           tap = "enabled";
