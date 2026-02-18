@@ -77,6 +77,7 @@
       virtualenv
 
       # nix tooling
+      nh
       nixd
       nixfmt
       nvd
