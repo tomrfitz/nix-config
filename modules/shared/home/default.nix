@@ -191,6 +191,10 @@
   # Ensure the SSH ControlPath directory exists
   home.file.".ssh/sockets/.keep".text = "";
 
+  home.file.".ssh/authorized_keys".text = ''
+    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJAf+U5Lj9RGzpxZJWVBTFpEAIqY2oTQor3URBBzWY2v
+  '';
+
   # ── Agent instructions (config/agents.md is the single source of truth) ──
   home.file.".config/AGENTS.md".source = ../../../config/agents.md;
   home.file.".claude/CLAUDE.md".source = ../../../config/agents.md;
