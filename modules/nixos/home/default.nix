@@ -5,7 +5,6 @@
 }:
 {
   imports = [
-    ./ssh.nix
   ];
 
   home.homeDirectory = lib.mkForce "/home/tomrfitz";
