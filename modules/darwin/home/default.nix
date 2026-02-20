@@ -7,7 +7,6 @@
   imports = [
     ./zsh.nix
     ./git.nix
-    ./ssh.nix
     ./topgrade.nix
   ];
 

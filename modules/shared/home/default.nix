@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  sshPublicKey,
   ...
 }:
 {
@@ -25,6 +26,15 @@
   home.sessionVariables = {
     EDITOR = "zeditor";
     NH_FLAKE = "$HOME/nix-config";
+
+    # Prefer 1Password's SSH agent everywhere (family/shared workflow).
+    # SSH also explicitly points at the same socket via `IdentityAgent`.
+    SSH_AUTH_SOCK =
+      if pkgs.stdenv.isDarwin then
+        "${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+      else
+        "${config.home.homeDirectory}/.1password/agent.sock";
+
     XDG_CONFIG_HOME = "$HOME/.config";
     XDG_CACHE_HOME = "$HOME/.cache";
     XDG_DATA_HOME = "$HOME/.local/share";
@@ -178,6 +188,16 @@
     enable = true;
     enableDefaultConfig = false;
     matchBlocks = {
+      "*" = {
+        extraOptions = {
+          AddKeysToAgent = "yes";
+          IdentityAgent =
+            if pkgs.stdenv.isDarwin then
+              "\"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock\""
+            else
+              "~/.1password/agent.sock";
+        };
+      };
       "github.com" = {
         extraOptions = {
           ControlMaster = "auto";
@@ -191,9 +211,13 @@
   # Ensure the SSH ControlPath directory exists
   home.file.".ssh/sockets/.keep".text = "";
 
-  home.file.".ssh/authorized_keys".text = ''
-    ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJAf+U5Lj9RGzpxZJWVBTFpEAIqY2oTQor3URBBzWY2v
-  '';
+  # On NixOS, prefer managing authorized keys via `users.users.<name>.openssh.authorizedKeys`.
+  # macOS doesn't have an equivalent declarative system-level module, so keep it in HM.
+  home.file.".ssh/authorized_keys" = lib.mkIf pkgs.stdenv.isDarwin {
+    text = ''
+      ${sshPublicKey}
+    '';
+  };
 
   # ── Agent instructions (config/agents.md is the single source of truth) ──
   home.file.".config/AGENTS.md".source = ../../../config/agents.md;
