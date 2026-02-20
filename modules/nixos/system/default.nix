@@ -61,6 +61,16 @@
     polkitPolicyOwners = [ "tomrfitz" ];
   };
 
+  # Allow Zen Browser to communicate with 1Password
+  # (1Password verifies browser binaries against an allowlist)
+  # Note: Firefox is built-in, but Zen and other forks need explicit allowlisting
+  environment.etc."1password/custom_allowed_browsers".text = ''
+    zen
+    zen-bin
+    zen-twilight
+  '';
+  environment.etc."1password/custom_allowed_browsers".mode = "0755";
+
   # ── Face authentication (howdy) ───────────────────────────────────────
   services.linux-enable-ir-emitter.enable = true;
   services.howdy = {
