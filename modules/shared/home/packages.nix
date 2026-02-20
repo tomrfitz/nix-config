@@ -11,6 +11,9 @@
       obsidian
       (callPackage ../../../pkgs/mdbase-tasknotes { })
 
+      yazi
+      tailscale
+
       docker
       dockerfmt
 

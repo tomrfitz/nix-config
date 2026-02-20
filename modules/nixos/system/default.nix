@@ -65,6 +65,7 @@
   services.linux-enable-ir-emitter.enable = true;
   services.howdy = {
     enable = true;
+    control = "sufficient";
     settings.video = {
       # Verify with: v4l2-ctl --list-devices (find the IR camera)
       device_path = "/dev/video2";
