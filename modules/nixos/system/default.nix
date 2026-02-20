@@ -81,18 +81,36 @@
   environment.etc."1password/custom_allowed_browsers".mode = "0755";
 
   # ── Face authentication (howdy) ───────────────────────────────────────
-  services.linux-enable-ir-emitter.enable = true;
+  services.linux-enable-ir-emitter = {
+    enable = true;
+    device = "video2"; # IR camera (interface 1.2 on USB hub 0:6)
+  };
   services.howdy = {
     enable = true;
     control = "sufficient";
     settings.video = {
-      # Verify with: v4l2-ctl --list-devices (find the IR camera)
-      device_path = "/dev/video2";
+      # Stable by-path avoids /dev/videoN renumbering across boots
+      # USB 0:6 interface 1.2 = IR camera (720p HD Camera)
+      device_path = "/dev/v4l/by-path/pci-0000:00:14.0-usb-0:6:1.2-video-index0";
+      # IR sensor native resolution — 640x480 causes cropping/static
+      frame_width = 340;
+      frame_height = 340;
     };
   };
   security.pam.services = {
     sudo.howdy.enable = true;
     login.howdy.enable = true;
     swaylock.howdy.enable = true;
+    polkit-1.howdy.enable = true; # 1Password uses polkit for system auth
   };
+
+  # Workaround: polkit 127 sandboxes polkit-agent-helper, blocking camera access
+  # Remove when nixpkgs#486044 merges or polkit is patched upstream
+  systemd.services."polkit-agent-helper@".serviceConfig = {
+    DeviceAllow = "char-video4linux rw";
+    PrivateDevices = "no";
+  };
+
+  # v4l-utils for camera diagnostics (v4l2-ctl)
+  environment.systemPackages = [ pkgs.v4l-utils ];
 }
