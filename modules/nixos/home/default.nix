@@ -11,7 +11,7 @@
 
   home.packages = with pkgs; [
     # 1password installed via programs._1password-gui in system config
-    # emacs # heavy — re-enable later
+    emacs
     foot # lightweight Wayland terminal
     wofi # app launcher
     wl-clipboard

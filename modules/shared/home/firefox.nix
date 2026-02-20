@@ -18,11 +18,13 @@ in
   programs.firefox = {
     enable = true;
     policies = sharedPolicies;
+    nativeMessagingHosts = [ pkgs._1password-gui ];
   };
 
   # ── Floorp ─────────────────────────────────────────────────────────────
   programs.floorp = {
     enable = true;
     policies = sharedPolicies;
+    nativeMessagingHosts = [ pkgs._1password-gui ];
   };
 }

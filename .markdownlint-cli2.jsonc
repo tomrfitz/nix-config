@@ -1,1 +1,21 @@
-config/markdownlint-cli2.jsonc
+{
+    "config": {
+        "MD009": true,
+        "MD012": true,
+        "MD022": true,
+        "MD023": true,
+        "MD026": { "punctuation": ".,;:!" },
+        "MD029": { "style": "ordered" },
+        "MD030": true,
+        "MD031": true,
+        "MD034": true,
+        "MD047": true,
+        "MD049": { "style": "consistent" },
+        "MD050": { "style": "consistent" },
+
+        "MD013": false,
+        "MD024": { "siblings_only": true },
+        "MD025": false,
+        "MD033": false
+    }
+}

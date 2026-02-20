@@ -16,7 +16,7 @@
     ./fastfetch.nix
     ./editors.nix
     ./ghostty.nix
-    # ./vesktop.nix # heavy — re-enable before darwin rebuild
+    ./vesktop.nix
     ./obsidian.nix
     ./stylix.nix
     ./ruff.nix
@@ -27,6 +27,8 @@
   ];
 
   home.stateVersion = "24.11";
+
+  xdg.enable = true;
 
   # ── Session environment ────────────────────────────────────────────────
   home.sessionVariables = {
@@ -41,10 +43,6 @@
       else
         "${config.home.homeDirectory}/.1password/agent.sock";
 
-    XDG_CONFIG_HOME = "$HOME/.config";
-    XDG_CACHE_HOME = "$HOME/.cache";
-    XDG_DATA_HOME = "$HOME/.local/share";
-    XDG_STATE_HOME = "$HOME/.local/state";
     VCPKG_ROOT = "$HOME/vcpkg";
     OLLAMA_GPU_LAYERS = "-1";
     OLLAMA_KEEP_ALIVE = "5m";
@@ -95,81 +93,9 @@
   programs.ripgrep.enable = true;
   programs.jq.enable = true;
 
-  programs.btop = {
-    enable = true;
-    settings = {
-      theme_background = true;
-      truecolor = true;
-      force_tty = false;
-      presets = "cpu:1:default,proc:0:default cpu:0:default,mem:0:default,net:0:default cpu:0:block,net:0:tty";
-      vim_keys = false;
-      rounded_corners = true;
-      terminal_sync = true;
-      graph_symbol = "braille";
-      graph_symbol_cpu = "default";
-      graph_symbol_mem = "default";
-      graph_symbol_net = "default";
-      graph_symbol_proc = "default";
-      shown_boxes = "cpu mem net proc";
-      update_ms = 2000;
-      proc_sorting = "cpu lazy";
-      proc_reversed = false;
-      proc_tree = false;
-      proc_colors = true;
-      proc_gradient = true;
-      proc_per_core = false;
-      proc_mem_bytes = true;
-      proc_cpu_graphs = true;
-      proc_info_smaps = false;
-      proc_left = false;
-      proc_filter_kernel = false;
-      proc_aggregate = false;
-      keep_dead_proc_usage = false;
-      cpu_graph_upper = "Auto";
-      cpu_graph_lower = "Auto";
-      cpu_invert_lower = true;
-      cpu_single_graph = false;
-      cpu_bottom = false;
-      show_uptime = true;
-      show_cpu_watts = true;
-      check_temp = true;
-      cpu_sensor = "Auto";
-      show_coretemp = true;
-      cpu_core_map = "";
-      temp_scale = "celsius";
-      base_10_sizes = false;
-      show_cpu_freq = true;
-      clock_format = "%X";
-      background_update = true;
-      custom_cpu_name = "";
-      disks_filter = "";
-      mem_graphs = true;
-      mem_below_net = false;
-      zfs_arc_cached = true;
-      show_swap = true;
-      swap_disk = true;
-      show_disks = true;
-      only_physical = true;
-      use_fstab = true;
-      zfs_hide_datasets = false;
-      disk_free_priv = false;
-      show_io_stat = true;
-      io_mode = false;
-      io_graph_combined = false;
-      io_graph_speeds = "";
-      net_download = 100;
-      net_upload = 100;
-      net_auto = true;
-      net_sync = true;
-      net_iface = "";
-      base_10_bitrate = "Auto";
-      show_battery = true;
-      selected_battery = "Auto";
-      show_battery_watts = true;
-      log_level = "WARNING";
-      save_config_on_exit = true;
-    };
-  };
+  programs.btop.enable = true;
+
+  programs.nushell.enable = true;
 
   programs.htop.enable = true;
   programs.gh = {
@@ -234,7 +160,49 @@
   home.file.".clang-format".source = ../../../config/clang-format;
 
   home.file.".editorconfig".source = ../../../config/editorconfig;
-  home.file.".markdownlint-cli2.jsonc".source = ../../../config/markdownlint-cli2.jsonc;
+  home.file.".hushlogin".text = "";
+
+  # markdownlint-cli2 config (shared by Zed ext, obsidian-markdownlint, CLI)
+  home.file.".markdownlint-cli2.jsonc".text = builtins.toJSON {
+    config = {
+      MD009 = true;
+      MD012 = true;
+      MD022 = true;
+      MD023 = true;
+      MD026 = {
+        punctuation = ".,;:!";
+      };
+      MD029 = {
+        style = "ordered";
+      };
+      MD030 = true;
+      MD031 = true;
+      MD034 = true;
+      MD047 = true;
+      MD049 = {
+        style = "consistent";
+      };
+      MD050 = {
+        style = "consistent";
+      };
+
+      # Relaxations for Obsidian compatibility
+      MD013 = false;
+      MD024 = {
+        siblings_only = true;
+      };
+      MD025 = false;
+      MD033 = false;
+    };
+  };
+
+  # todo-txt-cli config
+  home.file.".todo.cfg".text = ''
+    export TODO_DIR="$HOME"
+    export TODO_FILE="$TODO_DIR/todo.txt"
+    export DONE_FILE="$TODO_DIR/done.txt"
+    export REPORT_FILE="$TODO_DIR/report.txt"
+  '';
 
   programs.home-manager.enable = true;
 
@@ -244,7 +212,10 @@
     settings = {
       misc = {
         pre_sudo = false;
-        disable = [ "nix" ];
+        disable = [
+          "nix"
+          "home_manager"
+        ];
         cleanup = true;
         skip_notify = true;
         no_retry = true;
