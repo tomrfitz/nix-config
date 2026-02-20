@@ -1,6 +1,7 @@
 {
   pkgs,
   user,
+  sshPublicKey,
   ...
 }:
 {
@@ -30,7 +31,7 @@
     ];
     shell = pkgs.zsh;
     openssh.authorizedKeys.keys = [
-      "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJAf+U5Lj9RGzpxZJWVBTFpEAIqY2oTQor3URBBzWY2v"
+      sshPublicKey
     ];
   };
 }

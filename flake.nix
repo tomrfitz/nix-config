@@ -48,6 +48,9 @@
     }:
     let
       user = "tomrfitz";
+      fullName = "Thomas FitzGerald";
+      email = "tomrfitz@gmail.com";
+      sshPublicKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJAf+U5Lj9RGzpxZJWVBTFpEAIqY2oTQor3URBBzWY2v";
       systems = [
         "aarch64-darwin"
         "x86_64-linux"
@@ -60,6 +63,14 @@
           useGlobalPkgs = true;
           useUserPackages = true;
           backupFileExtension = "hm-backup";
+          extraSpecialArgs = {
+            inherit
+              user
+              fullName
+              email
+              sshPublicKey
+              ;
+          };
           users.${user}.imports = [
             agenix.homeManagerModules.default
             zen-browser.homeModules.twilight
@@ -67,53 +78,93 @@
           ++ hmModules;
         };
       };
+
+      mkDarwinHost =
+        {
+          system,
+          host,
+          overlays ? [ ],
+          hmModules,
+          extraModules ? [ ],
+        }:
+        nix-darwin.lib.darwinSystem {
+          inherit system;
+          specialArgs = {
+            inherit
+              agenix
+              user
+              fullName
+              email
+              sshPublicKey
+              ;
+          };
+          modules = [
+            {
+              nixpkgs.overlays = overlays;
+            }
+            host
+            home-manager.darwinModules.home-manager
+            (mkHM hmModules)
+            stylix.darwinModules.stylix
+          ]
+          ++ extraModules;
+        };
+
+      mkNixosHost =
+        {
+          system,
+          host,
+          hmModules,
+          extraModules ? [ ],
+        }:
+        nixpkgs.lib.nixosSystem {
+          inherit system;
+          specialArgs = {
+            inherit
+              user
+              fullName
+              email
+              sshPublicKey
+              ;
+          };
+          modules = [
+            host
+            home-manager.nixosModules.home-manager
+            (mkHM hmModules)
+            stylix.nixosModules.stylix
+          ]
+          ++ extraModules;
+        };
     in
     {
-      darwinConfigurations.trfmbp = nix-darwin.lib.darwinSystem {
-        specialArgs = { inherit agenix user; };
-        modules = [
-          {
-            nixpkgs.hostPlatform = "aarch64-darwin";
-            nixpkgs.overlays = [
-              (import ./overlays/vesktop-darwin.nix)
-              (import ./overlays/zed-editor-darwin.nix)
-            ];
-          }
-          ./hosts/trfmbp
-          home-manager.darwinModules.home-manager
-          (mkHM [
-            ./modules/shared/home
-            ./modules/darwin/home
-          ])
-          stylix.darwinModules.stylix
+      darwinConfigurations.trfmbp = mkDarwinHost {
+        system = "aarch64-darwin";
+        host = ./hosts/trfmbp;
+        overlays = [
+          (import ./overlays/vesktop-darwin.nix)
+          (import ./overlays/zed-editor-darwin.nix)
+        ];
+        hmModules = [
+          ./modules/shared/home
+          ./modules/darwin/home
         ];
       };
 
-      nixosConfigurations.trfnix = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit user; };
-        modules = [
-          { nixpkgs.hostPlatform = "x86_64-linux"; }
-          ./hosts/trfnix
-          home-manager.nixosModules.home-manager
-          (mkHM [
-            ./modules/shared/home
-            ./modules/nixos/home
-          ])
-          stylix.nixosModules.stylix
+      nixosConfigurations.trfnix = mkNixosHost {
+        system = "x86_64-linux";
+        host = ./hosts/trfnix;
+        hmModules = [
+          ./modules/shared/home
+          ./modules/nixos/home
         ];
       };
 
-      nixosConfigurations.trfhomelab = nixpkgs.lib.nixosSystem {
-        specialArgs = { inherit user; };
-        modules = [
-          { nixpkgs.hostPlatform = "x86_64-linux"; }
-          ./hosts/trfhomelab
-          home-manager.nixosModules.home-manager
-          (mkHM [
-            ./modules/shared/home
-            ./modules/nixos/home
-          ])
-          stylix.nixosModules.stylix
+      nixosConfigurations.trfhomelab = mkNixosHost {
+        system = "x86_64-linux";
+        host = ./hosts/trfhomelab;
+        hmModules = [
+          ./modules/shared/home
+          ./modules/nixos/home
         ];
       };
 

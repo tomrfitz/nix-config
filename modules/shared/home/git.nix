@@ -1,12 +1,11 @@
 {
   pkgs,
   lib,
+  fullName,
+  email,
+  sshPublicKey,
   ...
 }:
-let
-  fullName = "Thomas FitzGerald";
-  email = "tomrfitz@gmail.com";
-in
 {
   # ── Git ────────────────────────────────────────────────────────────────
   programs.git = {
@@ -15,7 +14,7 @@ in
     lfs.enable = true;
 
     signing = {
-      key = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIJAf+U5Lj9RGzpxZJWVBTFpEAIqY2oTQor3URBBzWY2v";
+      key = sshPublicKey;
       signByDefault = true;
       format = "ssh";
     };
