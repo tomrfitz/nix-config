@@ -5,6 +5,7 @@
 }:
 {
   imports = [
+    ./darkman.nix
   ];
 
   home.homeDirectory = lib.mkForce "/home/tomrfitz";
@@ -77,9 +78,36 @@
     };
   };
 
+  # Polkit authentication agent (required for 1Password system auth, etc.)
+  systemd.user.services.polkit-gnome-agent = {
+    Unit = {
+      Description = "polkit-gnome-authentication-agent-1";
+      After = [ "graphical-session.target" ];
+      PartOf = [ "graphical-session.target" ];
+    };
+    Service = {
+      Type = "simple";
+      ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
+      Restart = "on-failure";
+      RestartSec = 1;
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+  };
+
   # Notification daemon
   services.mako = {
     enable = true;
     settings.default-timeout = 5000;
+  };
+
+  # Blue light filter (screen temperature) for Wayland
+  # Uses geoclue2 for automatic location detection (like macOS Night Shift)
+  services.gammastep = {
+    enable = true;
+    provider = "geoclue2";
+    temperature = {
+      day = 6500;
+      night = 3000;
+    };
   };
 }
