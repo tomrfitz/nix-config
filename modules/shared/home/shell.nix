@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   ...
@@ -9,12 +10,19 @@
     enable = true;
     enableCompletion = true;
 
+    # Preemptively adopt HM's upcoming default: keep zsh dotfiles in XDG.
+    dotDir = "${config.xdg.configHome}/zsh";
+
     shellAliases = {
       ls = "eza --group-directories-first --icons --hyperlink --time-style=long-iso";
-      sa = "source ~/.zshrc && echo \"ZSH aliases sourced.\"";
+      sa = "source \"${"ZDOTDIR:-$HOME"}/.zshrc\" && echo \"ZSH aliases sourced.\"";
       histrg = "cat ~/.zsh_history | grep";
       mdlint = "markdownlint-cli2";
       mdfix = "markdownlint-cli2 --fix";
+
+      # 1Password CLI helpers
+      oprun = "op run --";
+      oprunenv = "op run --environment";
     };
 
     envExtra = ''
@@ -30,6 +38,12 @@
     completionInit = ''
       autoload -Uz compinit
       compdump="$HOME/.zcompdump"
+
+      # Third-party completion functions must be on `fpath` before `compinit`.
+      if [ -d "$HOME/.docker/completions" ]; then
+        fpath=("$HOME/.docker/completions" ''${fpath[@]})
+      fi
+
       if [[ ! -f "$compdump" || -n $(find "$compdump" -mtime +1 2>/dev/null) ]]; then
         compinit
       else
@@ -49,9 +63,6 @@
           source <(COMPLETE=zsh jj)
         fi
 
-        # Docker completions
-        [ -d "$HOME/.docker/completions" ] && fpath=("$HOME/.docker/completions" ''${fpath[@]})
-
         # uv completions
         if command -v uv &>/dev/null; then
           eval "$(uv generate-shell-completion zsh)"
@@ -63,6 +74,24 @@
 
         # Source custom environment file if it exists
         [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
+
+        # Load env vars from a 1Password Environment into the current shell.
+        # Requires 1Password CLI beta with `op environment read`.
+        oploadenv() {
+          if [ $# -ne 1 ]; then
+            echo "usage: oploadenv <OP_ENVIRONMENT_ID>" >&2
+            return 2
+          fi
+          if ! op environment read --help >/dev/null 2>&1; then
+            echo "op environment read is not available in this op build" >&2
+            echo "Hint: requires 1Password CLI >= 2.33.0-beta.02" >&2
+            return 1
+          fi
+
+          set -a
+          source <(op environment read "$1")
+          set +a
+        }
 
         function set_win_title() {
           echo -ne "\033]0; $(basename "$PWD") \007"
@@ -89,6 +118,7 @@
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
+    enableNushellIntegration = true;
     settings = {
       command_timeout = 500;
       scan_timeout = 30;
@@ -382,6 +412,7 @@
   programs.atuin = {
     enable = true;
     enableZshIntegration = true;
+    enableFishIntegration = true;
     settings = {
       dotfiles.enabled = true;
       enter_accept = true;
@@ -393,11 +424,13 @@
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
+    enableFishIntegration = true;
   };
 
   # ── Fzf ────────────────────────────────────────────────────────────────
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
+    enableFishIntegration = true;
   };
 }
