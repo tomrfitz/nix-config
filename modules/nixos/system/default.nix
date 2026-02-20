@@ -25,6 +25,20 @@
   # Falls back to America/New_York if location detection fails
   services.automatic-timezoned.enable = true;
 
+  # ── Sun-based theme and screen temperature ────────────────────────────
+  # Automatic dark/light mode switching based on sunrise/sunset
+  services.darkman.enable = true;
+
+  # Blue light filter (screen temperature) for Wayland
+  services.wlsunset = {
+    enable = true;
+    provider = "geoclue2"; # Auto-detect location
+    temperature = {
+      day = 6500;
+      night = 3000;
+    };
+  };
+
   # ── Audio ─────────────────────────────────────────────────────────────
   services.pipewire = {
     enable = true;
