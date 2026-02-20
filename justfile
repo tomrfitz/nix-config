@@ -53,13 +53,8 @@ snapshot-diff before after:
     ./scripts/snapshot-defaults.sh diff {{ before }} {{ after }}
 
 # Show what packages changed between current and previous generation
-[macos]
 diff:
     dix $(ls -d1 /nix/var/nix/profiles/system-*-link | tail -2 | head -1) /run/current-system
-
-[linux]
-diff:
-    nvd diff $(ls -d1 /nix/var/nix/profiles/system-*-link | tail -2 | head -1) /run/current-system
 
 # Re-encrypt all secrets for the current set of recipients
 rekey:
