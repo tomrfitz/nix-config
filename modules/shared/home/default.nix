@@ -151,10 +151,10 @@
     '';
   };
 
-  # ── Agent instructions (config/agents.md is the single source of truth) ──
-  home.file.".config/AGENTS.md".source = ../../../config/agents.md;
-  home.file.".config/opencode/AGENTS.md".source = ../../../config/agents.md;
-  home.file.".claude/CLAUDE.md".source = ../../../config/agents.md;
+  # ── Agent instructions (each tool looks for instructions at a different path) ──
+  home.file.".config/AGENTS.md".source = ../../../config/agents.md; # generic / Gemini
+  home.file.".config/opencode/AGENTS.md".source = ../../../config/agents.md; # OpenCode
+  home.file.".claude/CLAUDE.md".source = ../../../config/agents.md; # Claude Code
   home.file.".claude/settings.json".source = ../../../config/claude-settings.json;
 
   # ── Dotfiles managed via config/ ────────────────────────────────────────

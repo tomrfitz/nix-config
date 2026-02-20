@@ -87,6 +87,13 @@ modules/
 - **Package source priority:** nixpkgs shared → nixpkgs platform-specific → homebrew casks → Mac App Store (mas)
 - **Brew-preferred exceptions:** 1Password, Emacs (macOS native patches), Ghostty, Zed (need keychain/native integration)
 
+### Guardrails
+
+- **Don't run `just rebuild`** unless explicitly asked — it mutates the live system
+- **Don't modify `flake.lock`** directly — that's `just update`'s job
+- **Don't add packages to platform modules** without first checking if they work in `modules/shared/`
+- **Don't create new top-level modules** without discussing placement — the structure is intentional
+
 ### Platform-conditional pattern
 
 When a package needs different sources per platform, use `pkgs.stdenv.isDarwin` in a shared module rather than duplicating across platform modules:
