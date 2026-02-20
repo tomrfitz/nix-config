@@ -32,7 +32,7 @@
 
   # ── Session environment ────────────────────────────────────────────────
   home.sessionVariables = {
-    EDITOR = "zeditor --wait";
+    EDITOR = "zeditor --wait"; # overridden on darwin (zsh.nix) to use the .app CLI
     NH_FLAKE = "$HOME/nix-config";
 
     # Prefer 1Password's SSH agent everywhere (family/shared workflow).
