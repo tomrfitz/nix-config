@@ -58,4 +58,4 @@ diff:
 
 # Re-encrypt all secrets for the current set of recipients
 rekey:
-    cd secrets && agenix --rekey
+    cd secrets && agenix --rekey -i ~/.ssh/id_ed25519_agenix
