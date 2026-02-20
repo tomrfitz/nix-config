@@ -20,6 +20,10 @@
     };
   };
 
+  # ── Time zone ─────────────────────────────────────────────────────────
+  time.timeZone = "America/New_York";
+  services.automatic-timezoned.enable = true;
+
   # ── Audio ─────────────────────────────────────────────────────────────
   services.pipewire = {
     enable = true;
