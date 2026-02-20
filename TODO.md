@@ -2,20 +2,24 @@
 
 ## Next Steps
 
-- [ ] Configure alacritty and kitty settings (currently just `.enable = true`)
-- [ ] Helix language servers — configure LSPs
+- [ ] Helix language servers — configure and pin per-language tooling (nixd/ruff/ty/etc.)
 - [ ] Real secrets via agenix (API tokens, SSH keys — currently only a test secret)
-- [ ] Desktop wallpaper (nix-darwin can manage this)
 - [ ] Auto-update via launchd agent (nix flake update + rebuild on schedule)
 - [ ] Login items — investigate declaring startup apps via `launchd.agents`
 - [ ] Audit imperatively installed cargo packages (`rana`, `sgram-tui`) — package in nix or keep in cargo
+
+## Upstream Watchlist
+
+- [ ] `REVISIT(upstream): remove zed darwin overlay after fix is present in pinned nixpkgs rev; ref: https://github.com/NixOS/nixpkgs/pull/490957; checked: 2026-02-20`
+- [ ] `REVISIT(upstream): remove vesktop darwin overlay after upstream fix lands in pinned nixpkgs rev; ref: https://github.com/NixOS/nixpkgs/issues/489725; checked: 2026-02-20`
+- [ ] `REVISIT(upstream): remove polkit-agent-helper workaround once camera-device sandboxing fix lands; ref: https://github.com/NixOS/nixpkgs/issues/486044; checked: 2026-02-20`
 
 ## Phase 1 — NixOS-WSL homelab (`trfwsl`)
 
 Interim homelab on gaming PC via NixOS-WSL. See AGENTS.md Roadmap for context.
 
 - [ ] Add `nixos-wsl` flake input (follows nixpkgs)
-- [ ] Rename `trfhomelab` host → `trfwsl`, add WSL module (`wsl.enable`, `wsl.defaultUser`)
+- [ ] Add WSL module (`wsl.enable`, `wsl.defaultUser`) to `hosts/trfwsl`
 - [ ] Bootstrap NixOS-WSL on gaming PC (import tarball, generate agenix key, rekey)
 - [ ] Set up Tailscale (`services.tailscale.enable`) for remote access from Mac/phone
 - [ ] Create `modules/nixos/system/homelab.nix` for service definitions (host-agnostic)
@@ -119,3 +123,5 @@ declared via `launchd.agents` in home-manager instead.
 - [x] xcodes CLI added to nix packages (Xcode managed via `xcodes install`)
 - [x] Axonium, iA Writer dropped (not needed)
 - [x] Imperative install audit complete
+- [x] Configure alacritty and kitty via home-manager
+- [x] Desktop wallpaper managed via Stylix (`config/wallpaper.jpg`)

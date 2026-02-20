@@ -30,7 +30,7 @@ just fmt           # nix fmt (nixfmt)
 just fmt-check     # check formatting without modifying
 just eval          # nix flake check (eval errors only)
 just rollback      # switch to previous generation
-just diff          # nvd diff between last two generations
+just diff          # dix diff between previous and current system profile
 just snapshot NAME # take macOS defaults snapshot
 just rekey         # re-encrypt secrets for all recipients
 ```
@@ -43,7 +43,7 @@ just rekey         # re-encrypt secrets for all recipients
 
 ### Flake structure
 
-`flake.nix` defines one darwin host and two NixOS hosts (one bare-metal, one WSL stub) plus a `mkHM` helper that wires home-manager with agenix for each host. Inputs: nixpkgs (unstable), nix-darwin, home-manager, agenix, defaults2nix.
+`flake.nix` defines one darwin host and two NixOS hosts (one bare-metal, one WSL stub) plus host builders (`mkDarwinHost`/`mkNixosHost`) and a `mkHM` helper that wires home-manager modules consistently. Core inputs: nixpkgs (unstable), nix-darwin, home-manager, agenix, stylix, treefmt-nix, defaults2nix, zen-browser.
 
 ### Hosts are thin wiring
 
@@ -54,38 +54,39 @@ just rekey         # re-encrypt secrets for all recipients
 ```text
 modules/
   shared/          # Cross-platform (maximized — put everything here first)
-    system/nix.nix # Flakes, unfree, nix-command
-    home/          # Focused modules: packages, shell, git, editors, firefox, etc.
+    system/        # nix.nix, stylix.nix
+    home/          # Focused modules: packages, shell, git, editors, browser, media, tooling
   darwin/          # macOS-only
     system/        # homebrew.nix, settings.nix (system.defaults), security.nix
-    home/          # zsh.nix, git.nix (1Password signing), ssh.nix, topgrade.nix
-  nixos/           # Linux-only (minimal stubs)
-    system/        # Just enables zsh
-    home/          # homeDirectory, 1password-gui, emacs
+    home/          # zsh.nix, git.nix (1Password signing), topgrade.nix, aerospace.nix, sketchybar.nix
+  nixos/           # Linux-only
+    system/        # zsh/nh, sway+greetd, tailscale, 1Password GUI, howdy, openssh
+    home/          # homeDirectory, sway config, darkman, mako, gammastep
 ```
 
 `default.nix` files are aggregators — mostly import lists.
 
 ### Common edit locations
 
-| Task                                     | File                                 |
-| ---------------------------------------- | ------------------------------------ |
-| Add/remove nix packages                  | `modules/shared/home/packages.nix`   |
-| Add/remove macOS casks                   | `modules/darwin/system/homebrew.nix` |
-| Change macOS system settings             | `modules/darwin/system/settings.nix` |
-| Shell aliases/functions (cross-platform) | `modules/shared/home/shell.nix`      |
-| Shell aliases/functions (macOS-only)     | `modules/darwin/home/zsh.nix`        |
-| Configure editors                        | `modules/shared/home/editors.nix`    |
-| Firefox extensions                       | `modules/shared/home/firefox.nix`    |
-| Git settings (shared)                    | `modules/shared/home/git.nix`        |
-| Git settings (1Password signing)         | `modules/darwin/home/git.nix`        |
+- Add/remove nix packages: `modules/shared/home/packages.nix`
+- Add/remove macOS casks: `modules/darwin/system/homebrew.nix`
+- Change macOS system settings: `modules/darwin/system/settings.nix`
+- Shell aliases/functions (cross-platform): `modules/shared/home/shell.nix`
+- Shell aliases/functions (macOS-only): `modules/darwin/home/zsh.nix`
+- Linux system services: `modules/nixos/system/default.nix`
+- Linux desktop/session behavior: `modules/nixos/home/{default,darkman}.nix`
+- Configure editors: `modules/shared/home/editors.nix`
+- Firefox extensions: `modules/shared/home/firefox.nix`
+- Git settings (shared): `modules/shared/home/git.nix`
+- Git settings (1Password signing): `modules/darwin/home/git.nix`
+- Stylix defaults / fonts: `modules/shared/system/stylix.nix`
 
 ### Key design rules
 
 - **Maximize `modules/shared/`** — platform-specific modules only for genuine differences (e.g., 1Password SSH agent path, homebrew, macOS system.defaults)
 - **Prefer native home-manager modules** (`programs.*`) over `home.file` when available
 - **Package source priority:** nixpkgs shared → nixpkgs platform-specific → homebrew casks → Mac App Store (mas)
-- **Brew-preferred exceptions:** 1Password, Emacs (macOS native patches), Ghostty, Zed (need keychain/native integration)
+- **Brew-preferred exceptions:** 1Password, Emacs (macOS native patches), Ghostty (macOS app integration)
 
 ### Guardrails
 
@@ -93,6 +94,14 @@ modules/
 - **Don't modify `flake.lock`** directly — that's `just update`'s job
 - **Don't add packages to platform modules** without first checking if they work in `modules/shared/`
 - **Don't create new top-level modules** without discussing placement — the structure is intentional
+
+### Upstream Revisit Notation
+
+For temporary workarounds blocked on upstream changes, use this marker in comments and TODOs:
+
+- `REVISIT(upstream): <action when unblocked>; ref: <url-or-issue>; checked: <YYYY-MM-DD>`
+- Keep one central checklist in `TODO.md` under an "Upstream Watchlist" section.
+- When updating `flake.lock`, re-check all `REVISIT(upstream)` items before removing overrides/workarounds.
 
 ### Platform-conditional pattern
 
@@ -121,8 +130,8 @@ Agenix manages encrypted secrets in `secrets/`. Public keys mapped in `secrets/s
 
 - **Palette:** Flexoki (dark + light variants) across Ghostty, Zed, Helix, Vesktop
 - **Fonts:** Atkinson Hyperlegible (sans + mono)
-- **Stylix:** added to flake, single polarity (dark) for now; auto-switching via launchd + specialisations planned separately
-- **Exclude from Stylix:** Ghostty and Zed have native system-responsive theming
+- **Stylix:** shared defaults in `modules/shared/system/stylix.nix`; NixOS home uses dark/light specialisations with darkman auto-switching
+- **macOS behavior:** Ghostty and Zed keep native system-responsive theming (Stylix targets disabled on darwin)
 
 ## Custom packages
 
@@ -188,4 +197,5 @@ Hostnames follow `trf<identifier>` — initials prefix for network disambiguatio
 
 ## Active overlays
 
-- **`overlays/vesktop-darwin.nix`** — fixes codesign failure on macOS; remove when NixOS/nixpkgs#489725 merges
+- **`overlays/vesktop-darwin.nix`** — fixes codesign failure on macOS; `REVISIT(upstream): remove overlay after NixOS/nixpkgs#489725 lands in nixpkgs-unstable`
+- **`overlays/zed-editor-darwin.nix`** — temporary zed-editor darwin fix; `REVISIT(upstream): remove overlay after NixOS/nixpkgs#490957 lands in nixpkgs-unstable`
