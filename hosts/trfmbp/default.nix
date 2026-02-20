@@ -26,6 +26,6 @@
 
   environment.systemPackages = with pkgs; [
     nix
-    agenix.packages.aarch64-darwin.default
+    agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
   ];
 }
