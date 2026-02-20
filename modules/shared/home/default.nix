@@ -55,6 +55,12 @@
     "$HOME/go/bin"
   ];
 
+  # Export SSH_AUTH_SOCK to systemd user environment so GUI apps (Obsidian, etc.)
+  # can access the 1Password SSH agent
+  systemd.user.sessionVariables = {
+    SSH_AUTH_SOCK = config.home.sessionVariables.SSH_AUTH_SOCK;
+  };
+
   # ── Other programs with native modules ─────────────────────────────────
 
   programs.alacritty = {
