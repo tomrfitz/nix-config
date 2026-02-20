@@ -153,6 +153,7 @@
 
   # ── Agent instructions (config/agents.md is the single source of truth) ──
   home.file.".config/AGENTS.md".source = ../../../config/agents.md;
+  home.file.".config/opencode/AGENTS.md".source = ../../../config/agents.md;
   home.file.".claude/CLAUDE.md".source = ../../../config/agents.md;
   home.file.".claude/settings.json".source = ../../../config/claude-settings.json;
 
