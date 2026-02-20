@@ -61,6 +61,19 @@
     SSH_AUTH_SOCK = config.home.sessionVariables.SSH_AUTH_SOCK;
   };
 
+  # ── Blue light filter (screen temperature) ────────────────────────────
+  services.wlsunset = {
+    enable = true;
+    temperature = {
+      day = 6500;
+      night = 3000;
+    };
+    # Use geoclue2 for automatic location detection
+    # (requires services.geoclue2.enable = true in system config)
+    latitude = null;
+    longitude = null;
+  };
+
   # ── Other programs with native modules ─────────────────────────────────
 
   programs.alacritty = {
