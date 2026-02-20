@@ -105,7 +105,9 @@
   };
 
   # Workaround: polkit 127 sandboxes polkit-agent-helper, blocking camera access
-  # Remove when nixpkgs#486044 merges or polkit is patched upstream
+  # REVISIT(upstream): remove this override once nixpkgs#486044 lands or
+  # polkit-agent-helper no longer needs direct camera-device access;
+  # ref: https://github.com/NixOS/nixpkgs/issues/486044; checked: 2026-02-20
   systemd.services."polkit-agent-helper@".serviceConfig = {
     DeviceAllow = "char-video4linux rw";
     PrivateDevices = "no";
