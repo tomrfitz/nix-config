@@ -82,4 +82,17 @@
     enable = true;
     settings.default-timeout = 5000;
   };
+
+  # Blue light filter (screen temperature) for Wayland
+  services.wlsunset = {
+    enable = true;
+    temperature = {
+      day = 6500;
+      night = 3000;
+    };
+    # Use geoclue2 for automatic location detection
+    # (requires services.geoclue2.enable = true in system config)
+    latitude = null;
+    longitude = null;
+  };
 }
