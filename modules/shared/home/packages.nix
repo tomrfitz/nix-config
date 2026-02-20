@@ -120,7 +120,6 @@
       taskwarrior-tui
       texlive.combined.scheme-full
       gtypist
-      ncspot
       mailsy
       gemini-cli
       powershell
@@ -129,22 +128,22 @@
       # gossip # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
 
       # apps (migrated from Homebrew casks)
-      # discord # heavy — re-enable later
-      # slack # heavy — re-enable later
-      # thunderbird # heavy — re-enable later
-      # notesnook # heavy — re-enable later
-      # audacity # heavy — re-enable later
-      # sqlitebrowser # heavy — re-enable later
-      # lapce # heavy — re-enable later
-      # inkscape # heavy — re-enable later
-      # prismlauncher # heavy — re-enable later
-      # anki # heavy — re-enable later
-      # chatterino2 # heavy — re-enable later
-      # qbittorrent # heavy — re-enable later
+      discord
+      slack
+      thunderbird
+      notesnook
+      audacity
+      sqlitebrowser
+      lapce
+      inkscape
+      prismlauncher
+      anki
+      chatterino2
+      qbittorrent
 
       # fun
-      # pear-desktop # heavy — re-enable later
-      # zotero # heavy — re-enable later
+      pear-desktop
+      zotero
       _2048-in-terminal
       cbonsai
       cowsay
