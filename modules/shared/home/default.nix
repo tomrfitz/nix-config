@@ -62,7 +62,8 @@
   };
 
   # ── Blue light filter (screen temperature) ────────────────────────────
-  services.wlsunset = {
+  # Wayland-only (Linux), not available on macOS
+  services.wlsunset = lib.mkIf (!pkgs.stdenv.isDarwin) {
     enable = true;
     temperature = {
       day = 6500;
