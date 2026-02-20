@@ -9,6 +9,7 @@
   imports = [
     ./packages.nix
     ./shell.nix
+    ./fish.nix
     ./git.nix
     ./firefox.nix
     ./zen.nix
@@ -18,6 +19,11 @@
     # ./vesktop.nix # heavy — re-enable before darwin rebuild
     ./obsidian.nix
     ./stylix.nix
+    ./ruff.nix
+    ./micro.nix
+    ./beets.nix
+    ./mpv.nix
+    ./opencode.nix
   ];
 
   home.stateVersion = "24.11";

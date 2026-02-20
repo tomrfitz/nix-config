@@ -8,7 +8,6 @@
   home.packages =
     with pkgs;
     [
-      opencode
       obsidian
       (callPackage ../../../pkgs/mdbase-tasknotes { })
 
@@ -69,9 +68,7 @@
 
       # python tools
       uv
-      ruff
       ty
-      beets
       termdown
       virtualenv
 
@@ -116,7 +113,6 @@
       termshot
       lf
       lsd
-      micro
       kakoune
       witr
       todo-txt-cli

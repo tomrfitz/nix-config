@@ -1,0 +1,13 @@
+{
+  pkgs,
+  lib,
+  ...
+}:
+{
+  programs.fish = {
+    enable = true;
+    interactiveShellInit = ''
+      set -g fish_greeting
+    '';
+  };
+}
