@@ -14,12 +14,8 @@ Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md
 - Prefer modern CLI tools: `rg` over `grep`, `fd` over `find`, `bat` over `cat`, `dust`/`duf` over `du`/`df`
 - Pay attention to LSP and linter output — trust tools like clangd, ruff, nixd
 - Prefer recording your findings in open-standard style documents, then you can symlink to somewhere you prefer if necessary. ie create AGENTS.md in project root, then link to GEIMINI.md or CLAUDE.md.
-- Capture full command output to temp files rather than piping through `head`/`tail`:
-
-    ```sh
-    cmd > /tmp/out.txt 2>&1; ec=$?
-    if [ $ec -ne 0 ]; then cat /tmp/out.txt; fi
-    ```
+- Don't guess at command output — never truncate with `head`/`tail` before reading the result. Check the exit code and full output before deciding what's relevant.
+- Don't dump large output directly into context either. For long results, use targeted tools (grep, read with offset/limit) to extract the relevant section rather than consuming the whole thing.
 
 ### Language-specific
 
