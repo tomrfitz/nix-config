@@ -21,7 +21,8 @@
   };
 
   # ── Time zone ─────────────────────────────────────────────────────────
-  time.timeZone = "America/New_York";
+  # Use automatic timezone detection (sets time.timeZone = null internally)
+  # Falls back to America/New_York if location detection fails
   services.automatic-timezoned.enable = true;
 
   # ── Audio ─────────────────────────────────────────────────────────────
