@@ -39,7 +39,6 @@
 
       # C/C++ compiler and tools
       clang
-      gcc
 
       # build tools
       nixpkgs-review
