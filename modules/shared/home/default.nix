@@ -32,7 +32,7 @@
 
   # ── Session environment ────────────────────────────────────────────────
   home.sessionVariables = {
-    EDITOR = "zeditor";
+    EDITOR = "zeditor --wait";
     NH_FLAKE = "$HOME/nix-config";
 
     # Prefer 1Password's SSH agent everywhere (family/shared workflow).
