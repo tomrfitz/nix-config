@@ -37,6 +37,10 @@
       bun
       turso
 
+      # C/C++ compiler and tools
+      clang
+      gcc
+
       # build tools
       nixpkgs-review
       cmake
