@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  agenix,
   ...
 }:
 {
@@ -80,6 +81,7 @@
       virtualenv
 
       # nix tooling
+      agenix.packages.${pkgs.stdenv.hostPlatform.system}.default
       claude-code
       dix
       nh

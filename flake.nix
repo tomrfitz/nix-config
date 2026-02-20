@@ -65,6 +65,7 @@
           backupFileExtension = "hm-backup";
           extraSpecialArgs = {
             inherit
+              agenix
               user
               fullName
               email
