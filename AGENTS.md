@@ -4,7 +4,19 @@ Repo-specific guidance for AI agents working on this nix-config. See also `~/.co
 
 ## What This Is
 
-A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tracks on nixpkgs-unstable. The primary active machine is `trfmbp` (aarch64-darwin M1 Pro MacBook Pro). Two NixOS hosts (`trfnix`, `trfhomelab`) exist as stubs — do not invest effort in their configs.
+A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tracks on nixpkgs-unstable.
+
+### Machines
+
+| Hostname | Platform | Role | Status |
+| -------- | ---------------- | ---------------------------------------- | ------ |
+| `trfmbp` | aarch64-darwin | Daily driver (M1 Pro MacBook Pro) | Active |
+| `trfnix` | x86_64-linux | NixOS testbed (Samsung laptop) | Active |
+| `trfwsl` | x86_64-linux WSL | Interim homelab on gaming PC, later dev | Stub |
+| `trflab` | x86_64-linux | Dedicated homelab server | Future |
+| `trfvm` | TBD | Scratch/sandbox VM | Future |
+
+The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful for prototyping NixOS service configs. `trfwsl` is the next host to build out (see Roadmap below).
 
 ## Commands
 
@@ -31,7 +43,7 @@ just rekey         # re-encrypt secrets for all recipients
 
 ### Flake structure
 
-`flake.nix` defines three machines and a `mkHM` helper that wires home-manager with agenix for each host. Inputs: nixpkgs (unstable), nix-darwin, home-manager, agenix, defaults2nix.
+`flake.nix` defines one darwin host and two NixOS hosts (one bare-metal, one WSL stub) plus a `mkHM` helper that wires home-manager with agenix for each host. Inputs: nixpkgs (unstable), nix-darwin, home-manager, agenix, defaults2nix.
 
 ### Hosts are thin wiring
 
@@ -131,6 +143,41 @@ After bootstrapping, the new machine's agenix key can't decrypt existing secrets
 3. Run `just rekey` (re-encrypts all secrets for the new recipient set)
 4. Commit and push
 5. Pull on the new machine and rebuild
+
+## Roadmap
+
+### Phase 1 — NixOS-WSL on gaming PC (`trfwsl`)
+
+Interim homelab: run services inside NixOS-WSL on the existing Windows desktop until a dedicated server is available.
+
+1. Add `nixos-wsl` flake input
+2. Build out `trfwsl` host config with WSL module (`wsl.enable`, `wsl.defaultUser`, etc.)
+3. Enable native NixOS service modules for homelab stack (Plex/Jellyfin, Immich, *arr, etc.)
+4. Media storage stays on Windows NTFS drives (accessed via `/mnt/`)
+5. Tailscale for remote access (works on eduroam via DERP relay fallback over port 443)
+6. Auto-start WSL via Windows scheduled task
+
+**Constraints:** WSL doesn't auto-start with Windows, networking is NAT'd by default (use mirrored mode or Tailscale), no direct disk/hardware access, Windows updates can kill WSL. Acceptable for an interim setup.
+
+### Phase 2 — Dedicated NixOS server (`trflab`)
+
+When a separate machine is available:
+
+1. Same service configs from phase 1, swap WSL module for real hardware config
+2. NAS or network-attached storage with proper Linux filesystem (ext4/ZFS/btrfs)
+3. Auto-update/rebuild via systemd timers
+4. Tailscale carries over unchanged
+5. `trfwsl` becomes a lightweight dev environment on the gaming PC
+
+### Naming convention
+
+Hostnames follow `trf<identifier>` — initials prefix for network disambiguation (eduroam has many colliding default Apple/Windows names), short suffix for the device/role. Under 7 chars, unique prefixes for tab completion.
+
+### Future machines
+
+- **`trflab`** — dedicated homelab server (phase 2)
+- **`trfvm`** — scratch/sandbox NixOS VM (host TBD — could be local on Mac via UTM, or on the gaming PC via Hyper-V)
+- **`trfnix`** may be retired when the Samsung laptop is repurposed or replaced
 
 ## Active overlays
 

@@ -7,9 +7,30 @@
 - [ ] Real secrets via agenix (API tokens, SSH keys — currently only a test secret)
 - [ ] Desktop wallpaper (nix-darwin can manage this)
 - [ ] Auto-update via launchd agent (nix flake update + rebuild on schedule)
-- [ ] NixOS host config when a target Linux machine is available
 - [ ] Login items — investigate declaring startup apps via `launchd.agents`
 - [ ] Audit imperatively installed cargo packages (`rana`, `sgram-tui`) — package in nix or keep in cargo
+
+## Phase 1 — NixOS-WSL homelab (`trfwsl`)
+
+Interim homelab on gaming PC via NixOS-WSL. See AGENTS.md Roadmap for context.
+
+- [ ] Add `nixos-wsl` flake input (follows nixpkgs)
+- [ ] Rename `trfhomelab` host → `trfwsl`, add WSL module (`wsl.enable`, `wsl.defaultUser`)
+- [ ] Bootstrap NixOS-WSL on gaming PC (import tarball, generate agenix key, rekey)
+- [ ] Set up Tailscale (`services.tailscale.enable`) for remote access from Mac/phone
+- [ ] Create `modules/nixos/system/homelab.nix` for service definitions (host-agnostic)
+- [ ] Enable homelab services: Plex or Jellyfin, Immich, *arr stack
+- [ ] Configure media storage mounts (NTFS via `/mnt/` for now)
+- [ ] Windows-side: scheduled task to auto-start WSL, `.wslconfig` for mirrored networking
+- [ ] Test Tailscale on eduroam (DERP relay fallback over 443)
+
+## Phase 2 — Dedicated NixOS server (`trflab`)
+
+- [ ] Provision new machine, add `trflab` host to flake
+- [ ] Reuse homelab service module from phase 1 (swap WSL module for hardware config)
+- [ ] Set up NAS/network storage with proper Linux filesystem
+- [ ] Auto-rebuild via systemd timer (`nixos-rebuild switch --flake`)
+- [ ] Demote `trfwsl` to lightweight dev environment
 
 ## Undeclared Apps
 
