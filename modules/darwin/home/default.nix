@@ -8,6 +8,8 @@
     ./zsh.nix
     ./git.nix
     ./topgrade.nix
+    ./aerospace.nix
+    ./sketchybar.nix
   ];
 
   home.homeDirectory = lib.mkForce "/Users/tomrfitz";
