@@ -3,12 +3,20 @@
   lib,
   ...
 }:
+let
+  # The nix-packaged `zeditor` CLI can't connect to the running Zed.app
+  # (different bundle/socket path). Use the HM-linked .app's CLI instead.
+  zedCli = "~/Applications/Home\\ Manager\\ Apps/Zed.app/Contents/MacOS/cli";
+in
 {
+  # Override EDITOR to use the .app CLI that can actually talk to the running Zed
+  home.sessionVariables.EDITOR = lib.mkForce "${zedCli} --wait";
+
   programs.zsh = {
     shellAliases = {
       regossip = "mkdir -p ~/gossip && cd ~/gossip && git pull && RUSTFLAGS=\"-C target-cpu=native --cfg tokio_unstable\" cargo build --release --features=lang-cjk && strip ./target/release/gossip && ./target/release/gossip";
       code = "open -b com.microsoft.vscode";
-      zed = "~/Applications/Home\\ Manager\\ Apps/Zed.app/Contents/MacOS/cli";
+      zed = zedCli;
       ytm = "z pear && pnpm start";
     };
 
