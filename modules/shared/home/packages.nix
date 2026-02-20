@@ -13,6 +13,7 @@
 
       yazi
       tailscale
+      python3Packages.markitdown
 
       docker
       dockerfmt
