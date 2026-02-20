@@ -142,7 +142,7 @@
       audacity
       sqlitebrowser
       lapce
-
+      inkscape
       prismlauncher
       anki
       chatterino2
