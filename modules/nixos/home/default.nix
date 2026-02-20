@@ -84,14 +84,13 @@
   };
 
   # Blue light filter (screen temperature) for Wayland
-  # Using fixed sunrise/sunset times (geoclue2 requires manual lat/long or provider setup)
-  services.wlsunset = {
+  # Uses geoclue2 for automatic location detection (like macOS Night Shift)
+  services.gammastep = {
     enable = true;
+    provider = "geoclue2";
     temperature = {
       day = 6500;
       night = 3000;
     };
-    sunrise = "06:30";
-    sunset = "19:30";
   };
 }
