@@ -8,7 +8,8 @@
   programs.helix = {
     enable = true;
     settings = {
-      theme = "flexoki-dark";
+      # Stylix overrides this with its generated Base16 theme
+      theme = lib.mkDefault "flexoki-dark";
     };
     themes = {
       flexoki-dark = lib.importTOML ../../../config/helix-flexoki-dark.toml;
@@ -127,7 +128,7 @@
           model = "claude-sonnet-4-5";
         };
       };
-      ui_font_size = 14.0;
+      ui_font_size = lib.mkForce 14.0;
       tasks.prefer_lsp = true;
       tab_bar.show = true;
       always_treat_brackets_as_autoclosed = true;
@@ -194,7 +195,9 @@
       format_on_save = "on";
       tab_size = 4;
       base_keymap = "VSCode";
-      theme = {
+      # On macOS, Zed uses native system-responsive theming (Stylix disabled).
+      # On NixOS, Stylix manages the theme via HM specialisations.
+      theme = lib.mkIf pkgs.stdenv.isDarwin {
         mode = "system";
         light = "Flexoki Light";
         dark = "Flexoki Dark";
@@ -203,9 +206,9 @@
         diagnostics = false;
         metrics = false;
       };
-      buffer_font_family = "Atkinson Hyperlegible Mono";
-      ui_font_family = "Atkinson Hyperlegible Mono";
-      terminal.font_family = "Atkinson Hyperlegible Mono";
+      buffer_font_family = lib.mkForce "Atkinson Hyperlegible Mono";
+      ui_font_family = lib.mkForce "Atkinson Hyperlegible Mono";
+      terminal.font_family = lib.mkForce "Atkinson Hyperlegible Mono";
       bottom_dock_layout = "right_aligned";
       buffer_font_features.calt = true;
       ui_font_features.calt = true;
