@@ -12,8 +12,9 @@
 
   system.stateVersion = "24.11";
 
-  # TODO: Add hardware-configuration.nix, boot loader, networking,
-  #       and server services (Plex, *arr, Immich, file storage, etc.)
+  # TODO: Add nixos-wsl module (wsl.enable, wsl.defaultUser),
+  #       Tailscale, and homelab services (Plex/Jellyfin, *arr, Immich)
+  #       See TODO.md "Phase 1" for the full checklist
 
   users.users.${user} = {
     isNormalUser = true;

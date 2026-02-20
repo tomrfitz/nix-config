@@ -159,9 +159,9 @@
         ];
       };
 
-      nixosConfigurations.trfhomelab = mkNixosHost {
+      nixosConfigurations.trfwsl = mkNixosHost {
         system = "x86_64-linux";
-        host = ./hosts/trfhomelab;
+        host = ./hosts/trfwsl;
         hmModules = [
           ./modules/shared/home
           ./modules/nixos/home
