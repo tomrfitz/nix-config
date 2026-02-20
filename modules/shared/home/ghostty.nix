@@ -9,7 +9,9 @@
     enableZshIntegration = true;
     package = lib.mkIf pkgs.stdenv.isDarwin null;
     settings = {
-      theme = "light:Flexoki Light,dark:Flexoki Dark";
+      # On macOS, Ghostty uses native system-responsive theming (Stylix disabled).
+      # On NixOS, Stylix manages the theme via HM specialisations.
+      theme = lib.mkIf pkgs.stdenv.isDarwin "light:Flexoki Light,dark:Flexoki Dark";
       quit-after-last-window-closed = false;
       clipboard-read = "allow";
       clipboard-write = "allow";

@@ -5,6 +5,7 @@
 }:
 {
   imports = [
+    ./darkman.nix
   ];
 
   home.homeDirectory = lib.mkForce "/home/tomrfitz";

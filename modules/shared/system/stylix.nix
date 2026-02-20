@@ -1,11 +1,11 @@
-{ pkgs, ... }:
+{ pkgs, lib, ... }:
 {
   stylix = {
     enable = true;
     autoEnable = true;
     image = ../../../config/wallpaper.jpg;
-    base16Scheme = "${pkgs.base16-schemes}/share/themes/flexoki-dark.yaml";
-    polarity = "dark";
+    base16Scheme = lib.mkDefault "${pkgs.base16-schemes}/share/themes/flexoki-dark.yaml";
+    polarity = lib.mkDefault "dark";
 
     fonts.sizes = {
       applications = 12;
