@@ -12,8 +12,6 @@ let
     else
       "${config.home.homeDirectory}/notes/vault";
   gitDir = "${config.home.homeDirectory}/notes/obsidian-git/.git";
-  git = "${pkgs.git}/bin/git";
-  repo = "git@github.com:tomrfitz/Obsidian.git";
 in
 {
   # ── Session environment ────────────────────────────────────────────────
@@ -22,37 +20,36 @@ in
   };
 
   # ── Vault activation ──────────────────────────────────────────────────
-  # Ensures the Obsidian vault repo exists with a separate git dir.
-  # On a fresh machine this requires SSH access to GitHub; if that isn't
-  # available yet the clone is skipped and retried on the next activation.
   home.activation.obsidian-vault = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     GIT_DIR="${gitDir}"
-    VAULT="${vaultPath}"
+    VAULT_PATH="${vaultPath}"
 
-    run mkdir -p "$(dirname "$GIT_DIR")" "$VAULT"
 
-    # ── Clone (first run only) ──────────────────────────────────────────
+    mkdir -p "$(dirname "$GIT_DIR")"
+    mkdir -p "$VAULT_PATH"
+
     if [ ! -d "$GIT_DIR" ]; then
-      if run ${git} clone --separate-git-dir="$GIT_DIR" \
-           ${repo} "$VAULT" 2>&1; then
-        verboseEcho "Obsidian vault cloned to $VAULT"
-      else
-        verboseEcho "Obsidian vault clone skipped (SSH not ready?); will retry next activation"
+      export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh"
+      if ! ${pkgs.git}/bin/git clone --separate-git-dir="$GIT_DIR" \
+        git@github.com:tomrfitz/Obsidian.git "$VAULT_PATH" 2>&1; then
+        verboseEcho "obsidian-vault: clone failed (no network/key?), skipping"
       fi
     fi
 
-    # ── Fixups (idempotent) ─────────────────────────────────────────────
     if [ -d "$GIT_DIR" ]; then
-      # Ensure .git pointer in the worktree
-      WANT="gitdir: $GIT_DIR"
-      if [ ! -e "$VAULT/.git" ] || [ "$(cat "$VAULT/.git" 2>/dev/null)" != "$WANT" ]; then
-        run printf '%s\n' "$WANT" > "$VAULT/.git"
+      # Ensure .git file in vault points to the separate git dir
+      if [ ! -e "$VAULT_PATH/.git" ] || [ "$(cat "$VAULT_PATH/.git" 2>/dev/null)" != "gitdir: $GIT_DIR" ]; then
+        echo "gitdir: $GIT_DIR" > "$VAULT_PATH/.git"
       fi
 
-      # Ensure core.worktree is set
-      CURRENT="$(${git} --git-dir="$GIT_DIR" config --get core.worktree 2>/dev/null || true)"
-      if [ "$CURRENT" != "$VAULT" ]; then
-        run ${git} --git-dir="$GIT_DIR" config core.worktree "$VAULT"
+      # Ensure worktree is configured
+      ${pkgs.git}/bin/git --git-dir="$GIT_DIR" config core.worktree "$VAULT_PATH"
+
+      # Symlink shared markdownlint config into vault root
+      MDLINT_SRC="${config.home.homeDirectory}/.markdownlint-cli2.jsonc"
+      MDLINT_DST="$VAULT_PATH/.markdownlint-cli2.jsonc"
+      if [ -f "$MDLINT_SRC" ]; then
+        ln -sf "$MDLINT_SRC" "$MDLINT_DST"
       fi
     fi
   '';
