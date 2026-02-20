@@ -14,6 +14,7 @@ in
     package = lib.mkIf pkgs.stdenv.isDarwin null;
     suppressXdgMigrationWarning = true;
     policies = sharedPolicies;
+    nativeMessagingHosts = [ pkgs._1password-gui ];
 
     profiles.default = {
       id = 0;
