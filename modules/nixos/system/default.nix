@@ -61,6 +61,10 @@
     polkitPolicyOwners = [ "tomrfitz" ];
   };
 
+  # ── Secrets/keyring ───────────────────────────────────────────────────
+  # Required for 1Password to persist 2FA session and other secrets
+  services.gnome.gnome-keyring.enable = true;
+
   # Allow Zen Browser to communicate with 1Password
   # (1Password verifies browser binaries against an allowlist)
   # Note: Firefox is built-in, but Zen and other forks need explicit allowlisting
