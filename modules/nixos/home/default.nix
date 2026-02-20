@@ -27,7 +27,7 @@
     enable = true;
     config = {
       modifier = "Mod4"; # Super key
-      terminal = "foot";
+      terminal = "ghostty";
       menu = "wofi --show drun";
       bars = [
         {
