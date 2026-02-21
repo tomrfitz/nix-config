@@ -1,4 +1,8 @@
 { user, ... }:
+let
+  homeDirectory = "/Users/${user}";
+  homeManagerAppsDirectory = "${homeDirectory}/Applications/Home Manager Apps";
+in
 {
   system.defaults = {
     # ── Global (NSGlobalDomain) ──────────────────────────────────────────
@@ -35,16 +39,16 @@
       persistent-apps = [
         { app = "/System/Applications/Apps.app"; }
         { app = "/System/Applications/System Settings.app"; }
-        { app = "/Users/${user}/Applications/Home Manager Apps/Zotero.app"; }
-        { app = "/Users/${user}/Applications/Home Manager Apps/Obsidian.app"; }
-        { app = "/Users/${user}/Applications/Home Manager Apps/YouTube Music.app"; }
-        { app = "/Users/${user}/Applications/Home Manager Apps/Vesktop.app"; }
+        { app = "${homeManagerAppsDirectory}/Zotero.app"; }
+        { app = "${homeManagerAppsDirectory}/Obsidian.app"; }
+        { app = "${homeManagerAppsDirectory}/YouTube Music.app"; }
+        { app = "${homeManagerAppsDirectory}/Vesktop.app"; }
         { app = "/System/Applications/Messages.app"; }
         { app = "/System/Applications/Mail.app"; }
-        # { app = "/Users/${user}/Applications/Home Manager Apps/Zen Browser (Twilight).app"; }
+        # { app = "${homeManagerAppsDirectory}/Zen Browser (Twilight).app"; }
         { app = "/Applications/Twilight.app"; }
         { app = "/Applications/Ghostty.app"; }
-        { app = "/Users/${user}/Applications/Home Manager Apps/Zed.app"; }
+        { app = "${homeManagerAppsDirectory}/Zed.app"; }
       ];
 
       # Hot corners
@@ -88,7 +92,7 @@
 
     # ── Screenshot ───────────────────────────────────────────────────────
     screencapture = {
-      location = "/Users/${user}/Documents/Screenshots/";
+      location = "${homeDirectory}/Documents/Screenshots/";
       target = "file";
       show-thumbnail = false;
     };

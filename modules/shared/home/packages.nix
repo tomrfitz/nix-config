@@ -133,6 +133,8 @@
       cargo-update
       cargo-cache
       codex
+      antigravity
+
       # gossip # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
 
       # apps (migrated from Homebrew casks)
