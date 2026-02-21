@@ -7,13 +7,8 @@
   specialisation = {
     plasma.configuration = {
       services.xserver.enable = lib.mkForce true;
-      services.displayManager.gdm.enable = lib.mkForce false;
+      services.displayManager.gdm.enable = lib.mkForce true;
       services.desktopManager.gnome.enable = lib.mkForce false;
-
-      services.displayManager.sddm = {
-        enable = true;
-        wayland.enable = true;
-      };
       services.desktopManager.plasma6.enable = true;
     };
 

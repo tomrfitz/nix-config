@@ -1,4 +1,8 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  lib,
+  ...
+}:
 {
   stylix.targets = {
     # Vencord handles its own Flexoki theme via custom CSS
@@ -15,5 +19,9 @@
     firefox.enable = false;
     floorp.enable = false;
     zen-browser.enable = false;
+
+    # Use qtct backend across desktop environments to avoid deprecated
+    # platformTheme names and unsupported Stylix Qt backends.
+    qt.platform = lib.mkForce "qtct";
   };
 }
