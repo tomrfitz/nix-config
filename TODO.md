@@ -3,7 +3,6 @@
 ## Next Steps
 
 - [ ] Helix language servers — configure and pin per-language tooling (nixd/ruff/ty/etc.)
-- [ ] Real secrets via agenix (API tokens, SSH keys — currently only a test secret)
 - [ ] Auto-update via launchd agent (nix flake update + rebuild on schedule)
 - [ ] Login items — investigate declaring startup apps via `launchd.agents`
 - [ ] Audit imperatively installed cargo packages (`rana`, `sgram-tui`) — package in nix or keep in cargo
@@ -20,7 +19,7 @@ Interim homelab on gaming PC via NixOS-WSL. See AGENTS.md Roadmap for context.
 
 - [ ] Add `nixos-wsl` flake input (follows nixpkgs)
 - [ ] Add WSL module (`wsl.enable`, `wsl.defaultUser`) to `hosts/trfwsl`
-- [ ] Bootstrap NixOS-WSL on gaming PC (import tarball, generate agenix key, rekey)
+- [ ] Bootstrap NixOS-WSL on gaming PC (import tarball, switch to `trfwsl` host)
 - [ ] Set up Tailscale (`services.tailscale.enable`) for remote access from Mac/phone
 - [ ] Create `modules/nixos/system/homelab.nix` for service definitions (host-agnostic)
 - [ ] Enable homelab services: Plex or Jellyfin, Immich, *arr stack
@@ -63,7 +62,6 @@ Interim homelab on gaming PC via NixOS-WSL. See AGENTS.md Roadmap for context.
 | `Handy`                                  | Running   | Starts `/Applications/Handy.app` at login. Could use launchd.agents |
 | `com.riot.riotclient.checkinstalls`      | Installed | Riot/League auto-updater — app-managed, leave as-is                 |
 | `com.valvesoftware.steamclean`           | Installed | Steam cleanup — app-managed, leave as-is                            |
-| `org.nix-community.home.activate-agenix` | Installed | Managed by HM agenix module — leave as-is                           |
 
 ### Login Items (macOS System Settings)
 
@@ -94,7 +92,7 @@ declared via `launchd.agents` in home-manager instead.
 - [x] macOS system defaults (dock, trackpad, Finder, screenshot, menu bar)
 - [x] Homebrew CLI formulae migrated to nix home.packages
 - [x] Fastfetch config via programs.fastfetch.settings
-- [x] Agenix secrets management (flake input, HM module, test secret)
+- [x] Removed agenix test-secret scaffolding (1Password-only secret workflow)
 - [x] Fonts via nix home.packages (nerd fonts, iosevka, fira-code, etc.)
 - [x] All Homebrew casks declared with cleanup enabled
 - [x] MAS apps declared (14 apps)

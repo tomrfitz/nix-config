@@ -236,10 +236,4 @@
       };
     };
   };
-
-  # ── Agenix secrets ───────────────────────────────────────────────────
-  age.identityPaths = [ "${config.home.homeDirectory}/.ssh/id_ed25519_agenix" ];
-  age.secrets = {
-    test-secret.file = ../../../secrets/test-secret.age;
-  };
 }

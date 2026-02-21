@@ -3,7 +3,6 @@ set -euo pipefail
 
 REPO_URL="https://github.com/tomrfitz/nix-config.git"
 REPO_DIR="$HOME/nix-config"
-AGENIX_KEY="$HOME/.ssh/id_ed25519_agenix"
 
 platform="$(uname -s)"
 
@@ -60,20 +59,6 @@ fi
 
 mkdir -p "$HOME/.ssh"
 
-if [[ -f $AGENIX_KEY ]]; then
-    warn "Agenix key already exists at $AGENIX_KEY"
-else
-    info "Generating agenix identity key..."
-    ssh-keygen -t ed25519 -N "" -f "$AGENIX_KEY" -C "agenix@$(hostname -s)"
-    ok "Agenix key generated"
-    echo ""
-    warn "Add this public key to secrets/secrets.nix on an existing machine,"
-    warn "then run 'just rekey' and push to grant this machine access to secrets:"
-    echo ""
-    cat "${AGENIX_KEY}.pub"
-    echo ""
-fi
-
 # ── Phase 3: First build ────────────────────────────────────────────
 
 cd "$REPO_DIR"
@@ -105,9 +90,3 @@ if [[ $platform == "Darwin" ]]; then
 else
     echo "  2. Run: gh auth login"
 fi
-
-echo ""
-echo "  If this is a new machine, grant it access to agenix secrets:"
-echo "    - Add the pubkey above to secrets/secrets.nix"
-echo "    - Run: just rekey  (from a machine that can already decrypt)"
-echo "    - Push, pull on this machine, and rebuild"
