@@ -1,6 +1,5 @@
 {
   pkgs,
-  lib,
   ...
 }:
 {
@@ -20,8 +19,8 @@
     floorp.enable = false;
     zen-browser.enable = false;
 
-    # Use qtct backend across desktop environments to avoid deprecated
-    # platformTheme names and unsupported Stylix Qt backends.
-    qt.platform = lib.mkForce "qtct";
+    # Let each desktop environment manage Qt integration natively.
+    # This avoids brittle cross-DE behavior (e.g. Plasma session issues).
+    qt.enable = false;
   };
 }
