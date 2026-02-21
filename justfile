@@ -56,6 +56,11 @@ snapshot-diff before after:
 diff:
     dix $(ls -d1 /nix/var/nix/profiles/system-*-link | tail -2 | head -1) /run/current-system
 
+# List available system specialisations in the currently booted generation
+[linux]
+spec-list:
+    ls -1 /run/current-system/specialisation
+
 # Switch to base (default) system configuration
 [linux]
 spec-base:
@@ -64,9 +69,25 @@ spec-base:
 # Switch to Plasma specialisation
 [linux]
 spec-plasma:
-    sudo /run/current-system/specialisation/plasma/bin/switch-to-configuration switch
+    @path="/run/current-system/specialisation/plasma/bin/switch-to-configuration"; \
+      if [ ! -x "$path" ]; then \
+        echo "Plasma specialisation not found in current generation."; \
+        echo "Run 'just rebuild' first, then retry."; \
+        echo "Available specialisations:"; \
+        ls -1 /run/current-system/specialisation 2>/dev/null || echo "(none)"; \
+        exit 1; \
+      fi; \
+      sudo "$path" switch
 
 # Switch to Sway specialisation
 [linux]
 spec-sway:
-    sudo /run/current-system/specialisation/sway/bin/switch-to-configuration switch
+    @path="/run/current-system/specialisation/sway/bin/switch-to-configuration"; \
+      if [ ! -x "$path" ]; then \
+        echo "Sway specialisation not found in current generation."; \
+        echo "Run 'just rebuild' first, then retry."; \
+        echo "Available specialisations:"; \
+        ls -1 /run/current-system/specialisation 2>/dev/null || echo "(none)"; \
+        exit 1; \
+      fi; \
+      sudo "$path" switch
