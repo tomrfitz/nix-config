@@ -1,12 +1,14 @@
 {
   pkgs,
   lib,
+  user,
   ...
 }:
 {
   imports = [
     ./user.nix
     ./specialisations.nix
+    ./homelab.nix
   ];
 
   programs.zsh.enable = true;
@@ -68,7 +70,7 @@
   programs._1password.enable = true;
   programs._1password-gui = {
     enable = true;
-    polkitPolicyOwners = [ "tomrfitz" ];
+    polkitPolicyOwners = [ user ];
   };
 
   # ── Secrets/keyring ───────────────────────────────────────────────────

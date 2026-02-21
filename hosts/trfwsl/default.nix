@@ -1,18 +1,48 @@
 {
   hostName,
+  user,
+  lib,
   ...
 }:
 {
-  imports = [
-    ../../modules/shared/system/nix.nix
-    ../../modules/shared/system/stylix.nix
-    ../../modules/nixos/system
-  ];
-
   system.stateVersion = "24.11";
   networking.hostName = hostName;
 
-  # TODO: Add nixos-wsl module (wsl.enable, wsl.defaultUser),
-  #       Tailscale, and homelab services (Plex/Jellyfin, *arr, Immich)
-  #       See TODO.md "Phase 1" for the full checklist
+  wsl = {
+    enable = true;
+    defaultUser = user;
+  };
+
+  trf.homelab = {
+    enable = true;
+
+    # Keep firewall closed by default; expose via Tailscale first.
+    exposePorts = false;
+
+    # TRaSH-style roots on StableBit DrivePool-mounted Z: drive in WSL.
+    paths = {
+      mediaRoot = lib.mkDefault "/mnt/z/data/media";
+      downloadsRoot = lib.mkDefault "/mnt/z/data/torrents";
+      booksRoot = lib.mkDefault "/mnt/z/data/media/books";
+    };
+
+    # Current stack
+    apps = {
+      bazarr = true;
+      calibre = true;
+      lidarr = true;
+      plex = true;
+      radarr = true;
+      readarr = true;
+      sabnzbd = true;
+      sonarr = true;
+      tautulli = true;
+
+      # Planned migrations/additions
+      booklore = false;
+      immich = false;
+      jellyfin = false;
+      jellyseerr = false;
+    };
+  };
 }

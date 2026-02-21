@@ -17,8 +17,13 @@
 
 Interim homelab on gaming PC via NixOS-WSL. See AGENTS.md Roadmap for context.
 
-- [ ] Add `nixos-wsl` flake input (follows nixpkgs)
-- [ ] Add WSL module (`wsl.enable`, `wsl.defaultUser`) to `hosts/trfwsl`
+Reference configs for best-practice patterns:
+
+- [mitchellh/nixos-config](https://github.com/mitchellh/nixos-config)
+- [dustinlyons/nixos-config](https://github.com/dustinlyons/nixos-config)
+
+- [x] Add `nixos-wsl` flake input (follows nixpkgs)
+- [x] Add WSL module (`wsl.enable`, `wsl.defaultUser`) to `hosts/trfwsl`
 - [ ] Bootstrap NixOS-WSL on gaming PC (import tarball, switch to `trfwsl` host)
 - [ ] Set up Tailscale (`services.tailscale.enable`) for remote access from Mac/phone
 - [ ] Create `modules/nixos/system/homelab.nix` for service definitions (host-agnostic)

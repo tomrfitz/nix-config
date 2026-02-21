@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  user,
   ...
 }:
 {
@@ -8,7 +9,7 @@
     ./darkman.nix
   ];
 
-  home.homeDirectory = lib.mkForce "/home/tomrfitz";
+  home.homeDirectory = lib.mkForce "/home/${user}";
 
   home.packages = with pkgs; [
     # 1password installed via programs._1password-gui in system config

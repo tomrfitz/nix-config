@@ -23,6 +23,10 @@
       url = "github:nix-community/stylix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nixos-wsl = {
+      url = "github:nix-community/NixOS-WSL/main";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -39,6 +43,7 @@
       defaults2nix,
       treefmt-nix,
       stylix,
+      nixos-wsl,
       zen-browser,
     }:
     let
@@ -57,28 +62,14 @@
       mkHM =
         {
           hmModules,
-          hostName,
-          system,
-          isDarwin,
-          isWSL,
+          specialArgs,
         }:
         {
           home-manager = {
             useGlobalPkgs = true;
             useUserPackages = true;
             backupFileExtension = "hm-backup";
-            extraSpecialArgs = {
-              inherit
-                user
-                fullName
-                email
-                sshPublicKey
-                hostName
-                system
-                isDarwin
-                isWSL
-                ;
-            };
+            extraSpecialArgs = specialArgs;
             users.${user}.imports = [
               zen-browser.homeModules.twilight
             ]
@@ -101,6 +92,7 @@
           isDarwin = platform == "darwin";
           isWSL = wsl;
           systemBuilder = if isDarwin then nix-darwin.lib.darwinSystem else lib.nixosSystem;
+          platformSystemModule = if isDarwin then ./modules/darwin/system else ./modules/nixos/system;
           hmModule =
             if isDarwin then
               home-manager.darwinModules.home-manager
@@ -118,30 +110,27 @@
             isWSL = isWSL;
             isDarwin = isDarwin;
           };
+          sharedSystemModules = [
+            ./modules/shared/system/nix.nix
+            ./modules/shared/system/stylix.nix
+          ];
         in
         systemBuilder {
           inherit system;
-          specialArgs = {
-            inherit (commonSpecialArgs)
-              ;
-          };
+          specialArgs = commonSpecialArgs;
           modules = [
             {
               nixpkgs.overlays = overlays;
             }
-            {
-              _module.args = commonSpecialArgs;
-            }
+          ]
+          ++ sharedSystemModules
+          ++ [
+            platformSystemModule
             hostModule
             hmModule
             (mkHM {
-              inherit
-                hmModules
-                system
-                isDarwin
-                isWSL
-                ;
-              hostName = name;
+              inherit hmModules;
+              specialArgs = commonSpecialArgs;
             })
             (if isDarwin then stylix.darwinModules.stylix else stylix.nixosModules.stylix)
           ]
@@ -176,6 +165,7 @@
           platform = "nixos";
           wsl = true;
           hostModule = ./hosts/trfwsl;
+          extraModules = [ nixos-wsl.nixosModules.wsl ];
           hmModules = [
             ./modules/shared/home
             ./modules/nixos/home

@@ -3,8 +3,19 @@
   pkgs,
   lib,
   sshPublicKey,
+  isDarwin,
   ...
 }:
+let
+  onePasswordSshAgentSock =
+    if isDarwin then
+      "${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
+    else
+      "${config.home.homeDirectory}/.1password/agent.sock";
+  onePasswordIdentityAgent =
+    if isDarwin then "\"${onePasswordSshAgentSock}\"" else onePasswordSshAgentSock;
+  urlOpener = if isDarwin then "open" else "xdg-open";
+in
 {
   imports = [
     ./packages.nix
@@ -37,11 +48,7 @@
 
     # Prefer 1Password's SSH agent everywhere (family/shared workflow).
     # SSH also explicitly points at the same socket via `IdentityAgent`.
-    SSH_AUTH_SOCK =
-      if pkgs.stdenv.isDarwin then
-        "${config.home.homeDirectory}/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock"
-      else
-        "${config.home.homeDirectory}/.1password/agent.sock";
+    SSH_AUTH_SOCK = onePasswordSshAgentSock;
 
     VCPKG_ROOT = "$HOME/vcpkg";
     OLLAMA_GPU_LAYERS = "-1";
@@ -57,7 +64,7 @@
 
   # Export SSH_AUTH_SOCK to systemd user environment so GUI apps (Obsidian, etc.)
   # can access the 1Password SSH agent
-  systemd.user.sessionVariables = {
+  systemd.user.sessionVariables = lib.mkIf (!isDarwin) {
     SSH_AUTH_SOCK = config.home.sessionVariables.SSH_AUTH_SOCK;
   };
 
@@ -77,7 +84,7 @@
       };
       hints.enabled = [
         {
-          command = if pkgs.stdenv.isDarwin then "open" else "xdg-open";
+          command = urlOpener;
           hyperlinks = true;
           post_processing = true;
           persist = false;
@@ -129,11 +136,7 @@
       "*" = {
         extraOptions = {
           AddKeysToAgent = "yes";
-          IdentityAgent =
-            if pkgs.stdenv.isDarwin then
-              "\"~/Library/Group Containers/2BUA8C4S2C.com.1password/t/agent.sock\""
-            else
-              "~/.1password/agent.sock";
+          IdentityAgent = onePasswordIdentityAgent;
         };
       };
       "github.com" = {
@@ -151,7 +154,7 @@
 
   # On NixOS, prefer managing authorized keys via `users.users.<name>.openssh.authorizedKeys`.
   # macOS doesn't have an equivalent declarative system-level module, so keep it in HM.
-  home.file.".ssh/authorized_keys" = lib.mkIf pkgs.stdenv.isDarwin {
+  home.file.".ssh/authorized_keys" = lib.mkIf isDarwin {
     text = ''
       ${sshPublicKey}
     '';

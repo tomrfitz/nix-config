@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  user,
   ...
 }:
 {
@@ -12,7 +13,7 @@
     ./sketchybar.nix
   ];
 
-  home.homeDirectory = lib.mkForce "/Users/tomrfitz";
+  home.homeDirectory = lib.mkForce "/Users/${user}";
 
   # ── Copy .app bundles so Spotlight can index them ────────────────────
   targets.darwin.linkApps.enable = false;

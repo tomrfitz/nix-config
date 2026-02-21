@@ -16,7 +16,6 @@
     shellAliases = {
       ls = "eza --group-directories-first --icons --hyperlink --time-style=long-iso";
       sa = "source \"${"ZDOTDIR:-$HOME"}/.zshrc\" && echo \"ZSH aliases sourced.\"";
-      histrg = "cat ~/.zsh_history | grep";
       mdlint = "markdownlint-cli2";
       mdfix = "markdownlint-cli2 --fix";
 
@@ -29,15 +28,9 @@
       [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
     '';
 
-    profileExtra = ''
-      if [[ -o interactive && "$TERM_PROGRAM" != "vscode" && "$TERM_PROGRAM" != "zed" ]]; then
-        command -v fastfetch &>/dev/null && fastfetch
-      fi
-    '';
-
     completionInit = ''
       autoload -Uz compinit
-      compdump="$HOME/.zcompdump"
+      compdump="''${ZDOTDIR:-$HOME}/.zcompdump"
 
       # Third-party completion functions must be on `fpath` before `compinit`.
       if [ -d "$HOME/.docker/completions" ]; then
@@ -45,9 +38,9 @@
       fi
 
       if [[ ! -f "$compdump" || -n $(find "$compdump" -mtime +1 2>/dev/null) ]]; then
-        compinit
+        compinit -d "$compdump"
       else
-        compinit -C
+        compinit -C -d "$compdump"
       fi
     '';
 
@@ -58,19 +51,57 @@
       '')
 
       ''
+        # Show fastfetch for interactive top-level shells (e.g., Ghostty tabs).
+        if [[ -o interactive && "$SHLVL" -eq 1 ]]; then
+          command -v fastfetch &>/dev/null && fastfetch
+        fi
+
+        _zsh_completion_cache_dir="''${XDG_CACHE_HOME:-$HOME/.cache}/zsh/completions"
+        mkdir -p "$_zsh_completion_cache_dir"
+
+        # Cache generated completions and refresh when the backing binary changes.
+        _source_cached_completion() {
+          local name="$1"
+          local generator="$2"
+          local binary="$3"
+          local cache_file="$_zsh_completion_cache_dir/''${name}.zsh"
+          local tmp_file="''${cache_file}.tmp"
+          local needs_refresh=0
+
+          if [[ ! -s "$cache_file" ]]; then
+            needs_refresh=1
+          elif [[ -n "$binary" && "$cache_file" -ot "$binary" ]]; then
+            needs_refresh=1
+          fi
+
+          if (( needs_refresh )); then
+            if eval "$generator" >| "$tmp_file" 2>/dev/null; then
+              mv "$tmp_file" "$cache_file"
+            else
+              rm -f "$tmp_file"
+            fi
+          fi
+
+          [[ -r "$cache_file" ]] && source "$cache_file"
+        }
+
         # JJ completions (after compinit)
         if command -v jj &>/dev/null; then
-          source <(COMPLETE=zsh jj)
+          _source_cached_completion "jj" "COMPLETE=zsh jj" "$(command -v jj)"
         fi
 
         # uv completions
         if command -v uv &>/dev/null; then
-          eval "$(uv generate-shell-completion zsh)"
-          eval "$(uvx --generate-shell-completion zsh)"
+          _source_cached_completion "uv" "uv generate-shell-completion zsh" "$(command -v uv)"
+        fi
+        if command -v uvx &>/dev/null; then
+          _source_cached_completion "uvx" "uvx --generate-shell-completion zsh" "$(command -v uvx)"
         fi
 
         # Mole shell completion
-        if output="$(mole completion zsh 2>/dev/null)"; then eval "$output"; fi
+        if command -v mole &>/dev/null; then
+          _source_cached_completion "mole" "mole completion zsh" "$(command -v mole)"
+        fi
 
         # Source custom environment file if it exists
         [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
@@ -94,7 +125,7 @@
         }
 
         function set_win_title() {
-          echo -ne "\033]0; $(basename "$PWD") \007"
+          print -Pn "\033]0; %~ \007"
         }
         starship_precmd_user_func="set_win_title"
       ''

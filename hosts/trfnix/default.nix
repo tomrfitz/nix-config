@@ -5,9 +5,6 @@
 {
   imports = [
     ./hardware-configuration.nix
-    ../../modules/shared/system/nix.nix
-    ../../modules/shared/system/stylix.nix
-    ../../modules/nixos/system
   ];
 
   system.stateVersion = "24.11";

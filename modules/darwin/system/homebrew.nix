@@ -136,8 +136,8 @@
       "bluewallet"
 
       # misc
-      "antigravity"
       "handy"
+      "codex-app"
 
       # fonts (not in nixpkgs — Apple proprietary)
       "font-sf-mono"
