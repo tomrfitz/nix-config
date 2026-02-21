@@ -11,10 +11,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    agenix = {
-      url = "github:ryantm/agenix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     defaults2nix = {
       url = "github:joshryandavis/defaults2nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -40,13 +36,13 @@
       nixpkgs,
       nix-darwin,
       home-manager,
-      agenix,
       defaults2nix,
       treefmt-nix,
       stylix,
       zen-browser,
     }:
     let
+      lib = nixpkgs.lib;
       user = "tomrfitz";
       fullName = "Thomas FitzGerald";
       email = "tomrfitz@gmail.com";
@@ -58,116 +54,145 @@
       forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f system nixpkgs.legacyPackages.${system});
       treefmtEval = forAllSystems (_system: pkgs: treefmt-nix.lib.evalModule pkgs ./treefmt.nix);
 
-      mkHM = hmModules: {
-        home-manager = {
-          useGlobalPkgs = true;
-          useUserPackages = true;
-          backupFileExtension = "hm-backup";
-          extraSpecialArgs = {
-            inherit
-              agenix
-              user
-              fullName
-              email
-              sshPublicKey
-              ;
-          };
-          users.${user}.imports = [
-            agenix.homeManagerModules.default
-            zen-browser.homeModules.twilight
-          ]
-          ++ hmModules;
-        };
-      };
-
-      mkDarwinHost =
+      mkHM =
         {
+          hmModules,
+          hostName,
           system,
-          host,
+          isDarwin,
+          isWSL,
+        }:
+        {
+          home-manager = {
+            useGlobalPkgs = true;
+            useUserPackages = true;
+            backupFileExtension = "hm-backup";
+            extraSpecialArgs = {
+              inherit
+                user
+                fullName
+                email
+                sshPublicKey
+                hostName
+                system
+                isDarwin
+                isWSL
+                ;
+            };
+            users.${user}.imports = [
+              zen-browser.homeModules.twilight
+            ]
+            ++ hmModules;
+          };
+        };
+
+      mkHost =
+        {
+          name,
+          system,
+          hostModule,
+          platform,
           overlays ? [ ],
           hmModules,
+          wsl ? false,
           extraModules ? [ ],
         }:
-        nix-darwin.lib.darwinSystem {
-          inherit system;
-          specialArgs = {
+        let
+          isDarwin = platform == "darwin";
+          isWSL = wsl;
+          systemBuilder = if isDarwin then nix-darwin.lib.darwinSystem else lib.nixosSystem;
+          hmModule =
+            if isDarwin then
+              home-manager.darwinModules.home-manager
+            else
+              home-manager.nixosModules.home-manager;
+          commonSpecialArgs = {
             inherit
-              agenix
               user
               fullName
               email
               sshPublicKey
+              system
+              ;
+            hostName = name;
+            isWSL = isWSL;
+            isDarwin = isDarwin;
+          };
+        in
+        systemBuilder {
+          inherit system;
+          specialArgs = {
+            inherit (commonSpecialArgs)
               ;
           };
           modules = [
             {
               nixpkgs.overlays = overlays;
             }
-            host
-            home-manager.darwinModules.home-manager
-            (mkHM hmModules)
-            stylix.darwinModules.stylix
+            {
+              _module.args = commonSpecialArgs;
+            }
+            hostModule
+            hmModule
+            (mkHM {
+              inherit
+                hmModules
+                system
+                isDarwin
+                isWSL
+                ;
+              hostName = name;
+            })
+            (if isDarwin then stylix.darwinModules.stylix else stylix.nixosModules.stylix)
           ]
           ++ extraModules;
         };
 
-      mkNixosHost =
-        {
-          system,
-          host,
-          hmModules,
-          extraModules ? [ ],
-        }:
-        nixpkgs.lib.nixosSystem {
-          inherit system;
-          specialArgs = {
-            inherit
-              user
-              fullName
-              email
-              sshPublicKey
-              ;
-          };
-          modules = [
-            host
-            home-manager.nixosModules.home-manager
-            (mkHM hmModules)
-            stylix.nixosModules.stylix
-          ]
-          ++ extraModules;
+      hosts = {
+        trfmbp = {
+          system = "aarch64-darwin";
+          platform = "darwin";
+          hostModule = ./hosts/trfmbp;
+          overlays = [
+            (import ./overlays/vesktop-darwin.nix)
+            (import ./overlays/zed-editor-darwin.nix)
+          ];
+          hmModules = [
+            ./modules/shared/home
+            ./modules/darwin/home
+          ];
         };
+        trfnix = {
+          system = "x86_64-linux";
+          platform = "nixos";
+          hostModule = ./hosts/trfnix;
+          hmModules = [
+            ./modules/shared/home
+            ./modules/nixos/home
+          ];
+        };
+        trfwsl = {
+          system = "x86_64-linux";
+          platform = "nixos";
+          wsl = true;
+          hostModule = ./hosts/trfwsl;
+          hmModules = [
+            ./modules/shared/home
+            ./modules/nixos/home
+          ];
+        };
+      };
+
+      mkConfigurations =
+        targetPlatform:
+        lib.mapAttrs' (name: cfg: lib.nameValuePair name (mkHost ({ inherit name; } // cfg))) (
+          lib.filterAttrs (_: cfg: cfg.platform == targetPlatform) hosts
+        );
     in
     {
-      darwinConfigurations.trfmbp = mkDarwinHost {
-        system = "aarch64-darwin";
-        host = ./hosts/trfmbp;
-        overlays = [
-          (import ./overlays/vesktop-darwin.nix)
-          (import ./overlays/zed-editor-darwin.nix)
-        ];
-        hmModules = [
-          ./modules/shared/home
-          ./modules/darwin/home
-        ];
-      };
+      darwinConfigurations = mkConfigurations "darwin";
 
-      nixosConfigurations.trfnix = mkNixosHost {
-        system = "x86_64-linux";
-        host = ./hosts/trfnix;
-        hmModules = [
-          ./modules/shared/home
-          ./modules/nixos/home
-        ];
-      };
-
-      nixosConfigurations.trfwsl = mkNixosHost {
-        system = "x86_64-linux";
-        host = ./hosts/trfwsl;
-        hmModules = [
-          ./modules/shared/home
-          ./modules/nixos/home
-        ];
-      };
+      nixosConfigurations = mkConfigurations "nixos";
 
       # ── Formatter (nix fmt — runs all formatters via treefmt) ─────────
       formatter = forAllSystems (system: _pkgs: treefmtEval.${system}.config.build.wrapper);

@@ -32,7 +32,6 @@ just eval          # nix flake check (eval errors only)
 just rollback      # switch to previous generation
 just diff          # dix diff between previous and current system profile
 just snapshot NAME # take macOS defaults snapshot
-just rekey         # re-encrypt secrets for all recipients
 ```
 
 **Validation:** There are no tests. Correctness = `just check` (dry-run) or `just eval` succeeding. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
@@ -43,11 +42,20 @@ just rekey         # re-encrypt secrets for all recipients
 
 ### Flake structure
 
-`flake.nix` defines one darwin host and two NixOS hosts (one bare-metal, one WSL stub) plus host builders (`mkDarwinHost`/`mkNixosHost`) and a `mkHM` helper that wires home-manager modules consistently. Core inputs: nixpkgs (unstable), nix-darwin, home-manager, agenix, stylix, treefmt-nix, defaults2nix, zen-browser.
+`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Core inputs: nixpkgs (unstable), nix-darwin, home-manager, stylix, treefmt-nix, defaults2nix, zen-browser.
 
 ### Hosts are thin wiring
 
-`hosts/<machine>/default.nix` files only set hostname, user, and import system modules. All real configuration lives in `modules/`.
+`hosts/<machine>/default.nix` files only set machine facts (hardware imports, hostname, boot/networking quirks) and import system modules. All user/profile logic lives in `modules/`.
+
+### Host contract
+
+Keep host files concise, idiomatic, portable, and composable:
+
+- **Hosts (`hosts/<name>/default.nix`)** define only machine facts.
+- **OS system modules (`modules/{darwin,nixos}/system`)** define user/account shape and OS-wide services.
+- **Home-manager modules (`modules/{shared,darwin,nixos}/home`)** define user environment and app/tooling behavior.
+- **Use `hostName`, `isDarwin`, and `isWSL` from `specialArgs`** for conditional behavior instead of duplicating host-specific modules.
 
 ### Module organization
 
@@ -57,10 +65,10 @@ modules/
     system/        # nix.nix, stylix.nix
     home/          # Focused modules: packages, shell, git, editors, browser, media, tooling
   darwin/          # macOS-only
-    system/        # homebrew.nix, settings.nix (system.defaults), security.nix
+    system/        # user.nix, homebrew.nix, settings.nix (system.defaults), security.nix
     home/          # zsh.nix, git.nix (1Password signing), topgrade.nix, aerospace.nix, sketchybar.nix
   nixos/           # Linux-only
-    system/        # zsh/nh, sway+greetd, tailscale, 1Password GUI, howdy, openssh
+    system/        # user.nix, default GNOME, specialisations (sway/plasma), tailscale, 1Password GUI, howdy, openssh
     home/          # homeDirectory, sway config, darkman, mako, gammastep
 ```
 
@@ -120,7 +128,7 @@ home.packages = [ ... ] ++ lib.optionals (!pkgs.stdenv.isDarwin) [ pkgs.element-
 
 ### Secrets
 
-Agenix manages encrypted secrets in `secrets/`. Public keys mapped in `secrets/secrets.nix`. Each machine has a dedicated passphrase-less ed25519 key at `~/.ssh/id_ed25519_agenix` for decryption — generated automatically by the bootstrap script.
+1Password is the source of truth for secrets (SSH agent + vault-backed credentials). Prefer committing `op://` references and resolve real secret values at runtime.
 
 ### Config files
 
@@ -148,17 +156,7 @@ Fresh machine setup (darwin or NixOS):
 bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/main/scripts/bootstrap.sh)
 ```
 
-The script handles: Xcode CLT (darwin), Nix installation, repo clone, agenix key generation, and first `darwin-rebuild`/`nixos-rebuild`. The only manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
-
-### Adding a new machine to agenix
-
-After bootstrapping, the new machine's agenix key can't decrypt existing secrets yet. From an existing machine:
-
-1. Copy the pubkey printed by the bootstrap script
-2. Add it to `secrets/secrets.nix` in the `allKeys` list
-3. Run `just rekey` (re-encrypts all secrets for the new recipient set)
-4. Commit and push
-5. Pull on the new machine and rebuild
+The script handles: Xcode CLT (darwin), Nix installation, repo clone, and first `darwin-rebuild`/`nixos-rebuild`. The manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
 
 ## Roadmap
 

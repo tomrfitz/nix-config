@@ -56,6 +56,17 @@ snapshot-diff before after:
 diff:
     dix $(ls -d1 /nix/var/nix/profiles/system-*-link | tail -2 | head -1) /run/current-system
 
-# Re-encrypt all secrets for the current set of recipients
-rekey:
-    cd secrets && agenix --rekey -i ~/.ssh/id_ed25519_agenix
+# Switch to base (default) system configuration
+[linux]
+spec-base:
+    sudo /run/current-system/bin/switch-to-configuration switch
+
+# Switch to Plasma specialisation
+[linux]
+spec-plasma:
+    sudo /run/current-system/specialisation/plasma/bin/switch-to-configuration switch
+
+# Switch to Sway specialisation
+[linux]
+spec-sway:
+    sudo /run/current-system/specialisation/sway/bin/switch-to-configuration switch

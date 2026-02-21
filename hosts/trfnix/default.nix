@@ -1,7 +1,5 @@
 {
-  pkgs,
-  user,
-  sshPublicKey,
+  hostName,
   ...
 }:
 {
@@ -19,19 +17,6 @@
   boot.loader.efi.canTouchEfiVariables = true;
 
   # ── Networking ────────────────────────────────────────────────────────
-  networking.hostName = "trfnix";
+  networking.hostName = hostName;
   networking.networkmanager.enable = true;
-
-  # ── User ──────────────────────────────────────────────────────────────
-  users.users.${user} = {
-    isNormalUser = true;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-    ];
-    shell = pkgs.zsh;
-    openssh.authorizedKeys.keys = [
-      sshPublicKey
-    ];
-  };
 }

@@ -1,5 +1,14 @@
-{ pkgs, ... }:
 {
+  pkgs,
+  lib,
+  ...
+}:
+{
+  imports = [
+    ./user.nix
+    ./specialisations.nix
+  ];
+
   programs.zsh.enable = true;
 
   programs.nh = {
@@ -10,15 +19,10 @@
     };
   };
 
-  # ── Display / Sway ───────────────────────────────────────────────────
-  programs.sway.enable = true;
-  services.greetd = {
-    enable = true;
-    settings.default_session = {
-      command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd sway";
-      user = "greeter";
-    };
-  };
+  # ── Display / Desktop ────────────────────────────────────────────────
+  services.xserver.enable = lib.mkDefault true;
+  services.displayManager.gdm.enable = lib.mkDefault true;
+  services.desktopManager.gnome.enable = lib.mkDefault true;
 
   # ── Time zone ─────────────────────────────────────────────────────────
   # Use automatic timezone detection (sets time.timeZone = null internally)
@@ -43,6 +47,7 @@
   services.thermald.enable = true;
   services.tlp.enable = true;
   services.acpid.enable = true;
+  services.power-profiles-daemon.enable = lib.mkForce false;
 
   # Backlight control for unprivileged users
   programs.light.enable = true;
@@ -100,7 +105,6 @@
   security.pam.services = {
     sudo.howdy.enable = true;
     login.howdy.enable = true;
-    swaylock.howdy.enable = true;
     polkit-1.howdy.enable = true; # 1Password uses polkit for system auth
   };
 
