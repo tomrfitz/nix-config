@@ -134,6 +134,7 @@
       powershell
       cargo-update
       cargo-cache
+      codex
       # gossip # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
 
       # apps (migrated from Homebrew casks)
