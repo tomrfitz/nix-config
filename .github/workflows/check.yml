@@ -2,7 +2,7 @@ name: Check
 
 on:
     push:
-        branches: [main]
+        branches: [main, lix]
     pull_request:
 
 jobs:
@@ -11,12 +11,20 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - uses: DeterminateSystems/nix-installer-action@main
-              with:
-                  extra-conf: accept-flake-config = true
+            - uses: samueldr/lix-gha-installer-action@f13b95cb6e4f7f82078ceef2feecf26c98f91c2f
+
+            - name: Assert Lix runtime
+              run: |
+                  nix --version
+                  nix --version | grep -q "Lix"
 
             - name: Evaluate darwin configuration
               run: nix eval .#darwinConfigurations.trfmbp.system --raw
 
+            - name: Evaluate nixos configurations
+              run: |
+                  nix eval .#nixosConfigurations.trfnix.config.system.build.toplevel.drvPath --raw
+                  nix eval .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath --raw
+
             - name: Check formatting
-              run: nix build .#checks.x86_64-linux.formatting --no-link
+              run: nix build .#checks.$(nix eval --impure --expr builtins.currentSystem --raw).formatting --no-link
