@@ -42,6 +42,12 @@ eval:
 eval:
     nix eval .#nixosConfigurations.{{ host }}.config.system.build.toplevel --raw
 
+# Evaluate all flake hosts (darwin + nixos + nixos-wsl)
+eval-all:
+    nix eval .#darwinConfigurations.trfmbp.system --raw
+    nix eval .#nixosConfigurations.trfnix.config.system.build.toplevel.drvPath --raw
+    nix eval .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath --raw
+
 # Take a macOS defaults snapshot
 [macos]
 snapshot name:
