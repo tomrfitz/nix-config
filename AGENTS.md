@@ -5,6 +5,7 @@ Repo-specific guidance for AI agents working on this nix-config. See also `~/.co
 ## What This Is
 
 A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tracks on nixpkgs-unstable.
+The `lix` branch sets Lix as the default `nix.package` across all hosts.
 
 ### Machines
 
@@ -29,12 +30,13 @@ just update        # nh darwin switch --update (flake update + rebuild)
 just fmt           # nix fmt (nixfmt)
 just fmt-check     # check formatting without modifying
 just eval          # nix flake check (eval errors only)
+just eval-all      # eval all configured hosts (trfmbp + trfnix + trfwsl)
 just rollback      # switch to previous generation
 just diff          # dix diff between previous and current system profile
 just snapshot NAME # take macOS defaults snapshot
 ```
 
-**Validation:** There are no tests. Correctness = `just check` (dry-run) or `just eval` succeeding. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
+**Validation:** There are no tests. Correctness = `just check` (dry-run) or `just eval` succeeding. On the `lix` branch, use `just eval-all` as the migration gate. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
 
 **Important:** Nix flakes only see files tracked by git. When adding new files referenced by the flake (e.g., config files used in `home.file` or `source`), you must `git add` them before `just eval` or `just check` will work.
 
@@ -156,7 +158,14 @@ Fresh machine setup (darwin or NixOS):
 bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/main/scripts/bootstrap.sh)
 ```
 
-The script handles: Xcode CLT (darwin), Nix installation, repo clone, and first `darwin-rebuild`/`nixos-rebuild`. The manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
+Lix branch bootstrap (same flow, `lix` branch script):
+
+```bash
+bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/lix/scripts/bootstrap.sh)
+```
+
+The script handles: Xcode CLT (darwin), runtime installation, repo clone, and first `darwin-rebuild`/`nixos-rebuild`. The manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
+On the `lix` branch, bootstrap defaults to the Lix installer on macOS.
 
 ## Roadmap
 
