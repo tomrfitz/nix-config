@@ -11,7 +11,7 @@ jobs:
         steps:
             - uses: actions/checkout@v4
 
-            - uses: samueldr/lix-gha-installer-action@f13b95cb6e4f7f82078ceef2feecf26c98f91c2f
+            - uses: samueldr/lix-gha-installer-action@v2026-02-16
 
             - name: Assert Lix runtime
               run: |
