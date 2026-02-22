@@ -202,6 +202,7 @@
               pkgs.nixfmt
               pkgs.nixd
               pkgs.nvd
+              pkgs.nh
               pkgs.just
             ]
             ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
