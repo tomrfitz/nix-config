@@ -23,7 +23,7 @@
       go
       nodejs
       python3
-      deno
+
       dart
       elixir
       lua
