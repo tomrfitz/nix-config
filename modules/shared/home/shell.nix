@@ -16,9 +16,6 @@
     shellAliases = {
       ls = "eza --group-directories-first --icons --hyperlink --time-style=long-iso";
       sa = "source \"${"ZDOTDIR:-$HOME"}/.zshrc\" && echo \"ZSH aliases sourced.\"";
-      mdlint = "markdownlint-cli2";
-      mdfix = "markdownlint-cli2 --fix";
-
       # 1Password CLI helpers
       oprun = "op run --";
       oprunenv = "op run --environment";
@@ -28,9 +25,7 @@
       zln = "zmv -L";
     };
 
-    envExtra = ''
-      [ -f "$HOME/.cargo/env" ] && source "$HOME/.cargo/env"
-    '';
+    envExtra = "";
 
     completionInit = ''
       autoload -Uz compinit
