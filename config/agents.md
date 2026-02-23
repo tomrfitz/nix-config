@@ -2,6 +2,16 @@
 
 Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md`, `~/.claude/CLAUDE.md`, and `~/.config/opencode/AGENTS.md` by home-manager.
 
+## Principles
+
+Leverage existing tools, ecosystems, and accumulated community knowledge over ad-hoc solutions. This meta-principle generates the priorities below:
+
+1. **Idiomatic** — write things the way the ecosystem expects. Idiomaticity is how you inherit collective best practices and how tooling (LSPs, linters, formatters) can actually help you.
+2. **Concise, legible, composable** — balanced as a peer group. Minimize without sacrificing readability; decompose without over-abstracting. The right amount of structure is the minimum that keeps things navigable and reusable.
+3. **Portable** — a natural side effect of doing the above well, not an active design constraint. Build for your actual needs; don't prematurely generalize for hypothetical users or platforms.
+
+Code should work for its author first, be maintainable and accessible to them over time, and where practical, be understandable and contributable by others.
+
 ## Git
 
 - Subject line: imperative mood, ~50 chars, no trailing punctuation
@@ -12,7 +22,7 @@ Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md
 ## Tools
 
 - Available in dev shells: `rg`, `fd`, `bat`, `dust`/`duf`, `nixfmt`, `nixd`, `nvd`
-- Pay attention to LSP and linter output — trust tools like clangd, ruff, nixd
+- Trust tool output (LSPs, linters, formatters) over your own reasoning for syntax, style, and correctness — they encode more collective experience than any one agent has. Trust your own reasoning over tools for architecture and design intent.
 - Record findings in open-standard docs (AGENTS.md in project root), then symlink to tool-specific paths if needed (CLAUDE.md, GEMINI.md, etc.)
 - Don't guess at command output — never truncate with `head`/`tail` before reading the result. Check the exit code and full output before deciding what's relevant.
 - Don't dump large output directly into context. Use targeted tools (grep, read with offset/limit) to extract the relevant section.
@@ -36,7 +46,7 @@ Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md
 
 ## Problem-solving
 
-- Design for the final state from the start. Don't build incrementally toward a structure you can already foresee.
+- Design toward the final state, but don't build scaffolding for parts that don't exist yet. If the end structure is clear, adopt it now; if it isn't, take the simplest correct step.
 - Distinguish "not implemented yet" from "doesn't exist" when exploring APIs/options
 - Check official docs first; save significant research findings for future reference
 - When a decision has lasting consequences (naming, architecture, file placement), ask rather than assume. When the path forward is clear or easily reversible, just do it.
