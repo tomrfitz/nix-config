@@ -28,6 +28,13 @@ Reference configs for best-practice patterns:
 - [ ] Set up Tailscale (`services.tailscale.enable`) for remote access from Mac/phone
 - [ ] Create `modules/nixos/system/homelab.nix` for service definitions (host-agnostic)
 - [ ] Enable homelab services: Plex or Jellyfin, Immich, *arr stack
+  - **Service strategy:** prefer native NixOS `services.*` modules over OCI containers.
+    Native services give declarative config, shared Nix store, reproducible builds, and
+    supply chain transparency. Apply shared systemd hardening (`DynamicUser`,
+    `ProtectHome`, `PrivateTmp`, `NoNewPrivileges`, etc.) to match the runtime isolation
+    containers provide by default. Fall back to Podman (via `virtualisation.oci-containers`)
+    only for services with poor/missing NixOS modules (Immich is the likely exception —
+    complex multi-service app where upstream only supports Docker).
 - [ ] Configure media storage mounts (NTFS via `/mnt/` for now)
 - [ ] Windows-side: scheduled task to auto-start WSL, `.wslconfig` for mirrored networking
 - [ ] Test Tailscale on eduroam (DERP relay fallback over 443)
