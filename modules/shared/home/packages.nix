@@ -18,66 +18,11 @@
       docker
       dockerfmt
 
-      # dev toolchains
-      rustup
-      go
-      nodejs
-      python3
-
-      dart
-      elixir
-      lua
-      php
-      zig
-      vlang
-      c3c
-      c3-lsp
-      openjdk
-      typst
-      nasm
-      bun
-      turso
-
-      # C/C++ compiler and tools
-      clang
-
-      # build tools
-      nixpkgs-review
-      cmake
-      gnumake
-      ninja
-      bear
-      automake
-      autoconf-archive
-      ccache
+      # code formatters (available globally so editors find them)
+      shellcheck
+      shfmt
       clang-tools
-      cppcheck
-      doxygen
-      boost
-      rapidjson
-      raylib
-      libffi
-      gst_all_1.gstreamer
-      qt6Packages.qtbase
-      wxGTK32
-
-      # go tools
-      delve
-      gopls
-      gotests
-      impl
-      go-tools # staticcheck
-
-      # node tools
-      markdownlint-cli2
       nodePackages.prettier
-      nodePackages.yarn
-
-      # python tools
-      uv
-      ty
-      termdown
-      virtualenv
 
       # nix tooling
       claude-code
@@ -107,31 +52,22 @@
       pandoc
       pass
       pdfgrep
-      shellcheck
-      shfmt
-      silver-searcher
       speedtest-cli
-      stow
       streamlink
       texinfo
       tldr
       ansifilter
-      fontforge
       termshot
       lf
       lsd
-      kakoune
       witr
       todo-txt-cli
       timewarrior
       taskwarrior-tui
-      texlive.combined.scheme-full
       gtypist
       mailsy
       gemini-cli
-      powershell
-      cargo-update
-      cargo-cache
+      termdown
       codex
       antigravity
 
@@ -144,7 +80,6 @@
       notesnook
       audacity
       sqlitebrowser
-      lapce
       inkscape
       prismlauncher
       anki

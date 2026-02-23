@@ -14,8 +14,6 @@ in
 
   programs.zsh = {
     shellAliases = {
-      regossip = "mkdir -p ~/gossip && cd ~/gossip && git pull && RUSTFLAGS=\"-C target-cpu=native --cfg tokio_unstable\" cargo build --release --features=lang-cjk && strip ./target/release/gossip && ./target/release/gossip";
-      code = "open -b com.microsoft.vscode";
       zed = zedCli;
       ytm = "z pear && pnpm start";
     };
@@ -32,13 +30,6 @@ in
     initContent = ''
       # ── macOS-only global aliases ──
       alias -g C='| pbcopy'
-
-      # Bun completions
-      [ -s "$HOME/.bun/_bun" ] && source "$HOME/.bun/_bun"
-
-      # NVM
-      [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
-      [ -s "$NVM_DIR/bash_completion" ] && \. "$NVM_DIR/bash_completion"
 
       # Journal note function (writes directly to Obsidian vault)
       jn() {
