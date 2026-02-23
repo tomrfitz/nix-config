@@ -13,8 +13,13 @@
       # On NixOS, Stylix manages the theme via HM specialisations.
       theme = lib.mkIf pkgs.stdenv.isDarwin "light:Flexoki Light,dark:Flexoki Dark";
       quit-after-last-window-closed = false;
+      copy-on-select = "clipboard";
       clipboard-read = "allow";
       clipboard-write = "allow";
+      right-click-action = "copy-or-paste";
+      gtk-titlebar-style = "tabs";
+      link-url = "true";
+      link-previews = "true";
       window-padding-balance = true;
       window-theme = "system";
       window-height = 36;
