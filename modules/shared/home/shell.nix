@@ -22,6 +22,10 @@
       # 1Password CLI helpers
       oprun = "op run --";
       oprunenv = "op run --environment";
+
+      # zmv helpers
+      zcp = "zmv -C";
+      zln = "zmv -L";
     };
 
     envExtra = ''
@@ -47,6 +51,9 @@
     initContent = lib.mkMerge [
       (lib.mkBefore ''
         setopt CORRECT
+        setopt AUTO_CD
+        setopt GLOB_DOTS
+        setopt INTERACTIVE_COMMENTS
         typeset -U path
       '')
 
@@ -123,6 +130,44 @@
           source <(op environment read "$1")
           set +a
         }
+
+        # ── Edit command buffer (Ctrl+X Ctrl+E) ──
+        autoload -Uz edit-command-line
+        zle -N edit-command-line
+        bindkey '^X^E' edit-command-line
+
+        # ── Copy command buffer to clipboard (Ctrl+X c) ──
+        function copy-buffer-to-clipboard() {
+          if command -v pbcopy &>/dev/null; then
+            echo -n "$BUFFER" | pbcopy
+          elif command -v wl-copy &>/dev/null; then
+            echo -n "$BUFFER" | wl-copy
+          fi
+          zle -M "Copied to clipboard"
+        }
+        zle -N copy-buffer-to-clipboard
+        bindkey '^Xc' copy-buffer-to-clipboard
+
+        # ── zmv (batch rename/move) ──
+        autoload -Uz zmv
+
+        # ── Suffix aliases (type a filename to open it) ──
+        alias -s md=bat
+        alias -s log=bat
+        alias -s txt=bat
+        alias -s json='bat --language=json'
+        alias -s nix='$EDITOR'
+
+        # ── Global aliases (usable anywhere in a command) ──
+        alias -g NE='2>/dev/null'
+        alias -g NUL='>/dev/null 2>&1'
+        alias -g J='| jq'
+        alias -g L='| less'
+        alias -g H='| head'
+        alias -g T='| tail'
+        alias -g S='| sort'
+        alias -g U='| sort -u'
+        alias -g WC='| wc -l'
 
         function set_win_title() {
           print -Pn "\033]0; %~ \007"
@@ -463,5 +508,12 @@
     enable = true;
     enableZshIntegration = true;
     enableFishIntegration = true;
+  };
+
+  # ── Direnv (auto-load project environments) ─────────────────────────
+  programs.direnv = {
+    enable = true;
+    enableZshIntegration = true;
+    nix-direnv.enable = true;
   };
 }
