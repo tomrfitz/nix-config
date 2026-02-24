@@ -33,7 +33,6 @@ in
     ./ruff.nix
     ./micro.nix
     ./beets.nix
-    ./mpv.nix
     ./opencode.nix
   ];
 
