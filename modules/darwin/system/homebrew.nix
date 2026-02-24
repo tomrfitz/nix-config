@@ -72,7 +72,6 @@
       "daisydisk"
       "grandperspective"
       "imageoptim"
-      "jordanbaird-ice"
       "thaw"
       "keepingyouawake"
       "keyboardcleantool"
