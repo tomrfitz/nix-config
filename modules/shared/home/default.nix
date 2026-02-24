@@ -32,7 +32,6 @@ in
     ./stylix.nix
     ./ruff.nix
     ./micro.nix
-    ./beets.nix
     ./opencode.nix
   ];
 
