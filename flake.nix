@@ -144,7 +144,6 @@
           hostModule = ./hosts/trfmbp;
           overlays = [
             (import ./overlays/vesktop-darwin.nix)
-            (import ./overlays/zed-editor-darwin.nix)
           ];
           hmModules = [
             ./modules/shared/home
