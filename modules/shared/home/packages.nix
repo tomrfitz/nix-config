@@ -73,7 +73,7 @@
 
       # gossip # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
 
-      # apps (migrated from Homebrew casks)
+      # apps
       discord
       slack
       thunderbird
