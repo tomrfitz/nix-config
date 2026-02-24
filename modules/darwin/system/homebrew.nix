@@ -73,6 +73,7 @@
       "grandperspective"
       "imageoptim"
       "jordanbaird-ice"
+      "thaw"
       "keepingyouawake"
       "keyboardcleantool"
       "keyclu"
