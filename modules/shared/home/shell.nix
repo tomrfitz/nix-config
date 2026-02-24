@@ -131,6 +131,16 @@
           set +a
         }
 
+        # ── nixify (bootstrap direnv for a flake project) ──
+        nixify() {
+          if [[ ! -f flake.nix ]]; then
+            echo "No flake.nix in current directory" >&2
+            return 1
+          fi
+          echo "use flake" > .envrc
+          direnv allow
+        }
+
         # ── Edit command buffer (Ctrl+X Ctrl+E) ──
         autoload -Uz edit-command-line
         zle -N edit-command-line
