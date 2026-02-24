@@ -196,4 +196,3 @@ Hostnames follow `trf<identifier>` — initials prefix for network disambiguatio
 ## Active overlays
 
 - **`overlays/vesktop-darwin.nix`** — fixes codesign failure on macOS; `REVISIT(upstream): remove overlay after NixOS/nixpkgs#489725 lands in nixpkgs-unstable`
-- **`overlays/zed-editor-darwin.nix`** — temporary zed-editor darwin fix; `REVISIT(upstream): remove overlay after NixOS/nixpkgs#490957 lands in nixpkgs-unstable`
