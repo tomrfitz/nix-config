@@ -6,6 +6,7 @@
 {
   programs.ruff = {
     enable = true;
+    package = null; # provided by project devShells; global config is just defaults
     settings = {
       exclude = [
         ".bzr"
