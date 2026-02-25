@@ -4,8 +4,9 @@ Repo-specific guidance for AI agents working on this nix-config. See also `~/.co
 
 ## What This Is
 
-A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tracks on nixpkgs-unstable.
-The `lix` branch sets Lix as the default `nix.package` across all hosts.
+A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tracks on nixpkgs-unstable. Uses Lix as the nix runtime across all hosts.
+
+Two branches: `main` (stable) and `lean` (active development — trimming, cleanup, new features).
 
 ### Machines
 
@@ -36,7 +37,7 @@ just diff          # dix diff between previous and current system profile
 just snapshot NAME # take macOS defaults snapshot
 ```
 
-**Validation:** There are no tests. Correctness = `just check` (dry-run) or `just eval` succeeding. On the `lix` branch, use `just eval-all` as the migration gate. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
+**Validation:** There are no tests. Correctness = `just check` (dry-run) or `just eval` succeeding. Use `just eval-all` to gate cross-platform changes. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
 
 **Important:** Nix flakes only see files tracked by git. When adding new files referenced by the flake (e.g., config files used in `home.file` or `source`), you must `git add` them before `just eval` or `just check` will work.
 
@@ -97,6 +98,9 @@ modules/
 - **Prefer native home-manager modules** (`programs.*`) over `home.file` when available
 - **Package source priority:** nixpkgs shared → nixpkgs platform-specific → homebrew casks → Mac App Store (mas)
 - **Brew-preferred exceptions:** 1Password, Emacs (macOS native patches), Ghostty (macOS app integration)
+- **Language tooling belongs in project devShells**, not in the system config — only editor-universal tools (`nixd`, `nixfmt`, `shfmt`, `shellcheck`) stay global
+- **Config-only HM modules** (`package = null`) provide global defaults (e.g., `programs.ruff`) while project devShells provide the binary; `home.file` serves the same role for tools without HM modules (e.g., `.clang-format`)
+- **Zed uses `load_direnv = "shell_hook"`** to discover project-provided LSPs/formatters automatically
 
 ### Guardrails
 
@@ -158,14 +162,7 @@ Fresh machine setup (darwin or NixOS):
 bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/main/scripts/bootstrap.sh)
 ```
 
-Lix branch bootstrap (same flow, `lix` branch script):
-
-```bash
-bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/lix/scripts/bootstrap.sh)
-```
-
-The script handles: Xcode CLT (darwin), runtime installation, repo clone, and first `darwin-rebuild`/`nixos-rebuild`. The manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
-On the `lix` branch, bootstrap defaults to the Lix installer on macOS.
+The script handles: Xcode CLT (darwin), Lix installation, repo clone, and first `darwin-rebuild`/`nixos-rebuild`. The manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
 
 ## Roadmap
 
