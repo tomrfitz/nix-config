@@ -48,6 +48,7 @@
         opencode.type = "registry";
         github-copilot.type = "registry";
       };
+      load_direnv = "shell_hook";
       session = {
         trust_all_worktrees = true;
       };
