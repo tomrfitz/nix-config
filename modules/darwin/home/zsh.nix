@@ -15,7 +15,6 @@ in
   programs.zsh = {
     shellAliases = {
       zed = zedCli;
-      ytm = "z pear && pnpm start";
     };
 
     profileExtra = lib.mkAfter ''
