@@ -200,7 +200,7 @@
             packages = [
               pkgs.nixfmt
               pkgs.nixd
-              pkgs.nvd
+              pkgs.dix
               pkgs.nh
               pkgs.just
             ]
