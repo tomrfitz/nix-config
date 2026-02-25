@@ -29,7 +29,6 @@
   # ── macOS-specific session variables ───────────────────────────────────
   home.sessionVariables = {
     SCRNSHT = "$HOME/Documents/Screenshots/";
-    NVM_DIR = "$HOME/.nvm";
   };
 
   # ── Emacs-plus build config ──────────────────────────────────────────
@@ -38,12 +37,6 @@
   '';
 
   home.sessionPath = [
-    "$HOME/.cargo/bin"
-    "$HOME/.juliaup/bin"
     "$HOME/.config/emacs/bin"
-    "$HOME/vcpkg"
-    "$HOME/.cache/.bun/bin"
-    "$HOME/Library/Application Support/JetBrains/Toolbox/scripts"
-    "$HOME/Library/Application Support/Coursier/bin"
   ];
 }
