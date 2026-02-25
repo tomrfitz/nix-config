@@ -16,13 +16,10 @@
       python3Packages.markitdown
 
       docker
-      dockerfmt
 
       # code formatters (available globally so editors find them)
       shellcheck
       shfmt
-      clang-tools
-      nodePackages.prettier
 
       # nix tooling
       claude-code
@@ -115,8 +112,6 @@
       noto-fonts-color-emoji
     ]
     ++ lib.optionals pkgs.stdenv.isDarwin [
-      swiftlint
-      swiftformat
       xcodes
     ]
     ++ lib.optionals (!pkgs.stdenv.isDarwin) [

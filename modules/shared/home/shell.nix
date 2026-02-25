@@ -105,9 +105,6 @@
           _source_cached_completion "mole" "mole completion zsh" "$(command -v mole)"
         fi
 
-        # Source custom environment file if it exists
-        [ -f "$HOME/.local/bin/env" ] && . "$HOME/.local/bin/env"
-
         # Load env vars from a 1Password Environment into the current shell.
         # Requires 1Password CLI beta with `op environment read`.
         oploadenv() {
