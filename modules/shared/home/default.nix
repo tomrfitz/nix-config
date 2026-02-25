@@ -48,16 +48,12 @@ in
     # SSH also explicitly points at the same socket via `IdentityAgent`.
     SSH_AUTH_SOCK = onePasswordSshAgentSock;
 
-    VCPKG_ROOT = "$HOME/vcpkg";
     OLLAMA_GPU_LAYERS = "-1";
     OLLAMA_KEEP_ALIVE = "5m";
-    PYTORCH_ENABLE_MPS_FALLBACK = "1";
-    PYTORCH_MPS_HIGH_WATERMARK_RATIO = "0.0";
   };
 
   home.sessionPath = [
     "$HOME/.local/bin"
-    "$HOME/go/bin"
   ];
 
   # Export SSH_AUTH_SOCK to systemd user environment so GUI apps (Obsidian, etc.)
