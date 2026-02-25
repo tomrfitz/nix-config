@@ -31,7 +31,6 @@ in
     ./obsidian.nix
     ./stylix.nix
     ./ruff.nix
-    ./micro.nix
     ./opencode.nix
   ];
 
