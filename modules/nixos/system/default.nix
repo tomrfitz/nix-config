@@ -51,6 +51,13 @@
   services.acpid.enable = true;
   services.power-profiles-daemon.enable = lib.mkForce false;
 
+  # Headless/server: keep running with lid closed
+  services.logind = {
+    lidSwitch = "ignore";
+    lidSwitchDocked = "ignore";
+    lidSwitchExternalPower = "ignore";
+  };
+
   # Backlight control for unprivileged users
   programs.light.enable = true;
 
