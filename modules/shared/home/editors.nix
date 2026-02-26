@@ -172,9 +172,7 @@
       format_on_save = "on";
       tab_size = 4;
       base_keymap = "VSCode";
-      # On macOS, Zed uses native system-responsive theming (Stylix disabled).
-      # On NixOS, Stylix manages the theme via HM specialisations.
-      theme = lib.mkIf pkgs.stdenv.isDarwin {
+      theme = {
         mode = "system";
         light = "Flexoki Light";
         dark = "Flexoki Dark";
