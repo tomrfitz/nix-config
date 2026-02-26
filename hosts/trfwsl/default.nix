@@ -11,6 +11,10 @@
   wsl = {
     enable = true;
     defaultUser = user;
+    interop = {
+      register = true;
+      includePath = true;
+    };
   };
 
   trf.wsl.gpu.enable = true;

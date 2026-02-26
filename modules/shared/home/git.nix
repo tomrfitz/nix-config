@@ -4,6 +4,7 @@
   fullName,
   email,
   sshPublicKey,
+  isWSL,
   ...
 }:
 {
@@ -35,6 +36,14 @@
       core = {
         preloadindex = true;
         fscache = true;
+      }
+      // lib.optionalAttrs isWSL {
+        # Route SSH through Windows OpenSSH (talks to 1Password's agent)
+        sshCommand = "ssh.exe";
+      };
+      # On WSL, use 1Password's WSL signing binary for commit signatures.
+      gpg.ssh = lib.mkIf isWSL {
+        program = "/mnt/c/Users/Thomas FitzGerald/AppData/Local/Microsoft/WindowsApps/op-ssh-sign-wsl.exe";
       };
       diff = {
         algorithm = "histogram";
