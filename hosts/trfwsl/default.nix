@@ -41,10 +41,10 @@
     serviceConfig = {
       Restart = "on-failure";
       RestartSec = 5;
-      DynamicUser = true;
+      LoadCredential = "op-sa-token:/etc/op/service-account-token";
     };
     script = ''
-      export OP_SERVICE_ACCOUNT_TOKEN="$(cat /etc/op/service-account-token)"
+      export OP_SERVICE_ACCOUNT_TOKEN="$(cat "$CREDENTIALS_DIRECTORY/op-sa-token")"
       export TUNNEL_TOKEN="$(${pkgs._1password-cli}/bin/op read "op://Private/Cloudflare Tunnel pton/password")"
       exec ${pkgs.cloudflared}/bin/cloudflared tunnel run --no-autoupdate
     '';
