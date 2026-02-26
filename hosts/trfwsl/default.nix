@@ -45,7 +45,7 @@
     };
     script = ''
       export OP_SERVICE_ACCOUNT_TOKEN="$(cat "$CREDENTIALS_DIRECTORY/op-sa-token")"
-      export TUNNEL_TOKEN="$(${pkgs._1password-cli}/bin/op read "op://Private/Cloudflare Tunnel pton/password")"
+      export TUNNEL_TOKEN="$(${pkgs._1password-cli}/bin/op read "op://uqfzcav67dohngequpz4yj5dhm/p2aiyd6b4uvya2dn5psufsowui/password")"
       exec ${pkgs.cloudflared}/bin/cloudflared tunnel run --no-autoupdate
     '';
   };
