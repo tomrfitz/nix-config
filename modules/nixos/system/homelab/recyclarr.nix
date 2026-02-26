@@ -17,56 +17,36 @@ in
         sonarr.tv = {
           base_url = "http://127.0.0.1:8989";
           api_key._secret = "/etc/secrets/recyclarr/sonarr-api-key";
-
-          quality_definition = {
-            type = "series";
-          };
-
-          # Guide-backed profiles currently require `trash_id`.
-          # Keep names in comments for readability.
-          quality_profiles = [
-            {
-              # WEB-1080p
-              trash_id = "72dae194fc92bf828f32cde7744e51a1";
-              reset_unmatched_scores.enabled = true;
-            }
-            {
-              # WEB-2160p
-              trash_id = "d1498e7d189fbe6c7110ceaabb7473e6";
-              reset_unmatched_scores.enabled = true;
-            }
+          include = [
+            # Quality definition
+            { template = "sonarr-quality-definition-series"; }
+            # WEB-1080p profile + custom formats
+            { template = "sonarr-v4-quality-profile-web-1080p"; }
+            { template = "sonarr-v4-custom-formats-web-1080p"; }
+            # WEB-2160p profile + custom formats
+            { template = "sonarr-v4-quality-profile-web-2160p"; }
+            { template = "sonarr-v4-custom-formats-web-2160p"; }
           ];
         };
 
         radarr.movies = {
           base_url = "http://127.0.0.1:7878";
           api_key._secret = "/etc/secrets/recyclarr/radarr-api-key";
-
-          quality_definition = {
-            type = "movie";
-          };
-
-          quality_profiles = [
-            {
-              # HD Bluray + WEB
-              trash_id = "d1d67249d3890e49bc12e275d989a7e9";
-              reset_unmatched_scores.enabled = true;
-            }
-            {
-              # UHD Bluray + WEB
-              trash_id = "64fb5f9858489bdac2af690e27c8f42f";
-              reset_unmatched_scores.enabled = true;
-            }
-            {
-              # Remux + WEB 1080p
-              trash_id = "9ca12ea80aa55ef916e3751f4b874151";
-              reset_unmatched_scores.enabled = true;
-            }
-            {
-              # Remux + WEB 2160p
-              trash_id = "fd161a61e3ab826d3a22d53f935696dd";
-              reset_unmatched_scores.enabled = true;
-            }
+          include = [
+            # Quality definition
+            { template = "radarr-quality-definition-movie"; }
+            # HD Bluray + WEB profile + custom formats
+            { template = "radarr-quality-profile-hd-bluray-web"; }
+            { template = "radarr-custom-formats-hd-bluray-web"; }
+            # UHD Bluray + WEB profile + custom formats
+            { template = "radarr-quality-profile-uhd-bluray-web"; }
+            { template = "radarr-custom-formats-uhd-bluray-web"; }
+            # Remux + WEB 1080p profile + custom formats
+            { template = "radarr-quality-profile-remux-web-1080p"; }
+            { template = "radarr-custom-formats-remux-web-1080p"; }
+            # Remux + WEB 2160p profile + custom formats
+            { template = "radarr-quality-profile-remux-web-2160p"; }
+            { template = "radarr-custom-formats-remux-web-2160p"; }
           ];
         };
       };
