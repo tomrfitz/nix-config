@@ -23,34 +23,29 @@
 
   trf.homelab = {
     enable = true;
-
-    # Keep firewall closed by default; expose via Tailscale first.
-    exposePorts = false;
-
-    # TRaSH-style roots on StableBit DrivePool-mounted Z: drive in WSL.
+    bookshelf.enable = true;
     paths = {
       mediaRoot = lib.mkDefault "/mnt/z/data/media";
-      downloadsRoot = lib.mkDefault "/mnt/z/data/torrents";
+      usenetRoot = lib.mkDefault "/mnt/k/data/usenet";
+      torrentsRoot = lib.mkDefault "/mnt/k/data/torrents";
       booksRoot = lib.mkDefault "/mnt/z/data/media/books";
     };
+  };
 
-    # Current stack
-    apps = {
-      bazarr = true;
-      calibre = true;
-      lidarr = true;
-      plex = true;
-      radarr = true;
-      readarr = true;
-      sabnzbd = true;
-      sonarr = true;
-      tautulli = true;
-
-      # Planned migrations/additions
-      booklore = false;
-      immich = false;
-      jellyfin = false;
-      jellyseerr = false;
-    };
+  # Homelab services — enable individually, conventions layered by homelab modules.
+  services = {
+    bazarr.enable = true;
+    # REVISIT(upstream): re-enable calibre; ref: qmake build failure (calibre pkg) + flask-limiter (calibre-web); checked: 2026-02-26
+    # calibre-server.enable = true;
+    # calibre-web.enable = true;
+    lidarr.enable = true;
+    plex.enable = true;
+    radarr.enable = true;
+    # readarr replaced by bookshelf (Readarr fork with Hardcover metadata)
+    # readarr.enable = true;
+    sabnzbd.enable = true;
+    sonarr.enable = true;
+    tautulli.enable = true;
+    recyclarr.enable = true;
   };
 }
