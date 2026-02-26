@@ -7,12 +7,6 @@
     base16Scheme = lib.mkDefault "${pkgs.base16-schemes}/share/themes/flexoki-dark.yaml";
     polarity = lib.mkDefault "dark";
 
-    cursor = {
-      package = pkgs.adwaita-icon-theme;
-      name = "Adwaita";
-      size = 24;
-    };
-
     fonts.sizes = {
       applications = 12;
       desktop = 12;
