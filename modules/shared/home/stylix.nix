@@ -1,17 +1,14 @@
-{
-  pkgs,
-  ...
-}:
+{ ... }:
 {
   stylix.targets = {
     # Vencord handles its own Flexoki theme via custom CSS
     vesktop.enable = false;
 
-    # On macOS these apps have native system-responsive theming that follows
-    # macOS appearance (dark/light). Stylix would overwrite that with a static
-    # theme. On NixOS, Stylix manages them and HM specialisations handle switching.
-    ghostty.enable = !pkgs.stdenv.isDarwin;
-    zed.enable = !pkgs.stdenv.isDarwin;
+    # Both apps respond to the system dark/light preference natively
+    # (macOS appearance + freedesktop portal). Stylix's base16 themes
+    # are less granular than the bundled Flexoki themes.
+    ghostty.enable = false;
+    zed.enable = false;
 
     # Browsers follow the freedesktop portal dark preference automatically;
     # Stylix CSS injection requires profile names and isn't worth the complexity.
