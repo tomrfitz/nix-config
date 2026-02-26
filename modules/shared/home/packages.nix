@@ -78,7 +78,9 @@
       audacity
       sqlitebrowser
       prismlauncher
-      anki
+      # REVISIT(upstream): remove override once anki check phase has QtWebChannel in test deps;
+      # ref: https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/an/anki/package.nix; checked: 2026-02-25
+      (anki.overrideAttrs { doInstallCheck = false; })
       chatterino2
       qbittorrent
 
