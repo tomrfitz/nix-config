@@ -70,19 +70,6 @@ in
       };
     };
 
-    auth = {
-      usernameSecretRef = lib.mkOption {
-        type = lib.types.str;
-        default = "op://d2kparnm4436vrbora6wnty6pm/zfguahen7bcxcya4umyxysasye/username";
-        description = "1Password secret reference for shared homelab UI username.";
-      };
-
-      passwordSecretRef = lib.mkOption {
-        type = lib.types.str;
-        default = "op://d2kparnm4436vrbora6wnty6pm/zfguahen7bcxcya4umyxysasye/password";
-        description = "1Password secret reference for shared homelab UI password.";
-      };
-    };
   };
 
   config = lib.mkIf cfg.enable {
