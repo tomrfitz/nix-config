@@ -1,32 +1,13 @@
 {
   lib,
-  pkgs,
   ...
 }:
 {
   specialisation = {
-    plasma.configuration = {
+    gnome.configuration = {
       services.xserver.enable = lib.mkForce true;
       services.displayManager.gdm.enable = lib.mkForce true;
-      services.desktopManager.gnome.enable = lib.mkForce false;
-      services.desktopManager.plasma6.enable = true;
-    };
-
-    sway.configuration = {
-      services.xserver.enable = lib.mkForce false;
-      services.displayManager.gdm.enable = lib.mkForce false;
-      services.desktopManager.gnome.enable = lib.mkForce false;
-
-      programs.sway.enable = true;
-      services.greetd = {
-        enable = true;
-        settings.default_session = {
-          command = "${pkgs.tuigreet}/bin/tuigreet --time --cmd sway";
-          user = "greeter";
-        };
-      };
-
-      security.pam.services.swaylock.howdy.enable = true;
+      services.desktopManager.gnome.enable = lib.mkForce true;
     };
   };
 }
