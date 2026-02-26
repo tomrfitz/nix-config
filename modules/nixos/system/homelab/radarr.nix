@@ -11,6 +11,11 @@ in
     services.radarr = {
       group = "media";
       openFirewall = cfg.openFirewall;
+      settings.auth = {
+        enabled = true;
+        method = "Forms";
+        required = "Enabled";
+      };
     };
   };
 }
