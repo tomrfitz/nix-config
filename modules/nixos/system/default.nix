@@ -11,15 +11,16 @@
     ./homelab.nix
   ];
 
+  # Cursor theme (stylix.cursor doesn't exist on darwin)
+  stylix.cursor = {
+    package = pkgs.adwaita-icon-theme;
+    name = "Adwaita";
+    size = 24;
+  };
+
   programs.zsh.enable = true;
 
-  programs.nh = {
-    enable = true;
-    clean = {
-      enable = true;
-      extraArgs = "--keep 5 --keep-since 7d";
-    };
-  };
+  programs.nh.enable = true;
 
   # ── Display / Desktop ────────────────────────────────────────────────
   services.xserver.enable = lib.mkDefault true;
@@ -52,10 +53,10 @@
   services.power-profiles-daemon.enable = lib.mkForce false;
 
   # Headless/server: keep running with lid closed
-  services.logind = {
-    lidSwitch = "ignore";
-    lidSwitchDocked = "ignore";
-    lidSwitchExternalPower = "ignore";
+  services.logind.settings.Login = {
+    HandleLidSwitch = "ignore";
+    HandleLidSwitchDocked = "ignore";
+    HandleLidSwitchExternalPower = "ignore";
   };
 
   # Backlight control for unprivileged users
