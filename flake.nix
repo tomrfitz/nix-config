@@ -153,9 +153,11 @@
           system = "x86_64-linux";
           platform = "nixos";
           hostModule = ./hosts/trfnix;
+          extraModules = [ ./modules/nixos/system/desktop.nix ];
           hmModules = [
             ./modules/shared/home
             ./modules/nixos/home
+            ./modules/nixos/home/desktop.nix
           ];
         };
         trfwsl = {
