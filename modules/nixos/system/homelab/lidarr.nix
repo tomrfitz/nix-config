@@ -11,6 +11,11 @@ in
     services.lidarr = {
       group = "media";
       openFirewall = cfg.openFirewall;
+      settings.auth = {
+        enabled = true;
+        method = "Forms";
+        required = "Enabled";
+      };
     };
   };
 }
