@@ -9,7 +9,7 @@
 let
   cfg = config.trf.wsl.gpu;
   wslLibPath = "/usr/lib/wsl/lib";
-  mkWslLibEnv = enabled: lib.mkIf enabled { LD_LIBRARY_PATH = wslLibPath; };
+  mkWslLibEnv = enabled: lib.mkIf enabled { LD_LIBRARY_PATH = lib.mkForce wslLibPath; };
 in
 {
   options.trf.wsl.gpu.enable = lib.mkEnableOption "WSL GPU passthrough and container runtime wiring";
@@ -33,39 +33,18 @@ in
     users.users.${user}.extraGroups = lib.mkAfter [
       "video"
       "render"
-      "docker"
     ];
 
-    virtualisation.docker = {
+    virtualisation.podman = {
       enable = lib.mkDefault true;
-      daemon.settings = {
-        features.cdi = true;
-        cdi-spec-dirs = [ "/etc/cdi" ];
-      };
+      dockerCompat = true;
+      dockerSocket.enable = true;
     };
+    virtualisation.oci-containers.backend = "podman";
 
     hardware.nvidia-container-toolkit = {
       enable = lib.mkDefault true;
       suppressNvidiaDriverAssertion = lib.mkDefault true;
-    };
-
-    systemd.tmpfiles.rules = [
-      "d /etc/cdi 0755 root root - -"
-    ];
-
-    # Generate NVIDIA CDI spec for Docker GPU workloads.
-    systemd.services.nvidia-cdi-generate = {
-      description = "Generate NVIDIA CDI spec for WSL GPU containers";
-      wantedBy = [ "multi-user.target" ];
-      before = [ "docker.service" ];
-      after = [ "local-fs.target" ];
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-      };
-      script = ''
-        ${pkgs.nvidia-container-toolkit}/bin/nvidia-ctk cdi generate --output=/etc/cdi/nvidia.yaml
-      '';
     };
 
     # New Ollama module expects GPU flavor via package selection.
