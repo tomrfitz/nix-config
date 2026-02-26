@@ -77,7 +77,6 @@
       notesnook
       audacity
       sqlitebrowser
-      inkscape
       prismlauncher
       anki
       chatterino2
