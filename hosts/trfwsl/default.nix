@@ -2,6 +2,7 @@
   hostName,
   user,
   lib,
+  pkgs,
   ...
 }:
 {
@@ -19,7 +20,35 @@
 
   trf.wsl.gpu.enable = true;
 
+  # 1Password service account — resolves op:// references headlessly (boot, services, cron).
+  # Token bootstrapped manually: /etc/op/service-account-token (chmod 600)
+  environment.extraInit = ''
+    if [ -r /etc/op/service-account-token ]; then
+      export OP_SERVICE_ACCOUNT_TOKEN="$(cat /etc/op/service-account-token)"
+    fi
+  '';
+
   services.ollama.enable = true;
+
+  # ── Cloudflare Tunnel (exposes homelab services outside eduroam) ───────
+  # Routes managed in Cloudflare Zero Trust dashboard; token resolved via
+  # 1Password service account at service start.
+  systemd.services.cloudflared-tunnel = {
+    description = "Cloudflare Tunnel";
+    after = [ "network-online.target" ];
+    wants = [ "network-online.target" ];
+    wantedBy = [ "multi-user.target" ];
+    serviceConfig = {
+      Restart = "on-failure";
+      RestartSec = 5;
+      DynamicUser = true;
+    };
+    script = ''
+      export OP_SERVICE_ACCOUNT_TOKEN="$(cat /etc/op/service-account-token)"
+      export TUNNEL_TOKEN="$(${pkgs._1password-cli}/bin/op read "op://Private/Cloudflare Tunnel pton/password")"
+      exec ${pkgs.cloudflared}/bin/cloudflared tunnel run --no-autoupdate
+    '';
+  };
 
   trf.homelab = {
     enable = true;
