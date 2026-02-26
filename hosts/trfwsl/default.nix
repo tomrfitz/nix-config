@@ -62,7 +62,7 @@
       mediaRoot = lib.mkDefault "/mnt/z/data/media";
       usenetRoot = lib.mkDefault "/mnt/k/data/usenet";
       torrentsRoot = lib.mkDefault "/mnt/k/data/torrents";
-      booksRoot = lib.mkDefault "/mnt/z/data/media/books";
+      booksRoot = lib.mkDefault "/mnt/k/data/media/books";
     };
   };
 
