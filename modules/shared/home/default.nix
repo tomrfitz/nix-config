@@ -139,6 +139,9 @@ in
           ControlPersist = "3600";
         };
       };
+      "trfnix trfwsl trflab" = {
+        forwardAgent = true;
+      };
     };
   };
 
