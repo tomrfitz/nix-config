@@ -27,8 +27,8 @@
     }
     // lib.optionalAttrs isWSL {
       # On WSL, route through Windows OpenSSH to reach 1Password's SSH agent
-      ssh = "ssh.exe";
-      ssh-add = "ssh-add.exe";
+      ssh = "/mnt/c/Windows/System32/OpenSSH/ssh.exe";
+      ssh-add = "/mnt/c/Windows/System32/OpenSSH/ssh-add.exe";
     };
 
     envExtra = "";
