@@ -41,7 +41,7 @@ jobs:
             - uses: cachix/cachix-action@v15
               with:
                   name: tomrfitz
-                  authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+                  authToken: ${{ secrets.CACHIX }}
 
             - name: Build trfnix system closure
               run: nix build .#nixosConfigurations.trfnix.config.system.build.toplevel --no-link
