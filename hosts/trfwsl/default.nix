@@ -42,13 +42,16 @@
       Restart = "on-failure";
       RestartSec = 5;
       LoadCredential = "op-sa-token:/etc/op/service-account-token";
+      RuntimeDirectory = "cloudflared";
+      RuntimeDirectoryMode = "0700";
       StateDirectory = "cloudflared";
     };
     environment.HOME = "/var/lib/cloudflared";
     script = ''
       export OP_SERVICE_ACCOUNT_TOKEN="$(cat "$CREDENTIALS_DIRECTORY/op-sa-token")"
-      TOKEN="$(${pkgs._1password-cli}/bin/op read "op://d2kparnm4436vrbora6wnty6pm/lfxqpbrqybsjifdky766t35pcy/password")"
-      exec ${pkgs.cloudflared}/bin/cloudflared tunnel run --token "$TOKEN"
+      ${pkgs._1password-cli}/bin/op read "op://d2kparnm4436vrbora6wnty6pm/lfxqpbrqybsjifdky766t35pcy/password" \
+        > "$RUNTIME_DIRECTORY/tunnel-token"
+      exec ${pkgs.cloudflared}/bin/cloudflared tunnel run --token-file "$RUNTIME_DIRECTORY/tunnel-token"
     '';
   };
 
