@@ -14,7 +14,6 @@ let
       "${config.home.homeDirectory}/.1password/agent.sock";
   onePasswordIdentityAgent =
     if isDarwin then "\"${onePasswordSshAgentSock}\"" else onePasswordSshAgentSock;
-  urlOpener = if isDarwin then "open" else "xdg-open";
 in
 {
   imports = [
@@ -22,14 +21,8 @@ in
     ./shell.nix
     ./fish.nix
     ./git.nix
-    ./firefox.nix
-    ./zen.nix
     ./fastfetch.nix
     ./editors.nix
-    ./ghostty.nix
-    ./vesktop.nix
-    ./obsidian.nix
-    ./stylix.nix
     ./ruff.nix
     ./opencode.nix
   ];
@@ -63,39 +56,9 @@ in
 
   # ── Other programs with native modules ─────────────────────────────────
 
-  programs.alacritty = {
-    enable = true;
-    settings = {
-      general.live_config_reload = true;
-      window = {
-        decorations = "Buttonless";
-        dynamic_padding = true;
-        opacity = lib.mkForce 0.2;
-        blur = true;
-        resize_increments = true;
-        dynamic_title = true;
-      };
-      hints.enabled = [
-        {
-          command = urlOpener;
-          hyperlinks = true;
-          post_processing = true;
-          persist = false;
-          mouse.enabled = true;
-          binding = {
-            key = "O";
-            mods = "Control|Shift";
-          };
-          regex = "(ipfs:|ipns:|magnet:|mailto:|gemini://|gopher://|https://|http://|news:|file:|git://|ssh:|ftp://)[^\\u0000-\\u001F\\u007F-\\u009F<>\"\\\\s{-}\\\\^⟨⟩`]+";
-        }
-      ];
-    };
-  };
-
   programs.bat.enable = true;
   programs.eza.enable = true;
   programs.fd.enable = true;
-  programs.kitty.enable = true;
   programs.ripgrep.enable = true;
   programs.jq.enable = true;
 
