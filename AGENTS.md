@@ -71,7 +71,7 @@ modules/
     system/        # user.nix, homebrew.nix, settings.nix (system.defaults), security.nix
     home/          # zsh.nix, git.nix (1Password signing), topgrade.nix, aerospace.nix, sketchybar.nix
   nixos/           # Linux-only
-    system/        # user.nix, default GNOME, specialisations (sway/plasma), tailscale, 1Password GUI, howdy, openssh
+    system/        # user.nix, homelab/, wsl-gpu.nix, default GNOME, specialisations (sway/plasma), tailscale, 1Password GUI, howdy, openssh
     home/          # homeDirectory, sway config, darkman, mako, gammastep
 ```
 
@@ -85,6 +85,10 @@ modules/
 - Shell aliases/functions (cross-platform): `modules/shared/home/shell.nix`
 - Shell aliases/functions (macOS-only): `modules/darwin/home/zsh.nix`
 - Linux system services: `modules/nixos/system/default.nix`
+- Homelab shared config: `modules/nixos/system/homelab/default.nix`
+- Homelab per-service conventions: `modules/nixos/system/homelab/<service>.nix`
+- Enable homelab services: `hosts/trfwsl/default.nix` (via `services.<name>.enable`)
+- WSL GPU / container runtime: `modules/nixos/system/wsl-gpu.nix`
 - Linux desktop/session behavior: `modules/nixos/home/{default,darkman}.nix`
 - Configure editors: `modules/shared/home/editors.nix`
 - Firefox extensions: `modules/shared/home/firefox.nix`
