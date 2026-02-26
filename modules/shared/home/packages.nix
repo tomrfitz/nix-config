@@ -112,6 +112,10 @@
       nerd-fonts.symbols-only
       noto-fonts-color-emoji
     ]
+    ++ lib.optionals pkgs.stdenv.isLinux [
+      # Ensure SSH sessions from Ghostty render correctly on Linux hosts.
+      ghostty.terminfo
+    ]
     ++ lib.optionals pkgs.stdenv.isDarwin [
       xcodes
     ]
