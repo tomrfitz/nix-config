@@ -119,7 +119,6 @@
             model = "gemini-3-pro-preview";
           }
         ];
-        always_allow_tool_actions = true;
         use_modifier_to_send = false;
         default_profile = "write";
         dock = "left";
