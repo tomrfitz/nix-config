@@ -15,6 +15,8 @@ in
   options.trf.wsl.gpu.enable = lib.mkEnableOption "WSL GPU passthrough and container runtime wiring";
 
   config = lib.mkIf (isWSL && cfg.enable) {
+    programs.nix-ld.enable = lib.mkDefault true;
+
     # Wire WSL's Windows GPU userspace into NixOS.
     wsl.useWindowsDriver = lib.mkDefault true;
     hardware.graphics = {
