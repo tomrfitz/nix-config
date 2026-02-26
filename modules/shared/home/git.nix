@@ -39,7 +39,7 @@
       }
       // lib.optionalAttrs isWSL {
         # Route SSH through Windows OpenSSH (talks to 1Password's agent)
-        sshCommand = "ssh.exe";
+        sshCommand = "/mnt/c/Windows/System32/OpenSSH/ssh.exe";
       };
       # On WSL, use 1Password's WSL signing binary for commit signatures.
       gpg.ssh = lib.mkIf isWSL {
