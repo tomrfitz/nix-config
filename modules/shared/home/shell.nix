@@ -2,6 +2,7 @@
   config,
   pkgs,
   lib,
+  isWSL,
   ...
 }:
 {
@@ -23,6 +24,11 @@
       # zmv helpers
       zcp = "zmv -C";
       zln = "zmv -L";
+    }
+    // lib.optionalAttrs isWSL {
+      # On WSL, route through Windows OpenSSH to reach 1Password's SSH agent
+      ssh = "ssh.exe";
+      ssh-add = "ssh-add.exe";
     };
 
     envExtra = "";

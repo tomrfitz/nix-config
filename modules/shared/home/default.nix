@@ -4,6 +4,7 @@
   lib,
   sshPublicKey,
   isDarwin,
+  isWSL,
   ...
 }:
 let
@@ -36,12 +37,14 @@ in
     EDITOR = "zeditor --wait"; # overridden on darwin (zsh.nix) to use the .app CLI
     NH_FLAKE = "$HOME/nix-config";
 
-    # Prefer 1Password's SSH agent everywhere (family/shared workflow).
-    # SSH also explicitly points at the same socket via `IdentityAgent`.
-    SSH_AUTH_SOCK = onePasswordSshAgentSock;
-
     OLLAMA_GPU_LAYERS = "-1";
     OLLAMA_KEEP_ALIVE = "5m";
+  }
+  // lib.optionalAttrs (!isWSL) {
+    # Prefer 1Password's SSH agent everywhere (family/shared workflow).
+    # SSH also explicitly points at the same socket via `IdentityAgent`.
+    # On WSL, 1Password uses Windows interop (ssh.exe) instead of a Unix socket.
+    SSH_AUTH_SOCK = onePasswordSshAgentSock;
   };
 
   home.sessionPath = [
@@ -49,9 +52,9 @@ in
   ];
 
   # Export SSH_AUTH_SOCK to systemd user environment so GUI apps (Obsidian, etc.)
-  # can access the 1Password SSH agent
-  systemd.user.sessionVariables = lib.mkIf (!isDarwin) {
-    SSH_AUTH_SOCK = config.home.sessionVariables.SSH_AUTH_SOCK;
+  # can access the 1Password SSH agent (not needed on WSL — no Unix socket)
+  systemd.user.sessionVariables = lib.mkIf (!isDarwin && !isWSL) {
+    SSH_AUTH_SOCK = onePasswordSshAgentSock;
   };
 
   # ── Other programs with native modules ─────────────────────────────────
@@ -90,7 +93,7 @@ in
     enableDefaultConfig = false;
     matchBlocks = {
       "*" = {
-        extraOptions = {
+        extraOptions = lib.mkIf (!isWSL) {
           AddKeysToAgent = "yes";
           IdentityAgent = onePasswordIdentityAgent;
         };
