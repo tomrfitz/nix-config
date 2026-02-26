@@ -7,7 +7,7 @@
 {
   imports = [
     ./user.nix
-    ./homelab.nix
+    ./homelab
   ]
   ++ lib.optionals isWSL [ ./wsl-gpu.nix ];
 
