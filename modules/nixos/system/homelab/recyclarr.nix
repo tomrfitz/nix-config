@@ -16,7 +16,7 @@ in
       configuration = {
         sonarr.tv = {
           base_url = "http://127.0.0.1:8989";
-          api_key._secret = "/run/credentials/recyclarr.service/sonarr-api-key";
+          api_key._secret = "/etc/secrets/recyclarr/sonarr-api-key";
 
           quality_definition = {
             type = "series";
@@ -40,7 +40,7 @@ in
 
         radarr.movies = {
           base_url = "http://127.0.0.1:7878";
-          api_key._secret = "/run/credentials/recyclarr.service/radarr-api-key";
+          api_key._secret = "/etc/secrets/recyclarr/radarr-api-key";
 
           quality_definition = {
             type = "movie";
@@ -72,10 +72,5 @@ in
       };
     };
 
-    # Host-local API key files (kept out of the nix store).
-    systemd.services.recyclarr.serviceConfig.LoadCredential = [
-      "sonarr-api-key:/etc/secrets/recyclarr/sonarr-api-key"
-      "radarr-api-key:/etc/secrets/recyclarr/radarr-api-key"
-    ];
   };
 }
