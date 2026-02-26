@@ -146,6 +146,7 @@
           ];
           hmModules = [
             ./modules/shared/home
+            ./modules/shared/home/desktop.nix
             ./modules/darwin/home
           ];
         };
@@ -156,6 +157,7 @@
           extraModules = [ ./modules/nixos/system/desktop.nix ];
           hmModules = [
             ./modules/shared/home
+            ./modules/shared/home/desktop.nix
             ./modules/nixos/home
             ./modules/nixos/home/desktop.nix
           ];
