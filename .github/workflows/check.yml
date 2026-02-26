@@ -28,3 +28,20 @@ jobs:
 
             - name: Check formatting
               run: nix build .#checks.$(nix eval --impure --expr builtins.currentSystem --raw).formatting --no-link
+
+    build-trfnix:
+        if: github.event_name == 'push'
+        needs: check
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v4
+
+            - uses: samueldr/lix-gha-installer-action@v2026-02-16
+
+            - uses: cachix/cachix-action@v15
+              with:
+                  name: tomrfitz
+                  authToken: ${{ secrets.CACHIX_AUTH_TOKEN }}
+
+            - name: Build trfnix system closure
+              run: nix build .#nixosConfigurations.trfnix.config.system.build.toplevel --no-link
