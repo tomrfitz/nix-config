@@ -13,6 +13,10 @@
     defaultUser = user;
   };
 
+  trf.wsl.gpu.enable = true;
+
+  services.ollama.enable = true;
+
   trf.homelab = {
     enable = true;
 

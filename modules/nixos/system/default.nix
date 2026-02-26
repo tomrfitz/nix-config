@@ -1,11 +1,15 @@
 {
+  lib,
+  user,
+  isWSL,
   ...
 }:
 {
   imports = [
     ./user.nix
     ./homelab.nix
-  ];
+  ]
+  ++ lib.optionals isWSL [ ./wsl-gpu.nix ];
 
   programs.zsh.enable = true;
 
