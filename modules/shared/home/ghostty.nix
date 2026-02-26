@@ -29,6 +29,8 @@
       font-family = "Atkinson Hyperlegible Mono";
       quick-terminal-position = "center";
       custom-shader-animation = true;
+      # Keep remote SSH sessions usable when hosts don't yet have Ghostty terminfo.
+      shell-integration-features = "ssh-env,ssh-terminfo";
       window-padding-y = 5;
       window-position-y = 150;
       window-position-x = 175;
