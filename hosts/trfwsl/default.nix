@@ -45,8 +45,8 @@
     };
     script = ''
       export OP_SERVICE_ACCOUNT_TOKEN="$(cat "$CREDENTIALS_DIRECTORY/op-sa-token")"
-      export TUNNEL_TOKEN="$(${pkgs._1password-cli}/bin/op read "op://d2kparnm4436vrbora6wnty6pm/lfxqpbrqybsjifdky766t35pcy/password")"
-      exec ${pkgs.cloudflared}/bin/cloudflared tunnel run --no-autoupdate
+      TOKEN="$(${pkgs._1password-cli}/bin/op read "op://d2kparnm4436vrbora6wnty6pm/lfxqpbrqybsjifdky766t35pcy/password")"
+      exec ${pkgs.cloudflared}/bin/cloudflared tunnel run --token "$TOKEN"
     '';
   };
 
