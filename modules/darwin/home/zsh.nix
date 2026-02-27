@@ -1,21 +1,12 @@
 {
-  pkgs,
   lib,
   ...
 }:
-let
-  # The nix-packaged `zeditor` CLI can't connect to the running Zed.app
-  # (different bundle/socket path). Use the HM-linked .app's CLI instead.
-  zedCli = "~/Applications/Home\\ Manager\\ Apps/Zed.app/Contents/MacOS/cli";
-in
 {
-  # Override EDITOR to use the .app CLI that can actually talk to the running Zed
-  home.sessionVariables.EDITOR = lib.mkForce "${zedCli} --wait";
+  # Override EDITOR — brew cask installs a `zed` CLI shim at /usr/local/bin/zed
+  home.sessionVariables.EDITOR = lib.mkForce "zed --wait";
 
   programs.zsh = {
-    shellAliases = {
-      zed = zedCli;
-    };
 
     profileExtra = lib.mkAfter ''
       if [[ -x /opt/homebrew/bin/brew ]]; then

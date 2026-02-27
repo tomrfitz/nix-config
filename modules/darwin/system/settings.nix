@@ -48,7 +48,7 @@ in
         # { app = "${homeManagerAppsDirectory}/Zen Browser (Twilight).app"; }
         { app = "/Applications/Twilight.app"; }
         { app = "/Applications/Ghostty.app"; }
-        { app = "${homeManagerAppsDirectory}/Zed.app"; }
+        { app = "/Applications/Zed.app"; }
       ];
 
       # Hot corners
