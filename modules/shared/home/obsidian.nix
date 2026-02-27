@@ -19,6 +19,12 @@ in
     OBSD = "${vaultPath}/";
   };
 
+  # ── Obsidian CLI ─────────────────────────────────────────────────────
+  # On macOS the CLI lives inside the .app bundle; on Linux nixpkgs already puts it on PATH.
+  home.sessionPath = lib.mkIf isDarwin [
+    "${config.home.homeDirectory}/Applications/Home Manager Apps/Obsidian.app/Contents/MacOS"
+  ];
+
   # ── Vault activation ──────────────────────────────────────────────────
   home.activation.obsidian-vault = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
     GIT_DIR="${gitDir}"
