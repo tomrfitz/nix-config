@@ -21,7 +21,7 @@
 
       discord
       slack
-      thunderbird
+      # thunderbird
       notesnook
       audacity
       sqlitebrowser
