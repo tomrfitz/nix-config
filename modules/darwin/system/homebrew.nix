@@ -100,6 +100,7 @@
       "iterm2"
 
       # editors / writing
+      "zed"
 
       # creative / design
       "figma"

@@ -62,6 +62,7 @@
   # ── Zed ───────────────────────────────────────────────────────────────
   programs.zed-editor = {
     enable = true;
+    package = lib.mkIf pkgs.stdenv.isDarwin null;
     mutableUserSettings = true;
 
     extensions = [
