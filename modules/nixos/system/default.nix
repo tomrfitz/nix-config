@@ -12,16 +12,8 @@
   ++ lib.optionals (!isWSL) [ ./hardening.nix ]
   ++ lib.optionals isWSL [
     ./wsl-gpu.nix
-    # WSL overwrites /etc/resolv.conf on restart, breaking Tailscale MagicDNS.
-    # Use environment.etc instead of networking.nameservers to avoid pulling in
-    # openresolv/network-setup.service, which conflict with WSL's networking.
-    {
-      wsl.wslConf.network.generateResolvConf = false;
-      environment.etc."resolv.conf".text = ''
-        nameserver 100.100.100.100
-        nameserver 1.1.1.1
-      '';
-    }
+    # Stop WSL from overwriting /etc/resolv.conf — Tailscale manages it for MagicDNS
+    { wsl.wslConf.network.generateResolvConf = false; }
   ];
 
   programs.zsh.enable = true;
