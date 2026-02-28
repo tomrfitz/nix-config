@@ -12,8 +12,12 @@
   ++ lib.optionals (!isWSL) [ ./hardening.nix ]
   ++ lib.optionals isWSL [
     ./wsl-gpu.nix
-    # Stop WSL from overwriting /etc/resolv.conf — Tailscale manages it for MagicDNS
-    { wsl.wslConf.network.generateResolvConf = false; }
+    # Stop WSL from overwriting /etc/resolv.conf — Tailscale manages it for MagicDNS.
+    # Also disable NixOS's resolvconf so it doesn't fight Tailscale for ownership.
+    {
+      wsl.wslConf.network.generateResolvConf = false;
+      networking.resolvconf.enable = false;
+    }
   ];
 
   programs.zsh.enable = true;
