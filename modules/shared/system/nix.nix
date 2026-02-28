@@ -8,6 +8,9 @@
       "flakes"
     ];
     accept-flake-config = true;
+    # Trigger GC mid-build if free space drops below 25 GB, stop at 50 GB
+    min-free = 26843545600;
+    max-free = 53687091200;
     extra-substituters = [
       "https://cache.lix.systems"
       "https://nix-community.cachix.org"
