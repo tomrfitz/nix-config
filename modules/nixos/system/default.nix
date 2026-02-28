@@ -7,6 +7,7 @@
 {
   imports = [
     ./user.nix
+    ./hardening.nix
     ./homelab
   ]
   ++ lib.optionals isWSL [ ./wsl-gpu.nix ];
@@ -29,6 +30,9 @@
     settings = {
       PasswordAuthentication = false;
       PermitRootLogin = "no";
+      MaxAuthTries = 3;
+      ClientAliveInterval = 300;
+      ClientAliveCountMax = 2;
     };
   };
 
