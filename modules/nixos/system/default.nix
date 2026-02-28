@@ -7,10 +7,20 @@
 {
   imports = [
     ./user.nix
-    ./hardening.nix
     ./homelab
   ]
-  ++ lib.optionals isWSL [ ./wsl-gpu.nix ];
+  ++ lib.optionals (!isWSL) [ ./hardening.nix ]
+  ++ lib.optionals isWSL [
+    ./wsl-gpu.nix
+    # WSL overwrites /etc/resolv.conf on restart, breaking Tailscale MagicDNS
+    {
+      wsl.wslConf.network.generateResolvConf = false;
+      networking.nameservers = [
+        "100.100.100.100" # Tailscale MagicDNS
+        "1.1.1.1"
+      ];
+    }
+  ];
 
   programs.zsh.enable = true;
 
