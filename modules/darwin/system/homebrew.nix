@@ -32,7 +32,6 @@
       # dev tools
       "docker-desktop"
       "ghostty"
-      "jetbrains-toolbox"
       "xcodes-app"
       "emacs-plus-app"
 
