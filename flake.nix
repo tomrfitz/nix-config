@@ -199,7 +199,7 @@
       # ── Dev shell (tools for working on this config) ────────────────
       devShells = forAllSystems (
         system: pkgs: {
-          default = pkgs.mkShell {
+          default = pkgs.mkShellNoCC {
             packages = [
               pkgs.nixfmt
               pkgs.nixd
