@@ -26,8 +26,8 @@
       zln = "zmv -L";
     }
     // lib.optionalAttrs isWSL {
-      # On WSL, route through Windows OpenSSH to reach 1Password's SSH agent
-      ssh = "/mnt/c/Windows/System32/OpenSSH/ssh.exe";
+      # On WSL, ssh-add must route through Windows OpenSSH to reach 1Password's agent.
+      # Interactive ssh stays as Linux's — Git uses core.sshCommand for its own SSH.
       ssh-add = "/mnt/c/Windows/System32/OpenSSH/ssh-add.exe";
     };
 
