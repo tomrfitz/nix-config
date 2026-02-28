@@ -143,7 +143,6 @@
           platform = "darwin";
           hostModule = ./hosts/trfmbp;
           overlays = [
-            (import ./overlays/vesktop-darwin.nix)
           ];
           hmModules = [
             ./modules/shared/home
