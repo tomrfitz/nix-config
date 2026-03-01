@@ -16,6 +16,8 @@
 
       docker
 
+      mcrcon
+
       # code formatters (available globally so editors find them)
       shellcheck
       shfmt
