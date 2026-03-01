@@ -44,7 +44,7 @@ in
 
       serverProperties = {
         enable-rcon = true;
-        "rcon.password" = "op://Personal/MCRCON/password";
+        "rcon.password" = "op://d2kparnm4436vrbora6wnty6pm/MCRCON/password";
         "rcon.port" = 25575;
         gamemode = "survival";
         difficulty = "normal";
