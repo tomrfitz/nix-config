@@ -38,6 +38,10 @@ in
         "-XX:MaxTenuringThreshold=1"
       ];
 
+      whitelist = {
+        username1 = "0bd4a5acb3ce4570aee22af6e2e5cd20";
+      };
+
       serverProperties = {
         gamemode = "survival";
         difficulty = "normal";
