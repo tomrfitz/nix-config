@@ -81,5 +81,6 @@
     sonarr.enable = true;
     tautulli.enable = true;
     recyclarr.enable = true;
+    minecraft-server.enable = true;
   };
 }
