@@ -39,7 +39,7 @@ in
       ];
 
       whitelist = {
-        username1 = "0bd4a5acb3ce4570aee22af6e2e5cd20";
+        username1 = "0bd4a5ac-b3ce-4570-aee2-2af6e2e5cd20";
       };
 
       serverProperties = {
