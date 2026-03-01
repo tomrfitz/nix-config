@@ -13,10 +13,15 @@
   ++ lib.optionals isWSL [
     ./wsl-gpu.nix
     # Stop WSL from overwriting /etc/resolv.conf — Tailscale manages it for MagicDNS.
-    # Also disable NixOS's resolvconf so it doesn't fight Tailscale for ownership.
+    # Declare nameservers (satisfies nixos-wsl's check) but disable resolvconf so
+    # NixOS doesn't fight Tailscale for ownership of the file.
     {
       wsl.wslConf.network.generateResolvConf = false;
       networking.resolvconf.enable = false;
+      networking.nameservers = [
+        "100.100.100.100" # Tailscale MagicDNS
+        "1.1.1.1"
+      ];
     }
   ];
 
