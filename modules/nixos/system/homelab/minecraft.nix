@@ -6,9 +6,21 @@
 }:
 let
   cfg = config.trf.homelab;
+  rconRef = "op://d2kparnm4436vrbora6wnty6pm/MCRCON/password";
 in
 {
   config = lib.mkIf (cfg.enable && config.services.minecraft-server.enable) {
+    # Resolve RCON password from 1Password at service start, after the
+    # module's preStart writes the declarative server.properties.
+    systemd.services.minecraft-server = {
+      serviceConfig.LoadCredential = "op-sa-token:/etc/op/service-account-token";
+      preStart = lib.mkAfter ''
+        RCON_PASS="$(OP_SERVICE_ACCOUNT_TOKEN="$(cat "$CREDENTIALS_DIRECTORY/op-sa-token")" \
+          ${pkgs._1password-cli}/bin/op read "${rconRef}")"
+        ${pkgs.gnused}/bin/sed -i "s|^rcon\.password=.*|rcon.password=$RCON_PASS|" /var/lib/minecraft/server.properties
+      '';
+    };
+
     services.minecraft-server = {
       eula = true;
       declarative = true;
@@ -44,7 +56,7 @@ in
 
       serverProperties = {
         enable-rcon = true;
-        "rcon.password" = "op://d2kparnm4436vrbora6wnty6pm/MCRCON/password";
+        "rcon.password" = "PLACEHOLDER_RCON";
         "rcon.port" = 25575;
         gamemode = "survival";
         difficulty = "normal";
