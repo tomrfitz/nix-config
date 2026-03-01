@@ -43,6 +43,9 @@ in
       };
 
       serverProperties = {
+        enable-rcon = true;
+        "rcon.password" = "op://Personal/MCRCON/password";
+        "rcon.port" = 25575;
         gamemode = "survival";
         difficulty = "normal";
         max-players = 5;
