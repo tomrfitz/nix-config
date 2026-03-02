@@ -251,7 +251,7 @@
 
       directory = {
         home_symbol = "~";
-        truncation_length = 2;
+        truncation_length = 8;
         truncation_symbol = ".../";
         read_only = " [ro]";
         use_os_path_sep = true;
