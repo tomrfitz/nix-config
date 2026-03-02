@@ -42,11 +42,7 @@
       "zoom"
 
       # productivity
-      "chatgpt"
-      "chatgpt-atlas"
       "claude"
-      "codex"
-      "copilot-cli"
       "microsoft-office"
 
       # media
@@ -134,7 +130,6 @@
 
       # misc
       "handy"
-      "codex-app"
 
       # fonts (not in nixpkgs — Apple proprietary)
       "font-sf-mono"
