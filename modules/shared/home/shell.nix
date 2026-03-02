@@ -208,7 +208,7 @@
       scan_timeout = 30;
       add_newline = true;
       continuation_prompt = "[▸▹ ](dimmed white)";
-      format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$hostname$localip$shlvl$shell$env_var$jobs$sudo$username$character";
+      format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$username$hostname$env_var$jobs$sudo$character";
       right_format = "$singularity$kubernetes$directory$vcsh$fossil_branch$git_branch$git_commit$git_state$git_status$hg_branch$pijul_channel$docker_context$package$c$cpp$cmake$cobol$daml$dart$deno$dotnet$elixir$elm$erlang$fennel$golang$guix_shell$haskell$haxe$helm$java$julia$kotlin$gradle$lua$nim$nodejs$ocaml$opa$perl$php$pulumi$purescript$python$raku$rlang$red$ruby$rust$scala$solidity$swift$terraform$vlang$vagrant$zig$buf$conda$pixi$meson$spack$memory_usage$aws$gcloud$openstack$azure$crystal$custom$status$os$battery$time";
 
       fill.symbol = " ";
@@ -229,7 +229,7 @@
       };
 
       sudo = {
-        format = "[$symbol]($style)";
+        format = "[$symbol]($style) ";
         style = "bold bright-purple";
         symbol = "⋈┈";
         disabled = false;
@@ -238,7 +238,7 @@
       username = {
         style_user = "bright-yellow bold";
         style_root = "purple bold";
-        format = "[⭘ $user]($style) ";
+        format = "[$user@]($style)";
         disabled = false;
         show_always = false;
       };
@@ -263,10 +263,11 @@
         symbol = "[▶](blue)";
       };
 
-      localip = {
+      hostname = {
         ssh_only = true;
-        format = " ◯[$localipv4](bold magenta)";
-        disabled = false;
+        trim_at = ".";
+        format = "[$hostname]($style) ";
+        style = "bold dimmed green";
       };
 
       time = {
