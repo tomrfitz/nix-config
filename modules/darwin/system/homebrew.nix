@@ -9,7 +9,6 @@
     taps = [
       "d12frosted/emacs-plus" # emacs-plus
       "nikitabobko/tap" # aerospace
-      "krtirtho/apps" # spotube
     ];
 
     brews = [
@@ -57,8 +56,6 @@
       "plex"
       "plex-htpc"
       "pocket-casts"
-      "spotify"
-      "spotube"
       "vlc"
 
       # utilities
