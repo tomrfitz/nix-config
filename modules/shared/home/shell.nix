@@ -215,7 +215,7 @@
 
       character = {
         format = "$symbol ";
-        success_symbol = "[\\$](bold bright-yellow)";
+        success_symbol = "[\\$](bold cyan)";
         error_symbol = "[\\$](bold red)";
         vimcmd_symbol = "[:\\$](dimmed green)";
         vimcmd_replace_one_symbol = "[r\\$](dimmed yellow)";
@@ -231,19 +231,19 @@
 
       env_var.VIMSHELL = {
         format = "[$env_value]($style)";
-        style = "green";
+        style = "cyan";
       };
 
       sudo = {
         format = "[$symbol]($style) ";
-        style = "bold bright-purple";
+        style = "bold purple";
         symbol = "#";
         disabled = false;
       };
 
       username = {
-        style_user = "bright-yellow bold";
-        style_root = "purple bold";
+        style_user = "yellow bold";
+        style_root = "red bold";
         format = "[$user@]($style)";
         disabled = false;
         show_always = false;
@@ -260,11 +260,11 @@
         format = "[$path]($style)[$read_only]($read_only_style)";
       };
 
-      cmd_duration.format = "[$duration ](white)";
+      cmd_duration.format = "[$duration ](dimmed white)";
 
       jobs = {
         format = "[&$number]($style) ";
-        style = "white";
+        style = "dimmed white";
       };
 
       hostname = {
@@ -302,7 +302,7 @@
           }
           {
             threshold = 60;
-            style = "dimmed bright-purple";
+            style = "dimmed orange";
           }
           {
             threshold = 70;
@@ -313,7 +313,7 @@
 
       git_branch = {
         format = " [$branch(:$remote_branch)]($style)";
-        style = "bright-blue";
+        style = "blue";
         truncation_symbol = "...";
         truncation_length = 11;
         ignore_branches = [
@@ -332,17 +332,17 @@
       };
 
       git_status = {
-        style = "bold bright-blue";
+        style = "bold blue";
         format = "([$ahead_behind$staged$modified$untracked$renamed$deleted$conflicted$stashed]($style))";
-        conflicted = "[!](bright-magenta)";
+        conflicted = "[!](magenta)";
         ahead = "[up [\${count}](bold white)](green)";
         behind = "[dn [\${count}](bold white)](red)";
-        diverged = "[up [\${ahead_count}](bold white) dn [\${behind_count}](bold white)](bright-magenta)";
-        untracked = "[?](bright-yellow)";
-        stashed = "[s](white)";
-        modified = "[*](yellow)";
-        staged = "[+\${count}](bright-cyan)";
-        renamed = "[>](bright-blue)";
+        diverged = "[up [\${ahead_count}](bold white) dn [\${behind_count}](bold white)](magenta)";
+        untracked = "[?](yellow)";
+        stashed = "[s](dimmed white)";
+        modified = "[*](orange)";
+        staged = "[+\${count}](cyan)";
+        renamed = "[>](blue)";
         deleted = "[-](red)";
       };
 
@@ -356,13 +356,13 @@
       lua = {
         format = " [lua \${version}]($style)";
         version_format = "\${raw}";
-        style = "bold bright-yellow";
+        style = "bold yellow";
       };
 
       nodejs = {
         format = " [node ($version)]($style)";
         version_format = "\${raw}";
-        style = "bold bright-green";
+        style = "bold green";
         detect_files = [
           "package-lock.json"
           "yarn.lock"
@@ -374,7 +374,7 @@
       python = {
         format = " [py \${version}]($style)";
         version_format = "\${raw}";
-        style = "bold bright-yellow";
+        style = "bold yellow";
       };
 
       ruby = {
@@ -386,19 +386,19 @@
       rust = {
         format = " [rs $version]($style)";
         version_format = "\${raw}";
-        style = "bold red";
+        style = "bold orange";
       };
 
       package = {
         format = " [pkg $version]($style)";
         version_format = "\${raw}";
-        style = "dimmed yellow bold";
+        style = "bold yellow";
       };
 
       swift = {
         format = " [sw \${version}]($style)";
         version_format = "\${raw}";
-        style = "bold bright-red";
+        style = "bold red";
       };
 
       aws = {
@@ -440,7 +440,7 @@
       nim.format = " [nim ($version)]($style)";
 
       nix_shell = {
-        style = "bold dimmed blue";
+        style = "bold blue";
         format = "[nix($state)]($style) [$name](dimmed white)";
         impure_msg = "[:impure](bold dimmed red)";
         pure_msg = "[:pure](bold dimmed green)";
