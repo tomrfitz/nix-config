@@ -25,27 +25,27 @@
         {
           type = "os";
           key = "OS";
-          keyColor = "yellow";
+          keyColor = "blue";
         }
         {
           type = "host";
           key = "HOST";
-          keyColor = "yellow";
+          keyColor = "blue";
         }
         {
           type = "kernel";
           key = "KERNEL";
-          keyColor = "yellow";
+          keyColor = "blue";
         }
         {
           type = "uptime";
           key = "UPTIME";
-          keyColor = "yellow";
+          keyColor = "blue";
         }
         {
           type = "packages";
           key = "PKGS";
-          keyColor = "yellow";
+          keyColor = "blue";
           format = "{all}";
         }
         "break"
@@ -54,37 +54,37 @@
         {
           type = "shell";
           key = "SHELL";
-          keyColor = "blue";
+          keyColor = "cyan";
         }
         {
           type = "terminal";
           key = "TERM";
-          keyColor = "blue";
+          keyColor = "cyan";
         }
         {
           type = "terminalfont";
           key = "FONT";
-          keyColor = "blue";
+          keyColor = "cyan";
         }
         {
           type = "de";
           key = "DE";
-          keyColor = "blue";
+          keyColor = "cyan";
         }
         {
           type = "wm";
           key = "WM";
-          keyColor = "blue";
+          keyColor = "cyan";
         }
         {
           type = "wmtheme";
           key = "THEME";
-          keyColor = "blue";
+          keyColor = "cyan";
         }
         {
           type = "display";
           key = "DISPLAY";
-          keyColor = "blue";
+          keyColor = "cyan";
         }
         "break"
 
