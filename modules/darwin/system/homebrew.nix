@@ -57,12 +57,9 @@
       "1password"
       "activitywatch"
       "aerospace"
-      "applite"
       "batfi"
       "betterdisplay"
       "daisydisk"
-      "grandperspective"
-      "imageoptim"
       "thaw"
       "keepingyouawake"
       "keyboardcleantool"
@@ -87,22 +84,16 @@
       "transnomino"
       "utm"
 
-      # terminals
-      "iterm2"
-
       # editors / writing
       "zed"
 
       # creative / design
       "figma"
-      "fontforge-app"
-      "fontlab"
       "icon-composer"
       "monodraw"
 
       # gaming
       "league-of-legends"
-      "minecraft"
       "openemu"
       "osu"
       "steam"
@@ -119,13 +110,8 @@
       "microsoft-auto-update"
       "multipatch"
       # "pear" — moved to nix (pear-desktop in shared/home/packages.nix)
-      "sabnzbd"
       "sf-symbols"
       "tabtab"
-      "teamspeak-client"
-
-      # crypto
-      "bluewallet"
 
       # misc
       "handy"

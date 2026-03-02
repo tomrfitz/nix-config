@@ -50,15 +50,10 @@
       pdfgrep
       speedtest-cli
       streamlink
-      texinfo
       tldr
       ansifilter
       termshot
-      lf
       witr
-      todo-txt-cli
-      timewarrior
-      taskwarrior-tui
       gtypist
       mailsy
       termdown
