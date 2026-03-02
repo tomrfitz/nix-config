@@ -9,8 +9,8 @@
 
 ## Upstream Watchlist
 
-- [ ] `REVISIT(upstream): remove zed darwin overlay after fix is present in pinned nixpkgs rev; ref: https://github.com/NixOS/nixpkgs/pull/490957; checked: 2026-02-20`
-- [ ] `REVISIT(upstream): remove vesktop darwin overlay after upstream fix lands in pinned nixpkgs rev; ref: https://github.com/NixOS/nixpkgs/issues/489725; checked: 2026-02-20`
+- [ ] `REVISIT(upstream): remove anki doInstallCheck override once check phase has QtWebChannel in test deps; ref: https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/an/anki/package.nix; checked: 2026-02-25`
+- [ ] `REVISIT(upstream): re-enable calibre; ref: qmake build failure (calibre pkg) + flask-limiter (calibre-web); checked: 2026-02-26`
 - [ ] `REVISIT(upstream): remove polkit-agent-helper workaround once camera-device sandboxing fix lands; ref: https://github.com/NixOS/nixpkgs/issues/486044; checked: 2026-02-20`
 
 ## Phase 1 — NixOS-WSL homelab (`trfwsl`)
