@@ -63,7 +63,7 @@ Code should work for its author first, be maintainable and accessible to them ov
 
 - Treat AGENTS.md, memory files, and project docs as imperfect but valuable persistence — update them when you learn something that would save a future agent real orientation time
 - Distinguish facts (test status, file paths) from understanding (why a design decision was made, what the user's goals are) — both matter, but understanding is harder to capture and more valuable to try
-- The user's Obsidian vault at `$OBSD` is their primary knowledge base. When producing research or notes for later use, write there using this frontmatter style:
+- The user's Obsidian vault at `$OBSD` is their primary knowledge base. When producing research or notes for later use, write to `$OBSD/Notes/`. Use this frontmatter style:
 
     ```yaml
     ---
