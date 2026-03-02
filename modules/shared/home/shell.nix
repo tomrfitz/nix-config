@@ -215,12 +215,12 @@
 
       character = {
         format = "$symbol ";
-        success_symbol = "[◎](bold bright-yellow)";
-        error_symbol = "[○](purple)";
-        vimcmd_symbol = "[■](dimmed green)";
-        vimcmd_replace_one_symbol = "◌";
-        vimcmd_replace_symbol = "□";
-        vimcmd_visual_symbol = "▼";
+        success_symbol = "[\\$](bold bright-yellow)";
+        error_symbol = "[\\$](purple)";
+        vimcmd_symbol = "[:\\$](dimmed green)";
+        vimcmd_replace_one_symbol = "[r\\$](dimmed yellow)";
+        vimcmd_replace_symbol = "[R\\$](dimmed yellow)";
+        vimcmd_visual_symbol = "[v\\$](dimmed cyan)";
       };
 
       env_var.VIMSHELL = {
@@ -229,9 +229,9 @@
       };
 
       sudo = {
-        format = "[$symbol]($style) ";
+        format = "[$symbol]($style)";
         style = "bold bright-purple";
-        symbol = "⋈┈";
+        symbol = "#";
         disabled = false;
       };
 
