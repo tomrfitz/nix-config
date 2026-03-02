@@ -57,7 +57,6 @@
       ansifilter
       termshot
       lf
-      lsd
       witr
       todo-txt-cli
       timewarrior
