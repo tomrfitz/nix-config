@@ -202,7 +202,3 @@ Hostnames follow `trf<identifier>` — initials prefix for network disambiguatio
 - **`trflab`** — dedicated homelab server (phase 2)
 - **`trfvm`** — scratch/sandbox NixOS VM (host TBD — could be local on Mac via UTM, or on the gaming PC via Hyper-V)
 - **`trfnix`** may be retired when the Samsung laptop is repurposed or replaced
-
-## Active overlays
-
-- **`overlays/vesktop-darwin.nix`** — fixes codesign failure on macOS; `REVISIT(upstream): remove overlay after NixOS/nixpkgs#489725 lands in nixpkgs-unstable`
