@@ -1,9 +1,4 @@
-{
-  pkgs,
-  lib,
-  hostName,
-  ...
-}:
+{ ... }:
 {
   # ── Fastfetch ──────────────────────────────────────────────────────────
   programs.fastfetch = {
@@ -16,12 +11,6 @@
           left = 1;
           right = 2;
         };
-      }
-      // lib.optionalAttrs (hostName == "trfwsl") {
-        type = "kitty-direct";
-        source = "${../../../config/fastfetch-nixos-wsl.svg}";
-        width = 24;
-        height = 12;
       };
       display.separator = ": ";
       modules = [
