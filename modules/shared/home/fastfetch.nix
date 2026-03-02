@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  hostName,
   ...
 }:
 {
@@ -22,35 +23,40 @@
         width = 24;
         height = 12;
       };
-      display.separator = "  ";
+      display.separator = ": ";
       modules = [
         # Title
         {
           type = "title";
-          format = "{user-name-colored}@{host-name-colored}";
+          format = "{user-name}@{host-name}";
         }
         "break"
 
         # System
         {
           type = "os";
-          key = "󰍹 OS";
+          key = "OS";
+          keyColor = "yellow";
         }
         {
           type = "host";
-          key = "󰌢 Host";
+          key = "HOST";
+          keyColor = "yellow";
         }
         {
           type = "kernel";
-          key = "󰒋 Kernel";
+          key = "KERNEL";
+          keyColor = "yellow";
         }
         {
           type = "uptime";
-          key = "󰅐 Uptime";
+          key = "UPTIME";
+          keyColor = "yellow";
         }
         {
           type = "packages";
-          key = "󰏖 Packages";
+          key = "PKGS";
+          keyColor = "yellow";
           format = "{all}";
         }
         "break"
@@ -58,59 +64,72 @@
         # Environment (desktop modules auto-hide when empty)
         {
           type = "shell";
-          key = "󰞷 Shell";
+          key = "SHELL";
+          keyColor = "blue";
         }
         {
           type = "terminal";
-          key = "󰆍 Terminal";
+          key = "TERM";
+          keyColor = "blue";
         }
         {
           type = "terminalfont";
-          key = "󰛖 Font";
+          key = "FONT";
+          keyColor = "blue";
         }
         {
           type = "de";
-          key = "󰧨 DE";
+          key = "DE";
+          keyColor = "blue";
         }
         {
           type = "wm";
-          key = "󱂬 WM";
+          key = "WM";
+          keyColor = "blue";
         }
         {
           type = "wmtheme";
-          key = "󰉼 Theme";
+          key = "THEME";
+          keyColor = "blue";
         }
         {
           type = "display";
-          key = "󰹑 Display";
+          key = "DISPLAY";
+          keyColor = "blue";
         }
         "break"
 
         # Hardware
         {
           type = "cpu";
-          key = "󰻠 CPU";
+          key = "CPU";
+          keyColor = "green";
         }
         {
           type = "gpu";
-          key = "󰢮 GPU";
+          key = "GPU";
+          keyColor = "green";
         }
         {
           type = "memory";
-          key = "󰍛 Memory";
+          key = "MEM";
+          keyColor = "green";
         }
         {
           type = "disk";
-          key = "󰋊 Disk (/)";
+          key = "DISK(/)";
+          keyColor = "green";
           folders = "/";
         }
         {
           type = "battery";
-          key = "󰁹 Battery";
+          key = "BAT";
+          keyColor = "green";
         }
         {
           type = "localip";
-          key = "󰩟 IP";
+          key = "IP";
+          keyColor = "green";
         }
         "break"
 

@@ -208,19 +208,25 @@
       scan_timeout = 30;
       add_newline = true;
       continuation_prompt = "[.. ](dimmed white)";
-      format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$username$hostname$env_var$jobs$sudo$character";
-      right_format = "$singularity$kubernetes$directory$vcsh$fossil_branch$git_branch$git_commit$git_state$git_status$hg_branch$pijul_channel$docker_context$package$c$cpp$cmake$cobol$daml$dart$deno$dotnet$elixir$elm$erlang$fennel$golang$guix_shell$haskell$haxe$helm$java$julia$kotlin$gradle$lua$nim$nodejs$ocaml$opa$perl$php$pulumi$purescript$python$raku$rlang$red$ruby$rust$scala$solidity$swift$terraform$vlang$vagrant$zig$buf$conda$pixi$meson$spack$memory_usage$aws$gcloud$openstack$azure$crystal$custom$status$os$battery$time";
+      format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$status$username$hostname$env_var$jobs$sudo$character";
+      right_format = "$directory$git_branch$git_status$python$nodejs$rust$time";
 
       fill.symbol = " ";
 
       character = {
         format = "$symbol ";
         success_symbol = "[\\$](bold bright-yellow)";
-        error_symbol = "[\\$](purple)";
+        error_symbol = "[\\$](bold red)";
         vimcmd_symbol = "[:\\$](dimmed green)";
         vimcmd_replace_one_symbol = "[r\\$](dimmed yellow)";
         vimcmd_replace_symbol = "[R\\$](dimmed yellow)";
         vimcmd_visual_symbol = "[v\\$](dimmed cyan)";
+      };
+
+      status = {
+        disabled = false;
+        format = "[x$status]($style) ";
+        style = "bold red";
       };
 
       env_var.VIMSHELL = {
@@ -229,7 +235,7 @@
       };
 
       sudo = {
-        format = "[$symbol]($style)";
+        format = "[$symbol]($style) ";
         style = "bold bright-purple";
         symbol = "#";
         disabled = false;
@@ -266,7 +272,13 @@
         ssh_only = true;
         trim_at = ".";
         format = "[$hostname]($style) ";
-        style = "bold dimmed green";
+        style = "bold green";
+        aliases = {
+          trfmbp = "mbp";
+          trfnix = "nix";
+          trfwsl = "wsl";
+          trflab = "lab";
+        };
       };
 
       time = {
@@ -328,9 +340,9 @@
         behind = "[dn [\${count}](bold white)](red)";
         diverged = "[up [\${ahead_count}](bold white) dn [\${behind_count}](bold white)](bright-magenta)";
         untracked = "[?](bright-yellow)";
-        stashed = "[\\$](white)";
+        stashed = "[s](white)";
         modified = "[*](yellow)";
-        staged = "[[+\${count}](bold white)](bright-cyan)";
+        staged = "[+\${count}](bright-cyan)";
         renamed = "[>](bright-blue)";
         deleted = "[-](red)";
       };
@@ -417,7 +429,6 @@
       golang.format = " [go ($version)]($style)";
 
       haskell = {
-        symbol = "λ ";
         format = " [hs ($version)]($style)";
       };
 
