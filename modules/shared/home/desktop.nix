@@ -19,7 +19,6 @@
     [
       obsidian
 
-      discord
       slack
       # thunderbird
       notesnook
