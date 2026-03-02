@@ -29,7 +29,6 @@
       "zen@twilight"
 
       # dev tools
-      "docker-desktop"
       "ghostty"
       "xcodes-app"
       "emacs-plus-app"
