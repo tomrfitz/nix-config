@@ -20,6 +20,9 @@
       link-url = "true";
       link-previews = "true";
       window-padding-balance = true;
+      window-padding-x = 8;
+      window-padding-y = 8;
+      window-save-state = "never";
       window-theme = "system";
       window-height = 36;
       window-width = 130;
@@ -31,9 +34,6 @@
       custom-shader-animation = true;
       # Keep remote SSH sessions usable when hosts don't yet have Ghostty terminfo.
       shell-integration-features = "ssh-env,ssh-terminfo";
-      window-padding-y = 5;
-      window-position-y = 150;
-      window-position-x = 175;
       window-step-resize = true;
       keybind = [
         "global:shift+ctrl+backquote=new_window"
