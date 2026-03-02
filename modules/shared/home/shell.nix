@@ -207,7 +207,7 @@
       command_timeout = 500;
       scan_timeout = 30;
       add_newline = true;
-      continuation_prompt = "[▸▹ ](dimmed white)";
+      continuation_prompt = "[.. ](dimmed white)";
       format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$username$hostname$env_var$jobs$sudo$character";
       right_format = "$singularity$kubernetes$directory$vcsh$fossil_branch$git_branch$git_commit$git_state$git_status$hg_branch$pijul_channel$docker_context$package$c$cpp$cmake$cobol$daml$dart$deno$dotnet$elixir$elm$erlang$fennel$golang$guix_shell$haskell$haxe$helm$java$julia$kotlin$gradle$lua$nim$nodejs$ocaml$opa$perl$php$pulumi$purescript$python$raku$rlang$red$ruby$rust$scala$solidity$swift$terraform$vlang$vagrant$zig$buf$conda$pixi$meson$spack$memory_usage$aws$gcloud$openstack$azure$crystal$custom$status$os$battery$time";
 
@@ -244,23 +244,22 @@
       };
 
       directory = {
-        home_symbol = "⌂";
+        home_symbol = "~";
         truncation_length = 2;
-        truncation_symbol = "□ ";
-        read_only = " ◈";
+        truncation_symbol = ".../";
+        read_only = " [ro]";
         use_os_path_sep = true;
         style = "blue";
         format = "[$path]($style)[$read_only]($read_only_style)";
         repo_root_style = "bold blue";
-        repo_root_format = "[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style) [△](bold bright-blue)";
+        repo_root_format = "[$before_root_path]($before_repo_root_style)[$repo_root]($repo_root_style)[$path]($style)[$read_only]($read_only_style)";
       };
 
-      cmd_duration.format = "[◄ $duration ](white)";
+      cmd_duration.format = "[$duration ](white)";
 
       jobs = {
-        format = "[$symbol$number]($style) ";
+        format = "[&$number]($style) ";
         style = "white";
-        symbol = "[▶](blue)";
       };
 
       hostname = {
@@ -280,11 +279,11 @@
 
       battery = {
         format = "[ $percentage $symbol]($style)";
-        full_symbol = "█";
-        charging_symbol = "[↑](bold green)";
-        discharging_symbol = "↓";
-        unknown_symbol = "░";
-        empty_symbol = "▃";
+        full_symbol = "=";
+        charging_symbol = "[^](bold green)";
+        discharging_symbol = "v";
+        unknown_symbol = "?";
+        empty_symbol = "!";
         display = [
           {
             threshold = 20;
@@ -303,9 +302,8 @@
 
       git_branch = {
         format = " [$branch(:$remote_branch)]($style)";
-        symbol = "[△](bold bright-blue)";
         style = "bright-blue";
-        truncation_symbol = "⋯";
+        truncation_symbol = "...";
         truncation_length = 11;
         ignore_branches = [
           "main"
@@ -315,7 +313,7 @@
       };
 
       git_metrics = {
-        format = "([▴$added]($added_style))([▿$deleted]($deleted_style))";
+        format = "([+$added]($added_style))([-$deleted]($deleted_style))";
         added_style = "dimmed green";
         deleted_style = "dimmed red";
         ignore_submodules = true;
@@ -324,34 +322,36 @@
 
       git_status = {
         style = "bold bright-blue";
-        format = "([⎪$ahead_behind$staged$modified$untracked$renamed$deleted$conflicted$stashed⎥]($style))";
-        conflicted = "[◪◦](bright-magenta)";
-        ahead = "[▴│[\${count}](bold white)│](green)";
-        behind = "[▿│[\${count}](bold white)│](red)";
-        diverged = "[◇ ▴┤[\${ahead_count}](regular white)│▿┤[\${behind_count}](regular white)│](bright-magenta)";
-        untracked = "[◌◦](bright-yellow)";
-        stashed = "[◃◈](white)";
-        modified = "[●◦](yellow)";
-        staged = "[▪┤[$count](bold white)│](bright-cyan)";
-        renamed = "[◎◦](bright-blue)";
-        deleted = "[✕](red)";
+        format = "([$ahead_behind$staged$modified$untracked$renamed$deleted$conflicted$stashed]($style))";
+        conflicted = "[!](bright-magenta)";
+        ahead = "[up [\${count}](bold white)](green)";
+        behind = "[dn [\${count}](bold white)](red)";
+        diverged = "[up [\${ahead_count}](bold white) dn [\${behind_count}](bold white)](bright-magenta)";
+        untracked = "[?](bright-yellow)";
+        stashed = "[\\$](white)";
+        modified = "[*](yellow)";
+        staged = "[[+\${count}](bold white)](bright-cyan)";
+        renamed = "[>](bright-blue)";
+        deleted = "[-](red)";
       };
 
+      # Language modules — just "lang version" with color, no decorative symbols
       deno = {
-        format = " [deno]() [∫ $version](green bold)";
+        format = " [deno $version]($style)";
         version_format = "\${raw}";
+        style = "green bold";
       };
 
       lua = {
-        format = " [lua]() [\${symbol}\${version}]($style)";
+        format = " [lua \${version}]($style)";
         version_format = "\${raw}";
-        symbol = "⨀ ";
         style = "bold bright-yellow";
       };
 
       nodejs = {
-        format = " [node]() [◫ ($version)](bold bright-green)";
+        format = " [node ($version)]($style)";
         version_format = "\${raw}";
+        style = "bold bright-green";
         detect_files = [
           "package-lock.json"
           "yarn.lock"
@@ -361,135 +361,83 @@
       };
 
       python = {
-        format = " [py]() [\${symbol}\${version}]($style)";
-        symbol = "[⌉](bold bright-blue)⌊ ";
+        format = " [py \${version}]($style)";
         version_format = "\${raw}";
         style = "bold bright-yellow";
       };
 
       ruby = {
-        format = " [rb]() [\${symbol}\${version}]($style)";
-        symbol = "◆ ";
+        format = " [rb \${version}]($style)";
         version_format = "\${raw}";
         style = "bold red";
       };
 
       rust = {
-        format = " [rs]() [$symbol$version]($style)";
-        symbol = "⊃ ";
+        format = " [rs $version]($style)";
         version_format = "\${raw}";
         style = "bold red";
       };
 
       package = {
-        format = " [pkg](dimmed) [$symbol$version]($style)";
+        format = " [pkg $version]($style)";
         version_format = "\${raw}";
-        symbol = "◨ ";
         style = "dimmed yellow bold";
       };
 
       swift = {
-        format = " [sw]() [\${symbol}\${version}]($style)";
-        symbol = "◁ ";
-        style = "bold bright-red";
+        format = " [sw \${version}]($style)";
         version_format = "\${raw}";
+        style = "bold bright-red";
       };
 
       aws = {
         disabled = true;
-        format = " [aws]() [$symbol $profile $region]($style)";
+        format = " [aws $profile $region]($style)";
         style = "bold blue";
-        symbol = "▲ ";
       };
 
-      buf = {
-        symbol = "■ ";
-        format = " [buf]() [$symbol $version $buf_version]($style)";
-      };
+      buf.format = " [buf $version]($style)";
 
-      c = {
-        symbol = "ℂ ";
-        format = " [$symbol($version(-$name))]($style)";
-      };
+      c.format = " [c ($version(-$name))]($style)";
 
-      cpp = {
-        symbol = "ℂ ";
-        format = " [$symbol($version(-$name))]($style)";
-      };
+      cpp.format = " [c++ ($version(-$name))]($style)";
 
-      conda = {
-        symbol = "◯ ";
-        format = " conda [$symbol$environment]($style)";
-      };
+      conda.format = " [conda $environment]($style)";
 
-      pixi = {
-        symbol = "■ ";
-        format = " pixi [$symbol$version ($environment )]($style)";
-      };
+      pixi.format = " [pixi $version ($environment)]($style)";
 
-      dart = {
-        symbol = "◁◅ ";
-        format = " dart [$symbol($version )]($style)";
-      };
+      dart.format = " [dart ($version)]($style)";
 
-      docker_context = {
-        symbol = "◧ ";
-        format = " docker [$symbol$context]($style)";
-      };
+      docker_context.format = " [docker $context]($style)";
 
-      elixir = {
-        symbol = "△ ";
-        format = " exs [$symbol $version OTP $otp_version ]($style)";
-      };
+      elixir.format = " [elixir $version OTP $otp_version]($style)";
 
-      elm = {
-        symbol = "◩ ";
-        format = " elm [$symbol($version )]($style)";
-      };
+      elm.format = " [elm ($version)]($style)";
 
-      golang = {
-        symbol = "∩ ";
-        format = " go [$symbol($version )]($style)";
-      };
+      golang.format = " [go ($version)]($style)";
 
       haskell = {
-        symbol = "❯λ ";
-        format = " hs [$symbol($version )]($style)";
+        symbol = "λ ";
+        format = " [hs ($version)]($style)";
       };
 
-      java = {
-        symbol = "∪ ";
-        format = " java [\${symbol}(\${version} )]($style)";
-      };
+      java.format = " [java (\${version})]($style)";
 
-      julia = {
-        symbol = "◎ ";
-        format = " jl [$symbol($version )]($style)";
-      };
+      julia.format = " [jl ($version)]($style)";
 
-      memory_usage = {
-        symbol = "▪▫▪ ";
-        format = " mem [\${ram}( \${swap})]($style)";
-      };
+      memory_usage.format = " [mem \${ram}( \${swap})]($style)";
 
-      nim = {
-        symbol = "▴▲▴ ";
-        format = " nim [$symbol($version )]($style)";
-      };
+      nim.format = " [nim ($version)]($style)";
 
       nix_shell = {
         style = "bold dimmed blue";
-        symbol = "✶";
-        format = "[$symbol nix⎪$state⎪]($style) [$name](dimmed white)";
-        impure_msg = "[⌽](bold dimmed red)";
-        pure_msg = "[⌾](bold dimmed green)";
-        unknown_msg = "[◌](bold dimmed yellow)";
+        format = "[nix($state)]($style) [$name](dimmed white)";
+        impure_msg = "[:impure](bold dimmed red)";
+        pure_msg = "[:pure](bold dimmed green)";
+        unknown_msg = "";
       };
 
-      spack = {
-        symbol = "◇ ";
-        format = " spack [$symbol$environment]($style)";
-      };
+      spack.format = " [spack $environment]($style)";
     };
   };
 
