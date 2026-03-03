@@ -64,27 +64,27 @@
         "--show"
         "drun"
       ];
-      "Super+Q".action.close-window = true;
-      "Super+F".action.fullscreen-window = true;
+      "Super+Q".action.close-window = { };
+      "Super+F".action.fullscreen-window = { };
 
       # Focus (vim-style)
-      "Super+H".action.focus-column-left = true;
-      "Super+J".action.focus-window-down = true;
-      "Super+K".action.focus-window-up = true;
-      "Super+L".action.focus-column-right = true;
+      "Super+H".action.focus-column-left = { };
+      "Super+J".action.focus-window-down = { };
+      "Super+K".action.focus-window-up = { };
+      "Super+L".action.focus-column-right = { };
 
       # Move
-      "Super+Shift+H".action.move-column-left = true;
-      "Super+Shift+J".action.move-window-down = true;
-      "Super+Shift+K".action.move-window-up = true;
-      "Super+Shift+L".action.move-column-right = true;
+      "Super+Shift+H".action.move-column-left = { };
+      "Super+Shift+J".action.move-window-down = { };
+      "Super+Shift+K".action.move-window-up = { };
+      "Super+Shift+L".action.move-column-right = { };
 
       # Resize
       "Super+Minus".action.set-column-width = "-10%";
       "Super+Equal".action.set-column-width = "+10%";
 
       # Workspace nav
-      "Super+Tab".action.focus-workspace-previous = true;
+      "Super+Tab".action.focus-workspace-previous = { };
 
       # Lock
       "Super+Alt+L".action.spawn = "swaylock";
