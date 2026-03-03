@@ -10,6 +10,7 @@ let
 in
 {
   imports = [
+    ./vpn.nix
     ./sonarr.nix
     ./radarr.nix
     ./lidarr.nix

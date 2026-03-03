@@ -13,16 +13,15 @@
   ++ lib.optionals (!isWSL) [ ./hardening.nix ]
   ++ lib.optionals isWSL [
     ./wsl-gpu.nix
-    # Stop WSL from overwriting /etc/resolv.conf — Tailscale manages it for MagicDNS.
-    # Declare nameservers (satisfies nixos-wsl's check) but disable resolvconf so
-    # NixOS doesn't fight Tailscale for ownership of the file.
+    # Stop WSL from overwriting /etc/resolv.conf — resolved manages it instead.
+    # Tailscale and Mullvad both integrate with resolved natively for split-DNS.
     {
       wsl.wslConf.network.generateResolvConf = false;
-      networking.resolvconf.enable = false;
-      networking.nameservers = [
-        "100.100.100.100" # Tailscale MagicDNS
-        "1.1.1.1"
-      ];
+      services.resolved = {
+        enable = true;
+        settings.Resolve.FallbackDNS = [ "1.1.1.1" ];
+      };
+      networking.nameservers = [ "100.100.100.100" ]; # Tailscale MagicDNS
     }
   ];
 

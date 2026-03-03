@@ -64,6 +64,25 @@
       torrentsRoot = lib.mkDefault "/mnt/k/data/torrents";
       booksRoot = lib.mkDefault "/mnt/k/data/media/books";
     };
+    vpn = {
+      enable = true;
+      accountOpRef = "op://nhpd6oaryrf5sffg267ibor7ae/Mullvad/username";
+
+      excludedServices = [
+        # suspect to get rate-limited
+        "sonarr"
+        "radarr"
+        "lidarr"
+        "bazarr"
+        "jellyseerr"
+        "recyclarr"
+
+        "tautulli"
+        "plex"
+        "jellyfin"
+        "immich"
+      ];
+    };
   };
 
   # Homelab services — enable individually, conventions layered by homelab modules.
