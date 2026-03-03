@@ -27,6 +27,10 @@
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    niri-flake = {
+      url = "github:sodiboo/niri-flake";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -44,6 +48,7 @@
       treefmt-nix,
       stylix,
       nixos-wsl,
+      niri-flake,
       zen-browser,
     }:
     let
@@ -154,7 +159,10 @@
           system = "x86_64-linux";
           platform = "nixos";
           hostModule = ./hosts/trfnix;
-          extraModules = [ ./modules/nixos/system/desktop.nix ];
+          extraModules = [
+            ./modules/nixos/system/desktop.nix
+            niri-flake.nixosModules.niri
+          ];
           hmModules = [
             ./modules/shared/home
             ./modules/shared/home/desktop.nix
