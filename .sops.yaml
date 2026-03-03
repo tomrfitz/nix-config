@@ -1,0 +1,12 @@
+keys:
+    # User key (age-keygen on trfmbp)
+    - &admin age1ttfh2w9nga89rdxt4pt6f6pr7j7lkwft496j3ej0pf28w237xemqvd8e27
+    # trfwsl host key (derived from /etc/ssh/ssh_host_ed25519_key.pub via ssh-to-age)
+    - &trfwsl age1k7npyywhsqhm3gdq8ymthkjry6ea56lmjpz7w8y57704j3lh8ypsj0d8hk
+
+creation_rules:
+    - path_regex: secrets/trfwsl\.yaml$
+      key_groups:
+          - age:
+                - *admin
+                - *trfwsl
