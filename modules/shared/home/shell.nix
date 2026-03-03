@@ -301,11 +301,11 @@
             style = "bold red";
           }
           {
-            threshold = 60;
+            threshold = 40;
             style = "dimmed orange";
           }
           {
-            threshold = 70;
+            threshold = 75;
             style = "dimmed yellow";
           }
           {
