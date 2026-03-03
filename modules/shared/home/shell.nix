@@ -209,7 +209,7 @@
       add_newline = true;
       continuation_prompt = "[.. ](dimmed white)";
       format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$status$username$hostname$env_var$jobs$sudo$character";
-      right_format = "$directory$git_branch$git_status$python$nodejs$rust$time";
+      right_format = "$directory$git_branch$git_status$python$nodejs$rust$battery$time";
 
       fill.symbol = " ";
 
