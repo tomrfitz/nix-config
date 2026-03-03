@@ -96,7 +96,9 @@ in
 
           ${mullvad} auto-connect set on
           ${mullvad} lockdown-mode set on
-          ${mullvad} dns set default --block-ads --block-trackers --block-malware
+          # Mullvad's own DNS (100.64.0.7) is unreachable despite the tunnel
+          # working — cause unknown. Route DNS through tunnel to Cloudflare instead.
+          ${mullvad} dns set custom 1.1.1.1 1.0.0.1
         '';
       }
       # Register excluded services' PIDs with Mullvad split tunnel after they start
