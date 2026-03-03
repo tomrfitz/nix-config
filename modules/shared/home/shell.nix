@@ -208,7 +208,7 @@
       scan_timeout = 30;
       add_newline = true;
       continuation_prompt = "[.. ](dimmed white)";
-      format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$status$username$hostname$env_var$jobs$sudo$character";
+      format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$status${env_var.SSH_CONNECTION}$username$hostname${env_var.VIMSHELL}$jobs$sudo$character";
       right_format = "$directory$git_branch$git_status$python$nodejs$rust$battery$time";
 
       fill.symbol = " ";
@@ -227,6 +227,11 @@
         disabled = false;
         format = "[x$status]($style) ";
         style = "bold red";
+      };
+
+      env_var.SSH_CONNECTION = {
+        format = "[ssh>](bold cyan)";
+        style = "bold cyan";
       };
 
       env_var.VIMSHELL = {
