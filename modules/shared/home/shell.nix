@@ -308,6 +308,10 @@
             threshold = 70;
             style = "dimmed yellow";
           }
+          {
+            threshold = 100;
+            style = "dimmed green";
+          }
         ];
       };
 
