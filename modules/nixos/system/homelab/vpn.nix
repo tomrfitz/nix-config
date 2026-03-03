@@ -65,14 +65,15 @@ in
         content = ''
           chain outgoing {
             type route hook output priority 0; policy accept;
-            # tailscaled marks its own traffic with 0x80000
+            # tailscaled marks its own traffic (control plane, DERP relays)
             meta mark 0x80000 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
-            ip daddr 100.64.0.0/10 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+            # Reply packets for established Tailscale connections (e.g. SSH responses)
+            ct mark 0x00000f41 meta mark set 0x6d6f6c65
           }
 
           chain incoming {
             type filter hook prerouting priority -100; policy accept;
-            ip saddr 100.64.0.0/10 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+            iifname "tailscale0" ct mark set 0x00000f41 meta mark set 0x6d6f6c65
           }
         '';
       };
