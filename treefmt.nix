@@ -15,6 +15,10 @@
       "*.yaml"
       "*.yml"
     ];
+    excludes = [
+      "secrets/*"
+      ".sops.yaml"
+    ];
   };
 
   settings.formatter.markdownlint = {
