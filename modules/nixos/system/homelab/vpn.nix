@@ -53,7 +53,6 @@ in
           ${mullvad} auto-connect set on
           ${mullvad} lockdown-mode set on
           ${mullvad} dns set default --block-ads --block-trackers --block-malware
-          ${mullvad} split-tunnel set state on
         '';
       }
       # Register excluded services' PIDs with Mullvad split tunnel after they start
@@ -64,7 +63,7 @@ in
             after = [ "mullvad-daemon.service" ];
             wants = [ "mullvad-daemon.service" ];
             serviceConfig.ExecStartPost = [
-              "+${mullvad} split-tunnel pid add $MAINPID"
+              "+${mullvad} split-tunnel add $MAINPID"
             ];
           };
         }) vpn.excludedServices
