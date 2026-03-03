@@ -65,6 +65,8 @@
       enable = true;
 
       excludedServices = [
+        "cloudflared-tunnel"
+
         # suspect to get rate-limited
         "sonarr"
         "radarr"
