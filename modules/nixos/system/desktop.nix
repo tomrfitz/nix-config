@@ -30,7 +30,7 @@
   };
 
   # ── Hardware ──────────────────────────────────────────────────────────
-  security.polkit.enable = true;
+  # security.polkit and GNOME keyring also provided by nixosModules.niri
   hardware.graphics.enable = true;
   hardware.enableRedistributableFirmware = true;
   hardware.bluetooth.enable = true;
