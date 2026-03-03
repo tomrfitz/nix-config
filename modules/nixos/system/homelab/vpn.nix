@@ -1,14 +1,8 @@
-# Mullvad VPN network namespace for homelab services.
+# Mullvad VPN for homelab services.
 #
-# Creates an isolated network namespace with a WireGuard tunnel to Mullvad.
-# Services listed in `trf.homelab.vpn.services` are bound into this namespace —
-# their internet traffic routes through Mullvad, and if the tunnel drops they
-# lose connectivity entirely (kill-switch by design).
-#
-# A veth pair bridges the namespace to the host so VPN'd services remain
-# reachable from the LAN, Tailscale, and other local services (e.g., Sonarr
-# reaching Prowlarr). Services outside the namespace should use the veth IP
-# (default 10.200.1.2) instead of localhost to reach VPN'd services.
+# Routes all traffic through Mullvad by default. Services listed in
+# excludedServices bypass the VPN via PID-based split tunneling.
+# All inter-service communication uses localhost regardless of VPN status.
 {
   config,
   lib,
@@ -18,202 +12,69 @@
 let
   cfg = config.trf.homelab;
   vpn = cfg.vpn;
-  ns = vpn.namespace;
 in
 {
   options.trf.homelab.vpn = {
-    enable = lib.mkEnableOption "Mullvad VPN namespace for homelab services";
+    enable = lib.mkEnableOption "Mullvad VPN for homelab";
 
-    namespace = lib.mkOption {
+    accountOpRef = lib.mkOption {
       type = lib.types.str;
-      default = "mullvad";
-      description = "Name of the network namespace.";
+      description = "1Password op:// reference for the Mullvad account number.";
     };
 
-    # ── WireGuard / Mullvad config ──────────────────────────────────────
-
-    privateKeyOpRef = lib.mkOption {
-      type = lib.types.str;
-      description = "1Password op:// reference for the WireGuard private key.";
-      example = "op://Vault/mullvad-wg/private-key";
-    };
-
-    address = lib.mkOption {
-      type = lib.types.str;
-      description = "WireGuard interface address assigned by Mullvad (e.g., 10.68.x.x/32).";
-    };
-
-    dns = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ "10.64.0.1" ];
-      description = "DNS servers for the VPN namespace (Mullvad default: 10.64.0.1).";
-    };
-
-    peer = {
-      publicKey = lib.mkOption {
-        type = lib.types.str;
-        description = "Mullvad server's WireGuard public key.";
-      };
-
-      endpoint = lib.mkOption {
-        type = lib.types.str;
-        description = "Mullvad server endpoint (host:port).";
-        example = "198.54.128.82:51820";
-      };
-    };
-
-    # ── Internal networking ─────────────────────────────────────────────
-
-    vethHostAddr = lib.mkOption {
-      type = lib.types.str;
-      default = "10.200.1.1";
-      description = "Host-side veth address.";
-    };
-
-    vethNsAddr = lib.mkOption {
-      type = lib.types.str;
-      default = "10.200.1.2";
-      description = "Namespace-side veth address. Use this to reach VPN'd services from the host.";
-    };
-
-    # ── Service binding ─────────────────────────────────────────────────
-
-    services = lib.mkOption {
+    excludedServices = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
-      description = ''
-        systemd service names to bind into the VPN namespace.
-        Typical candidates: prowlarr, sabnzbd, qbittorrent, openbooks.
-      '';
-      example = [
-        "prowlarr"
-        "sabnzbd"
-        "qbittorrent"
-        "openbooks"
-      ];
+      description = "systemd service names whose internet traffic bypasses the VPN via split tunneling.";
     };
   };
 
   config = lib.mkIf (cfg.enable && vpn.enable) {
-
-    # ── Namespace setup service ─────────────────────────────────────────
-
-    systemd.services."netns-${ns}" = {
-      description = "Mullvad VPN network namespace (${ns})";
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
-      wantedBy = [ "multi-user.target" ];
-
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        LoadCredential = "op-sa-token:/etc/op/service-account-token";
-
-        ExecStart =
-          let
-            up = pkgs.writeShellScript "netns-${ns}-up" ''
-              set -euo pipefail
-              export PATH="${
-                lib.makeBinPath [
-                  pkgs.iproute2
-                  pkgs.wireguard-tools
-                  pkgs._1password-cli
-                ]
-              }:$PATH"
-
-              NS="${ns}"
-              WG_IF="wg-$NS"
-              VETH_HOST="veth-''${NS}0"
-              VETH_NS="veth-''${NS}1"
-
-              # ── Create namespace ────────────────────────────────────
-              ip netns add "$NS"
-              ip netns exec "$NS" ip link set lo up
-
-              # ── DNS for the namespace ───────────────────────────────
-              mkdir -p /etc/netns/"$NS"
-              printf '%s\n' ${lib.concatMapStringsSep " " (d: "'nameserver ${d}'") vpn.dns} \
-                > /etc/netns/"$NS"/resolv.conf
-
-              # ── veth pair (host ↔ namespace) ────────────────────────
-              ip link add "$VETH_HOST" type veth peer name "$VETH_NS"
-              ip link set "$VETH_NS" netns "$NS"
-
-              ip addr add ${vpn.vethHostAddr}/30 dev "$VETH_HOST"
-              ip link set "$VETH_HOST" up
-
-              ip netns exec "$NS" ip addr add ${vpn.vethNsAddr}/30 dev "$VETH_NS"
-              ip netns exec "$NS" ip link set "$VETH_NS" up
-
-              # ── WireGuard interface ─────────────────────────────────
-              ip link add "$WG_IF" type wireguard
-              ip link set "$WG_IF" netns "$NS"
-
-              # Resolve private key from 1Password
-              WG_KEY="$(OP_SERVICE_ACCOUNT_TOKEN="$(cat "$CREDENTIALS_DIRECTORY/op-sa-token")" \
-                op read "${vpn.privateKeyOpRef}")"
-
-              ip netns exec "$NS" wg set "$WG_IF" \
-                private-key <(printf '%s' "$WG_KEY") \
-                peer "${vpn.peer.publicKey}" \
-                endpoint "${vpn.peer.endpoint}" \
-                allowed-ips "0.0.0.0/0,::0/0"
-
-              ip netns exec "$NS" ip addr add ${vpn.address} dev "$WG_IF"
-              ip netns exec "$NS" ip link set "$WG_IF" up
-
-              # ── Routing inside namespace ────────────────────────────
-              # Default route through WireGuard
-              ip netns exec "$NS" ip route add default dev "$WG_IF"
-
-              # Private subnets route through veth (reach host services, Tailscale, LAN)
-              for cidr in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 100.64.0.0/10; do
-                ip netns exec "$NS" ip route add "$cidr" via ${vpn.vethHostAddr} dev "$VETH_NS"
-              done
-            '';
-          in
-          "${up}";
-
-        ExecStop =
-          let
-            down = pkgs.writeShellScript "netns-${ns}-down" ''
-              set -euo pipefail
-              export PATH="${lib.makeBinPath [ pkgs.iproute2 ]}:$PATH"
-
-              # Deleting the namespace removes all interfaces inside it
-              ip netns del "${ns}" || true
-              rm -rf /etc/netns/"${ns}"
-            '';
-          in
-          "${down}";
-      };
-    };
-
-    # ── Bind services into the namespace ────────────────────────────────
-
-    systemd.services = lib.mkMerge (
-      map (svc: {
-        ${svc} = {
-          after = [ "netns-${ns}.service" ];
-          requires = [ "netns-${ns}.service" ];
-          serviceConfig = {
-            NetworkNamespacePath = "/var/run/netns/${ns}";
-          };
-        };
-      }) vpn.services
-    );
-
-    # ── Host networking for namespace connectivity ──────────────────────
-
-    # Forward traffic between veth and the host network
-    boot.kernel.sysctl."net.ipv4.ip_forward" = lib.mkDefault true;
-
-    networking.nat = {
+    services.mullvad-vpn = {
       enable = true;
-      internalInterfaces = [ "veth-${ns}0" ];
+      enableExcludeWrapper = true;
     };
 
-    # Trust the veth interface (services need to be reachable from host)
-    networking.firewall.trustedInterfaces = [ "veth-${ns}0" ];
+    services.resolved.enable = true;
+
+    systemd.services =
+      let
+        mullvad = "${config.services.mullvad-vpn.package}/bin/mullvad";
+        op = "${pkgs._1password-cli}/bin/op";
+      in
+      {
+        mullvad-daemon = {
+          serviceConfig.LoadCredential = "op-sa-token:/etc/op/service-account-token";
+          postStart = ''
+            # Wait for daemon readiness
+            while ! ${mullvad} status &>/dev/null; do sleep 1; done
+
+            # Login if not already authenticated
+            if ! ${mullvad} account get &>/dev/null; then
+              export OP_SERVICE_ACCOUNT_TOKEN="$(cat "$CREDENTIALS_DIRECTORY/op-sa-token")"
+              ACCOUNT="$(${op} read "${vpn.accountOpRef}")"
+              ${mullvad} account login "$ACCOUNT"
+            fi
+
+            ${mullvad} auto-connect set on
+            ${mullvad} lockdown-mode set on
+            ${mullvad} dns set default --block-ads --block-trackers --block-malware
+            ${mullvad} split-tunnel set state on
+          '';
+        };
+      }
+      # Register excluded services' PIDs with Mullvad split tunnel after they start
+      // lib.listToAttrs (
+        map (svc: {
+          name = svc;
+          value = {
+            after = [ "mullvad-daemon.service" ];
+            wants = [ "mullvad-daemon.service" ];
+            serviceConfig.ExecStartPost = [
+              "+${mullvad} split-tunnel pid add $MAINPID"
+            ];
+          };
+        }) vpn.excludedServices
+      );
   };
 }
