@@ -1,47 +1,7 @@
 {
   pkgs,
-  lib,
   ...
 }:
-let
-  namedWorkspaces = [
-    "A"
-    "B"
-    "C"
-    "D"
-    "E"
-    "G"
-    "I"
-    "M"
-    "N"
-    "O"
-    "P"
-    "Q"
-    "R"
-    "S"
-    "T"
-    "U"
-    "V"
-    "W"
-    "X"
-    "Y"
-    "Z"
-  ];
-
-  numericWorkspaceBinds = lib.concatMapStrings (n: ''
-    Super+${n} { focus-workspace ${n}; }
-    Super+Shift+${n} { move-column-to-workspace ${n}; }
-  '') (map toString (lib.range 1 9));
-
-  namedWorkspaceDecls = lib.concatMapStrings (name: ''
-    workspace "${name}"
-  '') namedWorkspaces;
-
-  namedWorkspaceBinds = lib.concatMapStrings (name: ''
-    Super+${name} { focus-workspace "${name}"; }
-    Super+Shift+${name} { move-column-to-workspace "${name}"; }
-  '') namedWorkspaces;
-in
 {
   imports = [
     ./darkman.nix
@@ -55,6 +15,8 @@ in
     xwayland-satellite
     swaylock
     wl-clipboard
+    grim
+    slurp
     brightnessctl
     playerctl
     libnotify
@@ -62,83 +24,137 @@ in
   ];
 
   # ── Niri ────────────────────────────────────────────────────────────
-  xdg.configFile."niri/config.kdl".text = ''
-    input {
-      touchpad {
-        tap
-        natural-scroll
-        dwt
-      }
-    }
-
-    layout {
-      gaps 5
-      struts {
-        left 4
-        right 4
-        top 4
-        bottom 4
-      }
-    }
-
-    ${namedWorkspaceDecls}
-
-    binds {
-      Super+Return { spawn "ghostty"; }
-      Super+Space { spawn-sh "wofi --show drun"; }
-      Super+F { fullscreen-window; }
-
-      Super+H { focus-column-left; }
-      Super+J { focus-window-down; }
-      Super+K { focus-window-up; }
-      Super+L { focus-column-right; }
-
-      Super+Shift+H { move-column-left; }
-      Super+Shift+J { move-window-down; }
-      Super+Shift+K { move-window-up; }
-      Super+Shift+L { move-column-right; }
-
-      Super+Minus { set-column-width "-10%"; }
-      Super+Equal { set-column-width "+10%"; }
-
-      ${numericWorkspaceBinds}
-      ${namedWorkspaceBinds}
-
-      Super+Tab { focus-workspace-previous; }
-      Super+Shift+Tab { move-workspace-to-monitor-right; }
-      Super+Alt+L { spawn "swaylock"; }
-
-      XF86AudioRaiseVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%+"; }
-      XF86AudioLowerVolume allow-when-locked=true { spawn-sh "wpctl set-volume @DEFAULT_AUDIO_SINK@ 5%-"; }
-      XF86AudioMute allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle"; }
-      XF86AudioMicMute allow-when-locked=true { spawn-sh "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle"; }
-
-      XF86MonBrightnessUp allow-when-locked=true { spawn "brightnessctl" "set" "+5%"; }
-      XF86MonBrightnessDown allow-when-locked=true { spawn "brightnessctl" "set" "5%-"; }
-
-      XF86AudioPlay allow-when-locked=true { spawn-sh "playerctl play-pause"; }
-      XF86AudioNext allow-when-locked=true { spawn-sh "playerctl next"; }
-      XF86AudioPrev allow-when-locked=true { spawn-sh "playerctl previous"; }
-
-      Super+Shift+S { spawn-sh "${pkgs.grim}/bin/grim -g \"$(${pkgs.slurp}/bin/slurp)\" - | ${pkgs.wl-clipboard}/bin/wl-copy"; }
-    }
-  '';
-
-  # Polkit authentication agent (required for 1Password system auth, etc.)
-  systemd.user.services.polkit-gnome-agent = {
-    Unit = {
-      Description = "polkit-gnome-authentication-agent-1";
-      After = [ "graphical-session.target" ];
-      PartOf = [ "graphical-session.target" ];
+  # nixosModules.niri provides: polkit agent, xdg-desktop-portal-gnome,
+  # GNOME keyring, dconf, opengl, default fonts, swaylock PAM, binary cache
+  programs.niri.settings = {
+    environment."NIXOS_OZONE_WL" = "1";
+    input = {
+      keyboard.xkb = { };
+      touchpad = {
+        tap = true;
+        natural-scroll = true;
+        dwt = true;
+      };
     };
-    Service = {
-      Type = "simple";
-      ExecStart = "${pkgs.polkit_gnome}/libexec/polkit-gnome-authentication-agent-1";
-      Restart = "on-failure";
-      RestartSec = 1;
+
+    layout = {
+      gaps = 5;
+      struts = {
+        left = 4;
+        right = 4;
+        top = 4;
+        bottom = 4;
+      };
+      preset-column-widths = [
+        { proportion = 0.5; }
+        { proportion = 0.667; }
+        { proportion = 1.0; }
+      ];
+      default-column-width.proportion = 0.5;
     };
-    Install.WantedBy = [ "graphical-session.target" ];
+
+    # No named workspaces — embrace niri's scrolling model.
+    # Dynamic workspaces are created/destroyed as needed.
+
+    binds = {
+      # Launch
+      "Super+Return".action.spawn = "ghostty";
+      "Super+Space".action.spawn = [
+        "wofi"
+        "--show"
+        "drun"
+      ];
+      "Super+Q".action.close-window = true;
+      "Super+F".action.fullscreen-window = true;
+
+      # Focus (vim-style)
+      "Super+H".action.focus-column-left = true;
+      "Super+J".action.focus-window-down = true;
+      "Super+K".action.focus-window-up = true;
+      "Super+L".action.focus-column-right = true;
+
+      # Move
+      "Super+Shift+H".action.move-column-left = true;
+      "Super+Shift+J".action.move-window-down = true;
+      "Super+Shift+K".action.move-window-up = true;
+      "Super+Shift+L".action.move-column-right = true;
+
+      # Resize
+      "Super+Minus".action.set-column-width = "-10%";
+      "Super+Equal".action.set-column-width = "+10%";
+
+      # Workspace nav
+      "Super+Tab".action.focus-workspace-previous = true;
+
+      # Lock
+      "Super+Alt+L".action.spawn = "swaylock";
+
+      # Media keys (allow-when-locked)
+      "XF86AudioRaiseVolume" = {
+        allow-when-locked = true;
+        action.spawn = [
+          "wpctl"
+          "set-volume"
+          "@DEFAULT_AUDIO_SINK@"
+          "5%+"
+        ];
+      };
+      "XF86AudioLowerVolume" = {
+        allow-when-locked = true;
+        action.spawn = [
+          "wpctl"
+          "set-volume"
+          "@DEFAULT_AUDIO_SINK@"
+          "5%-"
+        ];
+      };
+      "XF86AudioMute" = {
+        allow-when-locked = true;
+        action.spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+      };
+      "XF86AudioMicMute" = {
+        allow-when-locked = true;
+        action.spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+      };
+      "XF86MonBrightnessUp" = {
+        allow-when-locked = true;
+        action.spawn = [
+          "brightnessctl"
+          "set"
+          "+5%"
+        ];
+      };
+      "XF86MonBrightnessDown" = {
+        allow-when-locked = true;
+        action.spawn = [
+          "brightnessctl"
+          "set"
+          "5%-"
+        ];
+      };
+      "XF86AudioPlay" = {
+        allow-when-locked = true;
+        action.spawn-sh = "playerctl play-pause";
+      };
+      "XF86AudioNext" = {
+        allow-when-locked = true;
+        action.spawn-sh = "playerctl next";
+      };
+      "XF86AudioPrev" = {
+        allow-when-locked = true;
+        action.spawn-sh = "playerctl previous";
+      };
+
+      # Screenshot (region → clipboard)
+      "Super+Shift+S".action.spawn-sh = ''grim -g "$(slurp)" - | wl-copy'';
+    };
+
+    spawn-at-startup = [
+      { argv = [ "xwayland-satellite" ]; }
+    ];
   };
+
+  # Polkit agent provided by nixosModules.niri (KDE polkit)
 
   # Notification daemon
   services.mako = {
