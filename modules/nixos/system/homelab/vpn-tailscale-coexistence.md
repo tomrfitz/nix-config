@@ -4,7 +4,7 @@
 
 I run a NixOS homelab (NixOS-WSL) where Mullvad with lockdown mode protects download traffic, and Tailscale provides remote SSH access via MagicDNS. This is a common homelab pattern: VPN kill-switch for untrusted traffic, mesh VPN for management.
 
-Getting both to coexist required solving three distinct problems. Documenting the full path here since existing guides only cover the first one.
+Getting both to coexist required solving four distinct problems. Documenting the full path here since existing guides only cover the first one.
 
 ## Environment
 
@@ -23,8 +23,7 @@ Getting both to coexist required solving three distinct problems. Documenting th
 **What didn't work:**
 
 - `mullvad lan set allow` — does not cover 100.64.0.0/10 (CGNAT, not LAN). Confirmed by [#6086](https://github.com/mullvad/mullvadvpn-app/issues/6086).
-- `mullvad split-tunnel add $(pgrep tailscaled)` — PID-based split tunneling only affects **outbound** traffic from the excluded process. Inbound SSH connections arriving on `tailscale0` are still dropped.
-- Adding tailscaled to excluded services — same limitation, outbound only.
+- `mullvad split-tunnel add $(pgrep tailscaled)` — PID-based split tunneling only affects **outbound** traffic from the excluded process. Inbound SSH connections arriving on `tailscale0` are still dropped. However, PID-based split tunneling *is* needed for a separate problem — see Problem 3½ (bootstrap ordering).
 
 **Solution:** Create a separate nftables table (`inet mullvad-ts`) that marks Tailscale traffic with Mullvad's split-tunnel fwmarks. Mullvad's firewall recognizes these marks and allows the traffic through. Since this is a separate table, Mullvad can't wipe it during reconnects (it only manages its own `inet mullvad` table).
 
@@ -35,23 +34,35 @@ The mark values come from [Mullvad's split-tunneling docs](https://mullvad.net/e
 
 Prior art: [TheOrangeOne](https://theorangeone.net/posts/tailscale-mullvad/), [rakhesh](https://rakhesh.com/linux-bsd/mullvad-and-tailscale-coexisting-or-hello-nftables/), [shervinsahba/mullvad-tailscale-nft](https://github.com/shervinsahba/mullvad-tailscale-nft).
 
-## Problem 2: CIDR-based nftables rules break Mullvad's DNS
+## Problem 2: CIDR-based nftables rules break Mullvad's DNS (inbound chain)
 
-**Symptoms:** With the commonly-suggested nftables rule `ip daddr 100.64.0.0/10 ct mark set 0x00000f41 meta mark set 0x6d6f6c65`, SSH over Tailscale works but DNS resolution for non-Tailscale domains fails completely.
+**Symptoms:** With the commonly-suggested nftables rule `ip daddr 100.64.0.0/10 ct mark set 0x00000f41 meta mark set 0x6d6f6c65` in a **prerouting** chain, SSH over Tailscale works but DNS resolution for non-Tailscale domains fails completely.
 
-**Root cause:** Mullvad's tunnel DNS resolver is at **100.64.0.7**, which falls within the Tailscale CGNAT range (100.64.0.0/10). The CIDR-based rule marks Mullvad's own DNS traffic for split-tunnel bypass, routing it outside the tunnel where it's unreachable.
+**Root cause:** Mullvad's tunnel DNS resolver is at **100.64.0.7**, which falls within the Tailscale CGNAT range (100.64.0.0/10). A CIDR-based prerouting rule marks Mullvad's own DNS traffic for split-tunnel bypass, routing it outside the tunnel where it's unreachable.
 
 This is a subtle conflict: both Mullvad and Tailscale use addresses in 100.64.0.0/10 for completely different purposes. The blog posts that pioneered the CIDR approach may not have hit this because Mullvad's DNS address allocation could vary by relay or configuration.
 
-**Solution:** Match on interface instead of CIDR. Use `iifname "tailscale0"` for inbound traffic and conntrack mark propagation for reply packets:
+**Solution:** Match on interface instead of CIDR for the **incoming** (prerouting) chain. Use `iifname "tailscale0"` — this avoids the CIDR overlap because Mullvad's DNS arrives on `wg0-mullvad`, not `tailscale0`.
+
+Note: using `ip daddr 100.64.0.0/10` in the **outgoing** chain is safe — it only matches locally-originated packets destined for Tailscale peers (e.g. SSH to another machine). Mullvad's DNS traffic to 100.64.0.7 goes through the tunnel and never matches the output chain's CIDR rule because it's already routed to `wg0-mullvad` by Mullvad's routing table.
+
+## Problem 3: Hook type matters — `route` vs `filter`
+
+**Symptoms:** With the outgoing chain using `type route hook output priority 0`, outbound SSH to Tailscale peers (e.g. `ssh 100.106.13.30`) gets "connection refused". The ct mark is being set (verified with nft counters) but Mullvad's output filter still drops the packets.
+
+**Root cause:** Mullvad's output chain uses `type filter hook output priority filter` (priority 0). A `route` hook and a `filter` hook at the same priority are different hook types — the ct mark set in the route hook is not visible to Mullvad's filter hook when they run at the same priority. The packets get marked but Mullvad's filter evaluates without seeing the mark and rejects them (Mullvad's output chain ends with `reject`, which the SSH client reports as "connection refused" rather than a timeout).
+
+**Solution:** Use `type filter hook output priority -1` instead of `type route`. Priority -1 ensures our chain runs just before Mullvad's priority 0 filter, and using the same hook type (`filter`) guarantees mark visibility.
 
 ```nft
 table inet mullvad-ts {
   chain outgoing {
-    type route hook output priority 0; policy accept;
+    type filter hook output priority -1; policy accept;
     # tailscaled marks its own traffic (control plane, DERP relays)
     meta mark 0x80000 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
-    # Reply packets for established Tailscale connections (e.g. SSH responses)
+    # New outbound connections to Tailscale CGNAT (e.g. SSH to peers)
+    ip daddr 100.64.0.0/10 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+    # Reply packets for established Tailscale connections
     ct mark 0x00000f41 meta mark set 0x6d6f6c65
   }
 
@@ -62,14 +73,28 @@ table inet mullvad-ts {
 }
 ```
 
-This avoids the CIDR overlap entirely:
+How the rules work together:
 
-- Inbound Tailscale traffic is identified by interface, not address
-- Outbound replies use conntrack to propagate the mark from the inbound leg
-- tailscaled's own outbound traffic is identified by its fwmark (`0x80000`)
-- Mullvad's DNS traffic to 100.64.0.7 is unaffected (it arrives on `wg0-mullvad`, not `tailscale0`)
+- **Inbound:** Tailscale traffic identified by interface (`tailscale0`), not address — avoids the DNS overlap
+- **Outbound (tailscaled):** tailscaled's own traffic identified by its fwmark (`0x80000`) — covers control plane, DERP relays
+- **Outbound (new connections):** SSH and other new connections to Tailscale peers identified by CIDR (`100.64.0.0/10`) — safe in the output chain
+- **Outbound (replies):** Conntrack propagates the mark from the inbound leg for established connections
+- **Mullvad DNS:** Traffic to 100.64.0.7 is unaffected — it arrives on `wg0-mullvad` (not `tailscale0`) and is routed through the tunnel (not matched by the output CIDR rule)
 
-## Problem 3: Mullvad's DNS resolver (100.64.0.7) unreachable
+## Problem 3½: Bootstrap ordering — tailscaled can't auth after restart
+
+**Symptoms:** After a WSL restart, tailscaled starts but can't reach the control plane (`controlplane.tailscale.com`). Logs show "connection refused" and "network is unreachable" for bootstrap DNS servers. Tailscale stays in a logged-out state until Mullvad is manually disconnected.
+
+**Root cause:** The nftables rules from Problem 3 handle steady-state traffic, but they rely on either `tailscale0` existing (incoming chain) or tailscaled setting fwmark `0x80000` on its packets (outgoing chain). During initial authentication — before the tunnel is established — tailscaled's control plane traffic may not carry the fwmark, and `tailscale0` doesn't exist yet. Mullvad's lockdown blocks these unrecognized packets.
+
+**Solution:** Add tailscaled to Mullvad's PID-based split tunnel via `vpn.excludedServices`. This registers tailscaled's PID with `mullvad split-tunnel add $MAINPID` on startup, exempting its outbound traffic from lockdown. The systemd service ordering (`after = [ "mullvad-daemon.service" ]`) ensures Mullvad is ready to accept the split-tunnel registration.
+
+PID-based and nftables approaches are complementary:
+
+- **PID split-tunnel** covers tailscaled's own outbound traffic (control plane auth, DERP relay connections) — works from first boot
+- **nftables** covers inbound traffic on `tailscale0`, outbound connections to peers (SSH), and reply packets — works once the tunnel is established
+
+## Problem 4: Mullvad's DNS resolver (100.64.0.7) unreachable
 
 **Symptoms:** Even with the interface-based nftables rules correctly in place, `resolvectl query github.com` times out. `ping 100.64.0.7` shows 100% packet loss. Meanwhile, the tunnel itself works fine — `ping 10.64.0.1` (tunnel gateway) responds, and `curl http://1.1.1.1` through the tunnel succeeds.
 
