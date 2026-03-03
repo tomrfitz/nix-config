@@ -41,7 +41,7 @@ jobs:
             - uses: cachix/cachix-action@v15
               with:
                   name: tomrfitz
-                  extraPullNames: nix-community
+                  extraPullNames: nix-community,niri
                   authToken: ${{ secrets.CACHIX }}
 
             - name: Build trfnix system closure
