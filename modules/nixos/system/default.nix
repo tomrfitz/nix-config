@@ -17,11 +17,14 @@
     # Tailscale and Mullvad both integrate with resolved natively for split-DNS.
     {
       wsl.wslConf.network.generateResolvConf = false;
-      services.resolved = {
-        enable = true;
-        settings.Resolve.FallbackDNS = [ "1.1.1.1" ];
-      };
-      networking.nameservers = [ "100.100.100.100" ]; # Tailscale MagicDNS
+      services.resolved.enable = true;
+      # MagicDNS (100.100.100.100) resolves *.ts.net via tailscale0's per-link
+      # DNS. Global nameservers provide general resolution — Mullvad overrides
+      # these when connected, and they serve as fallback when disconnected.
+      networking.nameservers = [
+        "1.1.1.1"
+        "1.0.0.1"
+      ];
     }
   ];
 
