@@ -9,16 +9,23 @@ let
   builderHost = "trfwsl";
   builderUser = "remotebuild";
   builderSshKey = "/root/.ssh/trfwsl-builder";
+  builderAuthorizedKey = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIHPxRsDJF+oWSJOBoZSiz739Cd1hvN5bWKNv8xQ9ugLv root@trfnix";
 
   atticCacheName = "trf-infra";
   atticPort = 8484;
+  atticSubstituter = "http://${builderHost}:${toString atticPort}/${atticCacheName}";
+  atticPublicKey = "trf-infra:9T9hcVKDnDKKTirHMarQGhjvHLmRT4prxPb4RLRXctI=";
 in
 {
   config = lib.mkMerge [
     (lib.mkIf (hostName == "trfnix") {
       # Offload Linux builds to trfwsl over Tailscale/MagicDNS.
       nix.distributedBuilds = true;
-      nix.settings.builders-use-substitutes = true;
+      nix.settings = {
+        builders-use-substitutes = true;
+        extra-substituters = [ atticSubstituter ];
+        extra-trusted-public-keys = [ atticPublicKey ];
+      };
 
       nix.buildMachines = [
         {
@@ -48,7 +55,10 @@ in
         isSystemUser = true;
         group = builderUser;
         useDefaultShell = true;
-        openssh.authorizedKeys.keys = [ sshPublicKey ];
+        openssh.authorizedKeys.keys = [
+          builderAuthorizedKey
+          sshPublicKey
+        ];
       };
 
       nix.settings.trusted-users = lib.mkAfter [ builderUser ];
