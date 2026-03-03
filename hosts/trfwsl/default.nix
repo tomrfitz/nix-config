@@ -1,4 +1,5 @@
 {
+  config,
   hostName,
   user,
   lib,
@@ -20,19 +21,20 @@
 
   trf.wsl.gpu.enable = true;
 
-  # 1Password service account — resolves op:// references headlessly (boot, services, cron).
-  # Token bootstrapped manually: /etc/op/service-account-token (chmod 600)
-  environment.extraInit = ''
-    if [ -r /etc/op/service-account-token ]; then
-      export OP_SERVICE_ACCOUNT_TOKEN="$(cat /etc/op/service-account-token)"
-    fi
-  '';
+  # ── sops-nix: decrypt secrets from repo at activation ─────────────────
+  sops = {
+    defaultSopsFile = ../../secrets/trfwsl.yaml;
+    defaultSopsFormat = "yaml";
+    age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
+  };
+
+  sops.secrets."cloudflared/tunnel-token" = { };
 
   services.ollama.enable = true;
 
   # ── Cloudflare Tunnel (exposes homelab services outside eduroam) ───────
-  # Routes managed in Cloudflare Zero Trust dashboard; token resolved via
-  # 1Password service account at service start.
+  # Routes managed in Cloudflare Zero Trust dashboard; token decrypted by
+  # sops-nix to /run/secrets/ at activation.
   systemd.services.cloudflared-tunnel = {
     description = "Cloudflare Tunnel";
     after = [ "network-online.target" ];
@@ -41,17 +43,12 @@
     serviceConfig = {
       Restart = "on-failure";
       RestartSec = 5;
-      LoadCredential = "op-sa-token:/etc/op/service-account-token";
-      RuntimeDirectory = "cloudflared";
-      RuntimeDirectoryMode = "0700";
       StateDirectory = "cloudflared";
     };
     environment.HOME = "/var/lib/cloudflared";
     script = ''
-      export OP_SERVICE_ACCOUNT_TOKEN="$(cat "$CREDENTIALS_DIRECTORY/op-sa-token")"
-      ${pkgs._1password-cli}/bin/op read "op://d2kparnm4436vrbora6wnty6pm/lfxqpbrqybsjifdky766t35pcy/password" \
-        > "$RUNTIME_DIRECTORY/tunnel-token"
-      exec ${pkgs.cloudflared}/bin/cloudflared tunnel run --token-file "$RUNTIME_DIRECTORY/tunnel-token"
+      exec ${pkgs.cloudflared}/bin/cloudflared tunnel run \
+        --token-file ${config.sops.secrets."cloudflared/tunnel-token".path}
     '';
   };
 
@@ -66,7 +63,6 @@
     };
     vpn = {
       enable = true;
-      accountOpRef = "op://nhpd6oaryrf5sffg267ibor7ae/Mullvad/username";
 
       excludedServices = [
         # suspect to get rate-limited

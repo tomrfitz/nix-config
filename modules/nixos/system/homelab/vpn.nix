@@ -6,7 +6,6 @@
 {
   config,
   lib,
-  pkgs,
   ...
 }:
 let
@@ -17,11 +16,6 @@ in
   options.trf.homelab.vpn = {
     enable = lib.mkEnableOption "Mullvad VPN for homelab";
 
-    accountOpRef = lib.mkOption {
-      type = lib.types.str;
-      description = "1Password op:// reference for the Mullvad account number.";
-    };
-
     excludedServices = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
@@ -30,6 +24,10 @@ in
   };
 
   config = lib.mkIf (cfg.enable && vpn.enable) {
+    sops.secrets."mullvad/account" = {
+      restartUnits = [ "mullvad-daemon.service" ];
+    };
+
     services.mullvad-vpn = {
       enable = true;
       enableExcludeWrapper = true;
@@ -40,28 +38,23 @@ in
     systemd.services =
       let
         mullvad = "${config.services.mullvad-vpn.package}/bin/mullvad";
-        op = "${pkgs._1password-cli}/bin/op";
       in
       {
-        mullvad-daemon = {
-          serviceConfig.LoadCredential = "op-sa-token:/etc/op/service-account-token";
-          postStart = ''
-            # Wait for daemon readiness
-            while ! ${mullvad} status &>/dev/null; do sleep 1; done
+        mullvad-daemon.postStart = ''
+          # Wait for daemon readiness
+          while ! ${mullvad} status &>/dev/null; do sleep 1; done
 
-            # Login if not already authenticated
-            if ! ${mullvad} account get &>/dev/null; then
-              export OP_SERVICE_ACCOUNT_TOKEN="$(cat "$CREDENTIALS_DIRECTORY/op-sa-token")"
-              ACCOUNT="$(${op} read "${vpn.accountOpRef}")"
-              ${mullvad} account login "$ACCOUNT"
-            fi
+          # Login if not already authenticated
+          if ! ${mullvad} account get &>/dev/null; then
+            ACCOUNT="$(cat ${config.sops.secrets."mullvad/account".path})"
+            ${mullvad} account login "$ACCOUNT"
+          fi
 
-            ${mullvad} auto-connect set on
-            ${mullvad} lockdown-mode set on
-            ${mullvad} dns set default --block-ads --block-trackers --block-malware
-            ${mullvad} split-tunnel set state on
-          '';
-        };
+          ${mullvad} auto-connect set on
+          ${mullvad} lockdown-mode set on
+          ${mullvad} dns set default --block-ads --block-trackers --block-malware
+          ${mullvad} split-tunnel set state on
+        '';
       }
       # Register excluded services' PIDs with Mullvad split tunnel after they start
       // lib.listToAttrs (
