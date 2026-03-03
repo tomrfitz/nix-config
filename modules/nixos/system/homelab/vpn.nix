@@ -13,6 +13,7 @@
 {
   config,
   lib,
+  isWSL,
   ...
 }:
 let
@@ -53,6 +54,10 @@ in
     #
     # Priority constraints from Mullvad docs: must be between -200 and 0.
     # Mullvad's prerouting is at -199; our -100 runs after it.
+    # WSL's kernel lacks nft_fib — disable the NixOS firewall whose nftables
+    # rules depend on it. WSL is behind Windows' firewall anyway.
+    networking.firewall.enable = lib.mkIf isWSL false;
+
     networking.nftables = {
       enable = true;
       tables.mullvad-ts = {
