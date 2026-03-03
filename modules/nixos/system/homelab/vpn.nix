@@ -52,8 +52,10 @@ in
     # (0x00000f41) and fwmark (0x6d6f6c65). Mullvad's firewall recognises
     # these marks and allows the traffic through.
     #
-    # Priority constraints from Mullvad docs: must be between -200 and 0.
-    # Mullvad's prerouting is at -199; our -100 runs after it.
+    # Priority: outgoing uses filter hook at -1 (just before Mullvad's
+    # priority 0 output filter). A route hook doesn't work — ct mark set
+    # there isn't visible to Mullvad's filter at the same priority.
+    # Mullvad's prerouting is at -199; our incoming -100 runs after it.
     # WSL's kernel lacks nft_fib — disable the NixOS firewall whose nftables
     # rules depend on it. WSL is behind Windows' firewall anyway.
     networking.firewall.enable = lib.mkIf isWSL false;
@@ -64,10 +66,12 @@ in
         family = "inet";
         content = ''
           chain outgoing {
-            type route hook output priority 0; policy accept;
+            type filter hook output priority -1; policy accept;
             # tailscaled marks its own traffic (control plane, DERP relays)
             meta mark 0x80000 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
-            # Reply packets for established Tailscale connections (e.g. SSH responses)
+            # New outbound connections to Tailscale CGNAT (e.g. SSH to peers)
+            ip daddr 100.64.0.0/10 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+            # Reply packets for established Tailscale connections
             ct mark 0x00000f41 meta mark set 0x6d6f6c65
           }
 
