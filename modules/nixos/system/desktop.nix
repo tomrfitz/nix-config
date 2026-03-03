@@ -16,6 +16,12 @@
     size = 24;
   };
 
+  # Required by HM xdg.portal when useUserPackages is enabled
+  environment.pathsToLink = [
+    "/share/applications"
+    "/share/xdg-desktop-portal"
+  ];
+
   # ── Display / Desktop ────────────────────────────────────────────────
   # programs.niri.enable = true;
   services.xserver.enable = lib.mkDefault true;
