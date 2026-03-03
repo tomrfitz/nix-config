@@ -65,6 +65,10 @@
       enable = true;
 
       excludedServices = [
+        # tailscaled needs split-tunnel bypass so it can reach the control
+        # plane during initial auth — the nftables fwmark rules alone don't
+        # cover bootstrap before tailscale0 exists
+        "tailscaled"
         "cloudflared-tunnel"
 
         # suspect to get rate-limited
