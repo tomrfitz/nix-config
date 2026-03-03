@@ -40,10 +40,9 @@ in
     OLLAMA_GPU_LAYERS = "-1";
     OLLAMA_KEEP_ALIVE = "5m";
   }
-  // lib.optionalAttrs (!isWSL) {
-    # Prefer 1Password's SSH agent everywhere (family/shared workflow).
-    # SSH also explicitly points at the same socket via `IdentityAgent`.
-    # On WSL, 1Password uses Windows interop (ssh.exe) instead of a Unix socket.
+  // {
+    # 1Password SSH agent everywhere. On macOS/NixOS, 1Password provides a native
+    # Unix socket. On WSL, a socat+npiperelay bridge exposes the Windows agent.
     SSH_AUTH_SOCK = onePasswordSshAgentSock;
   };
 
@@ -52,9 +51,41 @@ in
   ];
 
   # Export SSH_AUTH_SOCK to systemd user environment so GUI apps (Obsidian, etc.)
-  # can access the 1Password SSH agent (not needed on WSL — no Unix socket)
-  systemd.user.sessionVariables = lib.mkIf (!isDarwin && !isWSL) {
+  # can access the 1Password SSH agent
+  systemd.user.sessionVariables = lib.mkIf (!isDarwin) {
     SSH_AUTH_SOCK = onePasswordSshAgentSock;
+  };
+
+  # On WSL, bridge the 1Password Windows SSH agent to a Unix socket via
+  # npiperelay + socat. Requires npiperelay.exe on the Windows side
+  # (installed to C:\Users\<user>\.local\bin\npiperelay.exe).
+  systemd.user.services."1password-ssh-agent-bridge" = lib.mkIf isWSL {
+    Unit = {
+      Description = "Bridge 1Password Windows SSH agent to Unix socket";
+    };
+    Install.WantedBy = [ "default.target" ];
+    Service =
+      let
+        npiperelay = "/mnt/c/Users/Thomas FitzGerald/.local/bin/npiperelay.exe";
+        # Symlink npiperelay to a path without spaces so socat EXEC: can handle it
+        npiprelayLink = pkgs.runCommand "npiperelay-link" { } ''
+          mkdir -p $out/bin
+          ln -s "${npiperelay}" $out/bin/npiperelay.exe
+        '';
+        bridge = pkgs.writeShellScript "1password-ssh-bridge" ''
+          ${pkgs.coreutils}/bin/rm -f "${onePasswordSshAgentSock}"
+          ${pkgs.coreutils}/bin/mkdir -p "$(${pkgs.coreutils}/bin/dirname "${onePasswordSshAgentSock}")"
+          exec ${pkgs.socat}/bin/socat \
+            UNIX-LISTEN:${onePasswordSshAgentSock},fork \
+            EXEC:"${npiprelayLink}/bin/npiperelay.exe -ei -s //./pipe/openssh-ssh-agent",nofork
+        '';
+      in
+      {
+        Type = "simple";
+        ExecStart = "${bridge}";
+        Restart = "on-failure";
+        RestartSec = 3;
+      };
   };
 
   # ── Other programs with native modules ─────────────────────────────────
@@ -93,7 +124,7 @@ in
     enableDefaultConfig = false;
     matchBlocks = {
       "*" = {
-        extraOptions = lib.mkIf (!isWSL) {
+        extraOptions = {
           AddKeysToAgent = "yes";
           IdentityAgent = onePasswordIdentityAgent;
         };
