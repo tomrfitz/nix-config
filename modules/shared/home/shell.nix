@@ -225,7 +225,7 @@
       };
 
       env_var.SSH_CONNECTION = {
-        format = "[ssh>](bold cyan)";
+        format = "[ssh:](bold cyan)";
         style = "bold cyan";
       };
 
