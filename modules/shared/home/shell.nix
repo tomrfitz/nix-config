@@ -242,7 +242,7 @@
       };
 
       username = {
-        style_user = "yellow bold";
+        style_user = "dimmed cyan";
         style_root = "red bold";
         format = "[$user@]($style)";
         disabled = false;
@@ -268,10 +268,10 @@
       };
 
       hostname = {
-        ssh_only = true;
+        ssh_only = false;
         trim_at = ".";
         format = "[$hostname]($style) ";
-        style = "bold green";
+        style = "dimmed cyan";
         aliases = {
           trfmbp = "mbp";
           trfnix = "nix";
