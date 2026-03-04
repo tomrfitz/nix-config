@@ -11,12 +11,11 @@
     # 1password installed via programs._1password-gui in system config
     emacs
     foot # lightweight Wayland terminal
-    wofi # app launcher
+    fuzzel # app launcher
     xwayland-satellite
-    swaylock
+    swaylock-effects # lock screen (drop-in swaylock with blur/clock)
     wl-clipboard
-    grim
-    slurp
+    swaybg # wallpaper
     brightnessctl
     playerctl
     libnotify
@@ -57,39 +56,95 @@
     # Dynamic workspaces are created/destroyed as needed.
 
     binds = {
-      # Launch
+      # ── Launch ──────────────────────────────────────────────────────
       "Super+Return".action.spawn = "ghostty";
-      "Super+Space".action.spawn = [
-        "wofi"
-        "--show"
-        "drun"
-      ];
+      "Super+Space".action.spawn = "fuzzel";
       "Super+Q".action.close-window = { };
       "Super+F".action.fullscreen-window = { };
 
-      # Focus (vim-style)
+      # ── Focus (vim-style) ───────────────────────────────────────────
       "Super+H".action.focus-column-left = { };
       "Super+J".action.focus-window-down = { };
       "Super+K".action.focus-window-up = { };
       "Super+L".action.focus-column-right = { };
 
-      # Move
+      # ── Move ────────────────────────────────────────────────────────
       "Super+Shift+H".action.move-column-left = { };
       "Super+Shift+J".action.move-window-down = { };
       "Super+Shift+K".action.move-window-up = { };
       "Super+Shift+L".action.move-column-right = { };
 
-      # Resize
+      # ── Column management ───────────────────────────────────────────
+      "Super+Comma".action.consume-window-into-column = { };
+      "Super+Period".action.expel-window-from-column = { };
+      "Super+R".action.switch-preset-column-width = { };
+      "Super+W".action.maximize-column = { };
+      "Super+Shift+F".action.toggle-window-floating = { };
+
+      # ── Resize ──────────────────────────────────────────────────────
       "Super+Minus".action.set-column-width = "-10%";
       "Super+Equal".action.set-column-width = "+10%";
+      "Super+Shift+Minus".action.set-window-height = "-10%";
+      "Super+Shift+Equal".action.set-window-height = "+10%";
+      "Super+Shift+R".action.reset-window-height = { };
 
-      # Workspace nav
+      # ── Workspace nav ───────────────────────────────────────────────
       "Super+Tab".action.focus-workspace-previous = { };
+      "Super+U".action.focus-workspace-up = { };
+      "Super+I".action.focus-workspace-down = { };
+      "Super+Shift+U".action.move-window-to-workspace-up = { };
+      "Super+Shift+I".action.move-window-to-workspace-down = { };
 
-      # Lock
-      "Super+Alt+L".action.spawn = "swaylock";
+      # Workspace by index
+      "Super+1".action.focus-workspace = 1;
+      "Super+2".action.focus-workspace = 2;
+      "Super+3".action.focus-workspace = 3;
+      "Super+4".action.focus-workspace = 4;
+      "Super+5".action.focus-workspace = 5;
+      "Super+6".action.focus-workspace = 6;
+      "Super+7".action.focus-workspace = 7;
+      "Super+8".action.focus-workspace = 8;
+      "Super+9".action.focus-workspace = 9;
+      "Super+Shift+1".action.move-window-to-workspace = 1;
+      "Super+Shift+2".action.move-window-to-workspace = 2;
+      "Super+Shift+3".action.move-window-to-workspace = 3;
+      "Super+Shift+4".action.move-window-to-workspace = 4;
+      "Super+Shift+5".action.move-window-to-workspace = 5;
+      "Super+Shift+6".action.move-window-to-workspace = 6;
+      "Super+Shift+7".action.move-window-to-workspace = 7;
+      "Super+Shift+8".action.move-window-to-workspace = 8;
+      "Super+Shift+9".action.move-window-to-workspace = 9;
 
-      # Media keys (allow-when-locked)
+      # ── Column position ─────────────────────────────────────────────
+      "Super+Home".action.focus-column-first = { };
+      "Super+End".action.focus-column-last = { };
+      "Super+Shift+Home".action.move-column-to-first = { };
+      "Super+Shift+End".action.move-column-to-last = { };
+
+      # ── System ──────────────────────────────────────────────────────
+      "Super+Shift+E".action.quit = {
+        skip-confirmation = true;
+      };
+      "Super+Shift+P".action.power-off-monitors = { };
+      "Super+O".action.toggle-overview = { };
+
+      # ── Lock ────────────────────────────────────────────────────────
+      "Super+Alt+L".action.spawn = [
+        "swaylock"
+        "--screenshots"
+        "--clock"
+        "--effect-blur"
+        "7x5"
+        "--fade-in"
+        "0.2"
+      ];
+
+      # ── Screenshots (niri built-in) ─────────────────────────────────
+      "Super+Shift+S".action.screenshot = { };
+      "Print".action.screenshot-screen = { };
+      "Super+Print".action.screenshot-window = { };
+
+      # ── Media keys (allow-when-locked) ──────────────────────────────
       "XF86AudioRaiseVolume" = {
         allow-when-locked = true;
         action.spawn = [
@@ -144,17 +199,119 @@
         allow-when-locked = true;
         action.spawn-sh = "playerctl previous";
       };
-
-      # Screenshot (region → clipboard)
-      "Super+Shift+S".action.spawn-sh = ''grim -g "$(slurp)" - | wl-copy'';
     };
 
     spawn-at-startup = [
       { argv = [ "xwayland-satellite" ]; }
+      {
+        argv = [
+          "swaybg"
+          "-i"
+          "${../../../config/wallpaper.jpg}"
+          "-m"
+          "fill"
+        ];
+      }
     ];
   };
 
   # Polkit agent provided by nixosModules.niri (KDE polkit)
+
+  # ── Waybar ──────────────────────────────────────────────────────────
+  programs.waybar = {
+    enable = true;
+    settings.mainBar = {
+      layer = "top";
+      position = "top";
+      height = 30;
+      spacing = 8;
+      modules-left = [ "niri/workspaces" ];
+      modules-center = [ "clock" ];
+      modules-right = [
+        "cpu"
+        "memory"
+        "pulseaudio"
+        "network"
+        "battery"
+        "tray"
+      ];
+      battery = {
+        format-charging = "BAT ↑{capacity}% {power:.1f}W";
+        format-discharging = "BAT ↓{capacity}% {power:.1f}W";
+        format-full = "BAT full";
+        format-plugged = "BAT AC";
+        tooltip-format = "{timeTo}\n{power:.2f}W";
+        interval = 5;
+        states = {
+          warning = 30;
+          critical = 15;
+        };
+      };
+      clock = {
+        format = "{:%a %b %d  %H:%M}";
+        tooltip-format = "{:%Y-%m-%d %H:%M:%S}";
+      };
+      cpu.format = "CPU {usage}%";
+      memory.format = "RAM {}%";
+      network = {
+        format-wifi = "WIFI {essid} ({signalStrength}%)";
+        format-ethernet = "ETH {ipaddr}/{cidr}";
+        format-disconnected = "NET down";
+        tooltip-format = "{ifname} via {gwaddr}";
+      };
+      pulseaudio = {
+        format = "VOL {volume}%";
+        format-muted = "VOL mute";
+        on-click = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+      };
+      tray.spacing = 10;
+    };
+    # Stylix handles base theming (colors, fonts); custom overrides below
+    style = ''
+      @define-color tx-muted #878580;
+      @define-color bg-2 #1c1b1a;
+      @define-color ui #282726;
+      @define-color cyan #3aa99f;
+      @define-color yellow #d0a215;
+      @define-color red #d14d41;
+
+      window#waybar {
+        background: alpha(@base00, 0.92);
+        border-bottom: 1px solid alpha(@ui, 0.95);
+      }
+
+      #workspaces,
+      #clock,
+      #cpu,
+      #memory,
+      #pulseaudio,
+      #network,
+      #battery,
+      #tray {
+        padding: 0 8px;
+        background: alpha(@bg-2, 0.85);
+        border-radius: 8px;
+        margin: 4px 0;
+      }
+
+      #battery.warning { color: @yellow; }
+      #battery.critical { color: @red; }
+      #network { color: @cyan; }
+      #tray { color: @tx-muted; }
+
+      .modules-left #workspaces button {
+        border-bottom: 3px solid transparent;
+      }
+      .modules-left #workspaces button.active {
+        border-bottom: 3px solid @base05;
+      }
+      .modules-left #workspaces button.urgent {
+        border-bottom: 3px solid @base08;
+        background-color: @base08;
+        color: @base00;
+      }
+    '';
+  };
 
   # Notification daemon
   services.mako = {
