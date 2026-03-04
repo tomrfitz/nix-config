@@ -15,7 +15,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     owner = "arian-shamaei";
     repo = "sgram-tui";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-VA7fIB5aeFZ3Mf08J+PzMaQvJ7f7g5yjQkAuY9He6jw=";
+    hash = "sha256-zcPUtYtGz0nKD+jWXCLj7qZi7x4P+kk+2C//Pyn8wuo=";
   };
 
   cargoHash = lib.fakeHash;
