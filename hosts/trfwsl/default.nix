@@ -86,6 +86,7 @@
         "immich"
 
         # OCI containers — image pulls fail through VPN
+        "podman"
         "podman-spliit"
         "podman-bookshelf"
       ];
