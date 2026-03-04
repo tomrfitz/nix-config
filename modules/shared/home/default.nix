@@ -159,8 +159,8 @@ in
   };
 
   # ── Agent instructions (each tool looks for instructions at a different path) ──
-  home.file.".config/AGENTS.md".source = ../../../config/agents.md; # generic / Gemini
-  home.file.".config/opencode/AGENTS.md".source = ../../../config/agents.md; # OpenCode
+  xdg.configFile."AGENTS.md".source = ../../../config/agents.md; # generic / Gemini
+  xdg.configFile."opencode/AGENTS.md".source = ../../../config/agents.md; # OpenCode
   home.file.".claude/CLAUDE.md".source = ../../../config/agents.md; # Claude Code
   home.file.".claude/settings.json".source = ../../../config/claude-settings.json;
 
