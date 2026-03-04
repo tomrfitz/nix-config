@@ -18,7 +18,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     hash = "sha256-zcPUtYtGz0nKD+jWXCLj7qZi7x4P+kk+2C//Pyn8wuo=";
   };
 
-  cargoHash = lib.fakeHash;
+  cargoHash = "sha256-G242PbnRjR6dlDovsLdF7mR/VghFcjOKElGEfNYoXJY=";
 
   nativeBuildInputs = lib.optionals stdenv.isLinux [ pkg-config ];
   buildInputs = lib.optionals stdenv.isLinux [ alsa-lib ];
