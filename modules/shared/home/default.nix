@@ -40,9 +40,9 @@ in
     OLLAMA_GPU_LAYERS = "-1";
     OLLAMA_KEEP_ALIVE = "5m";
   }
-  // {
-    # 1Password SSH agent everywhere. On macOS/NixOS, 1Password provides a native
-    # Unix socket. On WSL, a socat+npiperelay bridge exposes the Windows agent.
+  // lib.optionalAttrs (isDarwin || isWSL) {
+    # 1Password SSH agent. On macOS it's the native app socket; on WSL the
+    # socat+npiperelay bridge. Set unconditionally — these are always local.
     SSH_AUTH_SOCK = onePasswordSshAgentSock;
   };
 
@@ -126,6 +126,11 @@ in
       "*" = {
         extraOptions = {
           AddKeysToAgent = "yes";
+        }
+        // lib.optionalAttrs (isDarwin || isWSL) {
+          # On macOS/WSL, always use the 1Password agent directly. On plain NixOS,
+          # omit this so SSH falls back to SSH_AUTH_SOCK — which preserves forwarded
+          # agents from SSH sessions while defaulting to 1Password locally (via zsh envExtra).
           IdentityAgent = onePasswordIdentityAgent;
         };
       };

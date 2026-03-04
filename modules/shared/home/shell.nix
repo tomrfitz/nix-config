@@ -26,7 +26,13 @@
       zln = "zmv -L";
     };
 
-    envExtra = "";
+    envExtra = lib.optionalString (!pkgs.stdenv.isDarwin && !isWSL) ''
+      # On NixOS, default to the local 1Password agent but preserve a forwarded
+      # agent from SSH (e.g., when SSHing in from trfmbp).
+      if [[ -z "$SSH_AUTH_SOCK" ]]; then
+        export SSH_AUTH_SOCK="${config.home.homeDirectory}/.1password/agent.sock"
+      fi
+    '';
 
     completionInit = ''
       autoload -Uz compinit
