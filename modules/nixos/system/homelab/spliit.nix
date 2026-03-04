@@ -37,7 +37,7 @@ in
     };
 
     virtualisation.oci-containers.containers.spliit = {
-      image = "ghcr.io/spliit-app/spliit:v1.19.1";
+      image = "ghcr.io/spliit-app/spliit:latest";
       environment = {
         POSTGRES_PRISMA_URL = "postgresql://${dbName}@127.0.0.1/${dbName}";
         POSTGRES_URL_NON_POOLING = "postgresql://${dbName}@127.0.0.1/${dbName}";
