@@ -1,16 +1,15 @@
 # nix-config task runner
 
-flake := "~/nix-config"
 host := `hostname`
 nh_cmd := if host == "trfmbp" { "darwin" } else { "os" }
 
 # Apply the current configuration
 rebuild:
-    nh {{ nh_cmd }} switch {{ flake }}
+    nh {{ nh_cmd }} switch
 
 # Build the system closure without activating
 check:
-    nh {{ nh_cmd }} build {{ flake }}
+    nh {{ nh_cmd }} build
 
 # Rollback to the previous generation
 [linux]
@@ -23,7 +22,7 @@ rollback:
 
 # Update flake inputs and rebuild
 update:
-    nh {{ nh_cmd }} switch --update {{ flake }}
+    nh {{ nh_cmd }} switch --update
 
 # Format all files (nix, toml, shell, json, md, yaml, justfile)
 fmt:
