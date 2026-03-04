@@ -24,11 +24,6 @@
       # zmv helpers
       zcp = "zmv -C";
       zln = "zmv -L";
-    }
-    // lib.optionalAttrs isWSL {
-      # On WSL, ssh-add must route through Windows OpenSSH to reach 1Password's agent.
-      # Interactive ssh stays as Linux's — Git uses core.sshCommand for its own SSH.
-      ssh-add = "/mnt/c/Windows/System32/OpenSSH/ssh-add.exe";
     };
 
     envExtra = "";
@@ -208,7 +203,7 @@
       scan_timeout = 30;
       add_newline = true;
       continuation_prompt = "[.. ](dimmed white)";
-      format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$status$username$hostname$env_var$jobs$sudo$character";
+      format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$status\${env_var.SSH_CONNECTION}$username$hostname\${env_var.VIMSHELL}$jobs$sudo$character";
       right_format = "$directory$git_branch$git_status$python$nodejs$rust$battery$time";
 
       fill.symbol = " ";
@@ -229,24 +224,32 @@
         style = "bold red";
       };
 
+      env_var.SSH_CONNECTION = {
+        format = "[ssh ](bold cyan)";
+        style = "bold cyan";
+      };
+
       env_var.VIMSHELL = {
         format = "[$env_value]($style)";
         style = "cyan";
       };
 
       sudo = {
-        format = "[$symbol]($style) ";
+        format = "[$symbol]($style)";
         style = "bold purple";
         symbol = "#";
         disabled = false;
       };
 
       username = {
-        style_user = "yellow bold";
+        style_user = "dimmed cyan";
         style_root = "red bold";
         format = "[$user@]($style)";
         disabled = false;
-        show_always = false;
+        show_always = true;
+        aliases = {
+          tomrfitz = "trf";
+        };
       };
 
       directory = {
@@ -268,10 +271,10 @@
       };
 
       hostname = {
-        ssh_only = true;
+        ssh_only = false;
         trim_at = ".";
         format = "[$hostname]($style) ";
-        style = "bold green";
+        style = "dimmed cyan";
         aliases = {
           trfmbp = "mbp";
           trfnix = "nix";
@@ -301,12 +304,16 @@
             style = "bold red";
           }
           {
-            threshold = 60;
+            threshold = 40;
             style = "dimmed orange";
           }
           {
-            threshold = 70;
+            threshold = 75;
             style = "dimmed yellow";
+          }
+          {
+            threshold = 100;
+            style = "dimmed green";
           }
         ];
       };

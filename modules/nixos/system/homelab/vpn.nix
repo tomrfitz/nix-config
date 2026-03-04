@@ -1,219 +1,122 @@
-# Mullvad VPN network namespace for homelab services.
+# Mullvad VPN for homelab services.
 #
-# Creates an isolated network namespace with a WireGuard tunnel to Mullvad.
-# Services listed in `trf.homelab.vpn.services` are bound into this namespace —
-# their internet traffic routes through Mullvad, and if the tunnel drops they
-# lose connectivity entirely (kill-switch by design).
+# Routes all traffic through Mullvad by default. Services listed in
+# excludedServices bypass the VPN via PID-based split tunneling.
+# All inter-service communication uses localhost regardless of VPN status.
 #
-# A veth pair bridges the namespace to the host so VPN'd services remain
-# reachable from the LAN, Tailscale, and other local services (e.g., Sonarr
-# reaching Prowlarr). Services outside the namespace should use the veth IP
-# (default 10.200.1.2) instead of localhost to reach VPN'd services.
+# Tailscale coexistence: A separate nftables table (mullvad-ts) marks
+# Tailscale CGNAT traffic (100.64.0.0/10) with Mullvad's split-tunnel
+# fwmarks so it bypasses the VPN firewall. This survives Mullvad reconnects
+# because Mullvad only manages its own `inet mullvad` table.
+# Ref: https://mullvad.net/en/help/split-tunneling-with-linux-advanced
+# Ref: https://theorangeone.net/posts/tailscale-mullvad/
 {
   config,
   lib,
-  pkgs,
+  isWSL,
   ...
 }:
 let
   cfg = config.trf.homelab;
   vpn = cfg.vpn;
-  ns = vpn.namespace;
 in
 {
   options.trf.homelab.vpn = {
-    enable = lib.mkEnableOption "Mullvad VPN namespace for homelab services";
+    enable = lib.mkEnableOption "Mullvad VPN for homelab";
 
-    namespace = lib.mkOption {
-      type = lib.types.str;
-      default = "mullvad";
-      description = "Name of the network namespace.";
-    };
-
-    # ── WireGuard / Mullvad config ──────────────────────────────────────
-
-    privateKeyOpRef = lib.mkOption {
-      type = lib.types.str;
-      description = "1Password op:// reference for the WireGuard private key.";
-      example = "op://Vault/mullvad-wg/private-key";
-    };
-
-    address = lib.mkOption {
-      type = lib.types.str;
-      description = "WireGuard interface address assigned by Mullvad (e.g., 10.68.x.x/32).";
-    };
-
-    dns = lib.mkOption {
-      type = lib.types.listOf lib.types.str;
-      default = [ "10.64.0.1" ];
-      description = "DNS servers for the VPN namespace (Mullvad default: 10.64.0.1).";
-    };
-
-    peer = {
-      publicKey = lib.mkOption {
-        type = lib.types.str;
-        description = "Mullvad server's WireGuard public key.";
-      };
-
-      endpoint = lib.mkOption {
-        type = lib.types.str;
-        description = "Mullvad server endpoint (host:port).";
-        example = "198.54.128.82:51820";
-      };
-    };
-
-    # ── Internal networking ─────────────────────────────────────────────
-
-    vethHostAddr = lib.mkOption {
-      type = lib.types.str;
-      default = "10.200.1.1";
-      description = "Host-side veth address.";
-    };
-
-    vethNsAddr = lib.mkOption {
-      type = lib.types.str;
-      default = "10.200.1.2";
-      description = "Namespace-side veth address. Use this to reach VPN'd services from the host.";
-    };
-
-    # ── Service binding ─────────────────────────────────────────────────
-
-    services = lib.mkOption {
+    excludedServices = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
-      description = ''
-        systemd service names to bind into the VPN namespace.
-        Typical candidates: prowlarr, sabnzbd, qbittorrent, openbooks.
-      '';
-      example = [
-        "prowlarr"
-        "sabnzbd"
-        "qbittorrent"
-        "openbooks"
-      ];
+      description = "systemd service names whose internet traffic bypasses the VPN via split tunneling.";
     };
   };
 
   config = lib.mkIf (cfg.enable && vpn.enable) {
+    sops.secrets."mullvad/account" = {
+      restartUnits = [ "mullvad-daemon.service" ];
+    };
 
-    # ── Namespace setup service ─────────────────────────────────────────
+    services.mullvad-vpn = {
+      enable = true;
+      enableExcludeWrapper = true;
+    };
 
-    systemd.services."netns-${ns}" = {
-      description = "Mullvad VPN network namespace (${ns})";
-      after = [ "network-online.target" ];
-      wants = [ "network-online.target" ];
-      wantedBy = [ "multi-user.target" ];
+    services.resolved.enable = true;
 
-      serviceConfig = {
-        Type = "oneshot";
-        RemainAfterExit = true;
-        LoadCredential = "op-sa-token:/etc/op/service-account-token";
+    # ── Tailscale coexistence via nftables ──────────────────────────────
+    # Mullvad's lockdown firewall (inet mullvad) drops all non-tunnel traffic.
+    # `mullvad lan set allow` does NOT cover Tailscale's 100.64.0.0/10 CGNAT
+    # range (ref: https://github.com/mullvad/mullvadvpn-app/issues/6086).
+    #
+    # Fix: mark Tailscale traffic with Mullvad's split-tunnel conntrack mark
+    # (0x00000f41) and fwmark (0x6d6f6c65). Mullvad's firewall recognises
+    # these marks and allows the traffic through.
+    #
+    # Priority: outgoing uses filter hook at -1 (just before Mullvad's
+    # priority 0 output filter). A route hook doesn't work — ct mark set
+    # there isn't visible to Mullvad's filter at the same priority.
+    # Mullvad's prerouting is at -199; our incoming -100 runs after it.
+    # WSL's kernel lacks nft_fib — disable the NixOS firewall whose nftables
+    # rules depend on it. WSL is behind Windows' firewall anyway.
+    networking.firewall.enable = lib.mkIf isWSL false;
 
-        ExecStart =
-          let
-            up = pkgs.writeShellScript "netns-${ns}-up" ''
-              set -euo pipefail
-              export PATH="${
-                lib.makeBinPath [
-                  pkgs.iproute2
-                  pkgs.wireguard-tools
-                  pkgs._1password-cli
-                ]
-              }:$PATH"
+    networking.nftables = {
+      enable = true;
+      tables.mullvad-ts = {
+        family = "inet";
+        content = ''
+          chain outgoing {
+            type filter hook output priority -1; policy accept;
+            # tailscaled marks its own traffic (control plane, DERP relays)
+            meta mark 0x80000 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+            # New outbound connections to Tailscale CGNAT (e.g. SSH to peers)
+            ip daddr 100.64.0.0/10 ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+            # Reply packets for established Tailscale connections
+            ct mark 0x00000f41 meta mark set 0x6d6f6c65
+          }
 
-              NS="${ns}"
-              WG_IF="wg-$NS"
-              VETH_HOST="veth-''${NS}0"
-              VETH_NS="veth-''${NS}1"
-
-              # ── Create namespace ────────────────────────────────────
-              ip netns add "$NS"
-              ip netns exec "$NS" ip link set lo up
-
-              # ── DNS for the namespace ───────────────────────────────
-              mkdir -p /etc/netns/"$NS"
-              printf '%s\n' ${lib.concatMapStringsSep " " (d: "'nameserver ${d}'") vpn.dns} \
-                > /etc/netns/"$NS"/resolv.conf
-
-              # ── veth pair (host ↔ namespace) ────────────────────────
-              ip link add "$VETH_HOST" type veth peer name "$VETH_NS"
-              ip link set "$VETH_NS" netns "$NS"
-
-              ip addr add ${vpn.vethHostAddr}/30 dev "$VETH_HOST"
-              ip link set "$VETH_HOST" up
-
-              ip netns exec "$NS" ip addr add ${vpn.vethNsAddr}/30 dev "$VETH_NS"
-              ip netns exec "$NS" ip link set "$VETH_NS" up
-
-              # ── WireGuard interface ─────────────────────────────────
-              ip link add "$WG_IF" type wireguard
-              ip link set "$WG_IF" netns "$NS"
-
-              # Resolve private key from 1Password
-              WG_KEY="$(OP_SERVICE_ACCOUNT_TOKEN="$(cat "$CREDENTIALS_DIRECTORY/op-sa-token")" \
-                op read "${vpn.privateKeyOpRef}")"
-
-              ip netns exec "$NS" wg set "$WG_IF" \
-                private-key <(printf '%s' "$WG_KEY") \
-                peer "${vpn.peer.publicKey}" \
-                endpoint "${vpn.peer.endpoint}" \
-                allowed-ips "0.0.0.0/0,::0/0"
-
-              ip netns exec "$NS" ip addr add ${vpn.address} dev "$WG_IF"
-              ip netns exec "$NS" ip link set "$WG_IF" up
-
-              # ── Routing inside namespace ────────────────────────────
-              # Default route through WireGuard
-              ip netns exec "$NS" ip route add default dev "$WG_IF"
-
-              # Private subnets route through veth (reach host services, Tailscale, LAN)
-              for cidr in 10.0.0.0/8 172.16.0.0/12 192.168.0.0/16 100.64.0.0/10; do
-                ip netns exec "$NS" ip route add "$cidr" via ${vpn.vethHostAddr} dev "$VETH_NS"
-              done
-            '';
-          in
-          "${up}";
-
-        ExecStop =
-          let
-            down = pkgs.writeShellScript "netns-${ns}-down" ''
-              set -euo pipefail
-              export PATH="${lib.makeBinPath [ pkgs.iproute2 ]}:$PATH"
-
-              # Deleting the namespace removes all interfaces inside it
-              ip netns del "${ns}" || true
-              rm -rf /etc/netns/"${ns}"
-            '';
-          in
-          "${down}";
+          chain incoming {
+            type filter hook prerouting priority -100; policy accept;
+            iifname "tailscale0" ct mark set 0x00000f41 meta mark set 0x6d6f6c65
+          }
+        '';
       };
     };
 
-    # ── Bind services into the namespace ────────────────────────────────
+    systemd.services =
+      let
+        mullvad = "${config.services.mullvad-vpn.package}/bin/mullvad";
+      in
+      {
+        mullvad-daemon.postStart = ''
+          # Wait for daemon readiness
+          while ! ${mullvad} status &>/dev/null; do sleep 1; done
 
-    systemd.services = lib.mkMerge (
-      map (svc: {
-        ${svc} = {
-          after = [ "netns-${ns}.service" ];
-          requires = [ "netns-${ns}.service" ];
-          serviceConfig = {
-            NetworkNamespacePath = "/var/run/netns/${ns}";
+          # Login if not already authenticated
+          if ! ${mullvad} account get &>/dev/null; then
+            ACCOUNT="$(cat ${config.sops.secrets."mullvad/account".path})"
+            ${mullvad} account login "$ACCOUNT"
+          fi
+
+          ${mullvad} auto-connect set on
+          ${mullvad} lockdown-mode set on
+          # Mullvad's own DNS (100.64.0.7) is unreachable despite the tunnel
+          # working — cause unknown. Route DNS through tunnel to Cloudflare instead.
+          ${mullvad} dns set custom 1.1.1.1 1.0.0.1
+        '';
+      }
+      # Register excluded services' PIDs with Mullvad split tunnel after they start
+      // lib.listToAttrs (
+        map (svc: {
+          name = svc;
+          value = {
+            after = [ "mullvad-daemon.service" ];
+            wants = [ "mullvad-daemon.service" ];
+            serviceConfig.ExecStartPost = [
+              "+${mullvad} split-tunnel add $MAINPID"
+            ];
           };
-        };
-      }) vpn.services
-    );
-
-    # ── Host networking for namespace connectivity ──────────────────────
-
-    # Forward traffic between veth and the host network
-    boot.kernel.sysctl."net.ipv4.ip_forward" = lib.mkDefault true;
-
-    networking.nat = {
-      enable = true;
-      internalInterfaces = [ "veth-${ns}0" ];
-    };
-
-    # Trust the veth interface (services need to be reachable from host)
-    networking.firewall.trustedInterfaces = [ "veth-${ns}0" ];
+        }) vpn.excludedServices
+      );
   };
 }

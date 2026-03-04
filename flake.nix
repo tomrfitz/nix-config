@@ -36,6 +36,10 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+    sops-nix = {
+      url = "github:Mic92/sops-nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -50,6 +54,7 @@
       nixos-wsl,
       niri-flake,
       zen-browser,
+      sops-nix,
     }:
     let
       lib = nixpkgs.lib;
@@ -139,6 +144,7 @@
             })
             (if isDarwin then stylix.darwinModules.stylix else stylix.nixosModules.stylix)
           ]
+          ++ lib.optionals (!isDarwin) [ sops-nix.nixosModules.sops ]
           ++ extraModules;
         };
 
@@ -214,6 +220,7 @@
               pkgs.dix
               pkgs.nh
               pkgs.just
+              pkgs.sops
             ]
             ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
               defaults2nix.packages.${system}.default

@@ -8,6 +8,15 @@ let
 in
 {
   config = lib.mkIf (cfg.enable && config.services.recyclarr.enable) {
+    sops.secrets."recyclarr/sonarr-api-key" = {
+      owner = "recyclarr";
+      restartUnits = [ "recyclarr.service" ];
+    };
+    sops.secrets."recyclarr/radarr-api-key" = {
+      owner = "recyclarr";
+      restartUnits = [ "recyclarr.service" ];
+    };
+
     services.recyclarr = {
       schedule = "daily";
 
@@ -16,7 +25,7 @@ in
       configuration = {
         sonarr.tv = {
           base_url = "http://127.0.0.1:8989";
-          api_key._secret = "/etc/secrets/recyclarr/sonarr-api-key";
+          api_key._secret = config.sops.secrets."recyclarr/sonarr-api-key".path;
           include = [
             # Quality definition
             { template = "sonarr-quality-definition-series"; }
@@ -31,7 +40,7 @@ in
 
         radarr.movies = {
           base_url = "http://127.0.0.1:7878";
-          api_key._secret = "/etc/secrets/recyclarr/radarr-api-key";
+          api_key._secret = config.sops.secrets."recyclarr/radarr-api-key".path;
           include = [
             # Quality definition
             { template = "radarr-quality-definition-movie"; }

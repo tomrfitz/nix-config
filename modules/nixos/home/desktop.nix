@@ -319,6 +319,120 @@
     settings.default-timeout = 5000;
   };
 
+  # Basic status bar for Niri; easy to style/expand later.
+  programs.waybar = {
+    enable = true;
+    systemd.enable = true;
+    settings = {
+      mainBar = {
+        layer = "top";
+        position = "top";
+        height = 30;
+        spacing = 8;
+
+        modules-left = [
+          "clock"
+        ];
+        modules-center = [
+          "cpu"
+          "memory"
+        ];
+        modules-right = [
+          "pulseaudio"
+          "network"
+          "battery"
+          "tray"
+        ];
+
+        clock = {
+          format = "{:%a %b %d  %H:%M}";
+          tooltip-format = "{:%Y-%m-%d %H:%M:%S}";
+        };
+
+        cpu.format = "CPU {usage}%";
+        memory.format = "RAM {}%";
+
+        pulseaudio = {
+          format = "VOL {volume}%";
+          format-muted = "VOL mute";
+          on-click = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+        };
+
+        network = {
+          format-wifi = "WIFI {essid} ({signalStrength}%)";
+          format-ethernet = "ETH {ipaddr}/{cidr}";
+          format-disconnected = "NET down";
+          tooltip-format = "{ifname} via {gwaddr}";
+        };
+
+        battery = {
+          states = {
+            warning = 30;
+            critical = 15;
+          };
+          format = "BAT {capacity}%";
+          format-charging = "BAT {capacity}%+";
+          format-plugged = "BAT AC";
+          format-full = "BAT full";
+          tooltip-format = "{timeTo}";
+        };
+
+        tray.spacing = 10;
+      };
+    };
+    style = ''
+      * {
+        font-family: "Atkinson Hyperlegible", "Symbols Nerd Font";
+        font-size: 12px;
+      }
+
+      @define-color tx #cecdc3;
+      @define-color tx-muted #878580;
+      @define-color bg #100f0f;
+      @define-color bg-2 #1c1b1a;
+      @define-color ui #282726;
+      @define-color cyan #3aa99f;
+      @define-color yellow #d0a215;
+      @define-color red #d14d41;
+
+      window#waybar {
+        background: alpha(@bg, 0.92);
+        color: @tx;
+        border-bottom: 1px solid alpha(@ui, 0.95);
+      }
+
+      #workspaces,
+      #clock,
+      #cpu,
+      #memory,
+      #pulseaudio,
+      #network,
+      #battery,
+      #tray {
+        padding: 0 8px;
+        background: alpha(@bg-2, 0.85);
+        border-radius: 8px;
+        margin: 4px 0;
+      }
+
+      #battery.warning {
+        color: @yellow;
+      }
+
+      #battery.critical {
+        color: @red;
+      }
+
+      #network {
+        color: @cyan;
+      }
+
+      #tray {
+        color: @tx-muted;
+      }
+    '';
+  };
+
   # Blue light filter (screen temperature) for Wayland
   # Uses geoclue2 for automatic location detection (like macOS Night Shift)
   services.gammastep = {
