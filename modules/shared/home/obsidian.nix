@@ -6,56 +6,41 @@
 }:
 let
   isDarwin = pkgs.stdenv.isDarwin;
+  vaultRepo = "git@github.com:tomrfitz/Obsidian.git";
   vaultPath =
     if isDarwin then
       "${config.home.homeDirectory}/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian"
     else
       "${config.home.homeDirectory}/notes/vault";
-  gitDir = "${config.home.homeDirectory}/notes/obsidian-git/.git";
+  # Git object database lives outside cloud storage (XDG_DATA_HOME)
+  gitDir = if isDarwin then "${config.xdg.dataHome}/obsidian-git" else null; # linux uses normal in-tree .git
 in
 {
-  # ── Session environment ────────────────────────────────────────────────
   home.sessionVariables = {
     OBSD = "${vaultPath}/";
   };
 
-  # ── Obsidian CLI ─────────────────────────────────────────────────────
   # On macOS the CLI lives inside the .app bundle; on Linux nixpkgs already puts it on PATH.
   home.sessionPath = lib.mkIf isDarwin [
     "${config.home.homeDirectory}/Applications/Home Manager Apps/Obsidian.app/Contents/MacOS"
   ];
 
-  # ── Vault activation ──────────────────────────────────────────────────
   home.activation.obsidian-vault = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    GIT_DIR="${gitDir}"
-    VAULT_PATH="${vaultPath}"
+    VAULT="${vaultPath}"
 
-
-    mkdir -p "$(dirname "$GIT_DIR")"
-    mkdir -p "$VAULT_PATH"
-
-    if [ ! -d "$GIT_DIR" ]; then
+    if [ ! -d "$VAULT" ]; then
       export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh"
-      if ! ${pkgs.git}/bin/git clone --separate-git-dir="$GIT_DIR" \
-        git@github.com:tomrfitz/Obsidian.git "$VAULT_PATH" 2>&1; then
+      if ! ${pkgs.git}/bin/git clone \
+        ${lib.optionalString (gitDir != null) "--separate-git-dir=\"${gitDir}\""} \
+        "${vaultRepo}" "$VAULT" 2>&1; then
         verboseEcho "obsidian-vault: clone failed (no network/key?), skipping"
       fi
-    fi
-
-    if [ -d "$GIT_DIR" ]; then
-      # Ensure .git file in vault points to the separate git dir
-      if [ ! -e "$VAULT_PATH/.git" ] || [ "$(cat "$VAULT_PATH/.git" 2>/dev/null)" != "gitdir: $GIT_DIR" ]; then
-        echo "gitdir: $GIT_DIR" > "$VAULT_PATH/.git"
-      fi
-
-      # Ensure worktree is configured
-      ${pkgs.git}/bin/git --git-dir="$GIT_DIR" config core.worktree "$VAULT_PATH"
-
-      # Symlink shared markdownlint config into vault root
-      MDLINT_SRC="${config.home.homeDirectory}/.markdownlint-cli2.jsonc"
-      MDLINT_DST="$VAULT_PATH/.markdownlint-cli2.jsonc"
-      if [ -f "$MDLINT_SRC" ]; then
-        ln -sf "$MDLINT_SRC" "$MDLINT_DST"
+    elif [ ${lib.boolToString (gitDir != null)} = "true" ]; then
+      # Vault exists — verify git dir linkage
+      if [ ! -d "${gitDir}" ]; then
+        verboseEcho "obsidian-vault: warning: vault exists but git dir missing at ${gitDir}"
+      elif [ ! -e "$VAULT/.git" ]; then
+        verboseEcho "obsidian-vault: warning: vault exists but .git pointer missing"
       fi
     fi
   '';
