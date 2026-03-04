@@ -9,7 +9,9 @@
     with pkgs;
     [
       (callPackage ../../../pkgs/mdbase-tasknotes { })
+      (callPackage ../../../pkgs/sgram-tui { })
 
+      rana
       yazi
       tailscale
       python3Packages.markitdown
