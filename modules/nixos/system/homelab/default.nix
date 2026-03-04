@@ -29,6 +29,7 @@ in
     ./recyclarr.nix
     ./openbooks.nix
     ./minecraft.nix
+    ./spliit.nix
   ];
 
   options.trf.homelab = {
