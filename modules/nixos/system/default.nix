@@ -13,15 +13,17 @@
   ++ lib.optionals (!isWSL) [ ./hardening.nix ]
   ++ lib.optionals isWSL [
     ./wsl-gpu.nix
-    # Stop WSL from overwriting /etc/resolv.conf — Tailscale manages it for MagicDNS.
-    # Declare nameservers (satisfies nixos-wsl's check) but disable resolvconf so
-    # NixOS doesn't fight Tailscale for ownership of the file.
+    # Stop WSL from overwriting /etc/resolv.conf — resolved manages it instead.
+    # Tailscale and Mullvad both integrate with resolved natively for split-DNS.
     {
       wsl.wslConf.network.generateResolvConf = false;
-      networking.resolvconf.enable = false;
+      services.resolved.enable = true;
+      # MagicDNS (100.100.100.100) resolves *.ts.net via tailscale0's per-link
+      # DNS. Global nameservers provide general resolution — Mullvad overrides
+      # these when connected, and they serve as fallback when disconnected.
       networking.nameservers = [
-        "100.100.100.100" # Tailscale MagicDNS
         "1.1.1.1"
+        "1.0.0.1"
       ];
     }
   ];
