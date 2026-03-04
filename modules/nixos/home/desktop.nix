@@ -203,7 +203,12 @@
 
     spawn-at-startup = [
       { argv = [ "xwayland-satellite" ]; }
-      { argv = [ "1password" "--silent" ]; }
+      {
+        argv = [
+          "1password"
+          "--silent"
+        ];
+      }
       { argv = [ "waybar" ]; }
       {
         argv = [
