@@ -22,10 +22,18 @@ The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful f
 
 ## Commands
 
-All common workflows are in the `justfile` (requires `just`, available via `nix develop`):
+### Rebuild workflow
+
+`NH_FLAKE` defaults to `github:tomrfitz/nix-config/main` — rebuilds fetch from the remote, so every build corresponds to a pushed commit. This enforces clean git discipline and triggers CI before any local build.
+
+- `nh darwin switch` — rebuild from remote (uses cached tarball; add `--refresh` to force re-fetch after a push)
+- `nh darwin switch --flake .` — local iteration escape hatch (dirty/uncommitted changes)
+- `nh darwin switch --refresh --update` — force re-fetch + flake input update (what topgrade runs)
+
+The `justfile` defers to `NH_FLAKE` (no hardcoded paths):
 
 ```bash
-just rebuild       # nh darwin switch (builds + activates with diff)
+just rebuild       # nh darwin switch
 just check         # nh darwin build (dry-run with diff)
 just update        # nh darwin switch --update (flake update + rebuild)
 just fmt           # nix fmt (nixfmt)
