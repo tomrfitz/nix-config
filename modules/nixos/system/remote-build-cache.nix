@@ -13,7 +13,7 @@ let
 
   atticCacheName = "trf-infra";
   atticPort = 8484;
-  atticSubstituter = "http://${builderHost}:${toString atticPort}/${atticCacheName}";
+  atticSubstituter = "http://${builderHost}:${toString atticPort}/${atticCacheName}?connect-timeout=5";
   atticPublicKey = "trf-infra:9T9hcVKDnDKKTirHMarQGhjvHLmRT4prxPb4RLRXctI=";
 in
 {
