@@ -24,7 +24,9 @@ in
   config = lib.mkIf (cfg.enable && bscfg.enable) {
     virtualisation.oci-containers.containers.bookshelf = {
       image = "ghcr.io/pennydreadful/bookshelf:hardcover";
-      ports = [ "${toString bscfg.port}:8787" ];
+      # WSL kernel lacks nftables modules needed by netavark for port
+      # mapping — use host network instead.
+      extraOptions = [ "--network=host" ];
       volumes = [
         "${cfg.paths.configRoot}/bookshelf:/config"
         "${cfg.paths.booksRoot}:/books"
