@@ -14,6 +14,9 @@
     # Preemptively adopt HM's upcoming default: keep zsh dotfiles in XDG.
     dotDir = "${config.xdg.configHome}/zsh";
 
+    # History is persistent state, not config — keep it in XDG_STATE_HOME.
+    history.path = "${config.xdg.stateHome}/zsh/history";
+
     shellAliases = {
       ls = "eza --group-directories-first --icons --hyperlink --time-style=long-iso";
       sa = "source \"${"ZDOTDIR:-$HOME"}/.zshrc\" && echo \"ZSH aliases sourced.\"";
@@ -36,7 +39,8 @@
 
     completionInit = ''
       autoload -Uz compinit
-      compdump="''${ZDOTDIR:-$HOME}/.zcompdump"
+      compdump="''${XDG_CACHE_HOME:-$HOME/.cache}/zsh/zcompdump"
+      mkdir -p "$(dirname "$compdump")"
 
       # Third-party completion functions must be on `fpath` before `compinit`.
       if [ -d "$HOME/.docker/completions" ]; then
