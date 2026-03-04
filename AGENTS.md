@@ -14,11 +14,11 @@ Two branches: `main` (stable) and `lean` (active development — trimming, clean
 | -------- | ---------------- | ---------------------------------------- | ------ |
 | `trfmbp` | aarch64-darwin | Daily driver (M1 Pro MacBook Pro) | Active |
 | `trfnix` | x86_64-linux | NixOS testbed (Samsung laptop) | Active |
-| `trfwsl` | x86_64-linux WSL | Interim homelab on gaming PC, later dev | Stub |
+| `trfwsl` | x86_64-linux WSL | Interim homelab on gaming PC, later dev | Active |
 | `trflab` | x86_64-linux | Dedicated homelab server | Future |
 | `trfvm` | TBD | Scratch/sandbox VM | Future |
 
-The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful for prototyping NixOS service configs. `trfwsl` is the next host to build out (see Roadmap below).
+The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful for prototyping NixOS service configs. `trfwsl` runs the homelab stack via NixOS-WSL (see Roadmap for remaining work).
 
 ## Commands
 
@@ -53,7 +53,7 @@ just snapshot NAME # take macOS defaults snapshot
 
 ### Flake structure
 
-`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Core inputs: nixpkgs (unstable), nix-darwin, home-manager, stylix, treefmt-nix, defaults2nix, zen-browser.
+`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Core inputs: nixpkgs (unstable), nix-darwin, home-manager, stylix, treefmt-nix, defaults2nix, zen-browser, nixos-wsl, sops-nix, niri-flake.
 
 ### Hosts are thin wiring
 
@@ -74,13 +74,13 @@ Keep host files concise, idiomatic, portable, and composable:
 modules/
   shared/          # Cross-platform (maximized — put everything here first)
     system/        # nix.nix, stylix.nix
-    home/          # Focused modules: packages, shell, git, editors, browser, media, tooling
+    home/          # packages, shell, git, editors, ghostty, firefox, zen, obsidian, fish, desktop, opencode, ruff, etc.
   darwin/          # macOS-only
     system/        # user.nix, homebrew.nix, settings.nix (system.defaults), security.nix
     home/          # zsh.nix, git.nix (1Password signing), topgrade.nix, aerospace.nix, sketchybar.nix
   nixos/           # Linux-only
-    system/        # user.nix, homelab/, wsl-gpu.nix, default GNOME, specialisations (sway/plasma), tailscale, 1Password GUI, howdy, openssh
-    home/          # homeDirectory, sway config, darkman, mako, gammastep
+    system/        # user.nix, desktop.nix, hardening.nix, homelab/, remote-build-cache.nix, specialisations.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh
+    home/          # desktop.nix, darkman.nix
 ```
 
 `default.nix` files are aggregators — mostly import lists.
@@ -146,7 +146,10 @@ home.packages = [ ... ] ++ lib.optionals (!pkgs.stdenv.isDarwin) [ pkgs.element-
 
 ### Secrets
 
-1Password is the source of truth for secrets (SSH agent + vault-backed credentials). Prefer committing `op://` references and resolve real secret values at runtime.
+Two mechanisms, split by trust model:
+
+- **1Password** — user-space secrets where a human is present to unlock (SSH agent, vault-backed credentials, `op://` references). Used on all platforms.
+- **sops-nix** — service-level secrets that must be available without user interaction (homelab API keys, tunnel tokens, VPN credentials). Age-encrypted in `secrets/`, decrypted to `/run/secrets/` at activation. Age keys derived from SSH host keys.
 
 ### Config files
 
@@ -180,14 +183,16 @@ The script handles: Xcode CLT (darwin), Lix installation, repo clone, and first 
 
 ### Phase 1 — NixOS-WSL on gaming PC (`trfwsl`)
 
-Interim homelab: run services inside NixOS-WSL on the existing Windows desktop until a dedicated server is available.
+Interim homelab running NixOS-WSL on the existing Windows desktop. Config is largely complete — host runs Plex, full *arr stack, sabnzbd, tautulli, recyclarr, minecraft, bookshelf, with Mullvad VPN + Tailscale coexistence, Cloudflare tunnel, sops-nix secrets, and ollama.
 
-1. Add `nixos-wsl` flake input
-2. Build out `trfwsl` host config with WSL module (`wsl.enable`, `wsl.defaultUser`, etc.)
-3. Enable native NixOS service modules for homelab stack (Plex/Jellyfin, Immich, *arr, etc.)
-4. Media storage stays on Windows NTFS drives (accessed via `/mnt/`)
-5. Tailscale for remote access (works on eduroam via DERP relay fallback over port 443)
-6. Auto-start WSL via Windows scheduled task
+**Done:** nixos-wsl input, host config, WSL module, homelab service modules, media path config (NTFS mounts), Tailscale, Mullvad VPN with nftables split-tunnel, Cloudflare tunnel, sops-nix secrets.
+
+**Remaining:**
+
+1. Bootstrap NixOS-WSL on gaming PC (import tarball, switch to `trfwsl` host)
+2. Enable remaining services: Jellyfin, Jellyseerr, Immich (modules exist, not yet enabled)
+3. Windows-side: scheduled task to auto-start WSL, `.wslconfig` for mirrored networking
+4. Test Tailscale on eduroam (DERP relay fallback over 443)
 
 **Constraints:** WSL doesn't auto-start with Windows, networking is NAT'd by default (use mirrored mode or Tailscale), no direct disk/hardware access, Windows updates can kill WSL. Acceptable for an interim setup.
 

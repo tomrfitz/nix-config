@@ -2,10 +2,10 @@
 
 ## Next Steps
 
-- [ ] Helix language servers — configure and pin per-language tooling (nixd/ruff/ty/etc.)
+- [x] Helix language servers — auto-discovers LSPs on PATH; no languages.toml needed
 - [ ] Auto-update via launchd agent (nix flake update + rebuild on schedule)
 - [ ] Login items — investigate declaring startup apps via `launchd.agents`
-- [ ] Audit imperatively installed cargo packages (`rana`, `sgram-tui`) — package in nix or keep in cargo
+- [x] Audit imperatively installed cargo packages — `rana` from nixpkgs, `sgram-tui` custom package
 
 ## Upstream Watchlist
 
@@ -24,12 +24,15 @@ Reference configs for best-practice patterns:
 
 - [x] Add `nixos-wsl` flake input (follows nixpkgs)
 - [x] Add WSL module (`wsl.enable`, `wsl.defaultUser`) to `hosts/trfwsl`
-- [ ] Bootstrap NixOS-WSL on gaming PC (import tarball, switch to `trfwsl` host)
-- [ ] Set up Tailscale (`services.tailscale.enable`) for remote access from Mac/phone
+- [x] Set up Tailscale (`services.tailscale.enable`) for remote access
 - [x] Create `modules/nixos/system/homelab/` for service definitions (host-agnostic, per-service files)
 - [x] Enable homelab services: Plex, *arr stack, sabnzbd, tautulli, recyclarr, minecraft, bookshelf
-- [ ] Enable remaining services: Immich (OCI), Jellyfin, Jellyseerr (modules exist, not yet enabled)
-- [ ] Configure media storage mounts (NTFS via `/mnt/` for now)
+- [x] Configure media storage mounts (NTFS via `/mnt/`)
+- [x] Mullvad VPN + Tailscale coexistence (nftables split-tunnel)
+- [x] Cloudflare tunnel for external access
+- [x] sops-nix secrets integration
+- [x] Bootstrap NixOS-WSL on gaming PC (import tarball, switch to `trfwsl` host)
+- [x] Enable remaining services: Immich, Jellyfin, Jellyseerr
 - [ ] Windows-side: scheduled task to auto-start WSL, `.wslconfig` for mirrored networking
 - [ ] Test Tailscale on eduroam (DERP relay fallback over 443)
 
@@ -80,9 +83,7 @@ declared via `launchd.agents` in home-manager instead.
 
 ## Broken Packages (revisit after `nix flake update`)
 
-- `cava` — unity-test build failure on aarch64-darwin
-- `poetry` — rapidfuzz atomics failure on aarch64-darwin
-- `gossip` — SDL2/CMake version conflict on aarch64-darwin
+- `gossip` — SDL2/CMake version conflict on aarch64-darwin (commented out in packages.nix)
 
 ## Done
 
