@@ -31,17 +31,21 @@ in
     if [ ! -d "$VAULT" ]; then
       export GIT_SSH_COMMAND="${pkgs.openssh}/bin/ssh"
       if ! ${pkgs.git}/bin/git clone \
-        ${lib.optionalString (gitDir != null) "--separate-git-dir=\"${gitDir}\""} \
+        ${if gitDir != null then "--separate-git-dir=\"${gitDir}\"" else ""} \
         "${vaultRepo}" "$VAULT" 2>&1; then
         verboseEcho "obsidian-vault: clone failed (no network/key?), skipping"
       fi
-    elif [ ${lib.boolToString (gitDir != null)} = "true" ]; then
-      # Vault exists — verify git dir linkage
-      if [ ! -d "${gitDir}" ]; then
-        verboseEcho "obsidian-vault: warning: vault exists but git dir missing at ${gitDir}"
-      elif [ ! -e "$VAULT/.git" ]; then
-        verboseEcho "obsidian-vault: warning: vault exists but .git pointer missing"
-      fi
+    ${
+      if gitDir != null then
+        ''
+          elif [ ! -d "${gitDir}" ]; then
+            verboseEcho "obsidian-vault: warning: vault exists but git dir missing at ${gitDir}"
+          elif [ ! -e "$VAULT/.git" ]; then
+            verboseEcho "obsidian-vault: warning: vault exists but .git pointer missing"
+        ''
+      else
+        ""
+    }
     fi
   '';
 }
