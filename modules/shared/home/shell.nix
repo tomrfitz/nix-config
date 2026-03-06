@@ -338,7 +338,7 @@
 
       git_branch = {
         format = " [$branch(:$remote_branch)]($style) ";
-        style = "blue";
+        style = "dimmed purple";
         truncation_symbol = "...";
         truncation_length = 11;
         ignore_branches = [
@@ -357,7 +357,7 @@
       };
 
       git_status = {
-        style = "bold blue";
+        style = "bold yellow";
         format = "([$ahead_behind$staged$modified$untracked$renamed$deleted$conflicted$stashed]($style))";
         conflicted = "[!](magenta)";
         ahead = "[up [\${count}](bold white)](green)";
