@@ -58,6 +58,9 @@
   # Backlight control for unprivileged users
   hardware.acpilight.enable = true;
 
+  # Battery reporting for desktop shell (noctalia)
+  services.upower.enable = true;
+
   # ── 1Password GUI ───────────────────────────────────────────────────
   programs._1password-gui = {
     enable = true;
