@@ -101,6 +101,7 @@
       # science / education
       "calibre"
       "libreoffice"
+      "zotero"
 
       # system / network
       "rustdesk"
