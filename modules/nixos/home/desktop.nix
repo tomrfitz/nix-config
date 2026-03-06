@@ -13,20 +13,19 @@
     foot # lightweight Wayland terminal
     fuzzel # app launcher
     xwayland-satellite
-    swaylock-effects # lock screen (drop-in swaylock with blur/clock)
     wl-clipboard
-    swaybg # wallpaper
     brightnessctl
     playerctl
     libnotify
-    mako # notification daemon
   ];
 
   # ── Niri ────────────────────────────────────────────────────────────
   # nixosModules.niri provides: polkit agent, xdg-desktop-portal-gnome,
   # GNOME keyring, dconf, opengl, default fonts, swaylock PAM, binary cache
   programs.niri.settings = {
+    prefer-no-csd = true;
     environment."NIXOS_OZONE_WL" = "1";
+
     input = {
       keyboard.xkb = { };
       touchpad = {
@@ -45,8 +44,9 @@
         bottom = 4;
       };
       preset-column-widths = [
+        { proportion = 0.33333; }
         { proportion = 0.5; }
-        { proportion = 0.667; }
+        { proportion = 0.66667; }
         { proportion = 1.0; }
       ];
       default-column-width.proportion = 0.5;
@@ -54,6 +54,38 @@
 
     # No named workspaces — embrace niri's scrolling model.
     # Dynamic workspaces are created/destroyed as needed.
+
+    window-rules = [
+      # Global corner radius
+      {
+        geometry-corner-radius =
+          let
+            r = 4.0;
+          in
+          {
+            top-left = r;
+            top-right = r;
+            bottom-left = r;
+            bottom-right = r;
+          };
+        clip-to-geometry = true;
+      }
+      # Firefox PiP → floating
+      {
+        matches = [
+          {
+            app-id = "^firefox$";
+            title = "^Picture-in-Picture$";
+          }
+        ];
+        open-floating = true;
+      }
+      # 1Password — hide from screencasts/screenshots
+      {
+        matches = [ { app-id = "^1Password$"; } ];
+        block-out-from = "screen-capture";
+      }
+    ];
 
     binds = {
       # ── Launch ──────────────────────────────────────────────────────
@@ -75,11 +107,17 @@
       "Super+Shift+L".action.move-column-right = { };
 
       # ── Column management ───────────────────────────────────────────
-      "Super+Comma".action.consume-window-into-column = { };
-      "Super+Period".action.expel-window-from-column = { };
+      "Super+BracketLeft".action.consume-or-expel-window-left = { };
+      "Super+BracketRight".action.consume-or-expel-window-right = { };
       "Super+R".action.switch-preset-column-width = { };
+      "Super+C".action.center-column = { };
+      "Super+T".action.toggle-column-tabbed-display = { };
       "Super+W".action.maximize-column = { };
+      "Super+Ctrl+F".action.expand-column-to-available-width = { };
+
+      # ── Floating ────────────────────────────────────────────────────
       "Super+Shift+F".action.toggle-window-floating = { };
+      "Super+V".action.switch-focus-between-floating-and-tiling = { };
 
       # ── Resize ──────────────────────────────────────────────────────
       "Super+Minus".action.set-column-width = "-10%";
@@ -127,17 +165,12 @@
       };
       "Super+Shift+P".action.power-off-monitors = { };
       "Super+O".action.toggle-overview = { };
+      "Super+Escape" = {
+        allow-inhibiting = false;
+        action.toggle-keyboard-shortcuts-inhibit = { };
+      };
 
-      # ── Lock ────────────────────────────────────────────────────────
-      "Super+Alt+L".action.spawn = [
-        "swaylock"
-        "--screenshots"
-        "--clock"
-        "--effect-blur"
-        "7x5"
-        "--fade-in"
-        "0.2"
-      ];
+      # Lock screen handled by noctalia (idle + manual via shell)
 
       # ── Screenshots (niri built-in) ─────────────────────────────────
       "Super+Shift+S".action.screenshot = { };
@@ -209,121 +242,109 @@
           "--silent"
         ];
       }
-      { argv = [ "waybar" ]; }
-      {
-        argv = [
-          "swaybg"
-          "-i"
-          "${../../../config/wallpaper.jpg}"
-          "-m"
-          "fill"
-        ];
-      }
     ];
   };
 
   # Polkit agent provided by nixosModules.niri (KDE polkit)
 
-  # ── Waybar ──────────────────────────────────────────────────────────
-  programs.waybar = {
+  # ── Noctalia (desktop shell: bar, notifications, OSD, wallpaper) ───
+  programs.noctalia-shell = {
     enable = true;
-    settings.mainBar = {
-      layer = "top";
-      position = "top";
-      height = 30;
-      spacing = 8;
-      modules-left = [ "niri/workspaces" ];
-      modules-center = [ "clock" ];
-      modules-right = [
-        "cpu"
-        "memory"
-        "pulseaudio"
-        "network"
-        "battery"
-        "tray"
-      ];
-      battery = {
-        format-charging = "BAT ↑{capacity}% {power:.1f}W";
-        format-discharging = "BAT ↓{capacity}% {power:.1f}W";
-        format-full = "BAT full";
-        format-plugged = "BAT AC";
-        tooltip-format = "{timeTo}\n{power:.2f}W";
-        interval = 5;
-        states = {
-          warning = 30;
-          critical = 15;
+    settings = {
+      # Opacity and font settings managed by Stylix — revisit when theming is consolidated
+      bar = {
+        position = "top";
+        density = "compact";
+        widgetSpacing = 6;
+        displayMode = "always_visible";
+        widgets = {
+          left = [
+            { id = "Launcher"; }
+            { id = "Clock"; }
+            { id = "SystemMonitor"; }
+            { id = "ActiveWindow"; }
+            { id = "MediaMini"; }
+          ];
+          center = [
+            { id = "Workspace"; }
+          ];
+          right = [
+            { id = "Tray"; }
+            { id = "NotificationHistory"; }
+            { id = "Battery"; }
+            { id = "Volume"; }
+            { id = "Brightness"; }
+            { id = "Network"; }
+            { id = "ControlCenter"; }
+          ];
         };
       };
-      clock = {
-        format = "{:%a %b %d  %H:%M}";
-        tooltip-format = "{:%Y-%m-%d %H:%M:%S}";
+      widgetSettings.bar = {
+        Workspace = {
+          labelMode = "index";
+          hideUnoccupied = false;
+          enableScrollWheel = true;
+        };
+        SystemMonitor = {
+          compactMode = true;
+          useMonospaceFont = true;
+          showCpuUsage = true;
+          showCpuTemp = true;
+          showMemoryUsage = true;
+          showMemoryAsPercent = false;
+          showDiskUsage = false;
+          showNetworkStats = false;
+        };
+        Clock = {
+          formatHorizontal = "HH:mm ddd, MMM dd";
+        };
       };
-      cpu.format = "CPU {usage}%";
-      memory.format = "RAM {}%";
-      network = {
-        format-wifi = "WIFI {essid} ({signalStrength}%)";
-        format-ethernet = "ETH {ipaddr}/{cidr}";
-        format-disconnected = "NET down";
-        tooltip-format = "{ifname} via {gwaddr}";
+      notifications = {
+        enabled = true;
+        location = "top_right";
+        lowUrgencyDuration = 3;
+        normalUrgencyDuration = 8;
+        criticalUrgencyDuration = 15;
+        sounds.enabled = false;
       };
-      pulseaudio = {
-        format = "VOL {volume}%";
-        format-muted = "VOL mute";
-        on-click = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+      osd = {
+        enabled = true;
+        location = "top_right";
+        autoHideMs = 2000;
       };
-      tray.spacing = 10;
+      wallpaper = {
+        enabled = true;
+        fillMode = "crop";
+      };
+      idle = {
+        enabled = true;
+        screenOffTimeout = 600;
+        lockTimeout = 660;
+        suspendTimeout = 1800;
+        fadeDuration = 5;
+      };
+      general = {
+        lockOnSuspend = true;
+        enableLockScreenCountdown = true;
+        lockScreenCountdownDuration = 10000;
+      };
     };
-    # Stylix handles base theming (colors, fonts); custom overrides below
-    style = ''
-      @define-color tx-muted #878580;
-      @define-color bg-2 #1c1b1a;
-      @define-color ui #282726;
-      @define-color cyan #3aa99f;
-      @define-color yellow #d0a215;
-      @define-color red #d14d41;
-
-      window#waybar {
-        background: alpha(@base00, 0.92);
-        border-bottom: 1px solid alpha(@ui, 0.95);
-      }
-
-      #workspaces,
-      #clock,
-      #cpu,
-      #memory,
-      #pulseaudio,
-      #network,
-      #battery,
-      #tray {
-        padding: 0 8px;
-        background: alpha(@bg-2, 0.85);
-        border-radius: 8px;
-        margin: 4px 0;
-      }
-
-      #battery.warning { color: @yellow; }
-      #battery.critical { color: @red; }
-      #network { color: @cyan; }
-      #tray { color: @tx-muted; }
-
-      .modules-left #workspaces button {
-        border-bottom: 3px solid transparent;
-      }
-      .modules-left #workspaces button.active {
-        border-bottom: 3px solid @base05;
-      }
-      .modules-left #workspaces button.urgent {
-        border-bottom: 3px solid @base08;
-        background-color: @base08;
-        color: @base00;
-      }
-    '';
-  };
-
-  # Notification daemon
-  services.mako = {
-    enable = true;
-    settings.default-timeout = 5000;
+    plugins = {
+      sources = [
+        {
+          enabled = true;
+          name = "Noctalia Plugins";
+          url = "https://github.com/noctalia-dev/noctalia-plugins";
+        }
+      ];
+      states = {
+        tailscale = {
+          enabled = true;
+          sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+        };
+      };
+      version = 2;
+    };
   };
 
   # Blue light filter (screen temperature) for Wayland
