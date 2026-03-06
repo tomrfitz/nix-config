@@ -30,7 +30,6 @@
       chatterino2
 
       pear-desktop
-      zotero
 
       # fonts
       aporetic
@@ -50,6 +49,7 @@
       noto-fonts-color-emoji
     ]
     ++ lib.optionals (!pkgs.stdenv.isDarwin) [
+      zotero # brew cask on darwin (firefox-esr build failures on aarch64-darwin)
       picard # brew cask "musicbrainz-picard" on darwin (qtwayland dep)
       rustdesk # brew cask on darwin (badPlatforms)
       element-desktop # brew cask on darwin (actool/Xcode build dep)

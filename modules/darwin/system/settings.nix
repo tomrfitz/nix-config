@@ -39,7 +39,7 @@ in
       persistent-apps = [
         { app = "/System/Applications/Apps.app"; }
         { app = "/System/Applications/System Settings.app"; }
-        { app = "${homeManagerAppsDirectory}/Zotero.app"; }
+        { app = "/Applications/Zotero.app"; }
         { app = "${homeManagerAppsDirectory}/Obsidian.app"; }
         { app = "${homeManagerAppsDirectory}/YouTube Music.app"; }
         { app = "${homeManagerAppsDirectory}/Vesktop.app"; }
