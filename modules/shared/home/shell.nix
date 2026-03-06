@@ -27,6 +27,12 @@
       # zmv helpers
       zcp = "zmv -C";
       zln = "zmv -L";
+
+      # SSH + tmux (attach or create named session)
+      smbp = "ssh trfmbp -t 'tmux new -As main'";
+      snix = "ssh trfnix -t 'tmux new -As main'";
+      swsl = "ssh trfwsl -t 'tmux new -As main'";
+      slab = "ssh trflab -t 'tmux new -As main'";
     };
 
     envExtra = lib.optionalString (!pkgs.stdenv.isDarwin && !isWSL) ''
