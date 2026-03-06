@@ -115,9 +115,26 @@ in
     historyLimit = 50000;
     escapeTime = 10;
     baseIndex = 1;
+    focusEvents = true;
     extraConfig = ''
       set -g renumber-windows on
+      set -g set-clipboard on
       set -ag terminal-overrides ",ghostty:RGB"
+
+      # Splits/windows preserve working directory
+      bind | split-window -h -c "#{pane_current_path}"
+      bind - split-window -v -c "#{pane_current_path}"
+      bind c new-window -c "#{pane_current_path}"
+
+      # ── Flexoki dark status bar ──
+      set -g status-style "bg=#282726,fg=#CECDC3"
+      set -g status-left "#[bg=#3AA99F,fg=#100F0F,bold] #S #[default] "
+      set -g status-right "#[fg=#6F6E69]%H:%M"
+      set -g window-status-format "#[fg=#6F6E69] #I:#W "
+      set -g window-status-current-format "#[fg=#3AA99F,bold] #I:#W "
+      set -g pane-border-style "fg=#575653"
+      set -g pane-active-border-style "fg=#3AA99F"
+      set -g message-style "bg=#282726,fg=#CECDC3"
     '';
   };
 
