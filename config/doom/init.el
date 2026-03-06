@@ -35,8 +35,8 @@
        undo
        vc
 
-       :term
-       vterm
+       ;;:term
+       ;;vterm
 
        :checkers
        syntax
@@ -58,7 +58,7 @@
        markdown
        nix
        org
-       (python +lsp +tree-sitter)
+       (python +tree-sitter)
        sh
        ;;yaml
 
