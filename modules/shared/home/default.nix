@@ -20,7 +20,6 @@ in
   imports = [
     ./packages.nix
     ./shell.nix
-    ./fish.nix
     ./git.nix
     ./fastfetch.nix
     ./editors.nix

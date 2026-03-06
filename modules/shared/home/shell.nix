@@ -478,7 +478,7 @@
   programs.atuin = {
     enable = true;
     enableZshIntegration = true;
-    enableFishIntegration = true;
+
     settings = {
       dotfiles.enabled = true;
       enter_accept = true;
@@ -490,14 +490,14 @@
   programs.zoxide = {
     enable = true;
     enableZshIntegration = true;
-    enableFishIntegration = true;
+
   };
 
   # ── Fzf ────────────────────────────────────────────────────────────────
   programs.fzf = {
     enable = true;
     enableZshIntegration = true;
-    enableFishIntegration = true;
+
   };
 
   # ── Direnv (auto-load project environments) ─────────────────────────

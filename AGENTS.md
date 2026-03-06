@@ -74,7 +74,7 @@ Keep host files concise, idiomatic, portable, and composable:
 modules/
   shared/          # Cross-platform (maximized — put everything here first)
     system/        # nix.nix, stylix.nix
-    home/          # packages, shell, git, editors, ghostty, firefox, zen, obsidian, fish, desktop, opencode, ruff, etc.
+    home/          # packages, shell, git, editors, ghostty, firefox, zen, obsidian, desktop, opencode, ruff, etc.
   darwin/          # macOS-only
     system/        # user.nix, homebrew.nix, settings.nix (system.defaults), security.nix
     home/          # zsh.nix, git.nix (1Password signing), topgrade.nix, aerospace.nix, sketchybar.nix
