@@ -308,11 +308,11 @@
       };
 
       battery = {
-        format = "[ $percentage $symbol]($style)";
+        format = "[ $percentage$symbol]($style)";
         full_symbol = "=";
         charging_symbol = "[^](bold green)";
         discharging_symbol = "v";
-        unknown_symbol = "?";
+        unknown_symbol = "-";
         empty_symbol = "!";
         display = [
           {
@@ -335,7 +335,7 @@
       };
 
       git_branch = {
-        format = " [$branch(:$remote_branch)]($style)";
+        format = " [$branch(:$remote_branch)]($style) ";
         style = "blue";
         truncation_symbol = "...";
         truncation_length = 11;
