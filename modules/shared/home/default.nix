@@ -48,6 +48,7 @@ in
 
   home.sessionPath = [
     "$HOME/.local/bin"
+    "$HOME/.config/emacs/bin" # doom CLI
   ];
 
   # Export SSH_AUTH_SOCK to systemd user environment so GUI apps (Obsidian, etc.)
@@ -161,6 +162,13 @@ in
       ${sshPublicKey}
     '';
   };
+
+  # ── Doom Emacs config ────────────────────────────────────────────────
+  # Doom itself lives in ~/.config/emacs (cloned manually or via doom install).
+  # These deploy the user config that Doom reads from $DOOMDIR (~/.config/doom/).
+  xdg.configFile."doom/init.el".source = ../../../config/doom/init.el;
+  xdg.configFile."doom/config.el".source = ../../../config/doom/config.el;
+  xdg.configFile."doom/packages.el".source = ../../../config/doom/packages.el;
 
   # ── Agent instructions (each tool looks for instructions at a different path) ──
   xdg.configFile."AGENTS.md".source = ../../../config/agents.md; # generic / Gemini

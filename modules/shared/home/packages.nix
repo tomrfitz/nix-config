@@ -75,6 +75,9 @@
     ++ lib.optionals pkgs.stdenv.isLinux [
       # Ensure SSH sessions from Ghostty render correctly on Linux hosts.
       ghostty.terminfo
+
+      # Emacs (macOS uses emacs-plus via homebrew for native app integration)
+      emacs
     ]
     ++ lib.optionals pkgs.stdenv.isDarwin [
       xcodes
