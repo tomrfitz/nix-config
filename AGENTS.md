@@ -198,13 +198,16 @@ Interim homelab running NixOS-WSL on the existing Windows desktop. Config is lar
 
 ### Phase 2 — Dedicated NixOS server (`trflab`)
 
-When a separate machine is available:
+**Hardware:** i5-12400 (6C/12T, 65W, Quick Sync) + B660M DDR4 mATX + 32GB DDR4. Reuses existing Fractal Focus G Mini case, Noctua NH-U9S cooler (LGA 1700 kit), EVGA 550 G2 PSU, GTX 1070 (ollama), and existing drives (512GB NVMe boot, 2TB HDD media, 240GB SSD scratch). Quick Sync handles Plex transcode; 1070 is for light ollama (7-8B models), not video.
 
-1. Same service configs from phase 1, swap WSL module for real hardware config
-2. NAS or network-attached storage with proper Linux filesystem (ext4/ZFS/btrfs)
-3. Auto-update/rebuild via systemd timers
-4. Tailscale carries over unchanged
-5. `trfwsl` becomes a lightweight dev environment on the gaming PC
+**Storage:** Direct-attached (no NAS). ZFS pool on new drive(s), ext4 or btrfs boot. DrivePool drives (NTFS, ~8TB, 95% full) migrate by rsyncing to the new ZFS pool — DrivePool is file-level pooling (not striped), so each drive is independently readable NTFS. Old drives then join the ZFS pool or become backup targets. NAS is a future consideration only if multiple machines need shared storage.
+
+1. Build `trflab`, add host to flake (swap WSL module for hardware config)
+2. Create ZFS pool on new drive(s), rsync media from DrivePool
+3. Migrate services from `trfwsl` (see TODO.md migration plan)
+4. Auto-rebuild via systemd timer
+5. Demote `trfwsl` to lightweight dev environment on gaming PC
+6. Tailscale carries over unchanged
 
 ### Naming convention
 
