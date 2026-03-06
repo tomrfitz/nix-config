@@ -36,6 +36,15 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
+    noctalia = {
+      url = "github:noctalia-dev/noctalia-shell";
+      inputs.nixpkgs.follows = "nixpkgs";
+      inputs.noctalia-qs.follows = "noctalia-qs";
+    };
+    noctalia-qs = {
+      url = "github:noctalia-dev/noctalia-qs";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -54,6 +63,8 @@
       nixos-wsl,
       niri-flake,
       zen-browser,
+      noctalia,
+      noctalia-qs,
       sops-nix,
     }:
     let
@@ -174,6 +185,7 @@
             ./modules/shared/home/desktop.nix
             ./modules/nixos/home
             ./modules/nixos/home/desktop.nix
+            noctalia.homeModules.default
           ];
         };
         trfwsl = {
