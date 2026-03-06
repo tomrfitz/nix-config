@@ -174,6 +174,9 @@ in
   home.file.".claude/CLAUDE.md".source = ../../../config/agents.md; # Claude Code
   home.file.".claude/settings.json".source = ../../../config/claude-settings.json;
 
+  # ── Templates ──────────────────────────────────────────────────────────
+  xdg.configFile."nix/flake-template.nix".source = ../../../config/flake-template.nix;
+
   # ── Dotfiles managed via config/ ────────────────────────────────────────
   home.file.".clang-format".source = ../../../config/clang-format;
 

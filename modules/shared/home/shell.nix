@@ -140,14 +140,16 @@
           set +a
         }
 
-        # ── nixify (bootstrap direnv for a flake project) ──
+        # ── nixify (bootstrap direnv + flake for a project) ──
         nixify() {
           if [[ ! -f flake.nix ]]; then
-            echo "No flake.nix in current directory" >&2
-            return 1
+            cp "''${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake-template.nix" flake.nix
+            echo "Created flake.nix"
           fi
-          echo "use flake" > .envrc
-          direnv allow
+          if [[ ! -f .envrc ]]; then
+            echo "use flake" > .envrc
+            direnv allow
+          fi
         }
 
         # ── Edit command buffer (Ctrl+X Ctrl+E) ──
