@@ -38,11 +38,71 @@ Reference configs for best-practice patterns:
 
 ## Phase 2 — Dedicated NixOS server (`trflab`)
 
-- [ ] Provision new machine, add `trflab` host to flake
-- [ ] Reuse homelab service module from phase 1 (swap WSL module for hardware config)
-- [ ] Set up NAS/network storage with proper Linux filesystem
+### Hardware
+
+- [ ] Buy i5-12400 (~$100-130) + B660M DDR4 mATX board (~$85) + 16GB DDR4 (~$25)
+- [ ] Order Noctua LGA 1700 mounting kit (free from Noctua or ~$8)
+- [ ] Buy bootstrap ZFS drive (4-8TB HDD)
+- [ ] Assemble in existing Fractal Focus G Mini case with existing PSU/cooler/1070/drives
+- [ ] Run memtest86+ overnight before committing (old board instability may have stressed RAM)
+
+### Nix config
+
+- [ ] Add `trflab` host to flake (swap WSL module for hardware config)
+- [ ] Reuse homelab service modules from phase 1
+- [ ] Swap NTFS mount paths for ZFS dataset paths in `configRoot`/`mediaRoot`/etc.
+- [ ] Configure headless NVIDIA for 1070 (ollama only — Quick Sync handles Plex transcode)
 - [ ] Auto-rebuild via systemd timer (`nixos-rebuild switch --flake`)
+
+### Storage: DrivePool → ZFS migration
+
+DrivePool is file-level pooling (not striped) — each drive is independently readable NTFS with files in hidden `PoolPart.*` folders.
+
+- [ ] Create ZFS pool on new drive in `trflab`
+- [ ] Mount old DrivePool drives (NTFS) individually, rsync media to ZFS pool
+- [ ] Deduplicate if DrivePool duplication was enabled for any folders
+- [ ] Verify checksums, then reformat old drives and add to ZFS pool as vdevs
+- [ ] Decide ZFS topology (mirror pairs vs raidz) based on final drive count
+
+### Service migration (`trfwsl` → `trflab`)
+
 - [ ] Demote `trfwsl` to lightweight dev environment
+
+### Data migration plan (`trfwsl` → `trflab`)
+
+Three categories of state to migrate:
+
+**Stateless (just rebuild):** Recyclarr, OpenBooks, VPN config, Cloudflare tunnel, Tailscale — fully described by nix config + sops secrets.
+
+**SQLite services (file copy):** *arr stack, SABnzbd, qBittorrent, Plex, Jellyfin, Jellyseerr, Tautulli, Calibre, Bookshelf, Minecraft. All under `/var/lib/homelab/<service>` or `/var/lib/<service>`. Stop service → rsync/tar directory → start on new host.
+
+**PostgreSQL services (pg_dump/restore):** Immich and Spliit both use Postgres.
+
+- Immich uses pgvecto.rs — the NixOS module handles the extension, but version alignment matters. Consider re-running ML jobs on the new host rather than migrating vector embeddings (simpler than ensuring exact pgvecto.rs parity).
+- Spliit is standard Postgres, straightforward dump/restore.
+
+**Media files (bulk transfer):** Currently on NTFS mounts (`/mnt/z`, `/mnt/k`). Rsync over Tailscale, or physically relocate drives. Verify checksums after transfer.
+
+#### Migration sequence
+
+1. Stand up `trflab` with same nix config — swap NTFS mount paths for real Linux filesystem paths in `configRoot`/`mediaRoot`/etc.
+2. Move media first (rsync or physical drive move), verify checksums
+3. Stop services on `trfwsl`:
+   - `pg_dump` Immich and Spliit databases
+   - tar/rsync `/var/lib/homelab/` and other state dirs
+4. Restore on `trflab`:
+   - `pg_restore` databases
+   - Extract state dirs to same relative paths
+   - Rebuild, start services
+5. Re-point Cloudflare tunnel to `trflab`'s Tailscale IP
+6. Verify, then decommission `trfwsl` homelab services
+
+#### Gotchas
+
+- **Plex claim token:** Plex ties to a machine identity. Moving the full data dir usually works, but may need to re-claim the server.
+- **Immich ML embeddings:** Re-running ML jobs on the new host avoids pgvecto.rs version coupling.
+- **`configRoot` abstraction already handles path differences** — just change one variable per host.
+- **Consider adding a backup job now** (restic/borgmatic) — doubles as migration dry-run and protects data in the interim.
 
 ## Undeclared Apps
 
