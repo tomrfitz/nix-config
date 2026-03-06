@@ -116,7 +116,6 @@ in
     historyLimit = 50000;
     escapeTime = 10;
     baseIndex = 1;
-    keyMode = "vi";
     extraConfig = ''
       set -g renumber-windows on
       set -ag terminal-overrides ",ghostty:RGB"
