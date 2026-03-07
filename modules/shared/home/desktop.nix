@@ -81,6 +81,7 @@
       "toml"
       "typst"
       "powershell"
+      "elisp"
     ];
 
     userSettings = {
