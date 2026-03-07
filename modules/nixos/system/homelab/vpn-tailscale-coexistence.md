@@ -125,7 +125,7 @@ This routes DNS queries to Cloudflare through the Mullvad tunnel (still encrypte
 
 ## Full NixOS module
 
-Working NixOS module for the complete setup: [`modules/nixos/system/homelab/vpn.nix`](https://github.com/tomrfitz/nix-config/blob/lean/modules/nixos/system/homelab/vpn.nix)
+Working NixOS module for the complete setup: [`modules/nixos/system/homelab/vpn.nix`](https://github.com/tomrfitz/nix-config/blob/main/modules/nixos/system/homelab/vpn.nix)
 
 ## Potential upstream improvements
 

@@ -6,8 +6,6 @@ Repo-specific guidance for AI agents working on this nix-config. See also `~/.co
 
 A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tracks on nixpkgs-unstable. Uses Lix as the nix runtime across all hosts.
 
-Two branches: `main` (stable) and `lean` (active development — trimming, cleanup, new features).
-
 ### Machines
 
 | Hostname | Platform | Role | Status |

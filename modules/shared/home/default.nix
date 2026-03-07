@@ -34,7 +34,7 @@ in
   # ── Session environment ────────────────────────────────────────────────
   home.sessionVariables = {
     EDITOR = "zeditor --wait"; # overridden on darwin (zsh.nix) to use the .app CLI
-    NH_FLAKE = "github:tomrfitz/nix-config/lean";
+    NH_FLAKE = "github:tomrfitz/nix-config/main";
 
     OLLAMA_GPU_LAYERS = "-1";
     OLLAMA_KEEP_ALIVE = "5m";
