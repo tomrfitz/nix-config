@@ -12,7 +12,6 @@ in
   programs.zen-browser = {
     enable = true;
     package = lib.mkIf pkgs.stdenv.isDarwin null;
-    suppressXdgMigrationWarning = true;
     policies = sharedPolicies;
     nativeMessagingHosts = [ pkgs._1password-gui ];
 
