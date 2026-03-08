@@ -16,8 +16,9 @@
         animation_speed = 4000;
         padding_top = 0;
         padding_bottom = 0;
-        padding_left = 8;
-        padding_right = 8;
+
+        padding_left = 2;
+        padding_right = 2;
         auto_center = false;
         border_active_window = false;
       };
