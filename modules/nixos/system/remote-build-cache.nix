@@ -20,12 +20,9 @@ in
   config = lib.mkMerge [
     (lib.mkIf (hostName == "trfnix") {
       # Offload Linux builds to trfwsl over Tailscale/MagicDNS.
+      # Attic substituter + public key now in shared nix.nix.
       nix.distributedBuilds = true;
-      nix.settings = {
-        builders-use-substitutes = true;
-        extra-substituters = [ atticSubstituter ];
-        extra-trusted-public-keys = [ atticPublicKey ];
-      };
+      nix.settings.builders-use-substitutes = true;
 
       nix.buildMachines = [
         {
