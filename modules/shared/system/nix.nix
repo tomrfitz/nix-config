@@ -16,12 +16,14 @@
       "https://nix-community.cachix.org"
       "https://niri.cachix.org"
       "https://tomrfitz.cachix.org"
+      "http://trfwsl:8484/trf-infra?connect-timeout=5"
     ];
     extra-trusted-public-keys = [
       "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "niri.cachix.org-1:Wv0OmO7PsuocRKzfDoJ3mulSl7Z6oezYhGhR+3W2964="
       "tomrfitz.cachix.org-1:LwNFrIvyn1kTHi9VH6w9gVz5VE5qhZpqIe7JMYAlDZI="
+      "trf-infra:9T9hcVKDnDKKTirHMarQGhjvHLmRT4prxPb4RLRXctI="
     ];
   };
   nix.gc = {
