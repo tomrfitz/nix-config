@@ -30,6 +30,7 @@ in
     ./openbooks.nix
     ./minecraft.nix
     ./spliit.nix
+    ./tandoor.nix
   ];
 
   options.trf.homelab = {
