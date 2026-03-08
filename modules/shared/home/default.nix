@@ -245,6 +245,7 @@ in
         disable = [
           "nix"
           "home_manager"
+          "pip3"
         ];
         cleanup = true;
         skip_notify = true;
