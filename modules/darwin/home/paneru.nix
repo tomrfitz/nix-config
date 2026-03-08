@@ -14,8 +14,8 @@
         swipe_gesture_fingers = 4;
         swipe_gesture_direction = "Natural";
         animation_speed = 4000;
-        padding_top = 4;
-        padding_bottom = 4;
+        padding_top = 0;
+        padding_bottom = 0;
         padding_left = 4;
         padding_right = 4;
         border_active_window = true;
