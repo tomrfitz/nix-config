@@ -6,7 +6,7 @@
         # Warm up SSH multiplex so git pulls don't hang on first connect
         ssh -T git@github.com || true
 
-        nh darwin switch --refresh --update
+        nh darwin switch --refresh
       '';
     };
     brew = {
