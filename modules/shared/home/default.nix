@@ -136,10 +136,6 @@ in
       # Reload config
       bind r source-file ~/.config/tmux/tmux.conf \; display "Config reloaded"
 
-      # ── Pane styling ──
-      set -g window-style "bg=#1C1B1A"
-      set -g window-active-style "bg=#282726"
-
       # ── Flexoki dark status bar ──
       set -g status-style "bg=#282726,fg=#878580"
       set -g status-left "#{?client_prefix,#[bg=#D0A215 fg=#100F0F bold],#[bg=#3AA99F fg=#100F0F bold]} #S #[default] "
