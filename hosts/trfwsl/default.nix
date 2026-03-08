@@ -84,6 +84,7 @@
         "plex"
         "jellyfin"
         "immich"
+        "tandoor-recipes"
 
         # OCI containers — image pulls fail through VPN
         "podman"
@@ -112,5 +113,6 @@
     tautulli.enable = true;
     recyclarr.enable = true;
     minecraft-server.enable = true;
+    tandoor-recipes.enable = true;
   };
 }
