@@ -11,6 +11,7 @@
     ./topgrade.nix
     ./aerospace.nix
     ./sketchybar.nix
+    ./auto-rebuild.nix
   ];
 
   home.homeDirectory = lib.mkForce "/Users/${user}";
