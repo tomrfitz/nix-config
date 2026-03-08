@@ -39,6 +39,7 @@
         "global:shift+ctrl+backquote=new_window"
         "global:ctrl+backquote=toggle_quick_terminal"
       ];
+      focus-follows-mouse = true;
       macos-titlebar-style = "tabs";
       macos-option-as-alt = true;
       auto-update = "off";
