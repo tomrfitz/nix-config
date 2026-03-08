@@ -207,6 +207,32 @@ Interim homelab running NixOS-WSL on the existing Windows desktop. Config is lar
 5. Demote `trfwsl` to lightweight dev environment on gaming PC
 6. Tailscale carries over unchanged
 
+## Automation
+
+### Auto-update pipeline
+
+`trfwsl` runs a daily pipeline that updates flake.lock, builds x86 closures, caches to Attic, and pushes to main. Other hosts rebuild on schedule.
+
+```text
+04:45  trfwsl: update flake.lock → eval all 3 hosts → build trfwsl + trfnix
+               → push to Attic → switch trfwsl → commit + push flake.lock to main
+06:30  trfnix: nixos-rebuild switch from remote main (Attic cache hits)
+06:30  trfmbp: nh darwin switch --refresh from remote main (local darwin build)
+on-push CI:    eval all 3 hosts + formatting check (safety net)
+```
+
+**Key files:**
+
+- `scripts/auto-update.sh` — pipeline logic (phases 0–7)
+- `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
+- `modules/darwin/home/auto-rebuild.nix` — launchd agent for trfmbp
+
+**Manual trigger:** `sudo systemctl start auto-update` on trfwsl
+
+**Check status:** `systemctl status auto-update.timer` / `journalctl -u auto-update`
+
+**Failure notification:** email to `nix@tomrfitz.com` via msmtp/Gmail relay (sops secret `mail/app-pass`)
+
 ### Naming convention
 
 Hostnames follow `trf<identifier>` — initials prefix for network disambiguation (eduroam has many colliding default Apple/Windows names), short suffix for the device/role. Under 7 chars, unique prefixes for tab completion.
