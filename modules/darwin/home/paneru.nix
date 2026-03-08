@@ -18,10 +18,8 @@
         padding_bottom = 0;
         padding_left = 4;
         padding_right = 4;
-        border_active_window = true;
-        border_color = "#3AA99F";
-        border_width = 2.0;
-        border_radius = 4.0;
+        auto_center = true;
+        border_active_window = false;
       };
 
       bindings = {
