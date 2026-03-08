@@ -53,6 +53,10 @@
       url = "github:karinushka/paneru";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    git-hooks = {
+      url = "github:cachix/git-hooks.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -71,6 +75,7 @@
       noctalia-qs,
       sops-nix,
       paneru,
+      git-hooks,
     }:
     let
       lib = nixpkgs.lib;
@@ -221,31 +226,42 @@
       # ── Formatter (nix fmt — runs all formatters via treefmt) ─────────
       formatter = forAllSystems (system: _pkgs: treefmtEval.${system}.config.build.wrapper);
 
-      # ── Checks (CI formatting validation) ───────────────────────────
+      # ── Checks (CI formatting + pre-commit hooks) ──────────────────
       checks = forAllSystems (
         system: _pkgs: {
           formatting = treefmtEval.${system}.config.build.check self;
+          pre-commit-check = git-hooks.lib.${system}.run {
+            src = ./.;
+            hooks.treefmt = {
+              enable = true;
+              package = treefmtEval.${system}.config.build.wrapper;
+            };
+          };
         }
       );
 
       # ── Dev shell (tools for working on this config) ────────────────
       devShells = forAllSystems (
-        system: pkgs: {
+        system: pkgs:
+        let
+          preCommit = self.checks.${system}.pre-commit-check;
+        in
+        {
           default = pkgs.mkShellNoCC {
-            packages = [
-              pkgs.nixfmt
-              pkgs.nixd
-              pkgs.dix
-              pkgs.nh
-              pkgs.just
-              pkgs.sops
-            ]
-            ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
-              defaults2nix.packages.${system}.default
-            ];
-            shellHook = ''
-              git config core.hooksPath .githooks
-            '';
+            inherit (preCommit) shellHook;
+            packages =
+              preCommit.enabledPackages
+              ++ [
+                pkgs.nixfmt
+                pkgs.nixd
+                pkgs.dix
+                pkgs.nh
+                pkgs.just
+                pkgs.sops
+              ]
+              ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+                defaults2nix.packages.${system}.default
+              ];
           };
         }
       );
