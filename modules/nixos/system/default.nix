@@ -8,6 +8,7 @@
   imports = [
     ./user.nix
     ./remote-build-cache.nix
+    ./auto-update.nix
     ./homelab
   ]
   ++ lib.optionals (!isWSL) [ ./hardening.nix ]
