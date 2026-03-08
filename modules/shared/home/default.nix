@@ -141,14 +141,15 @@ in
       set -g window-active-style "bg=#282726"
 
       # ── Flexoki dark status bar ──
-      set -g status-style "bg=#282726,fg=#CECDC3"
-      set -g status-left "#[bg=#3AA99F,fg=#100F0F,bold] #S #[default] "
-      set -g status-right "#[fg=#6F6E69]%H:%M"
-      set -g window-status-format "#[fg=#6F6E69] #I:#W "
-      set -g window-status-current-format "#[fg=#3AA99F,bold] #I:#W "
-      set -g pane-border-style "fg=#575653"
+      set -g status-style "bg=#282726,fg=#878580"
+      set -g status-left "#{?client_prefix,#[bg=#D0A215 fg=#100F0F bold],#[bg=#3AA99F fg=#100F0F bold]} #S #[default] "
+      set -g status-right "#[fg=#878580]%H:%M"
+      set -g window-status-format "#[fg=#6F6E69] #I #W "
+      set -g window-status-current-format "#[fg=#CECDC3,bold] #I #W "
+      set -g window-status-separator ""
+      set -g pane-border-style "fg=#343331"
       set -g pane-active-border-style "fg=#3AA99F"
-      set -g message-style "bg=#282726,fg=#CECDC3"
+      set -g message-style "bg=#343331,fg=#CECDC3"
     '';
   };
 
