@@ -49,6 +49,10 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    paneru = {
+      url = "github:karinushka/paneru";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -66,6 +70,7 @@
       noctalia,
       noctalia-qs,
       sops-nix,
+      paneru,
     }:
     let
       lib = nixpkgs.lib;
@@ -170,6 +175,7 @@
             ./modules/shared/home
             ./modules/shared/home/desktop.nix
             ./modules/darwin/home
+            paneru.homeModules.paneru
           ];
         };
         trfnix = {
