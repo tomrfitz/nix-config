@@ -234,14 +234,6 @@ in
     };
   };
 
-  # todo-txt-cli config
-  home.file.".todo.cfg".text = ''
-    export TODO_DIR="$HOME"
-    export TODO_FILE="$TODO_DIR/todo.txt"
-    export DONE_FILE="$TODO_DIR/done.txt"
-    export REPORT_FILE="$TODO_DIR/report.txt"
-  '';
-
   programs.home-manager.enable = true;
 
   # ── Topgrade ──────────────────────────────────────────────────────────

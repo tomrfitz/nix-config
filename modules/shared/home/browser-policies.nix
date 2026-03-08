@@ -6,8 +6,6 @@ let
   };
 in
 {
-  inherit amo;
-
   sharedPolicies = {
     DisableTelemetry = true;
     DisableAppUpdate = false;

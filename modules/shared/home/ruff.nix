@@ -66,7 +66,6 @@
           "N"
           "PERF"
           "DOC"
-          "D"
           "UP"
         ];
         ignore = [ ];
