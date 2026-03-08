@@ -18,7 +18,8 @@
     '';
 
     initContent = ''
-      # ── macOS-only global aliases ──
+      # ── macOS-only aliases ──
+      alias paneru-restart='launchctl kickstart -k gui/$(id -u)/com.github.karinushka.paneru'
       alias -g C='| pbcopy'
 
       # Journal note function (writes directly to Obsidian vault)
