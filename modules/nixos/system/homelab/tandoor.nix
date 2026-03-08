@@ -1,6 +1,6 @@
 # Tandoor Recipes — recipe management, meal planning, shopping lists.
 # Uses NixOS-native module with local PostgreSQL (Unix socket).
-# Default port 8080; open data plugin configured in app UI after first launch.
+# Port 8099 (SABnzbd uses default 8080); open data plugin configured in app UI after first launch.
 # https://github.com/TandoorRecipes/recipes
 # https://github.com/TandoorRecipes/open-tandoor-data
 {
@@ -30,12 +30,13 @@ in
 
     services.tandoor-recipes = {
       address = "127.0.0.1";
+      port = 8099; # SABnzbd uses default 8080
       database.createLocally = true;
     };
 
     systemd.services.tandoor-recipes.serviceConfig.EnvironmentFile =
       config.sops.templates."tandoor-env".path;
 
-    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ 8080 ];
+    networking.firewall.allowedTCPPorts = lib.mkIf cfg.openFirewall [ 8099 ];
   };
 }
