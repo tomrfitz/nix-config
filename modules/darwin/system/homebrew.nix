@@ -47,7 +47,6 @@
       # media
       "musicbrainz-picard"
       "handbrake-app"
-      "iina"
       "plex"
       "plex-htpc"
       "pocket-casts"

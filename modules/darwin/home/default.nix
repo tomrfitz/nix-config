@@ -37,7 +37,4 @@
     icon: liquid-glass
   '';
 
-  home.sessionPath = [
-    "$HOME/.config/emacs/bin"
-  ];
 }
