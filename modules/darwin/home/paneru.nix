@@ -9,6 +9,7 @@
           0.33
           0.5
           0.67
+          0.75
           1.0
         ];
         swipe_gesture_fingers = 4;
