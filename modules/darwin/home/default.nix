@@ -10,6 +10,7 @@
     ./git.nix
     ./topgrade.nix
     ./aerospace.nix
+    ./paneru.nix
     ./sketchybar.nix
     ./auto-rebuild.nix
   ];

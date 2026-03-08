@@ -430,6 +430,26 @@
         "type": "github"
       }
     },
+    "paneru": {
+      "inputs": {
+        "nixpkgs": [
+          "nixpkgs"
+        ]
+      },
+      "locked": {
+        "lastModified": 1772928212,
+        "narHash": "sha256-l6MOG6ayK5d7KAAQhbaKN9A1J6CC/FCqb2llBUsYNQk=",
+        "owner": "karinushka",
+        "repo": "paneru",
+        "rev": "a076fe5b04ad35f0ceacf929b842f1a5ce23bca0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "karinushka",
+        "repo": "paneru",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "defaults2nix": "defaults2nix",
@@ -440,6 +460,7 @@
         "nixpkgs": "nixpkgs",
         "noctalia": "noctalia",
         "noctalia-qs": "noctalia-qs",
+        "paneru": "paneru",
         "sops-nix": "sops-nix",
         "stylix": "stylix",
         "treefmt-nix": "treefmt-nix",
