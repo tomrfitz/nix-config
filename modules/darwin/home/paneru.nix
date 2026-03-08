@@ -17,8 +17,8 @@
         padding_top = 0;
         padding_bottom = 0;
 
-        padding_left = 2;
-        padding_right = 2;
+        padding_left = 0;
+        padding_right = 0;
         auto_center = false;
         border_active_window = false;
       };
