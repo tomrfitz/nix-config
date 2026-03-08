@@ -63,10 +63,10 @@ in
       _FXShowPosixPathInTitle = true;
       FXPreferredViewStyle = "clmv";
       FXRemoveOldTrashItems = true;
-      ShowExternalHardDrivesOnDesktop = true;
+      ShowExternalHardDrivesOnDesktop = false;
       ShowHardDrivesOnDesktop = false;
-      ShowMountedServersOnDesktop = true;
-      ShowRemovableMediaOnDesktop = true;
+      ShowMountedServersOnDesktop = false;
+      ShowRemovableMediaOnDesktop = false;
       NewWindowTarget = "Home";
     };
 
@@ -161,6 +161,7 @@ in
       };
       "com.apple.finder" = {
         ShowSidebar = true;
+        CreateDesktop = false; # disable desktop icon layer (fixes paneru tiling Finder's AXUnknown window)
       };
       "com.apple.spaces" = {
         "spans-displays" = false; # Independent spaces per display
