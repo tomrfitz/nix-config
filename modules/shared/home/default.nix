@@ -116,6 +116,7 @@ in
     escapeTime = 10;
     baseIndex = 1;
     focusEvents = true;
+    keyMode = "vi";
     extraConfig = ''
       set -g renumber-windows on
       set -g set-clipboard on
@@ -125,6 +126,19 @@ in
       bind | split-window -h -c "#{pane_current_path}"
       bind - split-window -v -c "#{pane_current_path}"
       bind c new-window -c "#{pane_current_path}"
+
+      # Vim pane navigation
+      bind h select-pane -L
+      bind j select-pane -D
+      bind k select-pane -U
+      bind l select-pane -R
+
+      # Reload config
+      bind r source-file ~/.config/tmux/tmux.conf \; display "Config reloaded"
+
+      # ── Pane styling ──
+      set -g window-style "bg=#1C1B1A"
+      set -g window-active-style "bg=#282726"
 
       # ── Flexoki dark status bar ──
       set -g status-style "bg=#282726,fg=#CECDC3"
