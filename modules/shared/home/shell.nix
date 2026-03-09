@@ -310,7 +310,7 @@
       };
 
       battery = {
-        format = "[ $percentage$symbol]($style)";
+        format = "[ $symbol$percentage]($style)";
         full_symbol = "=";
         charging_symbol = "[^](bold green)";
         discharging_symbol = "v";
