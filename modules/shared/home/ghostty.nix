@@ -34,7 +34,7 @@
       custom-shader-animation = true;
       # Keep remote SSH sessions usable when hosts don't yet have Ghostty terminfo.
       shell-integration-features = "ssh-env,ssh-terminfo";
-      window-step-resize = true;
+      window-step-resize = false;
       keybind = [
         "global:shift+ctrl+backquote=new_window"
         "global:ctrl+backquote=toggle_quick_terminal"
