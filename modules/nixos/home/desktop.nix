@@ -1,6 +1,7 @@
 {
   pkgs,
   lib,
+  config,
   ...
 }:
 let
@@ -13,6 +14,142 @@ let
       "call"
     ]
     ++ (lib.splitString " " cmd);
+
+  # Noctalia settings deployed as a mutable copy (not HM symlink) so that
+  # the GeoIP service can update location.name at runtime. HM activation
+  # re-copies the base config on each rebuild; the GeoIP service patches
+  # location.name on top after noctalia starts.
+  noctaliaSettings = {
+    colorSchemes = {
+      useWallpaperColors = true;
+      darkMode = true;
+      schedulingMode = "location";
+    };
+    templates = {
+      activeTemplates = [
+        "gtk3"
+        "gtk4"
+        "qt6ct"
+        "foot"
+        "ghostty"
+        "emacs"
+        "vesktop"
+      ];
+      enableUserTheming = false;
+    };
+    ui = {
+      fontDefault = "Atkinson Hyperlegible Next";
+      fontFixed = "Atkinson Hyperlegible Mono";
+    };
+    nightLight = {
+      enabled = true;
+      autoSchedule = true;
+      nightTemp = "3000";
+      dayTemp = "6500";
+    };
+    location = {
+      weatherEnabled = true;
+      useFahrenheit = false;
+      use12hourFormat = false;
+    };
+    appLauncher = {
+      enableClipboardHistory = true;
+      terminalCommand = "ghostty -e";
+      enableWindowsSearch = true;
+      enableSessionSearch = true;
+    };
+    bar = {
+      position = "top";
+      density = "compact";
+      widgetSpacing = 6;
+      displayMode = "always_visible";
+      widgets = {
+        left = [
+          { id = "Launcher"; }
+          { id = "Clock"; }
+          { id = "SystemMonitor"; }
+          { id = "ActiveWindow"; }
+          { id = "MediaMini"; }
+        ];
+        center = [
+          { id = "Workspace"; }
+        ];
+        right = [
+          { id = "Tray"; }
+          { id = "NotificationHistory"; }
+          { id = "Battery"; }
+          { id = "Volume"; }
+          { id = "Brightness"; }
+          { id = "Network"; }
+          { id = "ControlCenter"; }
+        ];
+      };
+    };
+    widgetSettings.bar = {
+      Workspace = {
+        labelMode = "index";
+        hideUnoccupied = false;
+        enableScrollWheel = true;
+      };
+      SystemMonitor = {
+        compactMode = true;
+        useMonospaceFont = true;
+        showCpuUsage = true;
+        showCpuTemp = true;
+        showMemoryUsage = true;
+        showMemoryAsPercent = false;
+        showDiskUsage = false;
+        showNetworkStats = false;
+      };
+      Clock.formatHorizontal = "HH:mm ddd, MMM dd";
+    };
+    notifications = {
+      enabled = true;
+      location = "top_right";
+      lowUrgencyDuration = 3;
+      normalUrgencyDuration = 8;
+      criticalUrgencyDuration = 15;
+      sounds.enabled = false;
+    };
+    osd = {
+      enabled = true;
+      location = "top_right";
+      autoHideMs = 2000;
+    };
+    wallpaper = {
+      enabled = true;
+      fillMode = "crop";
+    };
+    idle = {
+      enabled = true;
+      screenOffTimeout = 600;
+      lockTimeout = 660;
+      suspendTimeout = 1800;
+      fadeDuration = 5;
+    };
+    general = {
+      lockOnSuspend = true;
+      enableLockScreenCountdown = true;
+      lockScreenCountdownDuration = 10000;
+      autoStartAuth = true;
+      allowPasswordWithFprintd = true;
+      showChangelogOnStartup = false;
+    };
+    audio.volumeOverdrive = true;
+  };
+
+  noctaliaSettingsFile = (pkgs.formats.json { }).generate "noctalia-settings.json" noctaliaSettings;
+
+  # GeoIP → Noctalia IPC: detect city from IP, push via IPC (triggers geocode
+  # + weather refresh; Noctalia's save timer persists to mutable settings.json).
+  # ref: https://github.com/noctalia-dev/noctalia-shell/issues/1069
+  noctalia-geoip = pkgs.writeShellScript "noctalia-geoip" ''
+    for attempt in 1 2 3; do
+      city=$(${pkgs.curl}/bin/curl -sf --max-time 5 "http://ip-api.com/line/?fields=city") && break
+      sleep 10
+    done
+    [ -n "$city" ] && noctalia-shell ipc call location set "$city"
+  '';
 in
 {
   home.packages = with pkgs; [
@@ -283,6 +420,22 @@ in
     ];
   };
 
+  # ── Auto-detect location via GeoIP → Noctalia IPC ────────────────────
+  # ref: https://github.com/noctalia-dev/noctalia-shell/issues/1069
+  systemd.user.services.noctalia-location = {
+    Unit = {
+      Description = "Set Noctalia location from GeoIP";
+      After = [ "noctalia-shell.service" ];
+      Requires = [ "noctalia-shell.service" ];
+    };
+    Install.WantedBy = [ "graphical-session.target" ];
+    Service = {
+      Type = "oneshot";
+      ExecStartPre = "${pkgs.coreutils}/bin/sleep 3"; # wait for IPC socket
+      ExecStart = noctalia-geoip;
+    };
+  };
+
   # ── Wallpaper ─────────────────────────────────────────────────────────
   # Noctalia reads wallpaper paths from this cache file.
   # The image itself is deployed to the store; Noctalia picks up colors from it.
@@ -293,145 +446,15 @@ in
   # Polkit agent provided by nixosModules.niri (KDE polkit)
 
   # ── Noctalia (desktop shell + theming engine) ────────────────────────
+  # Settings managed as mutable copy (see noctaliaSettings in let block)
+  # so the GeoIP service can patch location.name at runtime.
+  home.activation.noctalia-settings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    install -Dm644 ${noctaliaSettingsFile} "$HOME/.config/noctalia/settings.json"
+  '';
+
   programs.noctalia-shell = {
     enable = true;
     systemd.enable = true;
-    settings = {
-      # ── Theming ──────────────────────────────────────────────────────
-      colorSchemes = {
-        useWallpaperColors = true;
-        darkMode = true;
-        schedulingMode = "auto"; # sunrise/sunset auto-switch via geoclue2
-      };
-      templates = {
-        # REVISIT(upstream): verify template name strings on running system;
-        # check via: noctalia-shell ipc call state all | jq .settings.templates.activeTemplates
-        # ref: https://github.com/noctalia-dev/noctalia-shell; checked: 2026-03-09
-        activeTemplates = [
-          "gtk3"
-          "gtk4"
-          "qt6ct"
-          "foot"
-          "ghostty"
-          "emacs"
-          "vesktop"
-        ];
-        enableUserTheming = false;
-      };
-      ui = {
-        fontDefault = "Atkinson Hyperlegible Next";
-        fontFixed = "Atkinson Hyperlegible Mono";
-      };
-
-      # ── Night light (replaces gammastep) ─────────────────────────────
-      nightLight = {
-        enabled = true;
-        autoSchedule = true; # uses geoclue2 for sunrise/sunset
-        nightTemp = "3000";
-        dayTemp = "6500";
-      };
-
-      # ── Location / weather ──────────────────────────────────────────
-      location = {
-        weatherEnabled = true;
-        useFahrenheit = false;
-        use12hourFormat = false;
-      };
-
-      # ── App launcher ────────────────────────────────────────────────
-      appLauncher = {
-        enableClipboardHistory = true;
-        terminalCommand = "ghostty -e";
-        enableWindowsSearch = true;
-        enableSessionSearch = true;
-      };
-
-      # ── Bar ──────────────────────────────────────────────────────────
-      bar = {
-        position = "top";
-        density = "compact";
-        widgetSpacing = 6;
-        displayMode = "always_visible";
-        widgets = {
-          left = [
-            { id = "Launcher"; }
-            { id = "Clock"; }
-            { id = "SystemMonitor"; }
-            { id = "ActiveWindow"; }
-            { id = "MediaMini"; }
-          ];
-          center = [
-            { id = "Workspace"; }
-          ];
-          right = [
-            { id = "Tray"; }
-            { id = "NotificationHistory"; }
-            { id = "Battery"; }
-            { id = "Volume"; }
-            { id = "Brightness"; }
-            { id = "Network"; }
-            { id = "ControlCenter"; }
-          ];
-        };
-      };
-      widgetSettings.bar = {
-        Workspace = {
-          labelMode = "index";
-          hideUnoccupied = false;
-          enableScrollWheel = true;
-        };
-        SystemMonitor = {
-          compactMode = true;
-          useMonospaceFont = true;
-          showCpuUsage = true;
-          showCpuTemp = true;
-          showMemoryUsage = true;
-          showMemoryAsPercent = false;
-          showDiskUsage = false;
-          showNetworkStats = false;
-        };
-        Clock = {
-          formatHorizontal = "HH:mm ddd, MMM dd";
-        };
-      };
-
-      # ── Notifications / OSD ──────────────────────────────────────────
-      notifications = {
-        enabled = true;
-        location = "top_right";
-        lowUrgencyDuration = 3;
-        normalUrgencyDuration = 8;
-        criticalUrgencyDuration = 15;
-        sounds.enabled = false;
-      };
-      osd = {
-        enabled = true;
-        location = "top_right";
-        autoHideMs = 2000;
-      };
-
-      # ── Wallpaper / idle / general ──────────────────────────────────
-      wallpaper = {
-        enabled = true;
-        fillMode = "crop";
-      };
-      idle = {
-        enabled = true;
-        screenOffTimeout = 600;
-        lockTimeout = 660;
-        suspendTimeout = 1800;
-        fadeDuration = 5;
-      };
-      general = {
-        lockOnSuspend = true;
-        enableLockScreenCountdown = true;
-        lockScreenCountdownDuration = 10000;
-        autoStartAuth = true;
-        allowPasswordWithFprintd = true;
-        showChangelogOnStartup = false;
-      };
-      audio.volumeOverdrive = true;
-    };
     plugins = {
       sources = [
         {

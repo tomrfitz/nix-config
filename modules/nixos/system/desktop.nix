@@ -59,9 +59,6 @@
   # Backlight control for unprivileged users
   hardware.acpilight.enable = true;
 
-  # Location provider for Noctalia (dark/light scheduling, night light, weather)
-  services.geoclue2.enable = true;
-
   # Battery reporting for desktop shell (noctalia)
   services.upower.enable = true;
 
