@@ -29,6 +29,18 @@ in
       sops.secrets."github/deploy-key" = {
         sopsFile = ../../../secrets/trfwsl.yaml;
       };
+      sops.secrets."attic/token" = {
+        sopsFile = ../../../secrets/trfwsl.yaml;
+      };
+
+      # Attic CLI config rendered by sops-nix with token interpolated
+      sops.templates."attic-config".content = ''
+        default-server = "local"
+
+        [servers.local]
+        endpoint = "http://127.0.0.1:8484"
+        token = "${config.sops.placeholder."attic/token"}"
+      '';
 
       programs.msmtp = {
         enable = true;
@@ -56,6 +68,10 @@ in
         environment.DEPLOY_KEY_PATH = config.sops.secrets."github/deploy-key".path;
         serviceConfig = {
           Type = "oneshot";
+          ExecStartPre = "+${pkgs.writeShellScript "attic-config-setup" ''
+            mkdir -p /root/.config/attic
+            cp ${config.sops.templates."attic-config".path} /root/.config/attic/config.toml
+          ''}";
           ExecStart = lib.getExe autoUpdateScript;
           TimeoutStartSec = "45min";
           StateDirectory = "auto-update";

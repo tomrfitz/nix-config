@@ -5,7 +5,7 @@ WORK_DIR="/var/lib/auto-update"
 REPO_DIR="${WORK_DIR}/nix-config"
 DEPLOY_KEY="${DEPLOY_KEY_PATH:?DEPLOY_KEY_PATH must be set}"
 REPO_URL="git@github.com:tomrfitz/nix-config.git"
-ATTIC_CACHE=$(cat /etc/attic/cache-name)
+ATTIC_CACHE="local:$(cat /etc/attic/cache-name)"
 
 # ── Phase 0: Setup ──────────────────────────────────────────────────────
 echo "==> Phase 0: Configuring deploy key from sops"
