@@ -283,6 +283,13 @@ in
     ];
   };
 
+  # ── Wallpaper ─────────────────────────────────────────────────────────
+  # Noctalia reads wallpaper paths from this cache file.
+  # The image itself is deployed to the store; Noctalia picks up colors from it.
+  home.file.".cache/noctalia/wallpapers.json".text = builtins.toJSON {
+    defaultWallpaper = "${../../../config/wallpaper.jpg}";
+  };
+
   # Polkit agent provided by nixosModules.niri (KDE polkit)
 
   # ── Noctalia (desktop shell + theming engine) ────────────────────────
