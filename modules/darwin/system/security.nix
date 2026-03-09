@@ -2,7 +2,10 @@
 {
   services.openssh.enable = true;
 
-  security.pam.services.sudo_local.touchIdAuth = true;
+  security.pam.services.sudo_local = {
+    touchIdAuth = true;
+    reattach = true;
+  };
 
   environment.etc = {
     "1password/custom_allowed_browsers" = {
