@@ -16,7 +16,6 @@
       clipboard-read = "allow";
       clipboard-write = "allow";
       right-click-action = "copy-or-paste";
-      gtk-titlebar-style = "tabs";
       link-url = "true";
       link-previews = "true";
       window-padding-balance = true;
