@@ -78,7 +78,6 @@
         "lidarr"
         "bazarr"
         "jellyseerr"
-        "recyclarr"
 
         "tautulli"
         "plex"
