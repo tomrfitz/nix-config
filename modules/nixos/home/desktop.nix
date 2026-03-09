@@ -60,7 +60,11 @@ in
       };
     };
 
+    # Stationary wallpaper: Noctalia draws wallpaper as a layer surface,
+    # niri's background becomes transparent so it shows through.
+    overview.workspace-shadow.enable = false;
     layout = {
+      background-color = "transparent";
       gaps = 5;
       struts = {
         left = 4;
@@ -115,7 +119,7 @@ in
 
     layer-rules = [
       {
-        matches = [ { namespace = "^noctalia-overview.*"; } ];
+        matches = [ { namespace = "^noctalia-wallpaper.*"; } ];
         place-within-backdrop = true;
       }
     ];
