@@ -34,9 +34,11 @@
   programs.nh.enable = true;
 
   # ── Time zone ─────────────────────────────────────────────────────────
-  # Use automatic timezone detection (sets time.timeZone = null internally)
-  # Falls back to America/New_York if location detection fails
-  services.automatic-timezoned.enable = true;
+  # WSL: geoclue (used by automatic-timezoned) has no location provider,
+  # so set timezone explicitly and sync time from Windows clock.
+  # Native: use geolocation-based automatic detection.
+  time.timeZone = lib.mkIf isWSL "America/New_York";
+  services.automatic-timezoned.enable = !isWSL;
 
   # ── Tailscale ──────────────────────────────────────────────────────────
   services.tailscale.enable = true;
