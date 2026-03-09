@@ -51,7 +51,7 @@ just snapshot NAME # take macOS defaults snapshot
 
 ### Flake structure
 
-`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Core inputs: nixpkgs (unstable), nix-darwin, home-manager, stylix, treefmt-nix, defaults2nix, zen-browser, nixos-wsl, sops-nix, niri-flake.
+`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Core inputs: nixpkgs (unstable), nix-darwin, home-manager, treefmt-nix, defaults2nix, zen-browser, nixos-wsl, sops-nix, niri-flake, noctalia.
 
 ### Hosts are thin wiring
 
@@ -71,14 +71,14 @@ Keep host files concise, idiomatic, portable, and composable:
 ```text
 modules/
   shared/          # Cross-platform (maximized — put everything here first)
-    system/        # nix.nix, stylix.nix
+    system/        # nix.nix
     home/          # packages, shell, git, editors, ghostty, firefox, zen, obsidian, desktop, opencode, ruff, etc.
   darwin/          # macOS-only
     system/        # user.nix, homebrew.nix, settings.nix (system.defaults), security.nix
     home/          # zsh.nix, git.nix (1Password signing), topgrade.nix, aerospace.nix, sketchybar.nix
   nixos/           # Linux-only
     system/        # user.nix, desktop.nix, hardening.nix, homelab/, remote-build-cache.nix, specialisations.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh
-    home/          # desktop.nix, darkman.nix
+    home/          # desktop.nix (niri + noctalia theming)
 ```
 
 `default.nix` files are aggregators — mostly import lists.
@@ -95,12 +95,13 @@ modules/
 - Homelab per-service conventions: `modules/nixos/system/homelab/<service>.nix`
 - Enable homelab services: `hosts/trfwsl/default.nix` (via `services.<name>.enable`)
 - WSL GPU / container runtime: `modules/nixos/system/wsl-gpu.nix`
-- Linux desktop/session behavior: `modules/nixos/home/{default,darkman}.nix`
+- Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
 - Configure editors: `modules/shared/home/editors.nix`
 - Firefox extensions: `modules/shared/home/firefox.nix`
 - Git settings (shared): `modules/shared/home/git.nix`
 - Git settings (1Password signing): `modules/darwin/home/git.nix`
-- Stylix defaults / fonts: `modules/shared/system/stylix.nix`
+- Fontconfig defaults: `modules/shared/home/fonts.nix`
+- Noctalia theming / night light / launcher: `modules/nixos/home/desktop.nix`
 
 ### Key design rules
 
@@ -155,10 +156,10 @@ Two mechanisms, split by trust model:
 
 ## Theming
 
-- **Palette:** Flexoki (dark + light variants) across Ghostty, Zed, Helix, Vesktop
-- **Fonts:** Atkinson Hyperlegible (sans + mono)
-- **Stylix:** shared defaults in `modules/shared/system/stylix.nix`; NixOS home uses dark/light specialisations with darkman auto-switching
-- **macOS behavior:** Ghostty and Zed keep native system-responsive theming (Stylix targets disabled on darwin)
+- **Linux theming engine:** Noctalia — wallpaper-derived Material You colors, template-based app theming (GTK, Qt, foot, Ghostty, Emacs, Vesktop), auto dark/light scheduling, night light, app launcher
+- **macOS theming:** native system appearance (Ghostty and Zed respond to system dark/light preference); Flexoki theme for Zed/Emacs
+- **Fonts:** Atkinson Hyperlegible Next (sans), Atkinson Hyperlegible Mono (monospace), fontconfig defaults in `modules/shared/home/fonts.nix`
+- **Emacs:** Noctalia-generated theme on Linux, Flexoki fallback on macOS
 
 ## Custom packages
 

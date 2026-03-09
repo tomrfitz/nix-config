@@ -19,10 +19,6 @@
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    stylix = {
-      url = "github:nix-community/stylix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -67,7 +63,6 @@
       home-manager,
       defaults2nix,
       treefmt-nix,
-      stylix,
       nixos-wsl,
       niri-flake,
       zen-browser,
@@ -143,7 +138,6 @@
           };
           sharedSystemModules = [
             ./modules/shared/system/nix.nix
-            ./modules/shared/system/stylix.nix
           ];
         in
         systemBuilder {
@@ -163,7 +157,6 @@
               inherit hmModules;
               specialArgs = commonSpecialArgs;
             })
-            (if isDarwin then stylix.darwinModules.stylix else stylix.nixosModules.stylix)
           ]
           ++ lib.optionals (!isDarwin) [ sops-nix.nixosModules.sops ]
           ++ extraModules;
