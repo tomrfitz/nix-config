@@ -17,9 +17,17 @@
 
   # ── Display / Desktop ────────────────────────────────────────────────
   programs.niri.enable = true;
-  services.xserver.enable = lib.mkDefault true;
-  services.displayManager.gdm.enable = lib.mkDefault true;
   services.desktopManager.gnome.enable = lib.mkDefault false;
+
+  # greetd: lightweight greeter for Wayland compositors
+  # (gnome specialisation overrides this with GDM when activated)
+  services.greetd = {
+    enable = true;
+    settings.default_session = {
+      command = "${pkgs.tuigreet}/bin/tuigreet --time --remember --cmd niri-session";
+      user = "greeter";
+    };
+  };
 
   # ── Audio ─────────────────────────────────────────────────────────────
   services.pipewire = {
