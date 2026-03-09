@@ -120,9 +120,7 @@ in
     extraConfig = ''
       set -g renumber-windows on
       set -g set-clipboard on
-      set -g extended-keys always
       set -ag terminal-overrides ",ghostty:RGB"
-      set -as terminal-features ",ghostty:extkeys"
 
       # Splits/windows preserve working directory
       bind | split-window -h -c "#{pane_current_path}"
