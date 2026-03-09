@@ -120,6 +120,7 @@ in
     extraConfig = ''
       set -g renumber-windows on
       set -g set-clipboard on
+      set -g mouse-scroll-lines 1
       set -ag terminal-overrides ",ghostty:RGB"
 
       # Splits/windows preserve working directory
