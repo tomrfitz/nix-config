@@ -426,9 +426,8 @@ in
     Unit = {
       Description = "Set Noctalia location from GeoIP";
       After = [ "noctalia-shell.service" ];
-      Requires = [ "noctalia-shell.service" ];
     };
-    Install.WantedBy = [ "graphical-session.target" ];
+    Install.WantedBy = [ "noctalia-shell.service" ];
     Service = {
       Type = "oneshot";
       ExecStartPre = "${pkgs.coreutils}/bin/sleep 3"; # wait for IPC socket
