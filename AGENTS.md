@@ -232,7 +232,7 @@ on-push CI:    eval all 3 hosts + formatting check (safety net)
 
 **Check status:** `systemctl status auto-update.timer` / `journalctl -u auto-update`
 
-**Failure notification:** email to `nix@tomrfitz.com` via msmtp/Gmail relay (sops secret `mail/app-pass`)
+**Failure notification:** email to `tomrfitz@gmail.com` via msmtp/Gmail relay (sops secret `mail/app-pass`)
 
 ### Naming convention
 

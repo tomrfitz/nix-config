@@ -39,7 +39,7 @@ in
           port = 587;
           user = "tomrfitz@gmail.com";
           passwordeval = "cat ${config.sops.secrets."mail/app-pass".path}";
-          from = "nix@tomrfitz.com";
+          from = "tomrfitz@gmail.com";
         };
       };
 
@@ -70,13 +70,13 @@ in
           ExecStart = pkgs.writeShellScript "auto-update-notify" ''
             {
               echo "Subject: [trfwsl] auto-update failed"
-              echo "From: nix@tomrfitz.com"
-              echo "To: nix@tomrfitz.com"
+              echo "From: tomrfitz@gmail.com"
+              echo "To: tomrfitz@gmail.com"
               echo ""
               echo "auto-update service failed at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
               echo ""
               ${pkgs.systemd}/bin/journalctl -u auto-update -n 80 --no-pager
-            } | ${pkgs.msmtp}/bin/msmtp -a default nix@tomrfitz.com
+            } | ${pkgs.msmtp}/bin/msmtp -a default tomrfitz@gmail.com
           '';
         };
       };

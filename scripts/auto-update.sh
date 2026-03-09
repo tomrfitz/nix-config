@@ -49,7 +49,7 @@ nixos-rebuild switch --flake .#trfwsl
 if ! git diff --quiet flake.lock; then
     echo "==> Phase 7: Committing and pushing flake.lock"
     git add flake.lock
-    git -c user.name="trfwsl auto-update" -c user.email="nix@tomrfitz.com" \
+    git -c user.name="trfwsl auto-update" -c user.email="tomrfitz@gmail.com" \
         commit -m "Update flake.lock"
     git push origin HEAD:main
 else
