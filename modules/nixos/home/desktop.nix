@@ -237,6 +237,7 @@
 
     spawn-at-startup = [
       { argv = [ "xwayland-satellite" ]; }
+      { argv = [ "noctalia-shell" ]; }
       {
         argv = [
           "1password"
