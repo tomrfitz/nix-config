@@ -49,11 +49,18 @@
   services.acpid.enable = true;
   services.power-profiles-daemon.enable = lib.mkForce false;
 
-  # Headless/server: keep running with lid closed
+  # Headless/server: stay awake indefinitely, lid closed or not
   services.logind.settings.Login = {
     HandleLidSwitch = "ignore";
     HandleLidSwitchDocked = "ignore";
     HandleLidSwitchExternalPower = "ignore";
+    IdleAction = "ignore";
+  };
+  systemd.sleep.settings.Sleep = {
+    AllowSuspend = "no";
+    AllowHibernation = "no";
+    AllowSuspendThenHibernate = "no";
+    AllowHybridSleep = "no";
   };
 
   # Backlight control for unprivileged users

@@ -124,7 +124,7 @@ let
       enabled = true;
       screenOffTimeout = 600;
       lockTimeout = 660;
-      suspendTimeout = 1800;
+      suspendTimeout = 0; # never suspend — functionally headless
       fadeDuration = 5;
     };
     general = {
