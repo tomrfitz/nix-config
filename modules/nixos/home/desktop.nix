@@ -48,7 +48,8 @@ in
     prefer-no-csd = true;
     environment."NIXOS_OZONE_WL" = "1";
 
-    debug.honor-xdg-activation-with-invalid-serial = true;
+    # Required for Noctalia notification actions and window activation
+    debug.honor-xdg-activation-with-invalid-serial = { };
 
     input = {
       keyboard.xkb = { };
