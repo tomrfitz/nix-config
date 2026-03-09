@@ -1,17 +1,24 @@
 {
   pkgs,
+  lib,
   ...
 }:
+let
+  # Build noctalia IPC command list. Args must be single-word tokens (no spaces).
+  noctalia =
+    cmd:
+    [
+      "noctalia-shell"
+      "ipc"
+      "call"
+    ]
+    ++ (lib.splitString " " cmd);
+in
 {
-  imports = [
-    ./darkman.nix
-  ];
-
   home.packages = with pkgs; [
     # 1password installed via programs._1password-gui in system config
     emacs
     foot # lightweight Wayland terminal
-    fuzzel # app launcher
     xwayland-satellite
     wl-clipboard
     brightnessctl
@@ -19,12 +26,29 @@
     libnotify
   ];
 
+  # ── Cursor ───────────────────────────────────────────────────────────
+  home.pointerCursor = {
+    package = pkgs.adwaita-icon-theme;
+    name = "Adwaita";
+    size = 24;
+    gtk.enable = true;
+  };
+
+  # ── Portal (freedesktop dark preference for apps) ────────────────────
+  xdg.portal = {
+    enable = true;
+    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
+    config.common.default = "*";
+  };
+
   # ── Niri ────────────────────────────────────────────────────────────
   # nixosModules.niri provides: polkit agent, xdg-desktop-portal-gnome,
   # GNOME keyring, dconf, opengl, default fonts, swaylock PAM, binary cache
   programs.niri.settings = {
     prefer-no-csd = true;
     environment."NIXOS_OZONE_WL" = "1";
+
+    debug.honor-xdg-activation-with-invalid-serial = true;
 
     input = {
       keyboard.xkb = { };
@@ -88,12 +112,22 @@
       }
     ];
 
+    layer-rules = [
+      {
+        matches = [ { namespace = "^noctalia-overview.*"; } ];
+        place-within-backdrop = true;
+      }
+    ];
+
     binds = {
       # ── Launch ──────────────────────────────────────────────────────
       "Super+Return".action.spawn = "ghostty";
-      "Super+Space".action.spawn = "fuzzel";
+      "Super+Space".action.spawn = noctalia "launcher toggle";
       "Super+Q".action.close-window = { };
       "Super+F".action.fullscreen-window = { };
+
+      # ── Lock ───────────────────────────────────────────────────────
+      "Super+Ctrl+L".action.spawn = noctalia "lockScreen lock";
 
       # ── Focus (vim-style) ───────────────────────────────────────────
       "Super+H".action.focus-column-left = { };
@@ -171,8 +205,6 @@
         action.toggle-keyboard-shortcuts-inhibit = { };
       };
 
-      # Lock screen handled by noctalia (idle + manual via shell)
-
       # ── Screenshots (niri built-in) ─────────────────────────────────
       "Super+Shift+S".action.screenshot = { };
       "Print".action.screenshot-screen = { };
@@ -237,7 +269,6 @@
 
     spawn-at-startup = [
       { argv = [ "xwayland-satellite" ]; }
-      { argv = [ "noctalia-shell" ]; }
       {
         argv = [
           "1password"
@@ -249,11 +280,61 @@
 
   # Polkit agent provided by nixosModules.niri (KDE polkit)
 
-  # ── Noctalia (desktop shell: bar, notifications, OSD, wallpaper) ───
+  # ── Noctalia (desktop shell + theming engine) ────────────────────────
   programs.noctalia-shell = {
     enable = true;
+    systemd.enable = true;
     settings = {
-      # Opacity and font settings managed by Stylix — revisit when theming is consolidated
+      # ── Theming ──────────────────────────────────────────────────────
+      colorSchemes = {
+        useWallpaperColors = true;
+        darkMode = true;
+        schedulingMode = "auto"; # sunrise/sunset auto-switch via geoclue2
+      };
+      templates = {
+        # REVISIT(upstream): verify template name strings on running system;
+        # check via: noctalia-shell ipc call state all | jq .settings.templates.activeTemplates
+        # ref: https://github.com/noctalia-dev/noctalia-shell; checked: 2026-03-09
+        activeTemplates = [
+          "gtk3"
+          "gtk4"
+          "qt6ct"
+          "foot"
+          "ghostty"
+          "emacs"
+          "vesktop"
+        ];
+        enableUserTheming = false;
+      };
+      ui = {
+        fontDefault = "Atkinson Hyperlegible Next";
+        fontFixed = "Atkinson Hyperlegible Mono";
+      };
+
+      # ── Night light (replaces gammastep) ─────────────────────────────
+      nightLight = {
+        enabled = true;
+        autoSchedule = true; # uses geoclue2 for sunrise/sunset
+        nightTemp = "3000";
+        dayTemp = "6500";
+      };
+
+      # ── Location / weather ──────────────────────────────────────────
+      location = {
+        weatherEnabled = true;
+        useFahrenheit = false;
+        use12hourFormat = false;
+      };
+
+      # ── App launcher ────────────────────────────────────────────────
+      appLauncher = {
+        enableClipboardHistory = true;
+        terminalCommand = "ghostty -e";
+        enableWindowsSearch = true;
+        enableSessionSearch = true;
+      };
+
+      # ── Bar ──────────────────────────────────────────────────────────
       bar = {
         position = "top";
         density = "compact";
@@ -301,6 +382,8 @@
           formatHorizontal = "HH:mm ddd, MMM dd";
         };
       };
+
+      # ── Notifications / OSD ──────────────────────────────────────────
       notifications = {
         enabled = true;
         location = "top_right";
@@ -314,6 +397,8 @@
         location = "top_right";
         autoHideMs = 2000;
       };
+
+      # ── Wallpaper / idle / general ──────────────────────────────────
       wallpaper = {
         enabled = true;
         fillMode = "crop";
@@ -329,7 +414,11 @@
         lockOnSuspend = true;
         enableLockScreenCountdown = true;
         lockScreenCountdownDuration = 10000;
+        autoStartAuth = true;
+        allowPasswordWithFprintd = true;
+        showChangelogOnStartup = false;
       };
+      audio.volumeOverdrive = true;
     };
     plugins = {
       sources = [
@@ -346,17 +435,6 @@
         };
       };
       version = 2;
-    };
-  };
-
-  # Blue light filter (screen temperature) for Wayland
-  # Uses geoclue2 for automatic location detection (like macOS Night Shift)
-  services.gammastep = {
-    enable = true;
-    provider = "geoclue2";
-    temperature = {
-      day = 6500;
-      night = 3000;
     };
   };
 }

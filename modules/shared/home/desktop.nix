@@ -10,7 +10,6 @@
     ./ghostty.nix
     ./vesktop.nix
     ./obsidian.nix
-    ./stylix.nix
   ];
 
   # ── GUI packages ──────────────────────────────────────────────────────

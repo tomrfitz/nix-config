@@ -23,6 +23,7 @@ in
     ./git.nix
     ./fastfetch.nix
     ./editors.nix
+    ./fonts.nix
     ./ruff.nix
     ./opencode.nix
   ];
