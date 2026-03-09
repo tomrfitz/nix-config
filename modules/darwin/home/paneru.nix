@@ -73,6 +73,11 @@
           bundle_id = "com.1password.1password";
           floating = true;
         };
+        finder = {
+          title = ".*";
+          bundle_id = "com.apple.finder";
+          floating = true;
+        };
       };
     };
   };
