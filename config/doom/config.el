@@ -18,3 +18,6 @@
 
 ;; ── Org ─────────────────────────────────────────────────────────────────
 (setq org-directory "~/notes/org")
+
+(add-to-list 'vc-directory-exclusion-list ".jj")
+
