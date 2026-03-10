@@ -17,4 +17,4 @@
     (setq doom-theme (if (display-graphic-p) 'flexoki-themes-dark nil))))
 
 ;; ── Org ─────────────────────────────────────────────────────────────────
-(setq org-directory "~/notes/")
+(setq org-directory "~/notes/org")
