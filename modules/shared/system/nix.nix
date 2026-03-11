@@ -11,12 +11,13 @@
     # Trigger GC mid-build if free space drops below 25 GB, stop at 50 GB
     min-free = 26843545600;
     max-free = 53687091200;
+    fallback = true;
     extra-substituters = [
       "https://cache.lix.systems"
       "https://nix-community.cachix.org"
       "https://niri.cachix.org"
       "https://tomrfitz.cachix.org"
-      "http://trfwsl:8484/trf-infra?connect-timeout=5"
+      "http://trfwsl:8484/trf-infra"
     ];
     extra-trusted-public-keys = [
       "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o="
