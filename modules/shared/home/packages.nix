@@ -12,6 +12,7 @@
       (callPackage ../../../pkgs/sgram-tui { })
 
       rana
+      comma
       yazi
       tailscale
       python3Packages.markitdown
