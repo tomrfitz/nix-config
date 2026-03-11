@@ -12,6 +12,8 @@
     min-free = 26843545600;
     max-free = 53687091200;
     fallback = true;
+    connect-timeout = 5;
+    log-lines = 25;
     extra-substituters = [
       "https://cache.lix.systems"
       "https://nix-community.cachix.org"
