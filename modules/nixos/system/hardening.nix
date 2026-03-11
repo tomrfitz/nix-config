@@ -46,4 +46,5 @@
   # ── sudo-rs ─────────────────────────────────────────────────────────
   # Memory-safe Rust implementation of sudo
   security.sudo-rs.enable = true;
+  security.sudo-rs.execWheelOnly = true;
 }
