@@ -130,9 +130,9 @@ in
         }; # Monday
         AppleICUDateFormatStrings = {
           "1" = "yyyy-MM-dd";
-          "2" = "yyyy-MM-dd 'Week' W";
-          "3" = "yyyy-MM-dd 'Week' W, EEEE";
-          "4" = "yyyy-MM-dd'T'HH:mm:ss";
+          "2" = "yyyy-MM-dd";
+          "3" = "yyyy-MM-dd";
+          "4" = "yyyy-MM-dd, EEEE";
         };
       };
       "com.apple.dock" = {
