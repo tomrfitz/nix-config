@@ -102,7 +102,6 @@ in
         wantedBy = [ "timers.target" ];
         timerConfig = {
           OnCalendar = "*-*-* 04:45:00";
-          Persistent = true;
           RandomizedDelaySec = "5min";
         };
       };
