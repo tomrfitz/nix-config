@@ -16,9 +16,16 @@ let
 in
 {
   config = lib.mkMerge [
+    # Attic substituter for all NixOS hosts (cache only holds x86_64-linux paths).
+    {
+      nix.settings = {
+        extra-substituters = [ "http://${builderHost}:${toString atticPort}/${atticCacheName}" ];
+        extra-trusted-public-keys = [ "trf-infra:9T9hcVKDnDKKTirHMarQGhjvHLmRT4prxPb4RLRXctI=" ];
+      };
+    }
+
     (lib.mkIf (hostName == "trfnix") {
       # Offload Linux builds to trfwsl over Tailscale/MagicDNS.
-      # Attic substituter + public key now in shared nix.nix.
       nix.distributedBuilds = true;
       nix.settings.builders-use-substitutes = true;
 
@@ -42,6 +49,20 @@ in
           ];
         }
       ];
+
+      # SSH keepalive + multiplexing for builder connections.
+      # Nix opens a new SSH session per build step; ControlMaster keeps a
+      # persistent master connection. connect-timeout in nix.conf only covers
+      # HTTP substituters, not SSH builders.
+      programs.ssh.extraConfig = ''
+        Host ${builderHost}
+          ControlMaster auto
+          ControlPath /tmp/ssh-nix-builder-%C
+          ControlPersist 10m
+          ServerAliveInterval 60
+          ServerAliveCountMax 3
+          ConnectTimeout 10
+      '';
     })
 
     (lib.mkIf (hostName == builderHost) {
