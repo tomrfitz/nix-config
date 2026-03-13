@@ -59,7 +59,7 @@
         autoStash = true;
         updateRefs = true;
       };
-      merge.conflictStyle = "zdiff3";
+
     };
   };
 

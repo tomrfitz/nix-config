@@ -107,6 +107,11 @@ in
     gitCredentialHelper.enable = false;
   };
   programs.lazygit.enable = true;
+  programs.mergiraf = {
+    enable = true;
+    enableGitIntegration = true;
+    enableJujutsuIntegration = true;
+  };
 
   # ── Tmux ──────────────────────────────────────────────────────────────
   programs.tmux = {
