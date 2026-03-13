@@ -138,6 +138,7 @@
           };
           sharedSystemModules = [
             ./modules/shared/system/nix.nix
+            ./modules/shared/system/user.nix
           ];
         in
         systemBuilder {
@@ -187,7 +188,6 @@
           hmModules = [
             ./modules/shared/home
             ./modules/shared/home/desktop.nix
-            ./modules/nixos/home
             ./modules/nixos/home/desktop.nix
             noctalia.homeModules.default
           ];
@@ -200,7 +200,6 @@
           extraModules = [ nixos-wsl.nixosModules.wsl ];
           hmModules = [
             ./modules/shared/home
-            ./modules/nixos/home
           ];
         };
       };
