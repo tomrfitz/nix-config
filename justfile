@@ -2,6 +2,7 @@
 
 host := `hostname`
 nh_cmd := if host == "trfmbp" { "darwin" } else { "os" }
+system := if host == "trfmbp" { "aarch64-darwin" } else { "x86_64-linux" }
 
 # Apply the current configuration
 rebuild:
@@ -46,6 +47,25 @@ eval-all:
     nix eval .#darwinConfigurations.trfmbp.system --raw
     nix eval .#nixosConfigurations.trfnix.config.system.build.toplevel.drvPath --raw
     nix eval .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath --raw
+
+# Build rendered topology diagrams for the current architecture
+topology:
+    nix build path:.#topology.{{ system }}.config.output
+
+# Build the generated disko script for trfnix
+[linux]
+disko-trfnix-script:
+    nix build path:.#nixosConfigurations.trfnix.config.system.build.diskoScript
+
+# Dry-run disko for trfnix (prints script path, does not execute)
+[linux]
+disko-trfnix-dry-run:
+    nix run github:nix-community/disko -- --mode destroy,format,mount --dry-run --flake path:.#trfnix
+
+# Regenerate trfnix facter report
+[linux]
+facter-trfnix:
+    sudo nix run nixpkgs#nixos-facter -- -o hosts/trfnix/facter.json
 
 # Take a macOS defaults snapshot
 [macos]
