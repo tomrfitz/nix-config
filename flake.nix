@@ -45,6 +45,14 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    disko = {
+      url = "github:nix-community/disko";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    nix-topology = {
+      url = "github:oddlama/nix-topology";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     paneru = {
       url = "github:karinushka/paneru";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -69,6 +77,8 @@
       noctalia,
       noctalia-qs,
       sops-nix,
+      disko,
+      nix-topology,
       paneru,
       git-hooks,
     }:
@@ -159,7 +169,10 @@
               specialArgs = commonSpecialArgs;
             })
           ]
-          ++ lib.optionals (!isDarwin) [ sops-nix.nixosModules.sops ]
+          ++ lib.optionals (!isDarwin) [
+            sops-nix.nixosModules.sops
+            nix-topology.nixosModules.default
+          ]
           ++ extraModules;
         };
 
@@ -184,6 +197,7 @@
           extraModules = [
             ./modules/nixos/system/desktop.nix
             niri-flake.nixosModules.niri
+            disko.nixosModules.disko
           ];
           hmModules = [
             ./modules/shared/home
@@ -214,6 +228,25 @@
       darwinConfigurations = mkConfigurations "darwin";
 
       nixosConfigurations = mkConfigurations "nixos";
+
+      topology = forAllSystems (
+        _system: pkgs:
+        import nix-topology {
+          pkgs = pkgs.extend nix-topology.overlays.default;
+          modules = [
+            ./topology.nix
+            {
+              nixosConfigurations = self.nixosConfigurations;
+            }
+          ];
+        }
+      );
+
+      packages = forAllSystems (
+        system: _pkgs: {
+          topology = self.topology.${system}.config.output;
+        }
+      );
 
       # ── Formatter (nix fmt — runs all formatters via treefmt) ─────────
       formatter = forAllSystems (system: _pkgs: treefmtEval.${system}.config.build.wrapper);
