@@ -8,6 +8,10 @@
     ./hardware-configuration.nix
   ];
 
+  # Keep generated hardware defaults as a fallback, but prefer facter data
+  # when hosts/trfnix/facter.json exists.
+  hardware.facter.reportPath = if builtins.pathExists ./facter.json then ./facter.json else null;
+
   system.stateVersion = "26.05";
 
   # ── Boot ──────────────────────────────────────────────────────────────
