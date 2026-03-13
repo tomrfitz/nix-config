@@ -45,6 +45,7 @@
       aria2
       duf
       dust
+      git-absorb
       git-filter-repo
       iperf3
       inetutils
