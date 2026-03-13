@@ -57,6 +57,7 @@ in
 
       systemd.services.auto-update = {
         description = "Nix flake auto-update pipeline";
+        restartIfChanged = false;
         after = [
           "network-online.target"
           "atticd.service"
