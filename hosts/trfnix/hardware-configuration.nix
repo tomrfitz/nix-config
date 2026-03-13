@@ -14,14 +14,14 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  boot.initrd.availableKernelModules = [
+  boot.initrd.availableKernelModules = lib.mkIf (config.hardware.facter.reportPath == null) [
     "xhci_pci"
     "ahci"
     "sd_mod"
     "rtsx_usb_sdmmc"
   ];
-  boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-intel" ];
+  boot.initrd.kernelModules = lib.mkIf (config.hardware.facter.reportPath == null) [ ];
+  boot.kernelModules = lib.mkIf (config.hardware.facter.reportPath == null) [ "kvm-intel" ];
   boot.extraModulePackages = [ ];
 
   fileSystems."/" = {
