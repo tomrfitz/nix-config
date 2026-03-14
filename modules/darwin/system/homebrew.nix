@@ -56,6 +56,7 @@
       "1password"
       "activitywatch"
       "aerospace"
+      "karabiner-elements"
       "batfi"
       "betterdisplay"
       "daisydisk"
