@@ -23,9 +23,7 @@
 
       # REVISIT(upstream): prismlauncher segfaults in wrap-qt6-apps-hook on aarch64-darwin; checked: 2026-03-04
       prismlauncher
-      # REVISIT(upstream): remove override once anki check phase has QtWebChannel in test deps;
-      # ref: https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/an/anki/package.nix; checked: 2026-02-25
-      (anki.overrideAttrs { doInstallCheck = false; })
+      anki
       chatterino2
 
       pear-desktop
