@@ -96,9 +96,8 @@
   # Homelab services — enable individually, conventions layered by homelab modules.
   services = {
     bazarr.enable = true;
-    # REVISIT(upstream): re-enable calibre; ref: qmake build failure (calibre pkg) + flask-limiter (calibre-web); checked: 2026-02-26
-    # calibre-server.enable = true;
-    # calibre-web.enable = true;
+    calibre-server.enable = true;
+    calibre-web.enable = true;
     lidarr.enable = true;
     plex.enable = true;
     radarr.enable = true;
