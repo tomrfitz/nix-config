@@ -221,7 +221,7 @@
       scan_timeout = 30;
       add_newline = true;
       continuation_prompt = "[.. ](dimmed white)";
-      format = "($nix_shell$container )$directory$git_branch$git_status$python$nodejs$rust$fill$git_metrics$battery$time\n$cmd_duration$status\${env_var.SSH_CONNECTION}$username$hostname\${env_var.VIMSHELL}$jobs$sudo$character";
+      format = "[┌](dimmed white) ($nix_shell$container )\${env_var.SSH_CONNECTION}$username$hostname$directory$git_branch$git_status$python$nodejs$rust$fill$git_metrics$battery$time\n[└](dimmed white) $cmd_duration$status\${env_var.VIMSHELL}$jobs$sudo$character";
       right_format = "";
 
       fill.symbol = " ";
