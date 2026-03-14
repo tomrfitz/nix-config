@@ -221,8 +221,8 @@
       scan_timeout = 30;
       add_newline = true;
       continuation_prompt = "[.. ](dimmed white)";
-      format = "($nix_shell$container$fill$git_metrics\n)$cmd_duration$status\${env_var.SSH_CONNECTION}$username$hostname\${env_var.VIMSHELL}$jobs$sudo$character";
-      right_format = "$directory$git_branch$git_status$python$nodejs$rust$battery$time";
+      format = "($nix_shell$container )$directory$git_branch$git_status$python$nodejs$rust$fill$git_metrics$battery$time\n$cmd_duration$status\${env_var.SSH_CONNECTION}$username$hostname\${env_var.VIMSHELL}$jobs$sudo$character";
+      right_format = "";
 
       fill.symbol = " ";
 
@@ -466,7 +466,7 @@
 
       nix_shell = {
         style = "bold blue";
-        format = "[nix($state)]($style) [$name](dimmed white)";
+        format = "[nix($state)]($style)";
         impure_msg = "[:impure](bold dimmed red)";
         pure_msg = "[:pure](bold dimmed green)";
         unknown_msg = "";
