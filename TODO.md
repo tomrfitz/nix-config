@@ -9,9 +9,8 @@
 
 ## Upstream Watchlist
 
-- [ ] `REVISIT(upstream): remove anki doInstallCheck override once check phase has QtWebChannel in test deps; ref: https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/an/anki/package.nix; checked: 2026-02-25`
-- [ ] `REVISIT(upstream): re-enable calibre; ref: qmake build failure (calibre pkg) + flask-limiter (calibre-web); checked: 2026-02-26`
-- [ ] `REVISIT(upstream): remove polkit-agent-helper workaround once camera-device sandboxing fix lands; ref: https://github.com/NixOS/nixpkgs/issues/486044; checked: 2026-02-20`
+- [ ] `REVISIT(upstream): remove once polkit-agent-helper allows camera-device access; ref: https://github.com/NixOS/nixpkgs/issues/486044 (covers hidraw only, not video4linux); checked: 2026-03-14`
+- [ ] `REVISIT(upstream): remove lix doInstallCheck override once 2.94.1+ lands in nixpkgs lixPackageSets.stable; ref: https://git.lix.systems/lix-project/lix/issues/1113; checked: 2026-03-14`
 
 ## Phase 1 — NixOS-WSL homelab (`trfwsl`)
 
