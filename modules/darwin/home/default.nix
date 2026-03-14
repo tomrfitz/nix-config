@@ -29,6 +29,9 @@
     SCRNSHT = "$HOME/Documents/Screenshots/";
   };
 
+  # ── Karabiner-Elements ──────────────────────────────────────────────
+  xdg.configFile."karabiner/karabiner.json".source = ../../../config/karabiner.json;
+
   # ── Emacs-plus build config ──────────────────────────────────────────
   xdg.configFile."emacs-plus/build.yml".text = ''
     icon: liquid-glass
