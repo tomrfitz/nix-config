@@ -5,10 +5,6 @@
   ...
 }:
 {
-  imports = [
-    ./specialisations.nix
-  ];
-
   # Required by HM xdg.portal when useUserPackages is enabled
   environment.pathsToLink = [
     "/share/applications"
@@ -17,10 +13,8 @@
 
   # ── Display / Desktop ────────────────────────────────────────────────
   programs.niri.enable = true;
-  services.desktopManager.gnome.enable = lib.mkDefault false;
 
   # greetd: lightweight greeter for Wayland compositors
-  # (gnome specialisation overrides this with GDM when activated)
   services.greetd = {
     enable = true;
     settings.default_session = {

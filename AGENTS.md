@@ -77,7 +77,7 @@ modules/
     system/        # user.nix, homebrew.nix, settings.nix (system.defaults), security.nix
     home/          # zsh.nix, git.nix (1Password signing), topgrade.nix, aerospace.nix, sketchybar.nix
   nixos/           # Linux-only
-    system/        # user.nix, desktop.nix, hardening.nix, homelab/, remote-build-cache.nix, specialisations.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh
+    system/        # user.nix, desktop.nix, hardening.nix, homelab/, remote-build-cache.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh
     home/          # desktop.nix (niri + noctalia theming)
 ```
 
