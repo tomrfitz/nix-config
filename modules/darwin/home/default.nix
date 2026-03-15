@@ -1,5 +1,6 @@
 {
   pkgs,
+  lib,
   ...
 }:
 {
@@ -30,7 +31,11 @@
   };
 
   # ── Karabiner-Elements ──────────────────────────────────────────────
-  xdg.configFile."karabiner/karabiner.json".source = ../../../config/karabiner.json;
+  # Karabiner rewrites its config in-place (unlinking symlinks), so we
+  # copy instead of symlinking to avoid home-manager backup conflicts.
+  home.activation.karabiner = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    install -Dm600 ${../../../config/karabiner.json} "$HOME/.config/karabiner/karabiner.json"
+  '';
 
   # ── Emacs-plus build config ──────────────────────────────────────────
   xdg.configFile."emacs-plus/build.yml".text = ''
