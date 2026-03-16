@@ -1,4 +1,8 @@
-{ pkgs, ... }:
+{
+  pkgs,
+  user,
+  ...
+}:
 {
   nixpkgs.config.allowUnfree = true;
   # REVISIT(upstream): remove doInstallCheck override; ref: https://git.lix.systems/lix-project/lix/issues/1113; checked: 2026-03-14
@@ -15,6 +19,10 @@
     fallback = true;
     connect-timeout = 5;
     log-lines = 25;
+    trusted-users = [
+      "root"
+      user
+    ];
     extra-substituters = [
       "https://cache.lix.systems"
       "https://nix-community.cachix.org"
