@@ -49,6 +49,7 @@ Code should work for its author first, be maintainable and accessible to them ov
 - Design toward the final state, but don't build scaffolding for parts that don't exist yet. If the end structure is clear, adopt it now; if it isn't, take the simplest correct step.
 - Distinguish "not implemented yet" from "doesn't exist" when exploring APIs/options
 - Check official docs first; save significant research findings for future reference
+- When referencing one-off sources (blog posts, forum threads, personal sites) during research, record the URL and a brief summary in memory or project docs — these are hard to re-find later
 - When a decision has lasting consequences (naming, architecture, file placement), ask rather than assume. When the path forward is clear or easily reversible, just do it.
 
 ## Communication
