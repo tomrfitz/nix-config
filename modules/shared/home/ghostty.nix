@@ -21,10 +21,8 @@
       window-padding-balance = true;
       window-padding-x = 8;
       window-padding-y = 8;
-      window-save-state = "never";
+      window-save-state = "always";
       window-theme = "system";
-      window-height = 36;
-      window-width = 130;
       bold-is-bright = true;
       cursor-style = "bar";
       font-thicken = true;
