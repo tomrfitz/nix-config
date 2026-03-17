@@ -67,6 +67,7 @@
           title = "Picture-in-Picture";
           bundle_id = "app.zen-browser.zen";
           floating = true;
+          grid = "50:50:39:1:10:8"; # top-right ish
         };
         onepassword = {
           title = ".*";
@@ -76,6 +77,13 @@
         finder = {
           title = ".*";
           bundle_id = "com.apple.finder";
+          floating = true;
+        };
+        # Emacs child frames (corfu/eldoc popups) — title is empty or
+        # starts with " *" (internal buffer names)
+        emacs-childframe = {
+          title = "^( \\*.*|)$";
+          bundle_id = "org.gnu.Emacs";
           floating = true;
         };
       };
