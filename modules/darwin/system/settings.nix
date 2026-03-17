@@ -166,6 +166,13 @@ in
       "com.apple.spaces" = {
         "spans-displays" = false; # Independent spaces per display
       };
+      "com.apple.mail" = {
+        AutoSelectFont = false; # Don't match reply font to original message
+        NSFont = "AtkinsonHyperlegibleNext-Regular";
+        NSFontSize = 12;
+        NSFixedPitchFont = "AtkinsonHyperlegibleMono-Regular";
+        NSFixedPitchFontSize = 12;
+      };
     };
   };
 }
