@@ -61,6 +61,10 @@
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    llm-agents = {
+      url = "github:numtide/llm-agents.nix";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
   };
 
   outputs =
@@ -81,6 +85,7 @@
       nix-topology,
       paneru,
       git-hooks,
+      llm-agents,
     }:
     let
       lib = nixpkgs.lib;
@@ -156,7 +161,7 @@
           specialArgs = commonSpecialArgs;
           modules = [
             {
-              nixpkgs.overlays = overlays;
+              nixpkgs.overlays = [ llm-agents.overlays.default ] ++ overlays;
             }
           ]
           ++ sharedSystemModules
