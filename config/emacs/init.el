@@ -84,6 +84,12 @@
     :family "Atkinson Hyperlegible Next"
     :height 140)
 
+;; CJK fallback: Pretendard (Korean) → Noto Sans CJK SC (Chinese/shared)
+(dolist (script '(hangul kana han cjk-misc))
+    (set-fontset-font t script (font-spec :family "Pretendard") nil 'prepend))
+(dolist (script '(han cjk-misc))
+    (set-fontset-font t script (font-spec :family "Noto Sans CJK SC") nil 'append))
+
 ;; ── Frame ───────────────────────────────────────────────────────────
 (when (eq system-type 'darwin)
     (add-to-list 'default-frame-alist '(undecorated-round . t)))
