@@ -332,4 +332,22 @@
             (when (file-directory-p dir)
                 (project-remember-project (project-current nil dir))))))
 
+;; ── Server ──────────────────────────────────────────────────────────
+;; Start server when launched normally (not as --daemon, which has its own).
+(unless (daemonp)
+    (server-start))
+
+;; Cmd-Q closes the frame, not Emacs — keeps the server alive for emacsclient.
+;; Use M-x kill-emacs to actually quit.
+(defun tf/close-frame ()
+    "Close the current frame. If it's the last visible one, hide it to keep the server alive."
+    (interactive)
+    (let ((visible (cl-count-if #'frame-visible-p (frame-list))))
+        (if (> visible 1)
+            (delete-frame)
+            (make-frame-invisible nil t))))
+
+(when (eq system-type 'darwin)
+    (global-set-key (kbd "s-q") #'tf/close-frame))
+
 ;;; init.el ends here
