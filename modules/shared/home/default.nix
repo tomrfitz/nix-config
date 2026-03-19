@@ -9,6 +9,7 @@
     ./fonts.nix
     ./ruff.nix
     ./opencode.nix
+    ./xdg-dirs.nix
     ./1password-ssh.nix
   ];
 
