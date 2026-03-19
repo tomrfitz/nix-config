@@ -83,6 +83,10 @@
     :family "Atkinson Hyperlegible Next"
     :height 140)
 
+;; ── Frame ───────────────────────────────────────────────────────────
+(when (eq system-type 'darwin)
+    (add-to-list 'default-frame-alist '(undecorated-round . t)))
+
 ;; ── Theme ─────────────────────────────────────────────────────────────
 ;; Local Flexoki theme (spec-corrected); platform-aware dark/light switching.
 (let ((themes-dir (expand-file-name "themes/" user-emacs-directory)))
