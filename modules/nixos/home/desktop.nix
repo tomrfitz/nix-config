@@ -154,7 +154,6 @@ in
 {
   home.packages = with pkgs; [
     # 1password installed via programs._1password-gui in system config
-    emacs
     foot # lightweight Wayland terminal
     xwayland-satellite
     wl-clipboard
