@@ -182,9 +182,9 @@
           platform = "darwin";
           hostModule = ./hosts/trfmbp;
           overlays = [
-            # REVISIT(upstream): remove once nixpkgs adds anki-audio + anki-mac-helper
-            # to anki pythonDeps (missed in uv-deps.json → python3Packages rewrite)
-            # ref: https://github.com/NixOS/nixpkgs/blob/master/pkgs/by-name/an/anki/package.nix; checked: 2026-03-14
+            # REVISIT(upstream): remove overlay once a214160f is in nixpkgs-unstable
+            # check: gh api repos/NixOS/nixpkgs/compare/a214160f...nixpkgs-unstable --jq '.status' → "ahead" or "identical" means it's in
+            # ref: https://github.com/NixOS/nixpkgs/commit/a214160f092d5a3eacd6831237db8fad6f578d4a; checked: 2026-03-17
             (_: prev: {
               anki = prev.anki.overrideAttrs (old: {
                 env = old.env // {
