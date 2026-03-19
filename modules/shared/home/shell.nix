@@ -17,23 +17,35 @@
     # History is persistent state, not config — keep it in XDG_STATE_HOME.
     history.path = "${config.xdg.stateHome}/zsh/history";
 
-    shellAliases = {
-      ls = "eza --group-directories-first --icons --hyperlink --time-style=long-iso";
-      sa = "source \"${"ZDOTDIR:-$HOME"}/.zshrc\" && echo \"ZSH aliases sourced.\"";
-      # 1Password CLI helpers
-      oprun = "op run --";
-      oprunenv = "op run --environment";
+    shellAliases =
+      let
+        nh = if pkgs.stdenv.isDarwin then "nh darwin" else "nh os";
+      in
+      {
+        ls = "eza --group-directories-first --icons --hyperlink";
+        ll = "eza -l --group-directories-first --icons --hyperlink --time-style=long-iso --git";
 
-      # zmv helpers
-      zcp = "zmv -C";
-      zln = "zmv -L";
+        # Rebuild shortcuts (nix rebuild switch/build)
+        nrs = "${nh} switch";
+        nrsr = "${nh} switch --refresh";
+        nrsl = "${nh} switch ~/nix-config";
+        nrb = "${nh} build";
+        nrbl = "${nh} build ~/nix-config";
 
-      # SSH + tmux (attach or create named session)
-      smbp = "ssh trfmbp -t 'tmux new -As main'";
-      snix = "ssh trfnix -t 'tmux new -As main'";
-      swsl = "ssh trfwsl -t 'tmux new -As main'";
-      slab = "ssh trflab -t 'tmux new -As main'";
-    };
+        # 1Password CLI helpers
+        oprun = "op run --";
+        oprunenv = "op run --environment";
+
+        # zmv helpers
+        zcp = "zmv -C";
+        zln = "zmv -L";
+
+        # SSH + tmux (attach or create named session)
+        smbp = "ssh trfmbp -t 'tmux new -As main'";
+        snix = "ssh trfnix -t 'tmux new -As main'";
+        swsl = "ssh trfwsl -t 'tmux new -As main'";
+        slab = "ssh trflab -t 'tmux new -As main'";
+      };
 
     envExtra = lib.optionalString (!pkgs.stdenv.isDarwin && !isWSL) ''
       # On NixOS, default to the local 1Password agent but preserve a forwarded
