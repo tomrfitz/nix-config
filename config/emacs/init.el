@@ -14,7 +14,7 @@
                      embark embark-consult corfu which-key pulsar
                      exec-path-from-shell spacious-padding olivetti mini-frame
                      magit nix-mode markdown-mode treesit-auto
-                     org-cliplink envrc editorconfig)))
+                     org-cliplink envrc editorconfig dashboard)))
     (let ((missing (cl-remove-if #'package-installed-p packages)))
         (when missing
             (package-refresh-contents)
@@ -49,8 +49,7 @@
 (setq display-line-numbers-width-start t)
 (show-paren-mode 1)
 
-(setq inhibit-startup-screen t
-    use-short-answers t
+(setq use-short-answers t
     confirm-kill-emacs nil
     create-lockfiles nil
     make-backup-files nil
@@ -145,6 +144,15 @@
     (corfu-popupinfo-mode))
 
 ;; ── Visual polish ─────────────────────────────────────────────────────
+(use-package dashboard
+    :custom
+    (dashboard-items '((recents . 10)
+                          (projects . 5)
+                          (bookmarks . 5)))
+    (dashboard-startup-banner 'ascii)
+    :config
+    (dashboard-setup-startup-hook))
+
 (use-package which-key
     :custom
     (which-key-side-window-location 'bottom)
