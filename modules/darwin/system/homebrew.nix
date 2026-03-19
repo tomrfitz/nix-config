@@ -7,7 +7,6 @@
     onActivation.cleanup = "uninstall";
 
     taps = [
-      "d12frosted/emacs-plus" # emacs-plus
       "nikitabobko/tap" # aerospace
     ];
 
@@ -31,8 +30,6 @@
       # dev tools
       "ghostty"
       "xcodes-app"
-      "emacs-plus-app"
-
       # communication
       "element"
       "microsoft-teams"

@@ -65,6 +65,10 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    homebrew-emacs-plus = {
+      url = "github:d12frosted/homebrew-emacs-plus";
+      flake = false;
+    };
   };
 
   outputs =
@@ -86,6 +90,7 @@
       paneru,
       git-hooks,
       llm-agents,
+      homebrew-emacs-plus,
     }:
     let
       lib = nixpkgs.lib;
@@ -146,6 +151,7 @@
               email
               sshPublicKey
               system
+              homebrew-emacs-plus
               ;
             hostName = name;
             isWSL = isWSL;
