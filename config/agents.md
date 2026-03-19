@@ -37,6 +37,7 @@ Code should work for its author first, be maintainable and accessible to them ov
 - Prefer dry-run/check before apply; never mutate live systems without explicit request
 - Understand which commands are idempotent (read-only queries, formatting checks) vs stateful (installs, deployments, database migrations)
 - When a validation step exists, run it before and after changes
+- Treat verifiable literals (version numbers, dates, commit SHAs, hashes, release tags) as facts to confirm from an authoritative source in-repo or upstream docs before acting (especially before commit-message rewrites or release metadata edits)
 
 ## Code organization
 
