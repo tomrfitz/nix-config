@@ -4,10 +4,10 @@
 (require 'flexoki)
 
 (deftheme flexoki-light
-  "Flexoki light — spec-corrected."
-  :family 'flexoki
-  :kind 'color-scheme
-  :background-mode 'light)
+    "Flexoki light — spec-corrected."
+    :family 'flexoki
+    :kind 'color-scheme
+    :background-mode 'light)
 
 (flexoki-create 'light 'flexoki-light)
 
