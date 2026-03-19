@@ -27,7 +27,6 @@
 
   home.sessionPath = [
     "$HOME/.local/bin"
-    "$HOME/.config/emacs/bin" # doom CLI
   ];
 
   # ── Other programs with native modules ─────────────────────────────────
@@ -116,13 +115,6 @@
 
   # Ensure the SSH ControlPath directory exists
   home.file.".ssh/sockets/.keep".text = "";
-
-  # ── Doom Emacs config ────────────────────────────────────────────────
-  # Doom itself lives in ~/.config/emacs (cloned manually or via doom install).
-  # These deploy the user config that Doom reads from $DOOMDIR (~/.config/doom/).
-  xdg.configFile."doom/init.el".source = ../../../config/doom/init.el;
-  xdg.configFile."doom/config.el".source = ../../../config/doom/config.el;
-  xdg.configFile."doom/packages.el".source = ../../../config/doom/packages.el;
 
   # ── Agent instructions (each tool looks for instructions at a different path) ──
   xdg.configFile."AGENTS.md".source = ../../../config/agents.md; # generic / Gemini
