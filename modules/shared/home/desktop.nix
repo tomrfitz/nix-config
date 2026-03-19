@@ -43,6 +43,8 @@
       monaspace
       nerd-fonts.symbols-only
       noto-fonts-color-emoji
+      noto-fonts-cjk-sans
+      pretendard
     ]
     ++ lib.optionals (!pkgs.stdenv.isDarwin) [
       zotero # brew cask on darwin (firefox-esr build failures on aarch64-darwin)
