@@ -28,8 +28,8 @@ in
       autohide-time-modifier = 0.15;
       expose-group-apps = true;
       magnification = true;
-      largesize = 89;
-      tilesize = 49;
+      largesize = 90;
+      tilesize = 50;
       mru-spaces = false;
       orientation = "bottom";
       show-recents = true;
@@ -49,6 +49,7 @@ in
         { app = "/Applications/Twilight.app"; }
         { app = "/Applications/Ghostty.app"; }
         { app = "/Applications/Zed.app"; }
+        { app = "${homeManagerAppsDirectory}/Emacs.app"; }
       ];
 
       # Hot corners
