@@ -25,7 +25,7 @@ in
     ./calibre.nix
     ./qbittorrent.nix
     ./immich.nix
-    ./booklore.nix
+
     ./recyclarr.nix
     ./openbooks.nix
     ./minecraft.nix
