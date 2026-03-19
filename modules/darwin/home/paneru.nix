@@ -26,37 +26,37 @@
 
       bindings = {
         # Focus (vim hjkl)
-        window_focus_west = "alt - h";
-        window_focus_east = "alt - l";
-        window_focus_north = "alt - k";
-        window_focus_south = "alt - j";
+        window_focus_west = "ctrl + alt - h";
+        window_focus_east = "ctrl + alt - l";
+        window_focus_north = "ctrl + alt - k";
+        window_focus_south = "ctrl + alt - j";
 
         # Swap
-        window_swap_west = "alt + shift - h";
-        window_swap_east = "alt + shift - l";
-        window_swap_north = "alt + shift - k";
-        window_swap_south = "alt + shift - j";
+        window_swap_west = "ctrl + alt + shift - h";
+        window_swap_east = "ctrl + alt + shift - l";
+        window_swap_north = "ctrl + alt + shift - k";
+        window_swap_south = "ctrl + alt + shift - j";
 
         # Jump to first/last
-        window_focus_first = "cmd + shift - h";
-        window_focus_last = "cmd + shift - l";
-        window_swap_first = "cmd + alt - h";
-        window_swap_last = "cmd + alt - l";
+        window_focus_first = "ctrl + alt + cmd - h";
+        window_focus_last = "ctrl + alt + cmd - l";
+        window_swap_first = "ctrl + alt + cmd + shift - h";
+        window_swap_last = "ctrl + alt + cmd + shift - l";
 
         # Layout
-        window_center = "alt - c";
-        window_resize = "alt - r";
-        window_shrink = "alt + shift - r";
-        window_fullwidth = "alt - f";
-        window_manage = "alt + shift - f";
-        window_equalize = "alt - e";
+        window_center = "ctrl + alt - c";
+        window_resize = "ctrl + alt - r";
+        window_shrink = "ctrl + alt + shift - r";
+        window_fullwidth = "ctrl + alt - f";
+        window_manage = "ctrl + alt + shift - f";
+        window_equalize = "ctrl + alt - e";
 
         # Stacking (consume/expel)
-        window_stack = "alt - ]";
-        window_unstack = "alt + shift - ]";
+        window_stack = "ctrl + alt - ]";
+        window_unstack = "ctrl + alt + shift - ]";
 
         # Multi-monitor
-        window_nextdisplay = "alt + shift - n";
+        window_nextdisplay = "ctrl + alt + shift - n";
 
         quit = "ctrl + alt - q";
       };
