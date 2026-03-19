@@ -26,6 +26,8 @@
 
       # nix tooling
       claude-code
+      llm-agents.hermes-agent
+      llm-agents.pi
       dix
       nh
       nixd
