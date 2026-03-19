@@ -37,9 +37,4 @@
     install -Dm600 ${../../../config/karabiner.json} "$HOME/.config/karabiner/karabiner.json"
   '';
 
-  # ── Emacs-plus build config ──────────────────────────────────────────
-  xdg.configFile."emacs-plus/build.yml".text = ''
-    icon: liquid-glass
-  '';
-
 }
