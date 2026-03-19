@@ -22,6 +22,7 @@
       # code formatters (available globally so editors find them)
       shellcheck
       shfmt
+      markdownlint-cli2
 
       # nix tooling
       claude-code
