@@ -48,7 +48,8 @@
 (pixel-scroll-precision-mode 1)
 (column-number-mode 1)
 (global-display-line-numbers-mode 1)
-(setq display-line-numbers-width-start t)
+(setq-default display-line-numbers-width-start t
+              display-line-numbers-grow-only t)
 (show-paren-mode 1)
 
 (setq use-short-answers t
