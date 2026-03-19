@@ -14,7 +14,9 @@
                      embark embark-consult corfu which-key pulsar
                      exec-path-from-shell spacious-padding olivetti mini-frame
                      magit nix-mode markdown-mode treesit-auto
-                     org-cliplink envrc editorconfig dashboard)))
+                     org-cliplink envrc editorconfig dashboard
+                     nerd-icons nerd-icons-dired nerd-icons-corfu
+                     nerd-icons-completion)))
     (let ((missing (cl-remove-if #'package-installed-p packages)))
         (when missing
             (package-refresh-contents)
@@ -143,13 +145,35 @@
     (global-corfu-mode)
     (corfu-popupinfo-mode))
 
+;; ── Icons ───────────────────────────────────────────────────────────
+(use-package nerd-icons)
+
+(use-package nerd-icons-dired
+    :hook (dired-mode . nerd-icons-dired-mode))
+
+(use-package nerd-icons-corfu
+    :after corfu
+    :config
+    (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+(use-package nerd-icons-completion
+    :after marginalia
+    :config
+    (nerd-icons-completion-mode)
+    (add-hook 'marginalia-mode-hook #'nerd-icons-completion-marginalia-setup))
+
 ;; ── Visual polish ─────────────────────────────────────────────────────
 (use-package dashboard
     :custom
+    (dashboard-display-icons-p t)
+    (dashboard-icon-type 'nerd-icons)
+    (dashboard-set-file-icons t)
+    (dashboard-set-heading-icons t)
     (dashboard-items '((recents . 10)
                           (projects . 5)
                           (bookmarks . 5)))
     (dashboard-startup-banner 'ascii)
+    (dashboard-center-content t)
     :config
     (dashboard-setup-startup-hook))
 
@@ -279,6 +303,11 @@
 ;; ── Direnv ────────────────────────────────────────────────────────────
 (use-package envrc
     :init (envrc-global-mode))
+
+;; ── Dired ────────────────────────────────────────────────────────────
+(setq delete-by-moving-to-trash t
+      dired-dwim-target t)
+(add-hook 'dired-mode-hook #'dired-hide-details-mode)
 
 ;; ── Misc ──────────────────────────────────────────────────────────────
 (add-to-list 'vc-directory-exclusion-list ".jj")
