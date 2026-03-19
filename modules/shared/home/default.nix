@@ -7,6 +7,7 @@
     ./fastfetch.nix
     ./editors.nix
     ./fonts.nix
+    ./notes.nix
     ./ruff.nix
     ./opencode.nix
     ./xdg-dirs.nix
