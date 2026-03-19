@@ -45,6 +45,9 @@
         snix = "ssh trfnix -t 'tmux new -As main'";
         swsl = "ssh trfwsl -t 'tmux new -As main'";
         slab = "ssh trflab -t 'tmux new -As main'";
+
+        # Emacs client (falls back to starting full Emacs if no server)
+        e = "emacsclient -c -a ''";
       };
 
     envExtra = lib.optionalString (!pkgs.stdenv.isDarwin && !isWSL) ''
