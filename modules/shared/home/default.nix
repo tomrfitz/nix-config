@@ -6,6 +6,7 @@
     ./git.nix
     ./fastfetch.nix
     ./editors.nix
+    ./emacs.nix
     ./fonts.nix
     ./notes.nix
     ./ruff.nix
