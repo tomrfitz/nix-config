@@ -61,6 +61,8 @@
     read-file-name-completion-ignore-case t
     kill-do-not-save-duplicates t
     ring-bell-function #'ignore
+    calendar-week-start-day 1
+    calendar-date-style 'iso
     scroll-conservatively 101
     scroll-margin 0)
 
