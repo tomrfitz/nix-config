@@ -202,15 +202,6 @@
 (use-package spacious-padding
     :init (spacious-padding-mode))
 
-;; Modeline at top — swap header-line and mode-line
-(setq-default header-line-format mode-line-format
-    mode-line-format nil)
-;; Info-mode uses header-line by default; move it to the (now-empty) mode-line
-(with-eval-after-load 'info
-    (add-hook 'Info-mode-hook
-        (lambda ()
-            (setq-local mode-line-format header-line-format
-                header-line-format nil))))
 
 (use-package olivetti
     :custom (olivetti-body-width 88)
