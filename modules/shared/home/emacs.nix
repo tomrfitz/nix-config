@@ -5,9 +5,10 @@
 }:
 let
   patchDir = "${homebrew-emacs-plus}/patches/emacs-30";
+  iconDir = "${homebrew-emacs-plus}/community/icons/liquid-glass";
 
   # macOS: emacs30 + emacs-plus patches (system appearance, rounded frames,
-  # window role fix, NS color fix)
+  # window role fix, NS color fix) + liquid glass icon
   # NixOS: stock emacs30
   emacs =
     if pkgs.stdenv.isDarwin then
@@ -18,6 +19,9 @@ let
           "${patchDir}/fix-window-role.patch"
           "${patchDir}/fix-ns-x-colors.patch"
         ];
+        postInstall = (old.postInstall or "") + ''
+          cp ${iconDir}/icon.icns $out/Applications/Emacs.app/Contents/Resources/Emacs.icns
+        '';
       }))
     else
       pkgs.emacs30;
