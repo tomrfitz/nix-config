@@ -235,6 +235,10 @@
                   (eglot--server-capable :documentFormattingProvider))
             (eglot-format-buffer))))
 
+;; Inlay hints off by default — toggle with C-c h
+(add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
+(global-set-key (kbd "C-c h") #'eglot-inlay-hints-mode)
+
 ;; Register LSP servers not built into eglot
 (with-eval-after-load 'eglot
     (add-to-list 'eglot-server-programs '((java-mode java-ts-mode) . ("jdtls")))
