@@ -237,7 +237,10 @@
 
 ;; Register LSP servers not built into eglot
 (with-eval-after-load 'eglot
-    (add-to-list 'eglot-server-programs '((java-mode java-ts-mode) . ("jdtls"))))
+    (add-to-list 'eglot-server-programs '((java-mode java-ts-mode) . ("jdtls")))
+    ;; Python: rass multiplexes ty (type checker) + ruff (linter/formatter)
+    ;; Falls back gracefully — only errors if rass/ty/ruff missing when eglot starts
+    (add-to-list 'eglot-server-programs '((python-mode python-ts-mode) . ("rass" "python"))))
 
 ;; ── Languages ─────────────────────────────────────────────────────────
 (use-package markdown-mode

@@ -24,6 +24,9 @@
       shfmt
       markdownlint-cli2
 
+      # LSP multiplexer (lets eglot run multiple servers per buffer, e.g. ty + ruff)
+      rassumfrassum
+
       # nix tooling
       claude-code
       llm-agents.hermes-agent
