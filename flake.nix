@@ -192,34 +192,7 @@
           system = "aarch64-darwin";
           platform = "darwin";
           hostModule = ./hosts/trfmbp;
-          overlays = [
-            # REVISIT(upstream): remove overlay once a214160f is in nixpkgs-unstable
-            # check: gh api repos/NixOS/nixpkgs/compare/a214160f...nixpkgs-unstable --jq '.status' → "ahead" or "identical" means it's in
-            # ref: https://github.com/NixOS/nixpkgs/commit/a214160f092d5a3eacd6831237db8fad6f578d4a; checked: 2026-03-17
-            (_: prev: {
-              anki = prev.anki.overrideAttrs (old: {
-                env = old.env // {
-                  UV_FIND_LINKS =
-                    let
-                      ankiAudio = prev.fetchurl {
-                        url = "https://files.pythonhosted.org/packages/66/c7/b4c86d89c51d5bdcfc21bffc58be96b84075cff24b6d6fa0276a699084ff/anki_audio-0.1.0-cp39-abi3-macosx_11_0_arm64.whl";
-                        hash = "sha256-JJ4/eDc2b42jQUE5KC+F32/mXe8uH3bCNg6ojgOGj2s=";
-                      };
-                      ankiMacHelper = prev.fetchurl {
-                        url = "https://files.pythonhosted.org/packages/40/82/edb6194704defec181dddce8bc6a53c4afc72fa1f2bb4d68ffe244567767/anki_mac_helper-0.1.1-py3-none-any.whl";
-                        hash = "sha256-d0ppz58P5tS1SUni1liKVKdv9R54y/wmtSfR7TxbNOM=";
-                      };
-                    in
-                    prev.runCommand "uv-wheels-patched" { } ''
-                      mkdir -p $out
-                      ln -s ${old.env.UV_FIND_LINKS}/* $out/
-                      ln -sf ${ankiAudio} $out/${ankiAudio.name}
-                      ln -sf ${ankiMacHelper} $out/${ankiMacHelper.name}
-                    '';
-                };
-              });
-            })
-          ];
+          overlays = [ ];
           hmModules = [
             ./modules/shared/home
             ./modules/shared/home/desktop.nix
