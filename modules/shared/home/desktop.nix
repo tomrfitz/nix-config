@@ -21,7 +21,6 @@
       slack
       audacity
 
-      # REVISIT(upstream): prismlauncher segfaults in wrap-qt6-apps-hook on aarch64-darwin; checked: 2026-03-04
       prismlauncher
       anki
       chatterino2

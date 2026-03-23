@@ -5,7 +5,7 @@
 }:
 {
   nixpkgs.config.allowUnfree = true;
-  # REVISIT(upstream): remove doInstallCheck override; ref: https://git.lix.systems/lix-project/lix/issues/1113; checked: 2026-03-14
+  # REVISIT(upstream): remove doInstallCheck override; ref: https://git.lix.systems/lix-project/lix/issues/1113; checked: 2026-03-23
   nix.package = pkgs.lixPackageSets.stable.lix.overrideAttrs { doInstallCheck = false; };
   nix.settings = {
     experimental-features = [
