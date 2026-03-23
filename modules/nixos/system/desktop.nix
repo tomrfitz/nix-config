@@ -110,7 +110,7 @@
   # Workaround: polkit 127 sandboxes polkit-agent-helper, blocking howdy camera access.
   # nixpkgs#486044 only covers FIDO/hidraw, not video4linux — this needs its own upstream fix.
   # REVISIT(upstream): remove once polkit-agent-helper allows camera-device access;
-  # ref: https://github.com/NixOS/nixpkgs/issues/486044; checked: 2026-03-14
+  # ref: https://github.com/NixOS/nixpkgs/issues/486044; checked: 2026-03-23
   systemd.services."polkit-agent-helper@".serviceConfig = {
     DeviceAllow = "char-video4linux rw";
     PrivateDevices = "no";

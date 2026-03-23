@@ -9,8 +9,8 @@
 
 ## Upstream Watchlist
 
-- [ ] `REVISIT(upstream): remove once polkit-agent-helper allows camera-device access; ref: https://github.com/NixOS/nixpkgs/issues/486044 (covers hidraw only, not video4linux); checked: 2026-03-14`
-- [ ] `REVISIT(upstream): remove lix doInstallCheck override once 2.94.1+ lands in nixpkgs lixPackageSets.stable; ref: https://git.lix.systems/lix-project/lix/issues/1113; checked: 2026-03-14`
+- [ ] `REVISIT(upstream): remove once polkit-agent-helper allows camera-device access; ref: https://github.com/NixOS/nixpkgs/issues/486044 (covers hidraw only, not video4linux); checked: 2026-03-23`
+- [ ] `REVISIT(upstream): remove lix doInstallCheck override once 2.94.1+ lands in nixpkgs lixPackageSets.stable; ref: https://git.lix.systems/lix-project/lix/issues/1113; checked: 2026-03-23`
 
 ## Phase 1 — NixOS-WSL homelab (`trfwsl`)
 
