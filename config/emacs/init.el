@@ -46,6 +46,10 @@
 (global-goto-address-mode 1)
 (winner-mode 1)
 (pixel-scroll-precision-mode 1)
+;; Prevent trackpad/scroll-wheel from triggering text-scale changes
+(global-set-key (kbd "<pinch>") 'ignore)
+(global-set-key (kbd "<C-wheel-up>") 'ignore)
+(global-set-key (kbd "<C-wheel-down>") 'ignore)
 (column-number-mode 1)
 (global-display-line-numbers-mode 1)
 (setq-default display-line-numbers-width-start t
