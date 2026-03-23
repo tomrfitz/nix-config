@@ -329,6 +329,12 @@
 
 ;; Register known project trees (deferred to avoid slowing startup)
 (require 'project)
+(setq project-switch-commands
+    '((magit-project-file-status "Magit" "m")
+         (project-find-file "Find file" "f")
+         (project-find-dir "Find dir" "d")
+         (project-eshell "Eshell" "e")
+         (consult-ripgrep "Ripgrep" "r")))
 (add-hook 'emacs-startup-hook
     (lambda ()
         (dolist (dir '("~/nix-config/"
