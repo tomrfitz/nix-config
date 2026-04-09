@@ -74,7 +74,7 @@ in
             cp ${config.sops.templates."attic-config".path} /root/.config/attic/config.toml
           ''}";
           ExecStart = lib.getExe autoUpdateScript;
-          TimeoutStartSec = "45min";
+          TimeoutStartSec = "90min";
           StateDirectory = "auto-update";
         };
         onFailure = [ "auto-update-notify.service" ];

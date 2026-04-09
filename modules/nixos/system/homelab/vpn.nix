@@ -6,13 +6,15 @@
 #
 # Tailscale coexistence: A separate nftables table (mullvad-ts) marks
 # Tailscale CGNAT traffic (100.64.0.0/10) with Mullvad's split-tunnel
-# fwmarks so it bypasses the VPN firewall. This survives Mullvad reconnects
-# because Mullvad only manages its own `inet mullvad` table.
+# fwmarks so it bypasses the VPN firewall. A policy routing rule sends
+# CGNAT replies to Tailscale's routing table before Mullvad captures them.
+# Both survive Mullvad reconnects — Mullvad only manages its own tables/rules.
 # Ref: https://mullvad.net/en/help/split-tunneling-with-linux-advanced
 # Ref: https://theorangeone.net/posts/tailscale-mullvad/
 {
   config,
   lib,
+  pkgs,
   isWSL,
   ...
 }:
@@ -59,6 +61,28 @@ in
     # WSL's kernel lacks nft_fib — disable the NixOS firewall whose nftables
     # rules depend on it. WSL is behind Windows' firewall anyway.
     networking.firewall.enable = lib.mkIf isWSL false;
+
+    # ── Policy routing for Tailscale replies ────────────────────────────
+    # The nftables marks above handle Mullvad's *firewall* (accept/drop),
+    # but policy routing runs before netfilter output hooks. Without this,
+    # reply packets (e.g. SYN-ACK for inbound SSH) hit Mullvad's routing
+    # table (rule 5209) and exit via wg0-mullvad instead of tailscale0.
+    # This rule sends CGNAT-destined traffic to Tailscale's table first.
+    systemd.services.tailscale-route-fix = {
+      description = "Add policy route for Tailscale CGNAT replies";
+      after = [
+        "tailscaled.service"
+        "mullvad-daemon.service"
+      ];
+      wants = [ "tailscaled.service" ];
+      wantedBy = [ "multi-user.target" ];
+      serviceConfig = {
+        Type = "oneshot";
+        RemainAfterExit = true;
+        ExecStart = "${lib.getExe' pkgs.iproute2 "ip"} rule add to 100.64.0.0/10 lookup 52 priority 5205";
+        ExecStop = "${lib.getExe' pkgs.iproute2 "ip"} rule del to 100.64.0.0/10 lookup 52 priority 5205";
+      };
+    };
 
     networking.nftables = {
       enable = true;
