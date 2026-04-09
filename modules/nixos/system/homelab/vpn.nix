@@ -108,7 +108,10 @@ in
           serviceConfig = {
             Type = "oneshot";
             RemainAfterExit = true;
-            ExecStart = "${lib.getExe' pkgs.iproute2 "ip"} rule add to 100.64.0.0/10 lookup 52 priority 5205";
+            ExecStart = "${pkgs.writeShellScript "tailscale-route-add" ''
+              ${lib.getExe' pkgs.iproute2 "ip"} rule del to 100.64.0.0/10 lookup 52 priority 5205 2>/dev/null || true
+              ${lib.getExe' pkgs.iproute2 "ip"} rule add to 100.64.0.0/10 lookup 52 priority 5205
+            ''}";
             ExecStop = "${lib.getExe' pkgs.iproute2 "ip"} rule del to 100.64.0.0/10 lookup 52 priority 5205";
           };
         };
