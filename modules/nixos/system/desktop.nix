@@ -1,4 +1,6 @@
 {
+  config,
+  options,
   pkgs,
   lib,
   user,
@@ -13,6 +15,17 @@
 
   # ── Display / Desktop ────────────────────────────────────────────────
   programs.niri.enable = true;
+  # REVISIT(upstream): remove when niri-flake raises sandbox ulimit;
+  #   ref: https://github.com/sodiboo/niri-flake/issues/1300; checked: 2026-04-09
+  programs.niri.package =
+    let
+      inherit (options.programs.niri.package) default;
+    in
+    default.overrideAttrs (old: {
+      preCheck = (old.preCheck or "") + ''
+        ulimit -n 4096
+      '';
+    });
 
   # greetd: lightweight greeter for Wayland compositors
   services.greetd = {

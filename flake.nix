@@ -209,17 +209,6 @@
             niri-flake.nixosModules.niri
             disko.nixosModules.disko
           ];
-          # REVISIT(upstream): remove overlay when niri-flake raises sandbox ulimit;
-          #   ref: https://github.com/sodiboo/niri-flake/issues/1300; checked: 2026-04-09
-          overlays = [
-            (_final: prev: {
-              niri = prev.niri.overrideAttrs (old: {
-                preCheck = (old.preCheck or "") + ''
-                  ulimit -n 4096
-                '';
-              });
-            })
-          ];
           hmModules = [
             ./modules/shared/home
             ./modules/shared/home/desktop.nix
