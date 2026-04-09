@@ -77,7 +77,7 @@
         "radarr"
         "lidarr"
         "bazarr"
-        "jellyseerr"
+        "seerr"
 
         "tautulli"
         "plex"
@@ -104,7 +104,7 @@
     # readarr replaced by bookshelf (Readarr fork with Hardcover metadata)
     # readarr.enable = true;
     jellyfin.enable = true;
-    jellyseerr.enable = true;
+    seerr.enable = true;
     immich.enable = true;
     sabnzbd.enable = true;
     sonarr.enable = true;
