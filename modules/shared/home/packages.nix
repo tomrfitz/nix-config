@@ -14,7 +14,6 @@
       rana
       comma
       yazi
-      tailscale
       python3Packages.markitdown
 
       mcrcon
