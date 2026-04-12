@@ -181,9 +181,9 @@ in
             container = c.Personal.id;
             position = 2000;
           };
-          Plex = {
+          Lab = {
             id = "{85ff3e10-eb35-4687-9171-5967177dea1a}";
-            icon = "🎥";
+            icon = "🖥️";
             container = c.Personal.id;
             position = 3000;
           };
@@ -272,60 +272,100 @@ in
             position = 8;
           };
 
-          # ── Plex pins ──
+          # ── Homelab: media servers ──
           Plex = {
             id = "{88265c48-a298-4d0a-85f8-2d4cb17131b4}";
-            url = "https://app.plex.tv/";
-            workspace = s.Plex.id;
+            url = "http://trfwsl.taila815b1.ts.net:32400/web/";
+            workspace = s.Lab.id;
             position = 0;
+          };
+          Jellyfin = {
+            id = "{d4e7a1c3-5b2f-4a89-9c6d-8e3f2a1b0c5d}";
+            url = "http://trfwsl.taila815b1.ts.net:8096/";
+            workspace = s.Lab.id;
+            position = 1;
           };
           Tautulli = {
             id = "{98441c65-8f0b-4e8c-850f-d74941e15f21}";
-            url = "http://10.50.157.227:8181/";
-            workspace = s.Plex.id;
-            position = 1;
+            url = "http://trfwsl.taila815b1.ts.net:8181/";
+            workspace = s.Lab.id;
+            position = 2;
           };
+          Jellyseerr = {
+            id = "{a7c3e5f1-9d2b-4f86-8a1c-6e4d3b2a0f9e}";
+            url = "http://trfwsl.taila815b1.ts.net:5055/";
+            workspace = s.Lab.id;
+            position = 3;
+          };
+          Immich = {
+            id = "{b8d4f2a6-1e3c-4b97-9d5a-7f6e8c3b2d1a}";
+            url = "http://trfwsl.taila815b1.ts.net:2283/";
+            workspace = s.Lab.id;
+            position = 4;
+          };
+
+          # ── Homelab: library management ──
           Sonarr = {
             id = "{01aa9f31-036a-4831-a955-f25bf107e9f6}";
-            url = "http://10.50.157.227:8989/";
-            workspace = s.Plex.id;
-            position = 2;
+            url = "http://trfwsl.taila815b1.ts.net:8989/";
+            workspace = s.Lab.id;
+            position = 5;
           };
           Radarr = {
             id = "{ac5052b3-9b4d-4a2f-8d31-c7efc88e5d67}";
-            url = "http://10.50.157.227:7878/";
-            workspace = s.Plex.id;
-            position = 3;
+            url = "http://trfwsl.taila815b1.ts.net:7878/";
+            workspace = s.Lab.id;
+            position = 6;
           };
           Lidarr = {
             id = "{32b376e2-3a62-4e24-bdf0-585631717e67}";
-            url = "http://10.50.157.227:8686/";
-            workspace = s.Plex.id;
-            position = 4;
+            url = "http://trfwsl.taila815b1.ts.net:8686/";
+            workspace = s.Lab.id;
+            position = 7;
           };
-          Readarr = {
+          Bookshelf = {
             id = "{24875b71-2158-4334-afa5-0c1e9be92399}";
-            url = "http://10.50.157.227:8787/";
-            workspace = s.Plex.id;
-            position = 5;
+            url = "http://trfwsl.taila815b1.ts.net:8787/";
+            workspace = s.Lab.id;
+            position = 8;
           };
           Bazarr = {
             id = "{2a42da54-8a2d-442a-8439-5eea547cbed2}";
-            url = "http://10.50.157.227:6767/series";
-            workspace = s.Plex.id;
-            position = 6;
+            url = "http://trfwsl.taila815b1.ts.net:6767/series";
+            workspace = s.Lab.id;
+            position = 9;
           };
+
+          # ── Homelab: downloads & utilities ──
           SABnzbd = {
             id = "{0dab148c-07e5-4863-8b7b-8f10258f4d4f}";
-            url = "http://10.50.157.227:8080/";
-            workspace = s.Plex.id;
-            position = 8;
+            url = "http://trfwsl.taila815b1.ts.net:8080/";
+            workspace = s.Lab.id;
+            position = 10;
           };
-          Calibre = {
+          "Calibre Server" = {
             id = "{79fa38f7-7aca-4401-9cff-82d8f0d32024}";
-            url = "http://10.50.186.183:7070/";
-            workspace = s.Plex.id;
-            position = 9;
+            url = "http://trfwsl.taila815b1.ts.net:8180/";
+            workspace = s.Lab.id;
+            position = 11;
+          };
+          "Calibre Web" = {
+            id = "{c5a9d3e7-2f1b-4c86-8d4a-9e7f6b3a1c2d}";
+            url = "http://trfwsl.taila815b1.ts.net:8083/";
+            workspace = s.Lab.id;
+            position = 12;
+          };
+          "Tandoor Recipes" = {
+            id = "{e6b8c4d2-3a1f-4e95-9c7d-5f2a8b6e4d3c}";
+            url = "http://trfwsl.taila815b1.ts.net:8099/";
+            workspace = s.Lab.id;
+            position = 13;
+          };
+          Spliit = {
+            id = "{f9c7d5e3-4b2a-4f86-8e1c-6a3d9b7f2e5a}";
+            url = "http://trfwsl.taila815b1.ts.net:3000/";
+            workspace = s.Lab.id;
+            position = 14;
           };
 
           # ── SmartCafe pins ──
