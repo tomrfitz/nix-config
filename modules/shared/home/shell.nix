@@ -158,7 +158,7 @@
         # ── nixify (bootstrap direnv + flake for a project) ──
         nixify() {
           if [[ ! -f flake.nix ]]; then
-            cp "''${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake-template.nix" flake.nix
+            install -m 644 "''${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake-template.nix" flake.nix
             echo "Created flake.nix"
           fi
           if [[ ! -f .envrc ]]; then
