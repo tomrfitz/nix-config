@@ -8,6 +8,7 @@
   xdg.userDirs = {
     enable = !pkgs.stdenv.isDarwin;
     createDirectories = true;
+    setSessionVariables = false;
 
     desktop = "${config.home.homeDirectory}/Desktop";
     documents = "${config.home.homeDirectory}/Documents";
