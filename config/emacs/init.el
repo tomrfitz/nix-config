@@ -16,7 +16,7 @@
                      magit diff-hl nix-mode markdown-mode treesit-auto
                      org-cliplink envrc editorconfig dashboard
                      nerd-icons nerd-icons-dired nerd-icons-corfu
-                     nerd-icons-completion)))
+                     nerd-icons-completion sqlformat sql-indent)))
     (let ((missing (cl-remove-if #'package-installed-p packages)))
         (when missing
             (package-refresh-contents)
@@ -235,9 +235,18 @@
     (diff-hl-margin-mode))
 
 ;; ── LSP (eglot — built-in) ───────────────────────────────────────────
-;; Auto-starts for any language with an LSP server on $PATH
-;; (discovered via envrc/direnv from devShells).
-(add-hook 'prog-mode-hook #'eglot-ensure)
+;; Auto-start for any language with an LSP server on $PATH.
+;; sql-mode excluded — no reliable SQL LSP; formatting via sqlformat package.
+(add-hook 'prog-mode-hook
+    (lambda ()
+        (unless (derived-mode-p 'sql-mode)
+            (eglot-ensure))))
+;; Retry after envrc injects the direnv PATH — catches devShell LSPs
+;; (sqls, ruff, etc.) that weren't on PATH when prog-mode-hook ran.
+(add-hook 'envrc-after-update-hook
+    (lambda ()
+        (when (derived-mode-p 'prog-mode)
+            (eglot-ensure))))
 
 ;; Format on save when an LSP is managing the buffer
 (add-hook 'before-save-hook
@@ -255,7 +264,8 @@
     (add-to-list 'eglot-server-programs '((java-mode java-ts-mode) . ("jdtls")))
     ;; Python: rass multiplexes ty (type checker) + ruff (linter/formatter)
     ;; Falls back gracefully — only errors if rass/ty/ruff missing when eglot starts
-    (add-to-list 'eglot-server-programs '((python-mode python-ts-mode) . ("rass" "python"))))
+    (add-to-list 'eglot-server-programs '((python-mode python-ts-mode) . ("rass" "python")))
+)
 
 ;; ── Languages ─────────────────────────────────────────────────────────
 (use-package markdown-mode
@@ -269,9 +279,34 @@
                                            (revert-buffer t t t)))
                                    nil t))))
 
+;; T-SQL as default SQL dialect
+(setq sql-product 'ms)
+
+(use-package sql-indent
+    :hook (sql-mode . sqlind-minor-mode))
+
+(use-package sqlformat
+    :custom
+    (sqlformat-command 'sql-formatter)
+    (sqlformat-args '("--language" "transactsql"))
+    :hook (sql-mode . sqlformat-on-save-mode))
+
 (use-package nix-mode
     :mode "\\.nix\\'"
     :hook (nix-mode . (lambda () (setq-local tab-width 2))))
+
+;; visual-basic-mode: not on MELPA/ELPA and has malformed version header,
+;; so package-vc-install fails. Download the .el directly on first use.
+(let ((vb-file (expand-file-name "lisp/visual-basic-mode.el" user-emacs-directory)))
+    (unless (file-exists-p vb-file)
+        (make-directory (file-name-directory vb-file) t)
+        (url-copy-file
+            "https://raw.githubusercontent.com/emacsmirror/visual-basic-mode/master/visual-basic-mode.el"
+            vb-file))
+    (when (file-exists-p vb-file)
+        (add-to-list 'load-path (file-name-directory vb-file))
+        (autoload 'visual-basic-mode "visual-basic-mode" "Visual Basic mode." t)
+        (add-to-list 'auto-mode-alist '("\\.\\(bas\\|cls\\|frm\\)\\'" . visual-basic-mode))))
 
 (use-package editorconfig
     :init (editorconfig-mode 1))
