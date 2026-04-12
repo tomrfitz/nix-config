@@ -79,6 +79,7 @@
       "typst"
       "powershell"
       "elisp"
+      "sql"
     ];
 
     userSettings = {
@@ -272,6 +273,17 @@
           formatter.external = {
             command = "clang-format";
             arguments = [ "--assume-filename={buffer_path}" ];
+          };
+        };
+        SQL = {
+          formatter.external = {
+            command = "sql-formatter";
+            arguments = [
+              "--language"
+              "transactsql"
+              "-c"
+              ''{"tabWidth":4,"keywordCase":"upper","dataTypeCase":"upper","functionCase":"upper"}''
+            ];
           };
         };
         Python = {
