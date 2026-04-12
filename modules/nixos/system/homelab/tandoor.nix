@@ -29,7 +29,7 @@ in
     };
 
     services.tandoor-recipes = {
-      address = "127.0.0.1";
+      address = "0.0.0.0";
       port = 8099; # SABnzbd uses default 8080
       database.createLocally = true;
     };
