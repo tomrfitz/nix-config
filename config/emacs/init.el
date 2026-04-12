@@ -388,7 +388,10 @@
 
 ;; ── Server ──────────────────────────────────────────────────────────
 ;; Start server when launched normally (not as --daemon, which has its own).
+;; Delete stale socket first so emacsclient (and with-editor) always connect.
 (unless (daemonp)
+    (setq server-name "server")
+    (when (server-running-p) (server-force-delete))
     (server-start))
 
 ;; Cmd-Q closes the frame, not Emacs — keeps the server alive for emacsclient.
