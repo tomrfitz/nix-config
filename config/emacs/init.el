@@ -13,7 +13,7 @@
 (let ((packages '(vertico orderless marginalia consult
                      embark embark-consult corfu which-key pulsar
                      exec-path-from-shell spacious-padding olivetti mini-frame
-                     magit nix-mode markdown-mode treesit-auto
+                     magit diff-hl nix-mode markdown-mode treesit-auto
                      org-cliplink envrc editorconfig dashboard
                      nerd-icons nerd-icons-dired nerd-icons-corfu
                      nerd-icons-completion)))
@@ -226,6 +226,13 @@
 ;; ── Git ───────────────────────────────────────────────────────────────
 (use-package magit
     :bind ("C-x g" . magit-status))
+
+(use-package diff-hl
+    :hook ((magit-pre-refresh  . diff-hl-magit-pre-refresh)
+           (magit-post-refresh . diff-hl-magit-post-refresh))
+    :init
+    (global-diff-hl-mode)
+    (diff-hl-margin-mode))
 
 ;; ── LSP (eglot — built-in) ───────────────────────────────────────────
 ;; Auto-starts for any language with an LSP server on $PATH
