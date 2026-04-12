@@ -379,11 +379,8 @@
          (consult-ripgrep "Ripgrep" "r")))
 (add-hook 'emacs-startup-hook
     (lambda ()
+        (project-remember-projects-under "~/Developer/")
         (dolist (dir '("~/nix-config/"
-                          "~/Developer/CSC204/"
-                          "~/Developer/CSC331/"
-                          "~/Developer/CS2A/"
-                          "~/Developer/CS1332xI/"
                           "~/Documents/notes/"
                           "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian/"))
             (when (file-directory-p dir)
