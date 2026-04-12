@@ -22,6 +22,7 @@ in
       (lib.mkIf config.services.calibre-web.enable {
         services.calibre-web = {
           group = "media";
+          listen.ip = "0.0.0.0";
           openFirewall = cfg.openFirewall;
           options.calibreLibrary = cfg.paths.booksRoot;
         };
