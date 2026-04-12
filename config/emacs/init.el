@@ -372,7 +372,7 @@
 ;; Register known project trees (deferred to avoid slowing startup)
 (require 'project)
 (setq project-switch-commands
-    '((magit-project-file-status "Magit" "m")
+    '((magit-project-status "Magit" "m")
          (project-find-file "Find file" "f")
          (project-find-dir "Find dir" "d")
          (project-eshell "Eshell" "e")
