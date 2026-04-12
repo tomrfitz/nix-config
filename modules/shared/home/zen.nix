@@ -504,7 +504,7 @@ in
         };
 
       # ── Keyboard shortcuts ─────────────────────────────────────────
-      keyboardShortcutsVersion = 16;
+      keyboardShortcutsVersion = 17;
       keyboardShortcuts = [
         {
           id = "zen-compact-mode-toggle";
