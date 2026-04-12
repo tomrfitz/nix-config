@@ -222,15 +222,7 @@
           wsl = true;
           hostModule = ./hosts/trfwsl;
           extraModules = [ nixos-wsl.nixosModules.wsl ];
-          # REVISIT(upstream): remove overlay when calibre-web accepts wand >=0.7.0;
-          #   ref: https://github.com/NixOS/nixpkgs/issues/403647; checked: 2026-03-24
-          overlays = [
-            (_final: prev: {
-              calibre-web = prev.calibre-web.overridePythonAttrs (old: {
-                pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "wand" ];
-              });
-            })
-          ];
+          overlays = [ ];
           hmModules = [
             ./modules/shared/home
           ];
