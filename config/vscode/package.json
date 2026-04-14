@@ -1,0 +1,26 @@
+{
+    "name": "flexoki-canonical",
+    "displayName": "Flexoki (Canonical)",
+    "description": "Spec-faithful Flexoki color theme",
+    "version": "0.1.0",
+    "engines": {
+        "vscode": "^1.60.0"
+    },
+    "categories": [
+        "Themes"
+    ],
+    "contributes": {
+        "themes": [
+            {
+                "label": "Flexoki Dark",
+                "uiTheme": "vs-dark",
+                "path": "./flexoki-dark-color-theme.json"
+            },
+            {
+                "label": "Flexoki Light",
+                "uiTheme": "vs",
+                "path": "./flexoki-light-color-theme.json"
+            }
+        ]
+    }
+}
