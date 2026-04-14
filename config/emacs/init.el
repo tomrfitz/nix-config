@@ -10,20 +10,29 @@
 (package-initialize)
 
 ;; Install missing packages up front (first launch pulls from network).
-(let ((packages '(vertico orderless marginalia consult
-                     embark embark-consult corfu which-key pulsar
+(let ((packages '(vertico orderless marginalia consult consult-dir
+                     embark embark-consult corfu cape which-key pulsar
                      exec-path-from-shell spacious-padding olivetti mini-frame
                      magit diff-hl nix-mode markdown-mode treesit-auto
-                     org-cliplink envrc editorconfig dashboard
+                     org-cliplink org-appear envrc editorconfig dashboard
                      nerd-icons nerd-icons-dired nerd-icons-corfu
-                     nerd-icons-completion sqlformat sql-indent)))
+                     nerd-icons-completion sqlformat sql-indent
+                     gcmh avy vundo helpful undo-fu-session
+                     string-inflection eat jinx)))
     (let ((missing (cl-remove-if #'package-installed-p packages)))
         (when missing
             (package-refresh-contents)
             (dolist (pkg missing)
                 (package-install pkg)))))
 
-(setq use-package-always-ensure t)
+(setq use-package-always-ensure t
+      use-package-expand-minimally t)
+
+(use-package gcmh
+    :init (gcmh-mode)
+    :custom
+    (gcmh-idle-delay 'auto)
+    (gcmh-high-cons-threshold (* 64 1024 1024)))
 
 ;; ── Shell environment ───────────────────────────────────────────────
 ;; macOS GUI Emacs doesn't inherit shell PATH — sync it from login shell
@@ -38,7 +47,10 @@
 ;; ── Sane defaults ─────────────────────────────────────────────────────
 (delete-selection-mode 1)
 (repeat-mode 1)
+(setq savehist-additional-variables
+    '(kill-ring register-alist mark-ring global-mark-ring))
 (savehist-mode 1)
+(setq recentf-exclude '("elpa/" "\\`/tmp/" "\\`/ssh:" "\\.elc\\'" "COMMIT_EDITMSG"))
 (recentf-mode 1)
 (save-place-mode 1)
 (global-auto-revert-mode 1)
@@ -70,6 +82,45 @@
     calendar-date-style 'iso
     scroll-conservatively 101
     scroll-margin 0)
+
+;; Subprocess I/O (critical for eglot/LSP performance)
+(setq read-process-output-max (* 4 1024 1024)
+      process-adaptive-read-buffering nil)
+
+;; File/buffer behavior
+(setq global-auto-revert-non-file-buffers t
+      dired-auto-revert-buffer t
+      vc-follow-symlinks t
+      find-file-visit-truename t
+      switch-to-buffer-obey-display-actions t
+      bookmark-save-flag 1
+      tramp-verbose 1)
+
+;; Display
+(setq x-underline-at-descent-line t
+      truncate-string-ellipsis "\u2026"
+      pixel-scroll-precision-use-momentum nil)
+
+;; Minibuffer
+(setq enable-recursive-minibuffers t)
+(file-name-shadow-mode 1)
+
+;; Ediff in same frame
+(setq ediff-window-setup-function #'ediff-setup-windows-plain)
+
+;; xref via ripgrep + vertico
+(setq xref-show-definitions-function #'xref-show-definitions-completing-read
+      xref-search-program 'ripgrep)
+
+;; Auto-chmod scripts on save
+(add-hook 'after-save-hook #'executable-make-buffer-file-executable-if-script-p)
+
+;; Tame popup buffers
+(setq display-buffer-alist
+    '(("\\*\\(Help\\|Warnings\\|Backtrace\\|Compile-Log\\|Flymake diagnostics\\|eldoc.*\\)\\*"
+       (display-buffer-in-side-window)
+       (window-height . 0.25)
+       (side . bottom))))
 
 ;; Load custom file if it exists (keeps init.el clean)
 (when (file-exists-p custom-file)
@@ -129,35 +180,61 @@
 
 ;; ── Completion ────────────────────────────────────────────────────────
 (use-package vertico
-    :init (vertico-mode))
+    :init (vertico-mode)
+    :bind (:map vertico-map
+           ("RET"   . vertico-directory-enter)
+           ("DEL"   . vertico-directory-delete-char)
+           ("M-DEL" . vertico-directory-delete-word))
+    :hook (rfn-eshadow-update-overlay . vertico-directory-tidy))
 
 (use-package orderless
     :custom
     (completion-styles '(orderless basic))
-    (completion-category-overrides '((file (styles partial-completion)))))
+    (completion-category-overrides
+     '((file (styles partial-completion))
+       (eglot (styles orderless basic))
+       (eglot-capf (styles orderless basic)))))
 
 (use-package marginalia
     :init (marginalia-mode))
 
 (use-package consult
     :bind (("C-x b"   . consult-buffer)
-              ("C-x r b" . consult-bookmark)
-              ("M-g g"   . consult-goto-line)
-              ("M-g M-g" . consult-goto-line)
-              ("M-s l"   . consult-line)
-              ("M-s r"   . consult-ripgrep)
-              ("M-s f"   . consult-find)))
+           ("C-x r b" . consult-bookmark)
+           ("M-g g"   . consult-goto-line)
+           ("M-g M-g" . consult-goto-line)
+           ("M-s l"   . consult-line)
+           ("M-s r"   . consult-ripgrep)
+           ("M-s f"   . consult-find))
+    :config
+    ;; Disable auto-preview for heavy commands (M-P to preview manually)
+    (consult-customize
+     consult-ripgrep consult-grep consult-git-grep
+     consult-bookmark consult-recent-file
+     :preview-key "M-P")
+    ;; Push mark before grep jumps so M-, returns
+    (advice-add 'consult-ripgrep :before
+        (lambda (&rest _) (xref-push-marker-stack))))
 
 (use-package embark
-    :bind ("C-."   . embark-act))
+    :bind ("C-." . embark-act)
+    :custom (prefix-help-command #'embark-prefix-help-command))
 
 (use-package embark-consult
     :after (embark consult))
+
+(use-package consult-dir
+    :bind (("C-x C-d" . consult-dir)
+           :map vertico-map
+           ("C-x C-d" . consult-dir)))
 
 (use-package corfu
     :custom
     (corfu-auto t)
     (corfu-cycle t)
+    :bind (:map corfu-map
+           ("RET" . nil)
+           ("M-RET" . corfu-insert))
     :init
     (global-corfu-mode)
     (corfu-popupinfo-mode))
@@ -172,6 +249,22 @@
     :after corfu
     :config
     (add-to-list 'corfu-margin-formatters #'nerd-icons-corfu-formatter))
+
+(use-package cape
+    :after corfu
+    :init
+    (add-hook 'completion-at-point-functions #'cape-file)
+    (add-hook 'completion-at-point-functions #'cape-dabbrev)
+    (add-hook 'completion-at-point-functions #'cape-elisp-block)
+    :config
+    ;; Bust eglot completion cache for fresh results
+    (advice-add 'eglot-completion-at-point :around #'cape-wrap-buster))
+
+(when (>= emacs-major-version 30)
+    (global-completion-preview-mode)
+    ;; Disable in corfu to avoid conflict
+    (add-hook 'corfu-mode-hook
+        (lambda () (completion-preview-mode (if corfu-mode -1 1)))))
 
 (use-package nerd-icons-completion
     :after marginalia
@@ -225,7 +318,11 @@
 
 ;; ── Git ───────────────────────────────────────────────────────────────
 (use-package magit
-    :bind ("C-x g" . magit-status))
+    :bind ("C-x g" . magit-status)
+    :custom
+    (magit-log-margin '(t "%Y-%m-%d %H:%M " magit-log-margin-width t 18))
+    (magit-diff-refine-hunk t)
+    (magit-section-initial-visibility-alist '((untracked . hide))))
 
 (use-package diff-hl
     :hook ((magit-pre-refresh  . diff-hl-magit-pre-refresh)
@@ -235,11 +332,18 @@
     (diff-hl-margin-mode))
 
 ;; ── LSP (eglot — built-in) ───────────────────────────────────────────
+(setq eglot-autoshutdown t
+      eglot-sync-connect 0
+      eglot-extend-to-xref t
+      eglot-events-buffer-config '(:size 0 :format short))
+(setq jsonrpc-event-hook nil)  ; eliminate logging overhead
+(setq eldoc-documentation-strategy 'eldoc-documentation-compose-eagerly)
+
 ;; Auto-start for any language with an LSP server on $PATH.
-;; sql-mode excluded — no reliable SQL LSP; formatting via sqlformat package.
+;; sql-mode/emacs-lisp-mode excluded — no useful LSP for either.
 (add-hook 'prog-mode-hook
     (lambda ()
-        (unless (derived-mode-p 'sql-mode)
+        (unless (derived-mode-p 'sql-mode 'emacs-lisp-mode)
             (eglot-ensure))))
 ;; Retry after envrc injects the direnv PATH — catches devShell LSPs
 ;; (sqls, ruff, etc.) that weren't on PATH when prog-mode-hook ran.
@@ -334,6 +438,14 @@
     (org-id-locations-file
         (expand-file-name ".org-id-locations" org-directory))
     (org-time-stamp-custom-formats '("<%Y-%m-%d>" . "<%Y-%m-%d %H:%M>"))
+    (org-use-speed-commands t)
+    (org-special-ctrl-a/e '(t . t))
+    (org-ellipsis " \u25be ")
+    (org-refile-use-cache t)
+    (org-refile-allow-creating-parent-nodes 'confirm)
+    (org-M-RET-may-split-line '((headline) (default . nil)))
+    (org-use-sub-superscripts '{})
+    (org-list-demote-modify-bullet '(("+" . "-") ("-" . "+") ("*" . "+")))
     ;; Refile: vertico-powered flat completion across org files
     (org-refile-targets '((org-agenda-files :maxlevel . 2)))
     (org-refile-use-outline-path 'file)
@@ -353,6 +465,24 @@
 
 (use-package org-cliplink
     :bind ("C-c n l" . org-cliplink))
+
+(custom-set-faces
+ '(outline-1 ((t (:weight extra-bold :height 1.25))))
+ '(outline-2 ((t (:weight bold :height 1.15))))
+ '(outline-3 ((t (:weight bold :height 1.12))))
+ '(outline-4 ((t (:weight semi-bold :height 1.09))))
+ '(outline-5 ((t (:weight semi-bold :height 1.06))))
+ '(outline-6 ((t (:weight semi-bold :height 1.03)))))
+
+(use-package org-appear
+    :hook (org-mode . org-appear-mode)
+    :custom (org-appear-autoemphasis t))
+
+(defun tf/defer-font-lock-in-large-buffers ()
+    (when (> (buffer-size) 50000)
+        (setq-local jit-lock-defer-time 0.05
+                    jit-lock-stealth-time 1)))
+(add-hook 'org-mode-hook #'tf/defer-font-lock-in-large-buffers)
 
 ;; ── TRAMP ─────────────────────────────────────────────────────────────
 (setq tramp-default-method "ssh")
@@ -385,6 +515,119 @@
                           "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian/"))
             (when (file-directory-p dir)
                 (project-remember-project (project-current nil dir))))))
+
+;; ── Navigation ──────────────────────────────────────────────────────
+(use-package avy
+    :bind (("C-'"   . avy-goto-char-timer)
+           ("M-g w" . avy-goto-word-1)
+           ("M-g l" . avy-goto-line))
+    :custom
+    (avy-all-windows t)
+    (avy-styles-alist '((avy-goto-char-timer . post)
+                         (avy-goto-line . pre))))
+
+;; ── Undo ────────────────────────────────────────────────────────────
+(use-package vundo
+    :bind ("C-x u" . vundo))
+
+(use-package undo-fu-session
+    :hook ((prog-mode conf-mode text-mode) . undo-fu-session-mode))
+
+;; ── Help ────────────────────────────────────────────────────────────
+(use-package helpful
+    :bind (("C-h f" . helpful-callable)
+           ("C-h v" . helpful-variable)
+           ("C-h k" . helpful-key)
+           ("C-h x" . helpful-command)))
+
+;; ── Editing ─────────────────────────────────────────────────────────
+(use-package string-inflection
+    :bind ("C-c i" . string-inflection-all-cycle))
+
+;; ── Terminal ────────────────────────────────────────────────────────
+(use-package eat
+    :bind ("C-c t" . eat))
+
+;; ── Spellcheck ──────────────────────────────────────────────────────
+(use-package jinx
+    :hook ((text-mode prog-mode conf-mode) . jinx-mode)
+    :bind ("M-$" . jinx-correct))
+
+;; ── Utility functions ───────────────────────────────────────────────
+;; Smarter C-g: deactivate region → close minibuffer → quit
+(defun tf/keyboard-quit-dwim ()
+    (interactive)
+    (cond
+     ((region-active-p) (keyboard-quit))
+     ((derived-mode-p 'completion-list-mode) (delete-completion-window))
+     ((> (minibuffer-depth) 0) (abort-recursive-edit))
+     (t (keyboard-quit))))
+(global-set-key [remap keyboard-quit] #'tf/keyboard-quit-dwim)
+
+;; C-a toggles between indentation and column 0
+(defun tf/beginning-of-line-or-indentation ()
+    (interactive "^")
+    (let ((orig (point)))
+        (back-to-indentation)
+        (when (= orig (point))
+            (beginning-of-line))))
+(global-set-key [remap move-beginning-of-line] #'tf/beginning-of-line-or-indentation)
+
+;; C-x 1 toggles: delete-other-windows ↔ winner-undo
+(defun tf/toggle-delete-other-windows ()
+    (interactive)
+    (if (and winner-mode (equal (selected-window) (next-window)))
+        (winner-undo)
+        (delete-other-windows)))
+(global-set-key [remap delete-other-windows] #'tf/toggle-delete-other-windows)
+
+;; Single binding for all narrowing: widen if narrowed, narrow to region/subtree/defun
+(defun tf/narrow-or-widen-dwim ()
+    (interactive)
+    (cond
+     ((buffer-narrowed-p) (widen))
+     ((region-active-p) (narrow-to-region (region-beginning) (region-end)))
+     ((derived-mode-p 'org-mode) (org-narrow-to-subtree))
+     ((derived-mode-p 'prog-mode) (narrow-to-defun))
+     (t (widen))))
+(global-set-key (kbd "C-x n") #'tf/narrow-or-widen-dwim)
+
+;; Open line below/above (vim-like o/O)
+(defun tf/open-line-below ()
+    (interactive)
+    (end-of-line)
+    (newline-and-indent))
+(defun tf/open-line-above ()
+    (interactive)
+    (beginning-of-line)
+    (newline)
+    (forward-line -1)
+    (indent-for-tab-command))
+(global-set-key (kbd "M-o")   #'tf/open-line-below)
+(global-set-key (kbd "M-O")   #'tf/open-line-above)
+
+;; find-file with line:column parsing (file.js:14:10)
+(advice-add 'find-file :around
+    (lambda (orig filename &optional wildcards)
+        (let* ((matched (string-match "^\\(.*?\\):\\([0-9]+\\):?\\([0-9]*\\)$" filename))
+               (line (and matched (match-string 2 filename)
+                          (string-to-number (match-string 2 filename))))
+               (col (and matched (match-string 3 filename)
+                         (let ((c (string-to-number (match-string 3 filename)))) (and (> c 0) c))))
+               (filename (if matched (match-string 1 filename) filename)))
+            (funcall orig filename wildcards)
+            (when line (goto-char (point-min)) (forward-line (1- line)))
+            (when col (forward-char (1- col))))))
+
+;; Save all buffers on focus loss
+(add-function :after after-focus-change-function
+    (lambda () (save-some-buffers t)))
+
+;; Disable VC for remote files (prevents TRAMP hangs)
+(add-hook 'find-file-hook
+    (lambda ()
+        (when (and buffer-file-name (file-remote-p buffer-file-name))
+            (setq-local vc-handled-backends nil))))
 
 ;; ── Server ──────────────────────────────────────────────────────────
 ;; Start server when launched normally (not as --daemon, which has its own).

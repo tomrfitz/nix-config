@@ -39,6 +39,7 @@ in
     pkgs.aspell
     pkgs.aspellDicts.en
     pkgs.aspellDicts.it
+    pkgs.enchant2
   ];
 
   # Emacs daemon: launchd (macOS) / systemd (NixOS)
