@@ -2,6 +2,7 @@
     "name": "flexoki-canonical",
     "displayName": "Flexoki (Canonical)",
     "description": "Spec-faithful Flexoki color theme",
+    "publisher": "tomrfitz",
     "version": "0.1.0",
     "engines": {
         "vscode": "^1.60.0"
