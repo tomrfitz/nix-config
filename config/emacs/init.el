@@ -389,6 +389,7 @@
 ;; ── Server ──────────────────────────────────────────────────────────
 ;; Start server when launched normally (not as --daemon, which has its own).
 ;; Delete stale socket first so emacsclient (and with-editor) always connect.
+(require 'server)
 (unless (daemonp)
     (setq server-name "server")
     (when (server-running-p) (server-force-delete))
