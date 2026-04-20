@@ -409,6 +409,7 @@ in
     };
 
     spawn-at-startup = [
+      { argv = [ "noctalia-shell" ]; }
       { argv = [ "xwayland-satellite" ]; }
       {
         argv = [
@@ -424,9 +425,9 @@ in
   systemd.user.services.noctalia-location = {
     Unit = {
       Description = "Set Noctalia location from GeoIP";
-      After = [ "noctalia-shell.service" ];
+      After = [ "graphical-session.target" ];
     };
-    Install.WantedBy = [ "noctalia-shell.service" ];
+    Install.WantedBy = [ "graphical-session.target" ];
     Service = {
       Type = "oneshot";
       ExecStartPre = "${pkgs.coreutils}/bin/sleep 3"; # wait for IPC socket
@@ -452,7 +453,6 @@ in
 
   programs.noctalia-shell = {
     enable = true;
-    systemd.enable = true;
     plugins = {
       sources = [
         {
