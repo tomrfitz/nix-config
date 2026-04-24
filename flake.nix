@@ -222,7 +222,15 @@
           wsl = true;
           hostModule = ./hosts/trfwsl;
           extraModules = [ nixos-wsl.nixosModules.wsl ];
-          overlays = [ ];
+          overlays = [
+            # REVISIT(upstream): remove once calibre-web relaxes requests upper bound;
+            #   ref: https://github.com/NixOS/nixpkgs/issues/493387; checked: 2026-04-24
+            (final: prev: {
+              calibre-web = prev.calibre-web.overridePythonAttrs (old: {
+                pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "requests" ];
+              });
+            })
+          ];
           hmModules = [
             ./modules/shared/home
           ];
