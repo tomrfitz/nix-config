@@ -12,7 +12,6 @@
       (callPackage ../../../pkgs/sgram-tui { })
 
       rana
-      comma
       yazi
       python3Packages.markitdown
 
@@ -28,6 +27,9 @@
       rassumfrassum
 
       # nix tooling
+      nurl
+      nix-init
+      statix
       claude-code
       llm-agents.hermes-agent
       llm-agents.pi

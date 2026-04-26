@@ -21,6 +21,8 @@
     ];
   };
 
+  programs.statix.enable = true;
+
   settings.formatter.markdownlint = {
     command = "${pkgs.markdownlint-cli2}/bin/markdownlint-cli2";
     options = [ "--fix" ];

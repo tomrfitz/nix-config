@@ -65,6 +65,10 @@
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    nix-index-database = {
+      url = "github:nix-community/nix-index-database";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     homebrew-emacs-plus = {
       url = "github:d12frosted/homebrew-emacs-plus";
       flake = false;
@@ -90,6 +94,7 @@
       paneru,
       git-hooks,
       llm-agents,
+      nix-index-database,
       homebrew-emacs-plus,
     }:
     let
@@ -118,6 +123,7 @@
             extraSpecialArgs = specialArgs;
             users.${user}.imports = [
               zen-browser.homeModules.twilight
+              nix-index-database.homeModules.nix-index
             ]
             ++ hmModules;
           };
