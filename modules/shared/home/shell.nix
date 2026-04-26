@@ -523,4 +523,11 @@
     enableZshIntegration = true;
     nix-direnv.enable = true;
   };
+
+  # ── Nix-index (pre-built database + command-not-found handler) ─────
+  programs.nix-index = {
+    enable = true;
+    enableZshIntegration = true;
+  };
+  programs.nix-index-database.comma.enable = true;
 }
