@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # Non-NixOS nodes can still be modeled here so the rendered graph reflects
   # the full environment around nixosConfigurations.
   nodes = {

@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   programs.topgrade.settings = {
     pre_commands = {
       "Flake Update + Darwin Rebuild" = ''

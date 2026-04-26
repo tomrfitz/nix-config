@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   fonts.fontconfig = {
     enable = true;
     defaultFonts = {

@@ -10,7 +10,7 @@ in
   config = lib.mkIf (cfg.enable && config.services.sabnzbd.enable) {
     services.sabnzbd = {
       group = "media";
-      openFirewall = cfg.openFirewall;
+      inherit (cfg) openFirewall;
       settings.misc = {
         host = "0.0.0.0";
         inet_exposure = "api+web (auth needed)";

@@ -10,7 +10,7 @@ in
   config = lib.mkIf (cfg.enable && config.services.qbittorrent.enable) {
     services.qbittorrent = {
       group = "media";
-      openFirewall = cfg.openFirewall;
+      inherit (cfg) openFirewall;
     };
   };
 }

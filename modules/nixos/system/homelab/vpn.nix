@@ -20,7 +20,7 @@
 }:
 let
   cfg = config.trf.homelab;
-  vpn = cfg.vpn;
+  inherit (cfg) vpn;
 in
 {
   options.trf.homelab.vpn = {
