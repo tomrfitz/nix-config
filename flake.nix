@@ -198,7 +198,17 @@
           system = "aarch64-darwin";
           platform = "darwin";
           hostModule = ./hosts/trfmbp;
-          overlays = [ ];
+          overlays = [
+            # REVISIT(upstream): remove once libcdio-paranoia gnu23 fix lands in unstable;
+            #   ref: https://github.com/NixOS/nixpkgs/pull/513650; checked: 2026-04-26
+            (final: prev: {
+              libcdio-paranoia = prev.libcdio-paranoia.overrideAttrs (old: {
+                env = (old.env or { }) // {
+                  NIX_CFLAGS_COMPILE = toString (old.env.NIX_CFLAGS_COMPILE or "") + " -std=gnu17";
+                };
+              });
+            })
+          ];
           hmModules = [
             ./modules/shared/home
             ./modules/shared/home/desktop.nix

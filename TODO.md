@@ -12,6 +12,7 @@
 - [ ] `REVISIT(upstream): remove once polkit-agent-helper allows camera-device access; ref: https://github.com/NixOS/nixpkgs/issues/486044 (covers hidraw only, not video4linux); checked: 2026-03-23`
 - [ ] `REVISIT(upstream): remove lix doInstallCheck override; ref: https://git.lix.systems/lix-project/lix/issues/1113 (socket path length) + https://git.lix.systems/lix-project/lix/issues/1101 (fork safety on macOS Sequoia); checked: 2026-03-23`
 - [ ] `REVISIT(upstream): remove calibre-web requests relaxation overlay; ref: https://github.com/NixOS/nixpkgs/issues/493387; checked: 2026-04-24`
+- [ ] `REVISIT(upstream): remove libcdio-paranoia gnu23 overlay on trfmbp; ref: https://github.com/NixOS/nixpkgs/pull/513650; checked: 2026-04-26`
 
 ## Phase 1 — NixOS-WSL homelab (`trfwsl`)
 
