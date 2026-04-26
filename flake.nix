@@ -98,7 +98,7 @@
       homebrew-emacs-plus,
     }:
     let
-      lib = nixpkgs.lib;
+      inherit (nixpkgs) lib;
       user = "tomrfitz";
       fullName = "Thomas FitzGerald";
       email = "tomrfitz@gmail.com";
@@ -160,8 +160,8 @@
               homebrew-emacs-plus
               ;
             hostName = name;
-            isWSL = isWSL;
-            isDarwin = isDarwin;
+            inherit isWSL;
+            inherit isDarwin;
           };
           sharedSystemModules = [
             ./modules/shared/system/nix.nix
@@ -271,7 +271,7 @@
           modules = [
             ./topology.nix
             {
-              nixosConfigurations = self.nixosConfigurations;
+              inherit (self) nixosConfigurations;
             }
           ];
         }

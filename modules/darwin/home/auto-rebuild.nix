@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   launchd.agents.auto-rebuild = {
     enable = true;
     config = {

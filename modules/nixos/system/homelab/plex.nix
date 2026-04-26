@@ -10,7 +10,7 @@ in
   config = lib.mkIf (cfg.enable && config.services.plex.enable) {
     services.plex = {
       group = "media";
-      openFirewall = cfg.openFirewall;
+      inherit (cfg) openFirewall;
     };
   };
 }

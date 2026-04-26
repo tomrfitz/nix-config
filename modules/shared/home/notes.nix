@@ -5,7 +5,7 @@
   ...
 }:
 let
-  isDarwin = pkgs.stdenv.isDarwin;
+  inherit (pkgs.stdenv) isDarwin;
   notesPath = "${config.home.homeDirectory}/Documents/notes";
   # On macOS, keep git objects outside iCloud (same pattern as obsidian.nix)
   gitDir = if isDarwin then "${config.xdg.dataHome}/notes-git" else null;

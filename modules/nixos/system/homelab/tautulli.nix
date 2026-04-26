@@ -10,7 +10,7 @@ in
 {
   config = lib.mkIf (cfg.enable && config.services.tautulli.enable) {
     services.tautulli = {
-      openFirewall = cfg.openFirewall;
+      inherit (cfg) openFirewall;
     };
   };
 }

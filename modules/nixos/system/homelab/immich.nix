@@ -12,7 +12,7 @@ in
       host = "0.0.0.0";
       group = "media";
       mediaLocation = "${cfg.paths.mediaRoot}/photos";
-      openFirewall = cfg.openFirewall;
+      inherit (cfg) openFirewall;
     };
   };
 }

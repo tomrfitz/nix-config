@@ -16,14 +16,14 @@ in
           group = "media";
           port = 8180;
           libraries = [ cfg.paths.booksRoot ];
-          openFirewall = cfg.openFirewall;
+          inherit (cfg) openFirewall;
         };
       })
       (lib.mkIf config.services.calibre-web.enable {
         services.calibre-web = {
           group = "media";
           listen.ip = "0.0.0.0";
-          openFirewall = cfg.openFirewall;
+          inherit (cfg) openFirewall;
           options.calibreLibrary = cfg.paths.booksRoot;
         };
       })

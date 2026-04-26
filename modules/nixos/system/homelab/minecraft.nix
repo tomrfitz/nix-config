@@ -25,7 +25,7 @@ in
       eula = true;
       declarative = true;
       package = pkgs.minecraftServers.vanilla;
-      openFirewall = cfg.openFirewall;
+      inherit (cfg) openFirewall;
 
       jvmOpts = lib.concatStringsSep " " [
         "-Xms2G"

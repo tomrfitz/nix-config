@@ -1,5 +1,4 @@
-{ ... }:
-{
+_: {
   # Keep disko declarative state in-repo, but don't replace runtime
   # fileSystems/swap config until we're ready to migrate.
   disko.enableConfig = false;
