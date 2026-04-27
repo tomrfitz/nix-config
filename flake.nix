@@ -208,6 +208,15 @@
                 ];
               });
             })
+            # REVISIT(upstream): remove once zsh sigsuspend fix lands;
+            #   ref: https://github.com/NixOS/nixpkgs/issues/513543; checked: 2026-04-26
+            (final: prev: {
+              zsh = prev.zsh.overrideAttrs (old: {
+                configureFlags = (old.configureFlags or [ ]) ++ [
+                  "zsh_cv_sys_sigsuspend=yes"
+                ];
+              });
+            })
           ];
           hmModules = [
             ./modules/shared/home
