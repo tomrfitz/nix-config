@@ -30,7 +30,6 @@
         nrsr = "${nh} switch --refresh";
         nrsl = "${nh} switch ~/nix-config";
         nrb = "${nh} build";
-        nrbl = "${nh} build ~/nix-config";
 
         # 1Password CLI helpers
         oprun = "op run --";

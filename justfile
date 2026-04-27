@@ -8,9 +8,17 @@ system := if host == "trfmbp" { "aarch64-darwin" } else { "x86_64-linux" }
 rebuild:
     nh {{ nh_cmd }} switch
 
-# Build the system closure without activating
+# Build the system closure without activating (local working tree, keep-going)
 check:
-    nh {{ nh_cmd }} build
+    nh {{ nh_cmd }} build --flake . -- --keep-going
+
+# Garbage collect old generations and unreferenced store paths
+clean:
+    nh clean all
+
+# Edit sops-encrypted secrets file for a host (default: trfwsl)
+sops-edit host="trfwsl":
+    sops secrets/{{ host }}.yaml
 
 # Rollback to the previous generation
 [linux]
