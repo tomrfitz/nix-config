@@ -208,6 +208,11 @@
                 };
               });
             })
+            # REVISIT(upstream): remove once kvazaar tests stop getting SIGKILL'd on darwin;
+            #   tests spawn ffmpeg subprocesses killed by sandbox; checked: 2026-04-26
+            (final: prev: {
+              kvazaar = prev.kvazaar.overrideAttrs { doCheck = false; };
+            })
           ];
           hmModules = [
             ./modules/shared/home
