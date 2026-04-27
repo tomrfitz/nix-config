@@ -95,6 +95,7 @@ _: {
       "steam"
 
       # science / education
+      "anki"
       "calibre"
       "libreoffice"
       "zotero"
