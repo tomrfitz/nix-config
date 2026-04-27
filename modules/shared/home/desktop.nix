@@ -22,7 +22,6 @@
       audacity
 
       prismlauncher
-      anki
       chatterino2
 
       pear-desktop
