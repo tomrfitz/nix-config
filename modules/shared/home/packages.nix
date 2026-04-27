@@ -30,7 +30,6 @@
       nix-init
       statix
       claude-code
-      llm-agents.hermes-agent
       llm-agents.pi
       dix
       nh
