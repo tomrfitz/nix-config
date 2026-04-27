@@ -13,7 +13,6 @@
 
       rana
       yazi
-      python3Packages.markitdown
 
       mcrcon
 
