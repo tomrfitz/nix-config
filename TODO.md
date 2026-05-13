@@ -13,6 +13,7 @@
 - [ ] `REVISIT(upstream): remove lix doInstallCheck override; ref: https://git.lix.systems/lix-project/lix/issues/1113 (socket path length) + https://git.lix.systems/lix-project/lix/issues/1101 (fork safety on macOS Sequoia); checked: 2026-03-23`
 - [ ] `REVISIT(upstream): remove calibre-web requests relaxation overlay; ref: https://github.com/NixOS/nixpkgs/issues/493387; checked: 2026-04-24`
 - [ ] `REVISIT(upstream): remove libcdio-paranoia gnu23 overlay on trfmbp; ref: https://github.com/NixOS/nixpkgs/pull/513650; checked: 2026-04-26`
+- [ ] `REVISIT(upstream): remove resolvconf script override in modules/nixos/system/default.nix when nixpkgs resolvconf.nix uses lib.getExe' with explicit "resolvconf" binary name (systemd 260+ has no bin/systemd; lib.getExe pkgs.systemd falls back to a non-existent path and crashes resolvconf.service when services.resolved is enabled); ref: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/config/resolvconf.nix; checked: 2026-04-29`
 
 ## Phase 1 — NixOS-WSL homelab (`trfwsl`)
 

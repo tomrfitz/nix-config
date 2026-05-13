@@ -15,17 +15,39 @@
     ./wsl-gpu.nix
     # Stop WSL from overwriting /etc/resolv.conf — resolved manages it instead.
     # Tailscale and Mullvad both integrate with resolved natively for split-DNS.
-    {
-      wsl.wslConf.network.generateResolvConf = false;
-      services.resolved.enable = true;
-      # MagicDNS (100.100.100.100) resolves *.ts.net via tailscale0's per-link
-      # DNS. Global nameservers provide general resolution — Mullvad overrides
-      # these when connected, and they serve as fallback when disconnected.
-      networking.nameservers = [
-        "1.1.1.1"
-        "1.0.0.1"
-      ];
-    }
+    (
+      { pkgs, config, ... }:
+      {
+        wsl.wslConf.network.generateResolvConf = false;
+        services.resolved.enable = true;
+        # MagicDNS (100.100.100.100) resolves *.ts.net via tailscale0's per-link
+        # DNS. Global nameservers provide general resolution — Mullvad overrides
+        # these when connected, and they serve as fallback when disconnected.
+        networking.nameservers = [
+          "1.1.1.1"
+          "1.0.0.1"
+        ];
+
+        # REVISIT(upstream): drop when nixpkgs resolvconf.nix switches to
+        # getExe' with explicit binary name. systemd 260+ has no bin/systemd,
+        # so `lib.getExe cfg.package` (where cfg.package=pkgs.systemd via
+        # services.resolved) crashes resolvconf.service with exit 127. The
+        # correct binary is bin/resolvconf.
+        # ref: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/config/resolvconf.nix
+        # checked: 2026-04-29
+        systemd.services.resolvconf.script = lib.mkIf config.networking.resolvconf.enable (
+          lib.mkForce ''
+            ${lib.getExe' config.networking.resolvconf.package "resolvconf"} -u
+            chgrp resolvconf ${lib.escapeShellArgs config.networking.resolvconf.subscriberFiles}
+            chmod g=u ${lib.escapeShellArgs config.networking.resolvconf.subscriberFiles}
+            ${lib.getExe' pkgs.acl "setfacl"} -R \
+              -m group:resolvconf:rwx \
+              -m default:group:resolvconf:rwx \
+              /run/resolvconf
+          ''
+        );
+      }
+    )
   ];
 
   programs.zsh.enable = true;
