@@ -9,10 +9,10 @@
 
 ## Upstream Watchlist
 
-- [ ] `REVISIT(upstream): remove once polkit-agent-helper allows camera-device access; ref: https://github.com/NixOS/nixpkgs/issues/486044 (covers hidraw only, not video4linux); checked: 2026-03-23`
-- [ ] `REVISIT(upstream): remove lix doInstallCheck override; ref: https://git.lix.systems/lix-project/lix/issues/1113 (socket path length) + https://git.lix.systems/lix-project/lix/issues/1101 (fork safety on macOS Sequoia); checked: 2026-03-23`
-- [ ] `REVISIT(upstream): remove calibre-web requests relaxation overlay; ref: https://github.com/NixOS/nixpkgs/issues/493387; checked: 2026-04-24`
-- [ ] `REVISIT(upstream): remove libcdio-paranoia gnu23 overlay on trfmbp; ref: https://github.com/NixOS/nixpkgs/pull/513650; checked: 2026-04-26`
+- [ ] `REVISIT(upstream): remove polkit-agent-helper@ video4linux override on trfnix once an upstream fix lands. nixpkgs#486044 (merged 2026-04-02) only covers FIDO/hidraw; howdy needs video4linux. No upstream tracking yet — file one or wait. checked: 2026-05-12`
+- [ ] `REVISIT(upstream): remove lix doInstallCheck=isLinux override on macOS once #1101 (fork safety on macOS Sequoia/Tahoe) lands. #1113 (socket path) was closed 2026-04-28 by disabling the test, but #1101 still open (milestone 2.96, due 2026-06-15). ref: https://git.lix.systems/lix-project/lix/issues/1101; checked: 2026-05-12`
+- [ ] `REVISIT(upstream): remove streamlink test_set_interface disable on trfmbp once nixpkgs#513047 merges (open, stalled) or streamlink upstream gates the test by platform. ref: https://github.com/NixOS/nixpkgs/pull/513047; checked: 2026-05-12`
+- [ ] `REVISIT(upstream): remove niri preCheck ulimit -n 4096 override on trfnix; ref: https://github.com/sodiboo/niri-flake/issues/1300; checked: 2026-05-12`
 - [ ] `REVISIT(upstream): remove resolvconf script override in modules/nixos/system/default.nix when nixpkgs resolvconf.nix uses lib.getExe' with explicit "resolvconf" binary name (systemd 260+ has no bin/systemd; lib.getExe pkgs.systemd falls back to a non-existent path and crashes resolvconf.service when services.resolved is enabled); ref: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/config/resolvconf.nix; checked: 2026-04-29`
 
 ## Phase 1 — NixOS-WSL homelab (`trfwsl`)

@@ -16,7 +16,7 @@
   # ── Display / Desktop ────────────────────────────────────────────────
   programs.niri.enable = true;
   # REVISIT(upstream): remove when niri-flake raises sandbox ulimit;
-  #   ref: https://github.com/sodiboo/niri-flake/issues/1300; checked: 2026-04-09
+  #   ref: https://github.com/sodiboo/niri-flake/issues/1300; checked: 2026-05-12
   programs.niri.package =
     let
       inherit (options.programs.niri.package) default;
@@ -121,9 +121,10 @@
   };
 
   # Workaround: polkit 127 sandboxes polkit-agent-helper, blocking howdy camera access.
-  # nixpkgs#486044 only covers FIDO/hidraw, not video4linux — this needs its own upstream fix.
-  # REVISIT(upstream): remove once polkit-agent-helper allows camera-device access;
-  # ref: https://github.com/NixOS/nixpkgs/issues/486044; checked: 2026-03-23
+  # nixpkgs#486044 (merged 2026-04-02) only covers FIDO/hidraw, not video4linux —
+  # video4linux needs its own upstream fix.
+  # REVISIT(upstream): no upstream tracking yet — file an issue or wait;
+  # related: https://github.com/NixOS/nixpkgs/pull/486044; checked: 2026-05-12
   systemd.services."polkit-agent-helper@".serviceConfig = {
     DeviceAllow = "char-video4linux rw";
     PrivateDevices = "no";
