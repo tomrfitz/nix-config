@@ -1,30 +1,30 @@
 name: Check
 
 on:
-    push:
-        branches: [main]
-    pull_request:
+  push:
+    branches: [main]
+  pull_request:
 
 jobs:
-    check:
-        runs-on: ubuntu-latest
-        steps:
-            - uses: actions/checkout@v4
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
 
-            - uses: samueldr/lix-gha-installer-action@v2026-02-16
+      - uses: samueldr/lix-gha-installer-action@v2026-02-16
 
-            - name: Assert Lix runtime
-              run: |
-                  nix --version
-                  nix --version | grep -q "Lix"
+      - name: Assert Lix runtime
+        run: |
+          nix --version
+          nix --version | grep -q "Lix"
 
-            - name: Evaluate darwin configuration
-              run: nix eval .#darwinConfigurations.trfmbp.system --raw
+      - name: Evaluate darwin configuration
+        run: nix eval .#darwinConfigurations.trfmbp.system --raw
 
-            - name: Evaluate nixos configurations
-              run: |
-                  nix eval .#nixosConfigurations.trfnix.config.system.build.toplevel.drvPath --raw
-                  nix eval .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath --raw
+      - name: Evaluate nixos configurations
+        run: |
+          nix eval .#nixosConfigurations.trfnix.config.system.build.toplevel.drvPath --raw
+          nix eval .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath --raw
 
-            - name: Check formatting
-              run: nix build .#checks.$(nix eval --impure --expr builtins.currentSystem --raw).formatting --no-link
+      - name: Check formatting
+        run: nix build .#checks.$(nix eval --impure --expr builtins.currentSystem --raw).formatting --no-link

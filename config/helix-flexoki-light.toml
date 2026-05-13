@@ -16,7 +16,7 @@
 "variable.parameter" = { fg = "magenta", modifiers = ["italic"] }
 "variable.builtin" = "red"
 "variable.other.member" = "blue"
-"label" = "blue"  # used for lifetimes
+"label" = "blue" # used for lifetimes
 "punctuation" = "tx-2"
 "punctuation.special" = "cyan"
 "keyword" = "green"
@@ -26,7 +26,7 @@
 "function.macro" = "cyan"
 "tag" = "blue"
 "namespace" = { fg = "yellow", modifiers = ["italic"] }
-"special" = "blue"  # fuzzy highlight
+"special" = "blue" # fuzzy highlight
 "markup.heading.1" = "red"
 "markup.heading.2" = "orange"
 "markup.heading.3" = "yellow"

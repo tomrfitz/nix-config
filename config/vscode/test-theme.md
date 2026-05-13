@@ -5,7 +5,7 @@ Body text should be default tx color, not purple, not dimmed.
 ## Markdown Basics
 
 **Bold text** should be bold, no color change.
-*Italic text* should be italic, no color change.
+_Italic text_ should be italic, no color change.
 ~~Strikethrough~~ should be struck through.
 `inline code` should be purple.
 
@@ -124,7 +124,7 @@ from typing import Optional, List
 
 # Functions (orange)
 def greet(name: str) -> str:
-    """Docstring should be tx-3 italic"""
+    """Docstring should be tx-3 italic (doc-comment scope, same color as regular comments)"""
     return f"Hello, {name}!"  # f-string interpolation
 
 # Class
@@ -298,19 +298,19 @@ public String toString() {
 
 ```json
 {
-  "name": "flexoki",
-  "version": "0.1.0",
-  "private": true,
-  "count": 42,
-  "ratio": 3.14,
-  "active": false,
-  "data": null,
-  "tags": ["theme", "color"],
-  "nested": {
-    "deep": {
-      "value": 100
+    "name": "flexoki",
+    "version": "0.1.0",
+    "private": true,
+    "count": 42,
+    "ratio": 3.14,
+    "active": false,
+    "data": null,
+    "tags": ["theme", "color"],
+    "nested": {
+        "deep": {
+            "value": 100
+        }
     }
-  }
 }
 ```
 
@@ -429,7 +429,7 @@ WHERE id = 42;
 ```bash
 #!/bin/bash
 
-# Comment (tx-3)
+# Comment (tx-2)
 
 # Variables (blue?)
 NAME="world"

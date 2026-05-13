@@ -67,12 +67,12 @@ Code should work for its author first, be maintainable and accessible to them ov
 - Distinguish facts (test status, file paths) from understanding (why a design decision was made, what the user's goals are) — both matter, but understanding is harder to capture and more valuable to try
 - The user's Obsidian vault at `$OBSD` is their primary knowledge base. When producing research or notes for later use, write to `$OBSD/Notes/`. Use this frontmatter style:
 
-    ```yaml
-    ---
-    date created: 2025-09-21, 18:42:24
-    date modified: 2025-09-21, 18:42:48
-    ---
-    ```
+  ```yaml
+  ---
+  date created: 2025-09-21, 18:42:24
+  date modified: 2025-09-21, 18:42:48
+  ---
+  ```
 
-    Use `[[wikilinks]]` for internal references.
+  Use `[[wikilinks]]` for internal references.
 - The user values long-term collaboration patterns over per-session efficiency — leave good context for next time
