@@ -26,7 +26,8 @@ The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful f
 
 - `nh darwin switch` — rebuild from remote (uses cached tarball; add `--refresh` to force re-fetch after a push)
 - `nh darwin switch --flake .` — local iteration escape hatch (dirty/uncommitted changes)
-- `nh darwin switch --refresh --update` — force re-fetch + flake input update (what topgrade runs)
+- `nh darwin switch --refresh` — force re-fetch from remote (what topgrade runs); does **not** bump `flake.lock`
+- `nh darwin switch --refresh --update` — force re-fetch + bump inputs (what `just update` runs)
 
 The `justfile` defers to `NH_FLAKE` (no hardcoded paths):
 
