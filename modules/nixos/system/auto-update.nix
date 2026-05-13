@@ -92,7 +92,15 @@ in
               echo ""
               echo "auto-update service failed at $(date -u +%Y-%m-%dT%H:%M:%SZ)"
               echo ""
+              echo "--- auto-update wrapper ---"
               ${pkgs.systemd}/bin/journalctl -u auto-update -n 80 --no-pager
+              echo ""
+              echo "--- nixos-rebuild switch-to-configuration (last hour) ---"
+              ${pkgs.systemd}/bin/journalctl -u nixos-rebuild-switch-to-configuration \
+                --since "1 hour ago" -n 200 --no-pager || true
+              echo ""
+              echo "--- currently failed units ---"
+              ${pkgs.systemd}/bin/systemctl --failed --no-pager --no-legend || true
             } | ${pkgs.msmtp}/bin/msmtp -a default tomrfitz@gmail.com
           '';
         };
