@@ -171,7 +171,7 @@
         show_close_button = "hover";
       };
       title_bar = {
-        show_branch_icon = true;
+        show_branch_status_icon = true;
         show_menus = false;
       };
       project_panel = {
@@ -237,6 +237,7 @@
           soft_wrap = "none";
         };
         Nix = {
+          soft_wrap = "bounded";
           preferred_line_length = 100;
           tab_size = 2;
           language_servers = [
