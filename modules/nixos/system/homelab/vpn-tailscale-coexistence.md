@@ -23,7 +23,7 @@ Getting both to coexist required solving four distinct problems. Documenting the
 **What didn't work:**
 
 - `mullvad lan set allow` — does not cover 100.64.0.0/10 (CGNAT, not LAN). Confirmed by [#6086](https://github.com/mullvad/mullvadvpn-app/issues/6086).
-- `mullvad split-tunnel add $(pgrep tailscaled)` — PID-based split tunneling only affects **outbound** traffic from the excluded process. Inbound SSH connections arriving on `tailscale0` are still dropped. However, PID-based split tunneling *is* needed for a separate problem — see Problem 3½ (bootstrap ordering).
+- `mullvad split-tunnel add $(pgrep tailscaled)` — PID-based split tunneling only affects **outbound** traffic from the excluded process. Inbound SSH connections arriving on `tailscale0` are still dropped. However, PID-based split tunneling _is_ needed for a separate problem — see Problem 3½ (bootstrap ordering).
 
 **Solution:** Create a separate nftables table (`inet mullvad-ts`) that marks Tailscale traffic with Mullvad's split-tunnel fwmarks. Mullvad's firewall recognizes these marks and allows the traffic through. Since this is a separate table, Mullvad can't wipe it during reconnects (it only manages its own `inet mullvad` table).
 
