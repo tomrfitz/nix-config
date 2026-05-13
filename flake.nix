@@ -199,8 +199,10 @@
           platform = "darwin";
           hostModule = ./hosts/trfmbp;
           overlays = [
-            # REVISIT(upstream): remove once streamlink tests gate SO_BINDTODEVICE on Linux;
-            #   new in 8.3.0, socket option doesn't exist on macOS; checked: 2026-04-26
+            # REVISIT(upstream): remove once nixpkgs#513047 lands (open, stalled) or
+            #   streamlink upstream gates the test by platform; SO_BINDTODEVICE is
+            #   Linux-only and the test was added in 8.3.0;
+            #   ref: https://github.com/NixOS/nixpkgs/pull/513047; checked: 2026-05-12
             (final: prev: {
               streamlink = prev.streamlink.overridePythonAttrs (old: {
                 disabledTests = (old.disabledTests or [ ]) ++ [
