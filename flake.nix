@@ -208,15 +208,6 @@
                 ];
               });
             })
-            # REVISIT(upstream): remove once zsh sigsuspend fix lands;
-            #   ref: https://github.com/NixOS/nixpkgs/issues/513543; checked: 2026-04-26
-            (final: prev: {
-              zsh = prev.zsh.overrideAttrs (old: {
-                configureFlags = (old.configureFlags or [ ]) ++ [
-                  "zsh_cv_sys_sigsuspend=yes"
-                ];
-              });
-            })
           ];
           hmModules = [
             ./modules/shared/home
@@ -247,15 +238,6 @@
           wsl = true;
           hostModule = ./hosts/trfwsl;
           extraModules = [ nixos-wsl.nixosModules.wsl ];
-          overlays = [
-            # REVISIT(upstream): remove once calibre-web relaxes requests upper bound;
-            #   ref: https://github.com/NixOS/nixpkgs/issues/493387; checked: 2026-04-24
-            (final: prev: {
-              calibre-web = prev.calibre-web.overridePythonAttrs (old: {
-                pythonRelaxDeps = (old.pythonRelaxDeps or [ ]) ++ [ "requests" ];
-              });
-            })
-          ];
           hmModules = [
             ./modules/shared/home
           ];
