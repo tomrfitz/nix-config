@@ -21,6 +21,7 @@
       shfmt
       markdownlint-cli2
       sql-formatter
+      dprint
 
       # LSP multiplexer (lets eglot run multiple servers per buffer, e.g. ty + ruff)
       rassumfrassum
