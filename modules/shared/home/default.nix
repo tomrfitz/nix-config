@@ -141,8 +141,6 @@
   # the repo-root file is the single source; treefmt reads it in place.
   home.file.".markdownlint-cli2.jsonc".source = ../../../.markdownlint-cli2.jsonc;
 
-  programs.home-manager.enable = true;
-
   # ── Topgrade ──────────────────────────────────────────────────────────
   programs.topgrade = {
     enable = true;
