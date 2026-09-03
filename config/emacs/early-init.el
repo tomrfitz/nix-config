@@ -39,11 +39,14 @@
 (push '(horizontal-scroll-bars . nil) default-frame-alist)
 (push '(fullscreen . maximized) default-frame-alist)
 
-;; Pixel-level frame resizing
+;; Pixel-level frame and window resizing
 (setq frame-resize-pixelwise t
+    window-resize-pixelwise t
     frame-inhibit-implied-resize t)
 
-;; Suppress native-comp warnings
-(setq native-comp-async-report-warnings-errors 'silent)
+;; Suppress native-comp warnings; don't start background compiles on battery
+;; (Emacs 31).
+(setq native-comp-async-report-warnings-errors 'silent
+    native-comp-async-on-battery-power nil)
 
 ;;; early-init.el ends here
