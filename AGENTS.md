@@ -26,6 +26,8 @@ The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful f
 
 nh derives the target host from macOS's `LocalHostName`, which the OS silently renames on a network clash (seen: `trfmbp-2` → `nh` fails with "Did you mean trfmbp?"). The justfile passes `-H` explicitly; the permanent fix is `sudo scutil --set LocalHostName trfmbp` (nix-darwin reasserts it on activation).
 
+A switch that changes paneru or uninstalls many apps can wedge paneru's event tap (every click freezes input until a forced restart — seen 2026-09-03): quit paneru before switching and run `paneru restart` after. Its logs are in `~/Library/Logs/paneru.err.log`.
+
 Project templates: `nix flake init -t ~/nix-config#python-uv` bootstraps a Python devShell (uv-managed interpreter + venv, ruff and ty on PATH for eglot). See `templates/`.
 
 - `nh darwin switch` — rebuild from remote (uses cached tarball; add `--refresh` to force re-fetch after a push)
