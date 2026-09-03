@@ -24,10 +24,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.flake-compat.follows = "git-hooks/flake-compat";
     };
-    niri-flake = {
-      url = "github:sodiboo/niri-flake";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     zen-browser = {
       url = "github:0xc000022070/zen-browser-flake";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -90,7 +86,6 @@
       defaults2nix,
       treefmt-nix,
       nixos-wsl,
-      niri-flake,
       zen-browser,
       noctalia,
       sops-nix,
@@ -220,7 +215,6 @@
           hostModule = ./hosts/trfnix;
           extraModules = [
             ./modules/nixos/system/desktop.nix
-            niri-flake.nixosModules.niri
             disko.nixosModules.disko
           ];
           hmModules = [

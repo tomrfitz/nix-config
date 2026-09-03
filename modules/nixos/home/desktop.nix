@@ -19,7 +19,6 @@ in
   home.packages = with pkgs; [
     # 1password installed via programs._1password-gui in system config
     foot # lightweight Wayland terminal
-    xwayland-satellite # niri ≥ 25.08 spawns it on demand and exports DISPLAY itself
     wl-clipboard
     brightnessctl
     playerctl
@@ -45,256 +44,251 @@ in
     gtk.enable = true;
   };
 
-  # ── Portal (freedesktop dark preference for apps) ────────────────────
-  xdg.portal = {
-    enable = true;
-    extraPortals = [ pkgs.xdg-desktop-portal-gtk ];
-    config.common.default = "*";
-  };
-
   # ── Niri ────────────────────────────────────────────────────────────
-  # nixosModules.niri provides: polkit agent, xdg-desktop-portal-gnome,
-  # GNOME keyring, dconf, opengl, default fonts, swaylock PAM, binary cache
-  programs.niri.settings = {
-    prefer-no-csd = true;
-    environment."NIXOS_OZONE_WL" = "1";
+  # nixpkgs' programs.niri (modules/nixos/system/desktop.nix) supplies the
+  # session, user units, gnome + gtk portals with niri's portal config,
+  # gnome-keyring, swaylock PAM, dconf and polkit (the agent is our
+  # polkit-agent unit, same file). This module renders config.kdl
+  # (checkConfig runs `niri validate` at build time) and adds niri (the same
+  # store path as the system install) and xwayland-satellite to
+  # home.packages. Generic KDL encoding: str/num/bool → single argument,
+  # { } → leaf node, _props → properties, _children → ordered or repeated
+  # nodes.
+  wayland.windowManager.niri = {
+    enable = true;
+    # The NixOS module already installs niri's units via systemd.packages
+    # (plus its restartIfChanged/PATH drop-in); don't add a second source.
+    systemd.enable = false;
+    # Portals and their config are system-side (xdg.portal.config.niri →
+    # /etc/xdg/xdg-desktop-portal/niri-portals.conf); a user-level
+    # portals.conf would shadow it, so nothing portal-related lives in HM.
+    portalPackage = null;
 
-    # Required for Noctalia notification actions and window activation
-    debug.honor-xdg-activation-with-invalid-serial = { };
+    settings = {
+      prefer-no-csd = { };
+      environment.NIXOS_OZONE_WL = "1";
 
-    input = {
-      keyboard.xkb = { };
-      touchpad = {
-        tap = true;
-        natural-scroll = true;
-        dwt = true;
+      # Required for Noctalia notification actions and window activation
+      debug.honor-xdg-activation-with-invalid-serial = { };
+
+      input.touchpad = {
+        tap = { };
+        natural-scroll = { };
+        dwt = { };
       };
-    };
 
-    # Stationary wallpaper: Noctalia draws wallpaper as a layer surface,
-    # niri's background becomes transparent so it shows through.
-    overview.workspace-shadow.enable = false;
-    layout = {
-      background-color = "transparent";
-      gaps = 5;
-      struts = {
-        left = 4;
-        right = 4;
-        top = 4;
-        bottom = 4;
+      # Stationary wallpaper: Noctalia draws wallpaper as a layer surface,
+      # niri's background becomes transparent so it shows through.
+      overview.workspace-shadow.off = { };
+      layout = {
+        background-color = "transparent";
+        gaps = 5;
+        struts = {
+          left = 4;
+          right = 4;
+          top = 4;
+          bottom = 4;
+        };
+        preset-column-widths._children = [
+          { proportion = 0.33333; }
+          { proportion = 0.5; }
+          { proportion = 0.66667; }
+          { proportion = 0.75; }
+          { proportion = 1.0; }
+        ];
+        default-column-width.proportion = 0.5;
       };
-      preset-column-widths = [
-        { proportion = 0.33333; }
-        { proportion = 0.5; }
-        { proportion = 0.66667; }
-        { proportion = 0.75; }
-        { proportion = 1.0; }
-      ];
-      default-column-width.proportion = 0.5;
-    };
 
-    # No named workspaces — embrace niri's scrolling model.
-    # Dynamic workspaces are created/destroyed as needed.
+      # No named workspaces — embrace niri's scrolling model.
+      # Dynamic workspaces are created/destroyed as needed.
 
-    window-rules = [
-      # Global corner radius
-      {
-        geometry-corner-radius =
-          let
-            r = 4.0;
-          in
-          {
-            top-left = r;
-            top-right = r;
-            bottom-left = r;
-            bottom-right = r;
+      # Repeated top-level nodes; rules apply in order of appearance.
+      _children = [
+        # Global corner radius
+        {
+          window-rule = {
+            geometry-corner-radius = 4;
+            clip-to-geometry = true;
           };
-        clip-to-geometry = true;
-      }
-      # Firefox PiP → floating
-      {
-        matches = [
-          {
-            app-id = "^firefox$";
-            title = "^Picture-in-Picture$";
-          }
-        ];
-        open-floating = true;
-      }
-      # 1Password — hide from screencasts/screenshots
-      {
-        matches = [ { app-id = "^1Password$"; } ];
-        block-out-from = "screen-capture";
-      }
-    ];
+        }
+        # Firefox PiP → floating
+        {
+          window-rule = {
+            match._props = {
+              app-id = "^firefox$";
+              title = "^Picture-in-Picture$";
+            };
+            open-floating = true;
+          };
+        }
+        # 1Password — hide from screencasts/screenshots
+        {
+          window-rule = {
+            match._props.app-id = "^1Password$";
+            block-out-from = "screen-capture";
+          };
+        }
+        {
+          layer-rule = {
+            match._props.namespace = "^noctalia-wallpaper$";
+            place-within-backdrop = true;
+          };
+        }
+      ];
 
-    layer-rules = [
-      {
-        matches = [ { namespace = "^noctalia-wallpaper$"; } ];
-        place-within-backdrop = true;
-      }
-    ];
+      binds = {
+        # ── Launch ──────────────────────────────────────────────────────
+        "Super+Return".spawn = [ "ghostty" ];
+        "Super+Space".spawn = noctalia "panel-toggle launcher";
+        "Super+Q".close-window = { };
+        "Super+F".fullscreen-window = { };
 
-    binds = {
-      # ── Launch ──────────────────────────────────────────────────────
-      "Super+Return".action.spawn = "ghostty";
-      "Super+Space".action.spawn = noctalia "panel-toggle launcher";
-      "Super+Q".action.close-window = { };
-      "Super+F".action.fullscreen-window = { };
+        # ── Lock ───────────────────────────────────────────────────────
+        "Super+Ctrl+L".spawn = noctalia "session lock";
 
-      # ── Lock ───────────────────────────────────────────────────────
-      "Super+Ctrl+L".action.spawn = noctalia "session lock";
+        # ── Focus (vim-style) ───────────────────────────────────────────
+        "Super+H".focus-column-left = { };
+        "Super+J".focus-window-down = { };
+        "Super+K".focus-window-up = { };
+        "Super+L".focus-column-right = { };
 
-      # ── Focus (vim-style) ───────────────────────────────────────────
-      "Super+H".action.focus-column-left = { };
-      "Super+J".action.focus-window-down = { };
-      "Super+K".action.focus-window-up = { };
-      "Super+L".action.focus-column-right = { };
+        # ── Move ────────────────────────────────────────────────────────
+        "Super+Shift+H".move-column-left = { };
+        "Super+Shift+J".move-window-down = { };
+        "Super+Shift+K".move-window-up = { };
+        "Super+Shift+L".move-column-right = { };
 
-      # ── Move ────────────────────────────────────────────────────────
-      "Super+Shift+H".action.move-column-left = { };
-      "Super+Shift+J".action.move-window-down = { };
-      "Super+Shift+K".action.move-window-up = { };
-      "Super+Shift+L".action.move-column-right = { };
+        # ── Column management ───────────────────────────────────────────
+        "Super+BracketLeft".consume-or-expel-window-left = { };
+        "Super+BracketRight".consume-or-expel-window-right = { };
+        "Super+R".switch-preset-column-width = { };
+        "Super+C".center-column = { };
+        "Super+T".toggle-column-tabbed-display = { };
+        "Super+W".maximize-column = { };
+        "Super+Ctrl+F".expand-column-to-available-width = { };
 
-      # ── Column management ───────────────────────────────────────────
-      "Super+BracketLeft".action.consume-or-expel-window-left = { };
-      "Super+BracketRight".action.consume-or-expel-window-right = { };
-      "Super+R".action.switch-preset-column-width = { };
-      "Super+C".action.center-column = { };
-      "Super+T".action.toggle-column-tabbed-display = { };
-      "Super+W".action.maximize-column = { };
-      "Super+Ctrl+F".action.expand-column-to-available-width = { };
+        # ── Floating ────────────────────────────────────────────────────
+        "Super+Shift+F".toggle-window-floating = { };
+        "Super+V".switch-focus-between-floating-and-tiling = { };
 
-      # ── Floating ────────────────────────────────────────────────────
-      "Super+Shift+F".action.toggle-window-floating = { };
-      "Super+V".action.switch-focus-between-floating-and-tiling = { };
+        # ── Resize ──────────────────────────────────────────────────────
+        "Super+Minus".set-column-width = "-10%";
+        "Super+Equal".set-column-width = "+10%";
+        "Super+Shift+Minus".set-window-height = "-10%";
+        "Super+Shift+Equal".set-window-height = "+10%";
+        "Super+Shift+R".reset-window-height = { };
 
-      # ── Resize ──────────────────────────────────────────────────────
-      "Super+Minus".action.set-column-width = "-10%";
-      "Super+Equal".action.set-column-width = "+10%";
-      "Super+Shift+Minus".action.set-window-height = "-10%";
-      "Super+Shift+Equal".action.set-window-height = "+10%";
-      "Super+Shift+R".action.reset-window-height = { };
+        # ── Workspace nav ───────────────────────────────────────────────
+        "Super+Tab".focus-workspace-previous = { };
+        "Super+U".focus-workspace-up = { };
+        "Super+I".focus-workspace-down = { };
+        "Super+Shift+U".move-window-to-workspace-up = { };
+        "Super+Shift+I".move-window-to-workspace-down = { };
 
-      # ── Workspace nav ───────────────────────────────────────────────
-      "Super+Tab".action.focus-workspace-previous = { };
-      "Super+U".action.focus-workspace-up = { };
-      "Super+I".action.focus-workspace-down = { };
-      "Super+Shift+U".action.move-window-to-workspace-up = { };
-      "Super+Shift+I".action.move-window-to-workspace-down = { };
+        # Workspace by index
+        "Super+1".focus-workspace = 1;
+        "Super+2".focus-workspace = 2;
+        "Super+3".focus-workspace = 3;
+        "Super+4".focus-workspace = 4;
+        "Super+5".focus-workspace = 5;
+        "Super+6".focus-workspace = 6;
+        "Super+7".focus-workspace = 7;
+        "Super+8".focus-workspace = 8;
+        "Super+9".focus-workspace = 9;
+        "Super+Shift+1".move-window-to-workspace = 1;
+        "Super+Shift+2".move-window-to-workspace = 2;
+        "Super+Shift+3".move-window-to-workspace = 3;
+        "Super+Shift+4".move-window-to-workspace = 4;
+        "Super+Shift+5".move-window-to-workspace = 5;
+        "Super+Shift+6".move-window-to-workspace = 6;
+        "Super+Shift+7".move-window-to-workspace = 7;
+        "Super+Shift+8".move-window-to-workspace = 8;
+        "Super+Shift+9".move-window-to-workspace = 9;
 
-      # Workspace by index
-      "Super+1".action.focus-workspace = 1;
-      "Super+2".action.focus-workspace = 2;
-      "Super+3".action.focus-workspace = 3;
-      "Super+4".action.focus-workspace = 4;
-      "Super+5".action.focus-workspace = 5;
-      "Super+6".action.focus-workspace = 6;
-      "Super+7".action.focus-workspace = 7;
-      "Super+8".action.focus-workspace = 8;
-      "Super+9".action.focus-workspace = 9;
-      "Super+Shift+1".action.move-window-to-workspace = 1;
-      "Super+Shift+2".action.move-window-to-workspace = 2;
-      "Super+Shift+3".action.move-window-to-workspace = 3;
-      "Super+Shift+4".action.move-window-to-workspace = 4;
-      "Super+Shift+5".action.move-window-to-workspace = 5;
-      "Super+Shift+6".action.move-window-to-workspace = 6;
-      "Super+Shift+7".action.move-window-to-workspace = 7;
-      "Super+Shift+8".action.move-window-to-workspace = 8;
-      "Super+Shift+9".action.move-window-to-workspace = 9;
+        # ── Column position ─────────────────────────────────────────────
+        "Super+Home".focus-column-first = { };
+        "Super+End".focus-column-last = { };
+        "Super+Shift+Home".move-column-to-first = { };
+        "Super+Shift+End".move-column-to-last = { };
 
-      # ── Column position ─────────────────────────────────────────────
-      "Super+Home".action.focus-column-first = { };
-      "Super+End".action.focus-column-last = { };
-      "Super+Shift+Home".action.move-column-to-first = { };
-      "Super+Shift+End".action.move-column-to-last = { };
+        # ── System ──────────────────────────────────────────────────────
+        "Super+Shift+E".quit._props.skip-confirmation = true;
+        "Super+Shift+P".power-off-monitors = { };
+        "Super+O".toggle-overview = { };
+        "Super+Escape" = {
+          _props.allow-inhibiting = false;
+          toggle-keyboard-shortcuts-inhibit = { };
+        };
 
-      # ── System ──────────────────────────────────────────────────────
-      "Super+Shift+E".action.quit = {
-        skip-confirmation = true;
+        # ── Screenshots (niri built-in) ─────────────────────────────────
+        "Super+Shift+S".screenshot = { };
+        "Print".screenshot-screen = { };
+        "Super+Print".screenshot-window = { };
+
+        # ── Media keys (allow-when-locked) ──────────────────────────────
+        "XF86AudioRaiseVolume" = {
+          _props.allow-when-locked = true;
+          spawn = [
+            "wpctl"
+            "set-volume"
+            "@DEFAULT_AUDIO_SINK@"
+            "5%+"
+          ];
+        };
+        "XF86AudioLowerVolume" = {
+          _props.allow-when-locked = true;
+          spawn = [
+            "wpctl"
+            "set-volume"
+            "@DEFAULT_AUDIO_SINK@"
+            "5%-"
+          ];
+        };
+        "XF86AudioMute" = {
+          _props.allow-when-locked = true;
+          spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
+        };
+        "XF86AudioMicMute" = {
+          _props.allow-when-locked = true;
+          spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
+        };
+        "XF86MonBrightnessUp" = {
+          _props.allow-when-locked = true;
+          spawn = [
+            "brightnessctl"
+            "set"
+            "+5%"
+          ];
+        };
+        "XF86MonBrightnessDown" = {
+          _props.allow-when-locked = true;
+          spawn = [
+            "brightnessctl"
+            "set"
+            "5%-"
+          ];
+        };
+        "XF86AudioPlay" = {
+          _props.allow-when-locked = true;
+          spawn-sh = "playerctl play-pause";
+        };
+        "XF86AudioNext" = {
+          _props.allow-when-locked = true;
+          spawn-sh = "playerctl next";
+        };
+        "XF86AudioPrev" = {
+          _props.allow-when-locked = true;
+          spawn-sh = "playerctl previous";
+        };
       };
-      "Super+Shift+P".action.power-off-monitors = { };
-      "Super+O".action.toggle-overview = { };
-      "Super+Escape" = {
-        allow-inhibiting = false;
-        action.toggle-keyboard-shortcuts-inhibit = { };
-      };
 
-      # ── Screenshots (niri built-in) ─────────────────────────────────
-      "Super+Shift+S".action.screenshot = { };
-      "Print".action.screenshot-screen = { };
-      "Super+Print".action.screenshot-window = { };
-
-      # ── Media keys (allow-when-locked) ──────────────────────────────
-      "XF86AudioRaiseVolume" = {
-        allow-when-locked = true;
-        action.spawn = [
-          "wpctl"
-          "set-volume"
-          "@DEFAULT_AUDIO_SINK@"
-          "5%+"
-        ];
-      };
-      "XF86AudioLowerVolume" = {
-        allow-when-locked = true;
-        action.spawn = [
-          "wpctl"
-          "set-volume"
-          "@DEFAULT_AUDIO_SINK@"
-          "5%-"
-        ];
-      };
-      "XF86AudioMute" = {
-        allow-when-locked = true;
-        action.spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SINK@ toggle";
-      };
-      "XF86AudioMicMute" = {
-        allow-when-locked = true;
-        action.spawn-sh = "wpctl set-mute @DEFAULT_AUDIO_SOURCE@ toggle";
-      };
-      "XF86MonBrightnessUp" = {
-        allow-when-locked = true;
-        action.spawn = [
-          "brightnessctl"
-          "set"
-          "+5%"
-        ];
-      };
-      "XF86MonBrightnessDown" = {
-        allow-when-locked = true;
-        action.spawn = [
-          "brightnessctl"
-          "set"
-          "5%-"
-        ];
-      };
-      "XF86AudioPlay" = {
-        allow-when-locked = true;
-        action.spawn-sh = "playerctl play-pause";
-      };
-      "XF86AudioNext" = {
-        allow-when-locked = true;
-        action.spawn-sh = "playerctl next";
-      };
-      "XF86AudioPrev" = {
-        allow-when-locked = true;
-        action.spawn-sh = "playerctl previous";
-      };
-    };
-
-    spawn-at-startup = [
       # noctalia starts via its HM systemd unit (programs.noctalia.systemd)
-      {
-        argv = [
-          "1password"
-          "--silent"
-        ];
-      }
-    ];
+      spawn-at-startup = [
+        "1password"
+        "--silent"
+      ];
+    };
   };
-
-  # Polkit agent provided by nixosModules.niri (KDE polkit)
 
   # ── Noctalia (desktop shell + theming engine) ────────────────────────
   # v5: config.toml holds the declarative defaults; runtime tweaks persist

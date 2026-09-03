@@ -68,7 +68,7 @@ just topology      # render the nix-topology diagram
 
 ### Flake structure
 
-`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, emacs-overlay, llm-agents (claude-code, pi), paneru, zen-browser, noctalia, niri-flake, nixos-wsl, sops-nix, disko, nix-topology, treefmt-nix, git-hooks, nix-index-database, defaults2nix, mattpocock-skills (pi skills).
+`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, emacs-overlay, llm-agents (claude-code, pi), paneru, zen-browser, noctalia, nixos-wsl, sops-nix, disko, nix-topology, treefmt-nix, git-hooks, nix-index-database, defaults2nix, mattpocock-skills (pi skills).
 
 ### Hosts are thin wiring
 
