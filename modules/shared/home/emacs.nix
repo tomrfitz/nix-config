@@ -2,11 +2,15 @@
   pkgs,
   lib,
   config,
-  homebrew-emacs-plus,
   ...
 }:
 let
-  iconDir = "${homebrew-emacs-plus}/community/icons/liquid-glass";
+  # Liquid-glass icon from the emacs-plus tap (its only use here), pinned to
+  # the commit that added it; the file has not changed since.
+  icon = pkgs.fetchurl {
+    url = "https://raw.githubusercontent.com/d12frosted/homebrew-emacs-plus/92bd70be4e25800e2b8ca93619e71627dcf58ae9/community/icons/liquid-glass/icon.icns";
+    hash = "sha256-N+3n5lHuRsWpFP0RuYDJLD72kuQcsmduJRjQnk19Xek=";
+  };
 
   # macOS: emacs30-macport (Mitsuharu Yamamoto patches — currently on
   # jdtsmith/emacs-mac community fork; see TODO.md upstream watchlist).
@@ -50,7 +54,7 @@ let
           mkdir -p $out
           cp -a ${emacsWithPkgs}/. $out/
           chmod -R u+w $out
-          cp ${iconDir}/icon.icns $out/Applications/Emacs.app/Contents/Resources/Emacs.icns
+          cp ${icon} $out/Applications/Emacs.app/Contents/Resources/Emacs.icns
         ''
     else
       emacsWithPkgs;

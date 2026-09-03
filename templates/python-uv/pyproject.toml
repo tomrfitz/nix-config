@@ -1,0 +1,14 @@
+# Minimal non-package project (what `uv init --bare` generates): no
+# [build-system], so `uv sync` installs the dependencies but never the project
+# itself — the grader takes bare .py files.
+#
+# No [tool.ruff] table: ruff then falls back to ~/.config/ruff/ruff.toml (the
+# home-manager programs.ruff config). If a project needs overrides, start the
+# table with `extend = "~/.config/ruff/ruff.toml"` — a [tool.ruff] table
+# without it shadows the user config entirely.
+[project]
+name = "project" # rename (kebab-case)
+version = "0.1.0"
+# Course target is 3.14; the exact build is pinned in .python-version
+requires-python = "==3.14.*"
+dependencies = []

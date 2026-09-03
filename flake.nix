@@ -22,6 +22,7 @@
     nixos-wsl = {
       url = "github:nix-community/NixOS-WSL/main";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-compat.follows = "git-hooks/flake-compat";
     };
     niri-flake = {
       url = "github:sodiboo/niri-flake";
@@ -34,11 +35,6 @@
     };
     noctalia = {
       url = "github:noctalia-dev/noctalia-shell";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.noctalia-qs.follows = "noctalia-qs";
-    };
-    noctalia-qs = {
-      url = "github:noctalia-dev/noctalia-qs";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     sops-nix = {
@@ -56,6 +52,7 @@
     paneru = {
       url = "github:karinushka/paneru";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nix-darwin.follows = "nix-darwin";
     };
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
@@ -64,13 +61,21 @@
     llm-agents = {
       url = "github:numtide/llm-agents.nix";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.treefmt-nix.follows = "treefmt-nix";
     };
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    homebrew-emacs-plus = {
-      url = "github:d12frosted/homebrew-emacs-plus";
+    emacs-overlay = {
+      url = "github:nix-community/emacs-overlay";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+    # Mattpocock's curated skill collection — consumed by pi via
+    # modules/shared/home/pi.nix; pi's recursive SKILL.md discovery walks
+    # the symlinked tree. Locked via flake.lock; `nix flake update' bumps.
+    mattpocock-skills = {
+      url = "github:mattpocock/skills";
       flake = false;
     };
   };
@@ -87,7 +92,6 @@
       niri-flake,
       zen-browser,
       noctalia,
-      noctalia-qs,
       sops-nix,
       disko,
       nix-topology,
@@ -95,7 +99,8 @@
       git-hooks,
       llm-agents,
       nix-index-database,
-      homebrew-emacs-plus,
+      emacs-overlay,
+      mattpocock-skills,
     }:
     let
       inherit (nixpkgs) lib;
@@ -156,8 +161,7 @@
               fullName
               email
               sshPublicKey
-              system
-              homebrew-emacs-plus
+              mattpocock-skills
               ;
             hostName = name;
             inherit isWSL;
@@ -169,11 +173,15 @@
           ];
         in
         systemBuilder {
-          inherit system;
           specialArgs = commonSpecialArgs;
           modules = [
             {
-              nixpkgs.overlays = [ llm-agents.overlays.default ] ++ overlays;
+              nixpkgs.hostPlatform = system;
+              nixpkgs.overlays = [
+                llm-agents.overlays.shared-nixpkgs
+                emacs-overlay.overlays.default
+              ]
+              ++ overlays;
             }
           ]
           ++ sharedSystemModules
@@ -198,24 +206,40 @@
           system = "aarch64-darwin";
           platform = "darwin";
           hostModule = ./hosts/trfmbp;
-          overlays = [
-            # REVISIT(upstream): remove once nixpkgs#513047 lands (open, stalled) or
-            #   streamlink upstream gates the test by platform; SO_BINDTODEVICE is
-            #   Linux-only and the test was added in 8.3.0;
-            #   ref: https://github.com/NixOS/nixpkgs/pull/513047; checked: 2026-05-12
-            (final: prev: {
-              streamlink = prev.streamlink.overridePythonAttrs (old: {
-                disabledTests = (old.disabledTests or [ ]) ++ [
-                  "test_set_interface"
-                ];
-              });
-            })
+          extraModules = [
+            paneru.darwinModules.paneru
+            # Built locally instead of from paneru's own package: build.rs
+            # hardcodes the CLT SDK path, so it needs the apple-sdk postPatch
+            # (and privateFrameworksHook) below. Drop once a test build of
+            # upstream's package succeeds. Version pin: see TODO.md Steps
+            # (the v0.4.4 tag at the lock bump).
+            (
+              { pkgs, ... }:
+              {
+                services.paneru.package = pkgs.rustPlatform.buildRustPackage {
+                  pname = "paneru";
+                  version = "0.4.2-local";
+                  src = pkgs.lib.cleanSource paneru;
+                  postPatch = ''
+                    substituteInPlace build.rs --replace-fail \
+                      'let sdk_dir = "/Library/Developer/CommandLineTools/SDKs";' \
+                      'let sdk_dir = "${pkgs.apple-sdk}/Platforms/MacOSX.platform/Developer/SDKs";'
+                  '';
+                  cargoLock.lockFile = "${paneru}/Cargo.lock";
+                  buildInputs = [ pkgs.apple-sdk.privateFrameworksHook ];
+                  doCheck = false;
+                  meta = {
+                    mainProgram = "paneru";
+                    platforms = pkgs.lib.platforms.darwin;
+                  };
+                };
+              }
+            )
           ];
           hmModules = [
             ./modules/shared/home
             ./modules/shared/home/desktop.nix
             ./modules/darwin/home
-            paneru.homeModules.paneru
           ];
         };
         trfnix = {
@@ -318,5 +342,27 @@
           };
         }
       );
+
+      # ── Templates (nix flake init -t github:tomrfitz/nix-config#python-uv) ──
+      templates.python-uv = {
+        path = ./templates/python-uv;
+        description = "Python devShell: uv-managed interpreter + venv, ruff and ty on PATH for eglot (rass)";
+        welcomeText = ''
+          # python-uv
+
+          Next steps (from the project directory):
+
+          1. `git init` — flakes only see tracked files, and git filtering keeps
+             `.venv/` out of the Nix store copy.
+          2. Set `name` in `pyproject.toml`; bump `.python-version` if the course
+             target moves.
+          3. Starter code with a `requirements.txt`: `uv add -r requirements.txt`.
+          4. `direnv allow` — the shellHook runs `uv sync` (downloads the pinned
+             CPython once) and activates `.venv`.
+
+          Ruff uses `~/.config/ruff/ruff.toml` automatically; add a `[tool.ruff]`
+          table only with `extend = "~/.config/ruff/ruff.toml"` as its first line.
+        '';
+      };
     };
 }
