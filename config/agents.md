@@ -21,7 +21,7 @@ Code should work for its author first, be maintainable and accessible to them ov
 
 ## Tools
 
-- Available in dev shells: `rg`, `fd`, `bat`, `dust`/`duf`, `nixfmt`, `nixd`, `nvd`
+- Available in dev shells: `rg`, `fd`, `bat`, `nixfmt`, `nixd`, `nvd`
 - Trust tool output (LSPs, linters, formatters) over your own reasoning for syntax, style, and correctness — they encode more collective experience than any one agent has. Trust your own reasoning over tools for architecture and design intent.
 - Record findings in open-standard docs (AGENTS.md in project root), then symlink to tool-specific paths if needed (CLAUDE.md, GEMINI.md, etc.)
 - Don't guess at command output — never truncate with `head`/`tail` before reading the result. Check the exit code and full output before deciding what's relevant.

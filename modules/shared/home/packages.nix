@@ -8,10 +8,8 @@
   home.packages =
     with pkgs;
     [
-      (callPackage ../../../pkgs/mdbase-tasknotes { })
       (callPackage ../../../pkgs/sgram-tui { })
 
-      rana
       yazi
 
       mcrcon
@@ -27,9 +25,7 @@
       rassumfrassum
 
       # nix tooling
-      nurl
       nix-init
-      statix
       claude-code
       llm-agents.pi
       dix
@@ -49,36 +45,10 @@
       gnutar
       gnugrep
       gawk
-      aria2
-      duf
-      dust
-      git-absorb
-      git-filter-repo
-      iperf3
-      inetutils
       pandoc
-      pass
-      pdfgrep
-      speedtest-cli
-      streamlink
       tldr
-      ansifilter
-      termshot
       witr
-      gtypist
-      mailsy
-      termdown
-
-      # gossip # broken on aarch64-darwin (SDL2 CMake version conflict) — revisit later
-
-      # fun
-      _2048-in-terminal
-      cbonsai
-      cowsay
-      figlet
-      fortune
-      pipes
-      mufetch
+      streamlink # launched by Chatterino ("open in streamlink", player = IINA), never from a shell
 
     ]
     ++ lib.optionals pkgs.stdenv.isLinux [

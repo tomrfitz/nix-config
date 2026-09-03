@@ -47,8 +47,6 @@
 
   programs.btop.enable = true;
 
-  programs.nushell.enable = true;
-
   programs.htop.enable = true;
   programs.gh = {
     enable = true;
