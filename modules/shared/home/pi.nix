@@ -61,14 +61,15 @@ let
   link = path: config.lib.file.mkOutOfStoreSymlink "${piRes}/${path}";
 
   # Upstream's promoted skills, read from its plugin manifest so renames track.
+  # One link farm, so ~/.pi/agent/skills/mattpocock stays a single symlink that
+  # home-manager can swap (a directory of links there would collide with the
+  # previous generation's link into the store).
   promoted = (lib.importJSON "${mattpocock-skills}/.claude-plugin/plugin.json").skills;
-  promotedLinks = lib.listToAttrs (
-    map (
-      p:
-      lib.nameValuePair ".pi/agent/skills/mattpocock/${baseNameOf p}" {
-        source = "${mattpocock-skills}/${lib.removePrefix "./" p}";
-      }
-    ) promoted
+  promotedSkills = pkgs.linkFarm "mattpocock-skills" (
+    map (p: {
+      name = baseNameOf p;
+      path = "${mattpocock-skills}/${lib.removePrefix "./" p}";
+    }) promoted
   );
 in
 {
@@ -84,7 +85,7 @@ in
 
   home.file = {
     ".pi/agent/skills/obsidian-vault".source = link "skills/obsidian-vault";
+    ".pi/agent/skills/mattpocock".source = promotedSkills;
     ".pi/agent/prompts/simplify.md".source = link "prompts/simplify.md";
-  }
-  // promotedLinks;
+  };
 }
