@@ -25,6 +25,10 @@
       ".direnv"
       ".envrc"
       ".vscode"
+      # Emacs droppings: #autosave#, .#lockfile, backup~
+      "\\#*\\#"
+      ".\\#*"
+      "*~"
     ];
 
     settings = {
