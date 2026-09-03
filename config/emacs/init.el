@@ -29,9 +29,8 @@
     (exec-path-from-shell-initialize))
 
 ;; ── macOS modifiers ─────────────────────────────────────────────────
-;; macport defaults Cmd→Meta, Option→Alt. Flip to the conventional
-;; Cmd→Super, Option→Meta so M-x = Option-x (matches every tutorial
-;; and emacs-plus/NS muscle memory).
+;; The NS build already maps Cmd→Super, Option→Meta (so M-x = Option-x).
+;; The macport defaulted Cmd→Meta, Option→Alt; this only fires there.
 (when (boundp 'mac-command-modifier)
     (setq mac-command-modifier 'super
           mac-option-modifier 'meta))
@@ -83,6 +82,9 @@
     scroll-conservatively 101
     scroll-margin 0)
 
+;; Trackpad: per-pixel smooth scrolling (the macport did this natively).
+(pixel-scroll-precision-mode 1)
+
 ;; Load custom file if it exists (keeps init.el clean)
 (when (file-exists-p custom-file)
     (load custom-file 'noerror))
@@ -123,8 +125,13 @@ A broken theme file should not abort startup — log and continue."
         (error (message "tf/apply-theme: %s" (error-message-string err)))))
 
 (cond
-    ;; macOS: instant switching via macport's appearance hook
-    ((eq system-type 'darwin)
+    ;; macOS, NS build (Emacs 29+): the system appearance hook hands us
+    ;; `light' or `dark' directly.
+    ((boundp 'ns-system-appearance-change-functions)
+        (add-hook 'ns-system-appearance-change-functions #'tf/apply-theme)
+        (tf/apply-theme ns-system-appearance))
+    ;; macOS, macport build: its own hook + `mac-application-state'.
+    ((and (eq system-type 'darwin) (fboundp 'mac-application-state))
         (defun tf/mac-appearance ()
             "Return macOS effective appearance as `light' or `dark'."
             (let ((a (plist-get (mac-application-state) :appearance)))
@@ -224,7 +231,7 @@ A broken theme file should not abort startup — log and continue."
     (nerd-icons-completion-mode))
 
 ;; ── Visual polish ─────────────────────────────────────────────────────
-;; Emacs 30 ships which-key in core (AOT-native-compiled in the macport), so
+;; Emacs 30+ ships which-key in core, so
 ;; use the built-in (:ensure nil) instead of the MELPA copy — matches the
 ;; built-in preference already applied to org/eglot/project, and drops one
 ;; package from the Nix closure.
