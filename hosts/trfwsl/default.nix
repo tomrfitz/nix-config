@@ -1,9 +1,6 @@
 {
-  config,
   hostName,
   user,
-  lib,
-  pkgs,
   ...
 }:
 {
@@ -28,40 +25,15 @@
     age.sshKeyPaths = [ "/etc/ssh/ssh_host_ed25519_key" ];
   };
 
-  sops.secrets."cloudflared/tunnel-token" = { };
-
   services.ollama.enable = true;
-
-  # ── Cloudflare Tunnel (exposes homelab services outside eduroam) ───────
-  # Routes managed in Cloudflare Zero Trust dashboard; token decrypted by
-  # sops-nix to /run/secrets/ at activation.
-  systemd.services.cloudflared-tunnel = {
-    description = "Cloudflare Tunnel";
-    after = [ "network-online.target" ];
-    wants = [ "network-online.target" ];
-    wantedBy = [ "multi-user.target" ];
-    serviceConfig = {
-      Restart = "on-failure";
-      RestartSec = 5;
-      StateDirectory = "cloudflared";
-    };
-    environment.HOME = "/var/lib/cloudflared";
-    script = ''
-      exec ${pkgs.cloudflared}/bin/cloudflared tunnel run \
-        --token-file ${config.sops.secrets."cloudflared/tunnel-token".path}
-    '';
-  };
 
   trf.homelab = {
     enable = true;
     bookshelf.enable = true;
     spliit.enable = true;
-    paths = {
-      mediaRoot = lib.mkDefault "/mnt/z/data/media";
-      usenetRoot = lib.mkDefault "/mnt/k/data/usenet";
-      torrentsRoot = lib.mkDefault "/mnt/k/data/torrents";
-      booksRoot = lib.mkDefault "/mnt/k/data/media/books";
-    };
+    cloudflared.enable = true; # exposes services outside eduroam
+    # mediaRoot/usenetRoot/torrentsRoot use the homelab module defaults.
+    paths.booksRoot = "/mnt/k/data/media/books";
     vpn = {
       enable = true;
 
@@ -82,7 +54,8 @@
         "tautulli"
         "plex"
         "jellyfin"
-        "immich"
+        "immich-server"
+        "immich-machine-learning"
         "tandoor-recipes"
 
         # OCI containers — image pulls fail through VPN

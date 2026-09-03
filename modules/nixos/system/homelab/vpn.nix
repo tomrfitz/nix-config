@@ -29,6 +29,9 @@ in
     excludedServices = lib.mkOption {
       type = lib.types.listOf lib.types.str;
       default = [ ];
+      # Entries must be EXACT systemd unit names (sans .service) — a typo'd
+      # name silently creates a hollow unit instead of patching the real one
+      # (e.g. immich's units are immich-server/immich-machine-learning).
       description = "systemd service names whose internet traffic bypasses the VPN via split tunneling.";
     };
   };

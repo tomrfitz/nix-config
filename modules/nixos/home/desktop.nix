@@ -1,7 +1,7 @@
 {
+  config,
   pkgs,
   lib,
-  config,
   ...
 }:
 let
@@ -9,158 +9,32 @@ let
   noctalia =
     cmd:
     [
-      "noctalia-shell"
-      "ipc"
-      "call"
+      "noctalia"
+      "msg"
     ]
     ++ (lib.splitString " " cmd);
-
-  # Noctalia settings deployed as a mutable copy (not HM symlink) so that
-  # the GeoIP service can update location.name at runtime. HM activation
-  # re-copies the base config on each rebuild; the GeoIP service patches
-  # location.name on top after noctalia starts.
-  noctaliaSettings = {
-    colorSchemes = {
-      useWallpaperColors = true;
-      darkMode = true;
-      schedulingMode = "location";
-    };
-    templates = {
-      activeTemplates = [
-        "gtk3"
-        "gtk4"
-        "qt6ct"
-        "foot"
-        "ghostty"
-        "emacs"
-        "vesktop"
-      ];
-      enableUserTheming = false;
-    };
-    ui = {
-      fontDefault = "Atkinson Hyperlegible Next";
-      fontFixed = "Atkinson Hyperlegible Mono";
-    };
-    nightLight = {
-      enabled = true;
-      autoSchedule = true;
-      nightTemp = "3000";
-      dayTemp = "6500";
-    };
-    location = {
-      weatherEnabled = true;
-      useFahrenheit = false;
-      use12hourFormat = false;
-    };
-    appLauncher = {
-      enableClipboardHistory = true;
-      terminalCommand = "ghostty -e";
-      enableWindowsSearch = true;
-      enableSessionSearch = true;
-    };
-    bar = {
-      position = "top";
-      density = "compact";
-      widgetSpacing = 6;
-      displayMode = "always_visible";
-      widgets = {
-        left = [
-          { id = "Launcher"; }
-          { id = "Clock"; }
-          { id = "SystemMonitor"; }
-          { id = "ActiveWindow"; }
-          { id = "MediaMini"; }
-        ];
-        center = [
-          { id = "Workspace"; }
-        ];
-        right = [
-          { id = "Tray"; }
-          { id = "NotificationHistory"; }
-          { id = "Battery"; }
-          { id = "Volume"; }
-          { id = "Brightness"; }
-          { id = "Network"; }
-          { id = "ControlCenter"; }
-        ];
-      };
-    };
-    widgetSettings.bar = {
-      Workspace = {
-        labelMode = "index";
-        hideUnoccupied = false;
-        enableScrollWheel = true;
-      };
-      SystemMonitor = {
-        compactMode = true;
-        useMonospaceFont = true;
-        showCpuUsage = true;
-        showCpuTemp = true;
-        showMemoryUsage = true;
-        showMemoryAsPercent = false;
-        showDiskUsage = false;
-        showNetworkStats = false;
-      };
-      Clock.formatHorizontal = "HH:mm ddd, MMM dd";
-    };
-    notifications = {
-      enabled = true;
-      location = "top_right";
-      lowUrgencyDuration = 3;
-      normalUrgencyDuration = 8;
-      criticalUrgencyDuration = 15;
-      sounds.enabled = false;
-    };
-    osd = {
-      enabled = true;
-      location = "top_right";
-      autoHideMs = 2000;
-    };
-    wallpaper = {
-      enabled = true;
-      fillMode = "crop";
-    };
-    idle = {
-      enabled = true;
-      screenOffTimeout = 600;
-      lockTimeout = 660;
-      suspendTimeout = 0; # never suspend — functionally headless
-      fadeDuration = 5;
-    };
-    general = {
-      lockOnSuspend = true;
-      enableLockScreenCountdown = true;
-      lockScreenCountdownDuration = 10000;
-      autoStartAuth = true;
-      allowPasswordWithFprintd = true;
-      showChangelogOnStartup = false;
-    };
-    audio.volumeOverdrive = true;
-  };
-
-  noctaliaSettingsFile = (pkgs.formats.json { }).generate "noctalia-settings.json" noctaliaSettings;
-
-  # GeoIP → Noctalia IPC: detect city from IP, push via IPC (triggers geocode
-  # + weather refresh; Noctalia's save timer persists to mutable settings.json).
-  # ref: https://github.com/noctalia-dev/noctalia-shell/issues/1069
-  noctalia-geoip = pkgs.writeShellScript "noctalia-geoip" ''
-    for attempt in 1 2 3; do
-      city=$(${pkgs.curl}/bin/curl -sf --max-time 5 "http://ip-api.com/line/?fields=city") && break
-      sleep 10
-    done
-    [ -n "$city" ] && noctalia-shell ipc call location set "$city"
-  '';
+  inherit (import ../../shared/home/browser-policies.nix) sharedPolicies;
 in
 {
   home.packages = with pkgs; [
     # 1password installed via programs._1password-gui in system config
     foot # lightweight Wayland terminal
-    xwayland-satellite
+    xwayland-satellite # niri ≥ 25.08 spawns it on demand and exports DISPLAY itself
     wl-clipboard
     brightnessctl
     playerctl
     libnotify
   ];
+
+  # Base browser on the Linux desktop (Zen is primary); the extension/policy
+  # manifest is shared with zen.nix.
+  programs.firefox = {
+    enable = true;
+    policies = sharedPolicies;
+    # New HM default (stateVersion ≥ 26.05); opt in now rather than carry the
+    # legacy ~/.mozilla path.
+    configPath = "${config.xdg.configHome}/mozilla/firefox";
+  };
 
   # ── Cursor ───────────────────────────────────────────────────────────
   home.pointerCursor = {
@@ -255,7 +129,7 @@ in
 
     layer-rules = [
       {
-        matches = [ { namespace = "^noctalia-wallpaper.*"; } ];
+        matches = [ { namespace = "^noctalia-wallpaper$"; } ];
         place-within-backdrop = true;
       }
     ];
@@ -263,12 +137,12 @@ in
     binds = {
       # ── Launch ──────────────────────────────────────────────────────
       "Super+Return".action.spawn = "ghostty";
-      "Super+Space".action.spawn = noctalia "launcher toggle";
+      "Super+Space".action.spawn = noctalia "panel-toggle launcher";
       "Super+Q".action.close-window = { };
       "Super+F".action.fullscreen-window = { };
 
       # ── Lock ───────────────────────────────────────────────────────
-      "Super+Ctrl+L".action.spawn = noctalia "lockScreen lock";
+      "Super+Ctrl+L".action.spawn = noctalia "session lock";
 
       # ── Focus (vim-style) ───────────────────────────────────────────
       "Super+H".action.focus-column-left = { };
@@ -409,8 +283,7 @@ in
     };
 
     spawn-at-startup = [
-      { argv = [ "noctalia-shell" ]; }
-      { argv = [ "xwayland-satellite" ]; }
+      # noctalia starts via its HM systemd unit (programs.noctalia.systemd)
       {
         argv = [
           "1password"
@@ -420,54 +293,118 @@ in
     ];
   };
 
-  # ── Auto-detect location via GeoIP → Noctalia IPC ────────────────────
-  # ref: https://github.com/noctalia-dev/noctalia-shell/issues/1069
-  systemd.user.services.noctalia-location = {
-    Unit = {
-      Description = "Set Noctalia location from GeoIP";
-      After = [ "graphical-session.target" ];
-    };
-    Install.WantedBy = [ "graphical-session.target" ];
-    Service = {
-      Type = "oneshot";
-      ExecStartPre = "${pkgs.coreutils}/bin/sleep 3"; # wait for IPC socket
-      ExecStart = noctalia-geoip;
-    };
-  };
-
-  # ── Wallpaper ─────────────────────────────────────────────────────────
-  # Noctalia reads wallpaper paths from this cache file.
-  # The image itself is deployed to the store; Noctalia picks up colors from it.
-  home.file.".cache/noctalia/wallpapers.json".text = builtins.toJSON {
-    defaultWallpaper = "${../../../config/wallpaper.jpg}";
-  };
-
   # Polkit agent provided by nixosModules.niri (KDE polkit)
 
   # ── Noctalia (desktop shell + theming engine) ────────────────────────
-  # Settings managed as mutable copy (see noctaliaSettings in let block)
-  # so the GeoIP service can patch location.name at runtime.
-  home.activation.noctalia-settings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    install -Dm644 ${noctaliaSettingsFile} "$HOME/.config/noctalia/settings.json"
-  '';
-
-  programs.noctalia-shell = {
+  # v5: config.toml holds the declarative defaults; runtime tweaks persist
+  # separately in $XDG_STATE_HOME/noctalia/settings.toml and win on merge.
+  # v4→v5 regressions (no v5 equivalent yet): tailscale bar plugin (v5
+  # plugin system unreleased), vesktop template (not in the builtin
+  # catalog), fixed/mono UI font, per-urgency notification durations.
+  programs.noctalia = {
     enable = true;
-    plugins = {
-      sources = [
-        {
-          enabled = true;
-          name = "Noctalia Plugins";
-          url = "https://github.com/noctalia-dev/noctalia-plugins";
-        }
-      ];
-      states = {
-        tailscale = {
-          enabled = true;
-          sourceUrl = "https://github.com/noctalia-dev/noctalia-plugins";
+    # The unit is PartOf graphical-session.target and restarts noctalia
+    # whenever config.toml changes on rebuild (replaces spawn-at-startup).
+    systemd.enable = true;
+
+    settings = {
+      shell = {
+        font_family = "Atkinson Hyperlegible Next";
+        setup_wizard_enabled = false;
+      };
+
+      theme = {
+        source = "wallpaper"; # wallpaper-derived Material You colors
+        mode = "auto"; # dark/light from [location] sun times
+        templates.builtin_ids = [
+          "gtk3"
+          "gtk4"
+          "qt" # writes both qt5ct and qt6ct color files
+          "foot"
+          "ghostty"
+          "emacs" # → ~/.config/emacs/themes/noctalia-theme.el
+        ];
+      };
+
+      nightlight = {
+        enabled = true;
+        temperature_night = 3000;
+        temperature_day = 6500;
+      };
+
+      # IP geolocation feeds weather, night light, and theme auto mode —
+      # replaces the v4 GeoIP-via-IPC workaround for
+      # https://github.com/noctalia-dev/noctalia-shell/issues/1069
+      location.auto_locate = true;
+
+      weather = {
+        enabled = true;
+        unit = "celsius";
+      };
+
+      audio = {
+        enable_overdrive = true;
+        enable_sounds = false;
+      };
+
+      bar.main = {
+        position = "top";
+        widget_spacing = 6;
+        start = [
+          "launcher"
+          "clock"
+          # builtin single-stat sysmon seeds (v4 SystemMonitor widget)
+          "cpu"
+          "temp"
+          "ram"
+          "active_window"
+          "media"
+        ];
+        center = [ "workspaces" ];
+        end = [
+          "tray"
+          "notifications"
+          "battery"
+          "volume"
+          "brightness"
+          "network"
+          "control-center"
+        ];
+      };
+
+      widget = {
+        clock.format = "{:%H:%M %a, %b %d}";
+        workspaces = {
+          display = "id";
+          hide_when_empty = false;
         };
       };
-      version = 2;
+
+      notification.position = "top_right";
+      osd.position = "top_right";
+
+      wallpaper = {
+        enabled = true;
+        fill_mode = "crop";
+        default.path = "${../../../config/wallpaper.jpg}";
+      };
+
+      idle = {
+        pre_action_fade_seconds = 5.0;
+        behavior = {
+          lock = {
+            enabled = true;
+            timeout = 660;
+            action = "lock";
+          };
+          screen-off = {
+            enabled = true;
+            timeout = 600;
+            action = "screen_off";
+          };
+          # no suspend behavior — functionally headless (v4 suspendTimeout = 0)
+        };
+      };
     };
   };
 }

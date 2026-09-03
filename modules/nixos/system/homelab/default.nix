@@ -11,6 +11,7 @@ in
 {
   imports = [
     ./vpn.nix
+    ./cloudflared.nix
     ./sonarr.nix
     ./radarr.nix
     ./lidarr.nix
