@@ -504,7 +504,7 @@ in
         };
 
       # ── Keyboard shortcuts ─────────────────────────────────────────
-      keyboardShortcutsVersion = 17;
+      keyboardShortcutsVersion = 20;
       keyboardShortcuts = [
         {
           id = "zen-compact-mode-toggle";
@@ -523,13 +523,17 @@ in
   # and lock flags). Home-manager deploys it as a read-only nix store symlink,
   # which causes Zen to loop on "Changes not saved". Replace the symlink with a
   # mutable copy after link generation so Zen can update it freely.
-  home.activation.makeZenProfilesMutable = lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-    zenProfiles="${config.home.homeDirectory}/Library/Application Support/zen/profiles.ini"
-    if [ -L "$zenProfiles" ]; then
-      realPath=$(readlink "$zenProfiles")
-      rm "$zenProfiles"
-      cp "$realPath" "$zenProfiles"
-      chmod u+w "$zenProfiles"
-    fi
-  '';
+  # macOS only: the path is the macOS profile dir, and on Linux the nix-wrapped
+  # Zen uses ~/.zen. `run` keeps the copy honest under `--dry-run`.
+  home.activation.makeZenProfilesMutable = lib.mkIf pkgs.stdenv.isDarwin (
+    lib.hm.dag.entryAfter [ "linkGeneration" ] ''
+      zenProfiles="${config.home.homeDirectory}/Library/Application Support/zen/profiles.ini"
+      if [ -L "$zenProfiles" ]; then
+        realPath=$(readlink "$zenProfiles")
+        run rm "$zenProfiles"
+        run cp "$realPath" "$zenProfiles"
+        run chmod u+w "$zenProfiles"
+      fi
+    ''
+  );
 }

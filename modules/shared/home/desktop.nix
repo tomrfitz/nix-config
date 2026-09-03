@@ -5,7 +5,6 @@
 }:
 {
   imports = [
-    ./firefox.nix
     ./zen.nix
     ./ghostty.nix
     ./vesktop.nix

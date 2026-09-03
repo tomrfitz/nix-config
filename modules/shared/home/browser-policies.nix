@@ -1,4 +1,6 @@
-# Shared browser policies for Firefox-based browsers (Firefox, Floorp, Zen)
+# Shared policies for the Firefox-family browsers home-manager wraps: Zen, and
+# base Firefox on the Linux desktop. On darwin Zen is a brew cask (package =
+# null), so this file is documentation there — extensions ride Firefox Sync.
 let
   amo = slug: {
     installation_mode = "normal_installed";
@@ -8,7 +10,9 @@ in
 {
   sharedPolicies = {
     DisableTelemetry = true;
-    DisableAppUpdate = false;
+    # Only nix-wrapped (Linux) builds see this, and they cannot self-update —
+    # leaving updates on just produces failed-update prompts.
+    DisableAppUpdate = true;
     DisableFirefoxStudies = true;
     DisablePocket = true;
     DontCheckDefaultBrowser = true;
@@ -35,13 +39,9 @@ in
       "{3c6bf0cc-3ae2-42fb-9993-0d33104fdcaf}" = amo "youtube-addon";
 
       # twitch
-      "firefox@betterttv.net" = amo "betterttv";
+      # Ads handled via Tampermonkey + video-swap-new userscript (install once
+      # per profile, auto-updates): https://github.com/pixeltris/TwitchAdSolutions
       "frankerfacez@frankerfacez.com" = amo "frankerfacez";
-      "{76ef94a4-e3d0-4c6f-961a-d38a429a332b}" = amo "ttv-lol-pro";
-      "moz-addon-prod@7tv.app" = {
-        installation_mode = "normal_installed";
-        install_url = "https://extension.7tv.gg/v3.1.13/ext.xpi";
-      };
 
       # reddit
       "jid1-xUfzOsOFlzSOXg@jetpack" = amo "reddit-enhancement-suite";
@@ -66,11 +66,6 @@ in
       "{cb31ec5d-c49a-4e5a-b240-16c767444f62}" = amo "indie-wiki-buddy";
       "historia@eros.man" = amo "historia";
       "{799c0914-748b-41df-a25c-22d008f9e83f}" = amo "web-scrobbler";
-
-      # browser UI
-      "{3c078156-979c-498b-8990-85f7987dd929}" = amo "sidebery";
-      "ATBC@EasonWong" = amo "adaptive-tab-bar-colour";
-      "{a1f01957-5419-4d40-9937-bdf7bba038b4}" = amo "chameleon-dynamic-theme-fixed";
 
       # dev tools
       "@react-devtools" = amo "react-devtools";
