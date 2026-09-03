@@ -33,6 +33,25 @@ let
     config = ../../../config/emacs/init.el;
     alwaysEnsure = false;
 
+    override = _self: super: {
+      # REVISIT(upstream): the pi-coding-agent MELPA package became a deprecated
+      #   alias for `piem` (2026-09) but declares none of piem's Package-Requires,
+      #   so it cannot byte-compile in isolation (piem needs md-ts-mode, which is
+      #   built into Emacs 31 and a MELPA backport on 30). Give it piem's deps;
+      #   drop once MELPA has a `piem` recipe (then `use-package piem`) or the
+      #   shim's header is fixed. ref: https://github.com/dnouri/piem; checked: 2026-09-03
+      pi-coding-agent = super.pi-coding-agent.overrideAttrs (old: {
+        packageRequires =
+          (old.packageRequires or [ ])
+          ++ (with super; [
+            transient
+            magit-section
+            md-ts-mode
+            markdown-table-wrap
+          ]);
+      });
+    };
+
     extraEmacsPackages = epkgs: [
       # Pre-provision tree-sitter grammars so pi-coding-agent (and any other
       # treesit user) doesn't prompt to build them on first run.
