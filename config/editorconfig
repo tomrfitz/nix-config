@@ -11,6 +11,13 @@ indent_size = 4
 [*.nix]
 indent_size = 2
 
+# Org's parser hard-requires tab-width 8 (else it raises "Tab width in Org
+# files must be 8"); without this the global indent_size=4 sets tab-width 4
+# and wins over the org-mode-hook. init.el also sets it via org-mode-hook
+# for non-file org buffers (capture/agenda) that editorconfig skips.
+[*.org]
+tab_width = 8
+
 [*.{md,markdown}]
 trim_trailing_whitespace = false
 
