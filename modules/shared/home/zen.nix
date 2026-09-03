@@ -17,7 +17,10 @@ in
     # cask is never upgraded by activation, so leave Zen's own updater on there.
     policies =
       sharedPolicies // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin { DisableAppUpdate = false; };
-    nativeMessagingHosts = [ pkgs._1password-gui ];
+    # Linux only: on darwin the cask talks to the 1Password app directly, and
+    # since the 2026-09 home-manager bump listing it here would pull the 540 MiB
+    # nix 1Password GUI into the closure for nothing.
+    nativeMessagingHosts = lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ pkgs._1password-gui ];
 
     profiles.default = {
       id = 0;
