@@ -8,10 +8,6 @@
     ./zsh.nix
     ./git.nix
     ./topgrade.nix
-    ./aerospace.nix
-    ./paneru.nix
-    ./sketchybar.nix
-    ./auto-rebuild.nix
   ];
 
   # ── Copy .app bundles so Spotlight can index them ────────────────────
@@ -34,7 +30,9 @@
   # Karabiner rewrites its config in-place (unlinking symlinks), so we
   # copy instead of symlinking to avoid home-manager backup conflicts.
   home.activation.karabiner = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
-    install -Dm600 ${../../../config/karabiner.json} "$HOME/.config/karabiner/karabiner.json"
+    if ! ${lib.getExe' pkgs.diffutils "cmp"} -s ${../../../config/karabiner.json} "$HOME/.config/karabiner/karabiner.json"; then
+      run install -Dm600 ${../../../config/karabiner.json} "$HOME/.config/karabiner/karabiner.json"
+    fi
   '';
 
 }

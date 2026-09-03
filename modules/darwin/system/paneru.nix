@@ -12,16 +12,17 @@
           0.75
           1.0
         ];
-        swipe_gesture_fingers = 4;
-        swipe_gesture_direction = "Natural";
         animation_speed = 4000;
-        padding_top = 0;
-        padding_bottom = 0;
-
-        padding_left = 0;
-        padding_right = 0;
         auto_center = false;
-        border_active_window = false;
+      };
+
+      # Trackpad: a four-finger horizontal swipe scrolls the column strip. The
+      # vertical swipe (switches virtual workspaces) is off — it kept firing on
+      # ordinary drags. Padding (0), direction (Natural) and the active-window
+      # border (off) are upstream defaults, so they are not restated here.
+      swipe.gesture = {
+        fingers_count = 4;
+        vertical = false;
       };
 
       bindings = {
@@ -56,7 +57,15 @@
         window_unstack = "ctrl + alt + shift - ]";
 
         # Multi-monitor
-        window_nextdisplay = "ctrl + alt + shift - n";
+        window_nextdisplay = "ctrl + alt + shift - n"; # move and follow
+        window_nextdisplaysend = "ctrl + alt + cmd - n"; # move but stay
+
+        # Virtual workspaces (experimental — virtualmove_north is a no-op at
+        # the topmost strip; focus restore on return isn't deterministic)
+        window_virtual_north = "ctrl + alt + cmd - k";
+        window_virtual_south = "ctrl + alt + cmd - j";
+        window_virtualmove_north = "ctrl + alt + cmd + shift - k";
+        window_virtualmove_south = "ctrl + alt + cmd + shift - j";
 
         quit = "ctrl + alt - q";
       };
