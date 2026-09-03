@@ -11,7 +11,7 @@ in
 {
   programs.zen-browser = {
     enable = true;
-    package = lib.mkIf pkgs.stdenv.isDarwin null;
+    package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
     policies = sharedPolicies;
     nativeMessagingHosts = [ pkgs._1password-gui ];
 
@@ -525,7 +525,7 @@ in
   # mutable copy after link generation so Zen can update it freely.
   # macOS only: the path is the macOS profile dir, and on Linux the nix-wrapped
   # Zen uses ~/.zen. `run` keeps the copy honest under `--dry-run`.
-  home.activation.makeZenProfilesMutable = lib.mkIf pkgs.stdenv.isDarwin (
+  home.activation.makeZenProfilesMutable = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
     lib.hm.dag.entryAfter [ "linkGeneration" ] ''
       zenProfiles="${config.home.homeDirectory}/Library/Application Support/zen/profiles.ini"
       if [ -L "$zenProfiles" ]; then

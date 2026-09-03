@@ -44,7 +44,7 @@ let
   # emacsWithPackages wrapper script and the .app bundle; we only overwrite
   # Emacs.icns.
   emacs =
-    if pkgs.stdenv.isDarwin then
+    if pkgs.stdenv.hostPlatform.isDarwin then
       pkgs.runCommand "emacs-macport-with-icon"
         {
           meta = emacsWithPkgs.meta // {
@@ -88,7 +88,7 @@ in
   #           calls (server-start) in init.el and IS the canonical server;
   #           `emacsclient' and Dock re-clicks attach to it as clients.
   services.emacs = {
-    enable = !pkgs.stdenv.isDarwin;
+    enable = !pkgs.stdenv.hostPlatform.isDarwin;
     package = emacs;
   };
 
@@ -97,7 +97,7 @@ in
   # would then fail to resolve TERM=xterm-ghostty (Ghostty installs that entry
   # only under ~/.local/share/terminfo). Publish it into the GUI login session
   # so the server inherits it. `launchctl setenv' returns immediately; no daemon.
-  launchd.agents.emacs-gui-env = lib.mkIf pkgs.stdenv.isDarwin {
+  launchd.agents.emacs-gui-env = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     enable = true;
     config = {
       ProgramArguments = [

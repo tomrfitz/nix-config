@@ -53,11 +53,11 @@
       streamlink # launched by Chatterino ("open in streamlink", player = IINA), never from a shell
 
     ]
-    ++ lib.optionals pkgs.stdenv.isLinux [
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isLinux [
       # Ensure SSH sessions from Ghostty render correctly on Linux hosts.
       ghostty.terminfo
     ]
-    ++ lib.optionals pkgs.stdenv.isDarwin [
+    ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       xcodes
     ];
 }

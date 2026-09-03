@@ -44,7 +44,7 @@
       noto-fonts-cjk-sans
       pretendard
     ]
-    ++ lib.optionals (!pkgs.stdenv.isDarwin) [
+    ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
       zotero # brew cask on darwin (firefox-esr build failures on aarch64-darwin)
       picard # brew cask "musicbrainz-picard" on darwin (qtwayland dep)
       rustdesk # brew cask on darwin (badPlatforms)
@@ -55,7 +55,7 @@
   # ── Zed ───────────────────────────────────────────────────────────────
   programs.zed-editor = {
     enable = true;
-    package = lib.mkIf pkgs.stdenv.isDarwin null;
+    package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
     mutableUserSettings = true;
 
     extensions = [
@@ -315,7 +315,7 @@
       };
       hints.enabled = [
         {
-          command = if pkgs.stdenv.isDarwin then "open" else "xdg-open";
+          command = if pkgs.stdenv.hostPlatform.isDarwin then "open" else "xdg-open";
           hyperlinks = true;
           post_processing = true;
           persist = false;

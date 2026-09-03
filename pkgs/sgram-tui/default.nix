@@ -20,8 +20,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoHash = "sha256-G242PbnRjR6dlDovsLdF7mR/VghFcjOKElGEfNYoXJY=";
 
-  nativeBuildInputs = lib.optionals stdenv.isLinux [ pkg-config ];
-  buildInputs = lib.optionals stdenv.isLinux [ alsa-lib ];
+  nativeBuildInputs = lib.optionals stdenv.hostPlatform.isLinux [ pkg-config ];
+  buildInputs = lib.optionals stdenv.hostPlatform.isLinux [ alsa-lib ];
 
   meta = {
     description = "Terminal spectrogram viewer with mic/WAV input and tunable DSP";

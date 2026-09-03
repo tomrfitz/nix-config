@@ -19,7 +19,7 @@
 
     shellAliases =
       let
-        nh = if pkgs.stdenv.isDarwin then "nh darwin" else "nh os";
+        nh = if pkgs.stdenv.hostPlatform.isDarwin then "nh darwin" else "nh os";
       in
       {
         ls = "eza --group-directories-first --icons --hyperlink";
@@ -47,7 +47,7 @@
 
       };
 
-    envExtra = lib.optionalString (!pkgs.stdenv.isDarwin && !isWSL) ''
+    envExtra = lib.optionalString (!pkgs.stdenv.hostPlatform.isDarwin && !isWSL) ''
       # On NixOS, default to the local 1Password agent but preserve a forwarded
       # agent from SSH (e.g., when SSHing in from trfmbp).
       if [[ -z "$SSH_AUTH_SOCK" ]]; then
@@ -86,7 +86,7 @@
         # is the GUI Emacs.app (no background daemon) — if it isn't up yet,
         # launch it the way the Dock would and wait. On Linux the systemd
         # `emacs --daemon' is always running, so this is just `emacsclient -t'.
-        e () {${lib.optionalString pkgs.stdenv.isDarwin ''
+        e () {${lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
 
           if ! emacsclient -e t >/dev/null 2>&1; then
             open -a "$HOME/Applications/Home Manager Apps/Emacs.app"
@@ -524,6 +524,8 @@
 
   # ── Fzf ────────────────────────────────────────────────────────────────
   programs.fzf = {
+    # atuin owns Ctrl-R; fzf's history widget would shadow it (home-manager warns).
+    historyWidget.command = "";
     enable = true;
     enableZshIntegration = true;
 
