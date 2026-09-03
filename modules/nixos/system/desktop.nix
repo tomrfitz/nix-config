@@ -6,17 +6,31 @@
   ...
 }:
 {
-  # Required by HM xdg.portal when useUserPackages is enabled
-  environment.pathsToLink = [
-    "/share/applications"
-    "/share/xdg-desktop-portal"
-  ];
-
   # ── Display / Desktop ────────────────────────────────────────────────
+  # nixpkgs' programs.niri: session package and user units, gnome + gtk
+  # portals with niri's portal config (/etc/xdg/xdg-desktop-portal/
+  # niri-portals.conf), gnome-keyring, polkit, swaylock PAM, dconf, and via
+  # services.graphical-desktop: xdg autostart/menus/mime/icons, xdg-utils,
+  # the default font set. The user-side config is wayland.windowManager.niri
+  # in modules/nixos/home/desktop.nix.
   programs.niri.enable = true;
-  # niri-flake is frozen (bot-only bumps; its pin runs niri 25.08): use
-  # nixpkgs' niri, current and cached. The flake still supplies the modules.
-  programs.niri.package = pkgs.niri;
+
+  # programs.niri enables polkit but ships no authentication agent (niri-flake
+  # used to run KDE's); 1Password's system auth and other polkit prompts need
+  # one on the session bus.
+  systemd.user.services.polkit-agent = {
+    description = "PolicyKit Authentication Agent";
+    wantedBy = [ "niri.service" ];
+    after = [ "graphical-session.target" ];
+    partOf = [ "graphical-session.target" ];
+    serviceConfig = {
+      Type = "simple";
+      ExecStart = "${pkgs.kdePackages.polkit-kde-agent-1}/libexec/polkit-kde-authentication-agent-1";
+      Restart = "on-failure";
+      RestartSec = 1;
+      TimeoutStopSec = 10;
+    };
+  };
 
   # greetd: lightweight greeter for Wayland compositors
   services.greetd = {
@@ -35,7 +49,7 @@
   };
 
   # ── Hardware ──────────────────────────────────────────────────────────
-  # security.polkit and GNOME keyring also provided by nixosModules.niri
+  # security.polkit and GNOME keyring also provided by programs.niri (nixpkgs)
   hardware.graphics.enable = true;
   hardware.enableRedistributableFirmware = true;
   hardware.bluetooth.enable = true;
