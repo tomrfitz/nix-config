@@ -16,8 +16,9 @@ let
   # jdtsmith/emacs-mac community fork; see TODO.md upstream watchlist).
   # Cached on cache.nixos.org. Icon overlay via runCommand: no emacs
   # rebuild on nixpkgs bumps, just a cp pass over the closure (~seconds).
-  # NixOS: stock emacs30.
-  emacsBase = if pkgs.stdenv.isDarwin then pkgs.emacs30-macport else pkgs.emacs30;
+  # NixOS: stock emacs (31.x; nixpkgs retired the emacs30 attribute in
+  # 2026-08). init.el has to stay 30.2-compatible for the macport.
+  emacsBase = if pkgs.stdenv.hostPlatform.isDarwin then pkgs.emacs30-macport else pkgs.emacs;
 
   # Derive the package set from `use-package` declarations in init.el.
   # Single source of truth: add a `(use-package foo :ensure t ...)` block
