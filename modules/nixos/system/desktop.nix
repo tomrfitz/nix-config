@@ -1,6 +1,5 @@
 {
   config,
-  options,
   pkgs,
   lib,
   user,
@@ -15,17 +14,9 @@
 
   # ── Display / Desktop ────────────────────────────────────────────────
   programs.niri.enable = true;
-  # REVISIT(upstream): remove when niri-flake raises sandbox ulimit;
-  #   ref: https://github.com/sodiboo/niri-flake/issues/1300; checked: 2026-05-12
-  programs.niri.package =
-    let
-      inherit (options.programs.niri.package) default;
-    in
-    default.overrideAttrs (old: {
-      preCheck = (old.preCheck or "") + ''
-        ulimit -n 4096
-      '';
-    });
+  # niri-flake is frozen (bot-only bumps; its pin runs niri 25.08): use
+  # nixpkgs' niri, current and cached. The flake still supplies the modules.
+  programs.niri.package = pkgs.niri;
 
   # greetd: lightweight greeter for Wayland compositors
   services.greetd = {
