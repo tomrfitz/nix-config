@@ -6,7 +6,7 @@
 #   ./scripts/snapshot-defaults.sh diff <before> <after>  Diff two snapshots
 #   ./scripts/snapshot-defaults.sh domains <name>    List domains in a snapshot
 #
-# Requires defaults2nix on PATH (enter via `nix develop` first).
+# Runs defaults2nix through `nix run` (first run fetches and builds it).
 
 set -euo pipefail
 
@@ -35,15 +35,10 @@ cmd_snapshot() {
     local name="${1:?snapshot name required}"
     local dest="$SNAPSHOTS_DIR/$name"
 
-    if ! command -v defaults2nix &>/dev/null; then
-        echo "Error: defaults2nix not found. Enter the dev shell first:" >&2
-        echo "  nix develop" >&2
-        exit 1
-    fi
-
     mkdir -p "$dest"
     echo "Taking snapshot '$name' -> $dest/"
-    defaults2nix -split -filter dates,state,uuids -out "$dest/" 2>&1
+    # defaults2nix's own documented invocation; nothing to install.
+    nix run github:joshryandavis/defaults2nix -- -split -filter dates,state,uuids -out "$dest/" 2>&1
     echo ""
     echo "Snapshot '$name' complete: $(ls "$dest/" | wc -l | tr -d ' ') domains captured."
 }

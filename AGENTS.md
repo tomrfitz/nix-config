@@ -57,7 +57,6 @@ just diff          # dix diff between previous and current system profile
 just snapshot NAME # take macOS defaults snapshot; snapshot-diff BEFORE AFTER compares two
 just clean         # nh clean all (old generations + unreferenced store paths)
 just sops-edit     # edit secrets/trfwsl.yaml (HOST=... for another host)
-just topology      # render the nix-topology diagram
 ```
 
 **Validation:** There are no tests. Correctness = `just check` (build without activating) or `just eval` succeeding. Use `just eval-all` to gate cross-platform changes. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
@@ -68,7 +67,7 @@ just topology      # render the nix-topology diagram
 
 ### Flake structure
 
-`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, emacs-overlay, llm-agents (claude-code, pi), paneru, zen-browser, noctalia, nixos-wsl, sops-nix, disko, nix-topology, treefmt-nix, git-hooks, nix-index-database, defaults2nix, mattpocock-skills (pi skills).
+`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks, nix-index-database, mattpocock-skills (pi skills). Claude Code, pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules.
 
 ### Hosts are thin wiring
 

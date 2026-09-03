@@ -5,3 +5,5 @@
 !.claude/skills/
 result
 .pre-commit-config.yaml
+# macOS defaults snapshots (scripts/snapshot-defaults.sh)
+snapshots/

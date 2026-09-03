@@ -11,10 +11,6 @@
       url = "github:nix-community/home-manager";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    defaults2nix = {
-      url = "github:joshryandavis/defaults2nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     treefmt-nix = {
       url = "github:numtide/treefmt-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -33,14 +29,6 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
-    disko = {
-      url = "github:nix-community/disko";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-    nix-topology = {
-      url = "github:oddlama/nix-topology";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     paneru = {
       url = "github:karinushka/paneru";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -49,11 +37,6 @@
     git-hooks = {
       url = "github:cachix/git-hooks.nix";
       inputs.nixpkgs.follows = "nixpkgs";
-    };
-    llm-agents = {
-      url = "github:numtide/llm-agents.nix";
-      inputs.nixpkgs.follows = "nixpkgs";
-      inputs.treefmt-nix.follows = "treefmt-nix";
     };
     nix-index-database = {
       url = "github:nix-community/nix-index-database";
@@ -65,8 +48,8 @@
       inputs.nixpkgs-stable.follows = "nixpkgs"; # only upstream's hydraJobs use it
     };
     # Mattpocock's curated skill collection — consumed by pi via
-    # modules/shared/home/pi.nix; pi's recursive SKILL.md discovery walks
-    # the symlinked tree. Locked via flake.lock; `nix flake update' bumps.
+    # modules/shared/home/pi.nix, which links only the skills its plugin
+    # manifest promotes. Locked via flake.lock; the lock bump moves it.
     mattpocock-skills = {
       url = "github:mattpocock/skills";
       flake = false;
@@ -79,16 +62,12 @@
       nixpkgs,
       nix-darwin,
       home-manager,
-      defaults2nix,
       treefmt-nix,
       nixos-wsl,
       zen-browser,
       sops-nix,
-      disko,
-      nix-topology,
       paneru,
       git-hooks,
-      llm-agents,
       nix-index-database,
       emacs-overlay,
       mattpocock-skills,
@@ -169,7 +148,6 @@
             {
               nixpkgs.hostPlatform = system;
               nixpkgs.overlays = [
-                llm-agents.overlays.shared-nixpkgs
                 emacs-overlay.overlays.default
               ]
               ++ overlays;
@@ -187,7 +165,6 @@
           ]
           ++ lib.optionals (!isDarwin) [
             sops-nix.nixosModules.sops
-            nix-topology.nixosModules.default
           ]
           ++ extraModules;
         };
@@ -208,10 +185,7 @@
           system = "x86_64-linux";
           platform = "nixos";
           hostModule = ./hosts/trfnix;
-          extraModules = [
-            ./modules/nixos/system/desktop.nix
-            disko.nixosModules.disko
-          ];
+          extraModules = [ ./modules/nixos/system/desktop.nix ];
           hmModules = [
             ./modules/shared/home
             ./modules/shared/home/desktop.nix
@@ -241,25 +215,6 @@
 
       nixosConfigurations = mkConfigurations "nixos";
 
-      topology = forAllSystems (
-        _system: pkgs:
-        import nix-topology {
-          pkgs = pkgs.extend nix-topology.overlays.default;
-          modules = [
-            ./topology.nix
-            {
-              inherit (self) nixosConfigurations;
-            }
-          ];
-        }
-      );
-
-      packages = forAllSystems (
-        system: _pkgs: {
-          topology = self.topology.${system}.config.output;
-        }
-      );
-
       # ── Formatter (nix fmt — runs all formatters via treefmt) ─────────
       formatter = forAllSystems (system: _pkgs: treefmtEval.${system}.config.build.wrapper);
 
@@ -286,19 +241,14 @@
         {
           default = pkgs.mkShellNoCC {
             inherit (preCommit) shellHook;
-            packages =
-              preCommit.enabledPackages
-              ++ [
-                pkgs.nixfmt
-                pkgs.nixd
-                pkgs.dix
-                pkgs.nh
-                pkgs.just
-                pkgs.sops
-              ]
-              ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
-                defaults2nix.packages.${system}.default
-              ];
+            packages = preCommit.enabledPackages ++ [
+              pkgs.nixfmt
+              pkgs.nixd
+              pkgs.dix
+              pkgs.nh
+              pkgs.just
+              pkgs.sops
+            ];
           };
         }
       );
