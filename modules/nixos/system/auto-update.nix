@@ -112,6 +112,9 @@ in
         timerConfig = {
           OnCalendar = "*-*-* 04:45:00";
           RandomizedDelaySec = "5min";
+          # Fire a missed run on next boot — WSL is regularly down at 04:45
+          # (no auto-start with Windows; Windows updates kill it).
+          Persistent = true;
         };
       };
     })
@@ -122,7 +125,6 @@ in
         enable = true;
         flake = "github:tomrfitz/nix-config/main";
         dates = "*-*-* 06:30:00";
-        flags = [ "--refresh" ];
       };
     })
   ];
