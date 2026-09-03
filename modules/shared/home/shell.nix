@@ -45,8 +45,6 @@
         swsl = "ssh trfwsl -t 'tmux new -As main'";
         slab = "ssh trflab -t 'tmux new -As main'";
 
-        # Emacs client (falls back to starting full Emacs if no server)
-        e = "emacsclient -c -a ''";
       };
 
     envExtra = lib.optionalString (!pkgs.stdenv.isDarwin && !isWSL) ''
@@ -82,6 +80,21 @@
         setopt INTERACTIVE_COMMENTS
         typeset -U path
       '')
+
+      ''
+        # `e`: attach a terminal frame to the Emacs server. On macOS the server
+        # is the GUI Emacs.app (no background daemon) — if it isn't up yet,
+        # launch it the way the Dock would and wait. On Linux the systemd
+        # `emacs --daemon' is always running, so this is just `emacsclient -t'.
+        e () {${lib.optionalString pkgs.stdenv.isDarwin ''
+
+          if ! emacsclient -e t >/dev/null 2>&1; then
+            open -a "$HOME/Applications/Home Manager Apps/Emacs.app"
+            until emacsclient -e t >/dev/null 2>&1; do sleep 0.1; done
+          fi''}
+          emacsclient -t "$@"
+        }
+      ''
 
       ''
         # Show fastfetch for interactive top-level shells (e.g., Ghostty tabs).

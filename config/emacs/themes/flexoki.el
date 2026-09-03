@@ -12,18 +12,21 @@
 ;; ── Changes from upstream (crmsnbleyd/flexoki-emacs-theme v0.20) ────
 ;;
 ;; Palette fixes:
-;;   - Neutral scale uses full spec (n-50 through n-950, not just 6 greys)
+;;   - Neutral scale uses full spec (n-50 through n-950, incl. n-150)
 ;;   - Semantic neutrals (bg, bg-2, ui, ui-2, ui-3, tx, tx-2, tx-3) follow
 ;;     the official spec mapping — upstream had tx-2/tx-3 swapped between
-;;     light and dark variants
+;;     light and dark variants (light ui-2/ui-3 = n-150/n-200, so region
+;;     never equals a text colour)
 ;;
 ;; Font-lock corrections (spec + Helix alignment):
 ;;   - keyword-face:       magenta → green   (spec: keywords = green)
 ;;   - builtin-face:       green → magenta   (spec: language features = magenta)
 ;;   - constant-face:      purple → yellow   (spec: constants = yellow)
 ;;   - preprocessor-face:  default fg → magenta
-;;   - comment-face:       tx-2 (wrong) → tx-3 (spec: comments = faint text)
-;;   - doc-markup-face:    (new) tx-2 for @param/@return tags in doc comments
+;;   - comment-face:       kept at tx-2, a deliberate deviation — spec says
+;;                         tx-3 (faint), but that is 2.0:1 light / 2.6:1 dark
+;;                         and vanishes on a selection; upstream trades the same
+;;   - doc-markup-face:    (new) tx for @param/@return tags in doc comments
 ;;
 ;; New Emacs 29+ tree-sitter faces (not in upstream):
 ;;   - font-lock-number-face:      purple   (spec: numbers = purple)
@@ -61,6 +64,7 @@
             (n-500  "#878580")
             (n-300  "#B7B5AC")
             (n-200  "#CECDC3")
+            (n-150  "#DAD8CE")
             (n-100  "#E6E4D9")
             (n-50   "#F2F0E5")
             (paper  "#FFFCF0")
@@ -69,8 +73,8 @@
             (bg      (if (eq variant 'light) paper  black))
             (bg-2    (if (eq variant 'light) n-50   n-950))
             (ui      (if (eq variant 'light) n-100  n-900))
-            (ui-2    (if (eq variant 'light) n-200  n-850))
-            (ui-3    (if (eq variant 'light) n-300  n-800))
+            (ui-2    (if (eq variant 'light) n-150  n-850))
+            (ui-3    (if (eq variant 'light) n-200  n-800))
             (tx-3    (if (eq variant 'light) n-300  n-700))
             (tx-2    (if (eq variant 'light) n-600  n-500))
             (tx      (if (eq variant 'light) black  n-200))
@@ -92,9 +96,9 @@
             `(default                ((t (:background ,bg :foreground ,tx))))
             `(cursor                 ((t (:background ,tx))))
             `(fringe                 ((t (:background ,bg))))
-            `(hl-line                ((t (:background ,ui-2))))
-            `(region                 ((t (:background ,ui-3))))
-            `(secondary-selection    ((t (:background ,ui-2))))
+            `(hl-line                 ((t (:background ,bg-2 :extend t))))
+            `(region                 ((t (:background ,ui-2 :extend t))))
+            `(secondary-selection    ((t (:background ,ui-3 :extend t))))
             `(vertical-border        ((t (:foreground ,ui-3))))
             `(internal-border        ((t (:background ,bg :foreground ,bg))))
             `(minibuffer-prompt      ((t (:foreground ,purple :weight semi-bold))))
@@ -119,8 +123,10 @@
             ;; Spec mapping:
             ;;   keywords=green, functions=orange, constants=yellow,
             ;;   strings=cyan, variables/attributes=blue, numbers=purple,
-            ;;   language-features=magenta, comments=tx-3,
-            ;;   punctuation/operators=tx-2
+            ;;   language-features=magenta, punctuation/operators=tx-2,
+            ;;   comments=tx-3 — deliberately tx-2 here: tx-3 is 2.0:1 on
+            ;;   paper / 2.6:1 on black (fails WCAG AA) and vanishes on a
+            ;;   selection; the upstream Emacs port makes the same trade.
             `(font-lock-keyword-face       ((t (:foreground ,green))))
             `(font-lock-builtin-face       ((t (:foreground ,magenta))))
             `(font-lock-function-name-face ((t (:foreground ,orange))))
@@ -128,9 +134,9 @@
             `(font-lock-constant-face      ((t (:foreground ,yellow))))
             `(font-lock-type-face          ((t (:foreground ,yellow))))
             `(font-lock-string-face        ((t (:foreground ,cyan))))
-            `(font-lock-comment-face       ((t (:foreground ,tx-3 :slant italic))))
-            `(font-lock-doc-face           ((t (:foreground ,tx-3 :slant italic))))
-            `(font-lock-doc-markup-face   ((t (:foreground ,tx-2))))
+            `(font-lock-comment-face       ((t (:foreground ,tx-2 :slant italic))))
+            `(font-lock-doc-face           ((t (:foreground ,tx-2 :slant italic))))
+            `(font-lock-doc-markup-face   ((t (:foreground ,tx))))
             `(font-lock-warning-face       ((t (:foreground ,yellow :weight bold))))
             `(font-lock-preprocessor-face  ((t (:foreground ,magenta))))
             `(font-lock-negation-char-face ((t (:foreground ,red))))
@@ -149,7 +155,7 @@
             `(font-lock-misc-punctuation-face ((t (:foreground ,tx-2))))
 
             ;; ── Line numbers ──────────────────────────────────────────────
-            `(line-number              ((t (:foreground ,ui-3))))
+            `(line-number              ((t (:foreground ,tx-3))))
             `(line-number-current-line ((t (:foreground ,tx-2))))
 
             ;; ── Mode line ──────────────────────────────────────────────────
