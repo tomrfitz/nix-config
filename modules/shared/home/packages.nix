@@ -26,8 +26,6 @@
 
       # nix tooling
       nix-init
-      claude-code
-      llm-agents.pi
       dix
       nh
       nixd
