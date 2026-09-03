@@ -125,7 +125,7 @@ modules/
 - **Maximize `modules/shared/`** — platform-specific modules only for genuine differences (e.g., 1Password SSH agent path, homebrew, macOS system.defaults)
 - **Prefer native home-manager modules** (`programs.*`) over `home.file` when available
 - **Package source priority:** nixpkgs shared → nixpkgs platform-specific → homebrew casks → Mac App Store (mas)
-- **Brew-preferred exceptions:** 1Password, Ghostty (macOS app integration). Emacs is nix-owned (emacs-overlay + macport) — see `modules/shared/home/emacs.nix`
+- **Brew-preferred exceptions:** 1Password, Ghostty (macOS app integration). Emacs is nix-owned (emacs-overlay, nixpkgs emacs 31 on both platforms) — see `modules/shared/home/emacs.nix`
 - **Language tooling belongs in project devShells**, not in the system config — only editor-universal tools (`nixd`, `nixfmt`, `shfmt`, `shellcheck`) stay global
 - **Config-only HM modules** (`package = null`) provide global defaults (e.g., `programs.ruff`) while project devShells provide the binary; `home.file` serves the same role for tools without HM modules (e.g., `.clang-format`)
 - **Zed uses `load_direnv = "shell_hook"`** to discover project-provided LSPs/formatters automatically

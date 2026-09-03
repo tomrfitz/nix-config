@@ -12,13 +12,12 @@ let
     hash = "sha256-N+3n5lHuRsWpFP0RuYDJLD72kuQcsmduJRjQnk19Xek=";
   };
 
-  # macOS: emacs30-macport (Mitsuharu Yamamoto patches — currently on
-  # jdtsmith/emacs-mac community fork; see TODO.md upstream watchlist).
-  # Cached on cache.nixos.org. Icon overlay via runCommand: no emacs
-  # rebuild on nixpkgs bumps, just a cp pass over the closure (~seconds).
-  # NixOS: stock emacs (31.x; nixpkgs retired the emacs30 attribute in
-  # 2026-08). init.el has to stay 30.2-compatible for the macport.
-  emacsBase = if pkgs.stdenv.hostPlatform.isDarwin then pkgs.emacs30-macport else pkgs.emacs;
+  # nixpkgs' emacs (31.x, cached) on both platforms. The darwin macport
+  # (Mitsuharu's patches, 30.2.50 with no 31 in sight) was dropped 2026-09-03:
+  # the 30/31 split constrained init.el, and the NS build covers the config
+  # (appearance hook, modifiers, pixel-scroll-precision-mode). Icon overlay via
+  # runCommand on darwin: no emacs rebuild on nixpkgs bumps, just a cp pass.
+  emacsBase = pkgs.emacs;
 
   # Derive the package set from `use-package` declarations in init.el.
   # Single source of truth: add a `(use-package foo :ensure t ...)` block
@@ -36,10 +35,11 @@ let
     override = _self: super: {
       # REVISIT(upstream): the pi-coding-agent MELPA package became a deprecated
       #   alias for `piem` (2026-09) but declares none of piem's Package-Requires,
-      #   so it cannot byte-compile in isolation (piem needs md-ts-mode, which is
-      #   built into Emacs 31 and a MELPA backport on 30). Give it piem's deps;
-      #   drop once MELPA has a `piem` recipe (then `use-package piem`) or the
-      #   shim's header is fixed. ref: https://github.com/dnouri/piem; checked: 2026-09-03
+      #   so it cannot byte-compile in isolation (md-ts-mode is a MELPA package
+      #   on every Emacs we run, 31.1 included). Give it piem's deps; drop once
+      #   MELPA has a `piem` recipe (then `use-package piem`) or the shim's
+      #   header is fixed.
+      #   ref: https://github.com/dnouri/piem; checked: 2026-09-03
       pi-coding-agent = super.pi-coding-agent.overrideAttrs (old: {
         packageRequires =
           (old.packageRequires or [ ])
@@ -64,7 +64,7 @@ let
   # Emacs.icns.
   emacs =
     if pkgs.stdenv.hostPlatform.isDarwin then
-      pkgs.runCommand "emacs-macport-with-icon"
+      pkgs.runCommand "emacs-with-icon"
         {
           meta = emacsWithPkgs.meta // {
             mainProgram = "emacs";
@@ -100,12 +100,12 @@ in
 
   # Emacs as a server.
   #   NixOS — a systemd user daemon (`emacs --daemon`).
-  #   macOS — NO launchd daemon. On the macport a launchd-started daemon never
-  #           gets window-server (Aqua) access, so it can't create GUI frames
-  #           ("Mac native windows are not in use or not initialized"). Instead
-  #           the GUI Emacs.app you launch from your session (Dock/Spotlight)
-  #           calls (server-start) in init.el and IS the canonical server;
-  #           `emacsclient' and Dock re-clicks attach to it as clients.
+  #   macOS — no launchd daemon: the GUI Emacs.app you launch from your session
+  #           (Dock/Spotlight) calls (server-start) in init.el and IS the
+  #           canonical server; `emacsclient' and Dock re-clicks attach to it.
+  #           (Chosen when the macport could not open GUI frames from launchd;
+  #           the NS build could run `services.emacs` as a user agent instead —
+  #           revisit if the GUI-app-as-server arrangement ever annoys.)
   services.emacs = {
     enable = !pkgs.stdenv.hostPlatform.isDarwin;
     package = emacs;
