@@ -7,7 +7,6 @@
   imports = [
     ./zsh.nix
     ./git.nix
-    ./topgrade.nix
   ];
 
   # ── Copy .app bundles so Spotlight can index them ────────────────────
