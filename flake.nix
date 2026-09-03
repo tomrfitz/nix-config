@@ -34,7 +34,7 @@
       inputs.home-manager.follows = "home-manager";
     };
     noctalia = {
-      url = "github:noctalia-dev/noctalia-shell";
+      url = "github:noctalia-dev/noctalia";
       inputs.nixpkgs.follows = "nixpkgs";
     };
     sops-nix = {
@@ -206,36 +206,7 @@
           system = "aarch64-darwin";
           platform = "darwin";
           hostModule = ./hosts/trfmbp;
-          extraModules = [
-            paneru.darwinModules.paneru
-            # Built locally instead of from paneru's own package: build.rs
-            # hardcodes the CLT SDK path, so it needs the apple-sdk postPatch
-            # (and privateFrameworksHook) below. Drop once a test build of
-            # upstream's package succeeds. Version pin: see TODO.md Steps
-            # (the v0.4.4 tag at the lock bump).
-            (
-              { pkgs, ... }:
-              {
-                services.paneru.package = pkgs.rustPlatform.buildRustPackage {
-                  pname = "paneru";
-                  version = "0.4.2-local";
-                  src = pkgs.lib.cleanSource paneru;
-                  postPatch = ''
-                    substituteInPlace build.rs --replace-fail \
-                      'let sdk_dir = "/Library/Developer/CommandLineTools/SDKs";' \
-                      'let sdk_dir = "${pkgs.apple-sdk}/Platforms/MacOSX.platform/Developer/SDKs";'
-                  '';
-                  cargoLock.lockFile = "${paneru}/Cargo.lock";
-                  buildInputs = [ pkgs.apple-sdk.privateFrameworksHook ];
-                  doCheck = false;
-                  meta = {
-                    mainProgram = "paneru";
-                    platforms = pkgs.lib.platforms.darwin;
-                  };
-                };
-              }
-            )
-          ];
+          extraModules = [ paneru.darwinModules.paneru ];
           hmModules = [
             ./modules/shared/home
             ./modules/shared/home/desktop.nix

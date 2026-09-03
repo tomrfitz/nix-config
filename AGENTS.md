@@ -135,6 +135,7 @@ modules/
 - **Don't run rebuilds yourself** — neither `just rebuild` nor the personal `nr*` aliases; applying mutates the live system
 - **Don't commit during exploratory work** — leave the working tree dirty so commits can be shaped in magit (trim/atomize) after the apply
 - **Don't modify `flake.lock`** directly — that's `just update`'s job
+- **Inputs float** — every input tracks its upstream default branch and a bump moves all of them; adapt the config to upstream changes rather than pinning. A pin is a last resort and carries a `REVISIT(upstream)`
 - **Don't add packages to platform modules** without first checking if they work in `modules/shared/`
 - **Don't create new top-level modules** without discussing placement — the structure is intentional
 
