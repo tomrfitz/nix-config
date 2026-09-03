@@ -25,6 +25,18 @@
             "Bash(nix flake show:*)",
             "Bash(nixfmt:*)",
             "Bash(nvd diff:*)"
+        ],
+        "ask": [
+            "Bash(just rebuild:*)",
+            "Bash(just update:*)",
+            "Bash(just rollback:*)",
+            "Bash(nh darwin switch:*)",
+            "Bash(nh os switch:*)",
+            "Bash(darwin-rebuild switch:*)",
+            "Bash(sudo darwin-rebuild switch:*)",
+            "Bash(nixos-rebuild switch:*)",
+            "Bash(sudo nixos-rebuild switch:*)",
+            "Bash(topgrade:*)"
         ]
     }
 }

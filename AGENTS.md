@@ -24,27 +24,41 @@ The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful f
 
 `NH_FLAKE` defaults to `github:tomrfitz/nix-config/main` — rebuilds fetch from the remote, so every build corresponds to a pushed commit. This enforces clean git discipline and triggers CI before any local build.
 
+nh derives the target host from macOS's `LocalHostName`, which the OS silently renames on a network clash (seen: `trfmbp-2` → `nh` fails with "Did you mean trfmbp?"). The justfile passes `-H` explicitly; the permanent fix is `sudo scutil --set LocalHostName trfmbp` (nix-darwin reasserts it on activation).
+
+Project templates: `nix flake init -t ~/nix-config#python-uv` bootstraps a Python devShell (uv-managed interpreter + venv, ruff and ty on PATH for eglot). See `templates/`.
+
 - `nh darwin switch` — rebuild from remote (uses cached tarball; add `--refresh` to force re-fetch after a push)
-- `nh darwin switch --flake .` — local iteration escape hatch (dirty/uncommitted changes)
+- `nh darwin switch .` — local iteration escape hatch (dirty/uncommitted changes; flakeref is positional in nh 4.x)
 - `nh darwin switch --refresh` — force re-fetch from remote (what topgrade runs); does **not** bump `flake.lock`
 - `nh darwin switch --refresh --update` — force re-fetch + bump inputs (what `just update` runs)
 
-The `justfile` defers to `NH_FLAKE` (no hardcoded paths):
+Personal `nr*` aliases (declared in `modules/shared/home/shell.nix`):
+
+- `nrs` — switch from remote `NH_FLAKE` (daily-driver path)
+- `nrsr` — switch with `--refresh` (force re-fetch the remote flake tarball)
+- `nrsl` — switch from the local working tree (`~/nix-config`); use for dirty/iterative work
+- `nrb` — build only (no activation)
+
+The `justfile` defers to `NH_FLAKE` for switches; `check` builds the local tree and every nh recipe passes `-H` (see the hostname note above):
 
 ```bash
 just rebuild       # nh darwin switch
-just check         # nh darwin build (dry-run with diff)
+just check         # nh darwin build . (local tree; build closure without activating, with diff)
 just update        # nh darwin switch --update (flake update + rebuild)
 just fmt           # nix fmt (nixfmt)
 just fmt-check     # check formatting without modifying
-just eval          # nix flake check (eval errors only)
+just eval          # eval current host's system (catches eval errors without building)
 just eval-all      # eval all configured hosts (trfmbp + trfnix + trfwsl)
 just rollback      # switch to previous generation
 just diff          # dix diff between previous and current system profile
-just snapshot NAME # take macOS defaults snapshot
+just snapshot NAME # take macOS defaults snapshot; snapshot-diff BEFORE AFTER compares two
+just clean         # nh clean all (old generations + unreferenced store paths)
+just sops-edit     # edit secrets/trfwsl.yaml (HOST=... for another host)
+just topology      # render the nix-topology diagram
 ```
 
-**Validation:** There are no tests. Correctness = `just check` (dry-run) or `just eval` succeeding. Use `just eval-all` to gate cross-platform changes. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
+**Validation:** There are no tests. Correctness = `just check` (build without activating) or `just eval` succeeding. Use `just eval-all` to gate cross-platform changes. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
 
 **Important:** Nix flakes only see files tracked by git. When adding new files referenced by the flake (e.g., config files used in `home.file` or `source`), you must `git add` them before `just eval` or `just check` will work.
 
@@ -52,7 +66,7 @@ just snapshot NAME # take macOS defaults snapshot
 
 ### Flake structure
 
-`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Core inputs: nixpkgs (unstable), nix-darwin, home-manager, treefmt-nix, defaults2nix, zen-browser, nixos-wsl, sops-nix, niri-flake, noctalia.
+`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, emacs-overlay, llm-agents (claude-code, pi), paneru, zen-browser, noctalia, niri-flake, nixos-wsl, sops-nix, disko, nix-topology, treefmt-nix, git-hooks, nix-index-database, defaults2nix, mattpocock-skills (pi skills).
 
 ### Hosts are thin wiring
 
@@ -72,13 +86,13 @@ Keep host files concise, idiomatic, portable, and composable:
 ```text
 modules/
   shared/          # Cross-platform (maximized — put everything here first)
-    system/        # nix.nix
-    home/          # packages, shell, git, editors, ghostty, firefox, zen, obsidian, desktop, opencode, ruff, etc.
+    system/        # nix.nix, user.nix
+    home/          # packages, shell, git, editors, emacs, ghostty, zen, browser-policies, obsidian, notes, desktop, pi, dprint, xdg-*, etc.
   darwin/          # macOS-only
-    system/        # user.nix, homebrew.nix, settings.nix (system.defaults), security.nix
-    home/          # zsh.nix, git.nix (1Password signing), topgrade.nix, aerospace.nix, sketchybar.nix
+    system/        # homebrew.nix, settings.nix (system.defaults), security.nix, paneru.nix, auto-rebuild.nix
+    home/          # zsh.nix, git.nix (1Password signing), topgrade.nix
   nixos/           # Linux-only
-    system/        # user.nix, desktop.nix, hardening.nix, homelab/, remote-build-cache.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh
+    system/        # desktop.nix, hardening.nix, homelab/, auto-update.nix, remote-build-cache.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh
     home/          # desktop.nix (niri + noctalia theming)
 ```
 
@@ -98,7 +112,7 @@ modules/
 - WSL GPU / container runtime: `modules/nixos/system/wsl-gpu.nix`
 - Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
 - Configure editors: `modules/shared/home/editors.nix`
-- Firefox extensions: `modules/shared/home/firefox.nix`
+- Browsers: Zen is primary (`modules/shared/home/zen.nix`); extension/policy manifest in `browser-policies.nix` (live on Linux, documentation on darwin where brew apps ignore it); Helium via cask; Safari native; Linux base Firefox in `modules/nixos/home/desktop.nix`.
 - Git settings (shared): `modules/shared/home/git.nix`
 - Git settings (1Password signing): `modules/darwin/home/git.nix`
 - Fontconfig defaults: `modules/shared/home/fonts.nix`
@@ -109,14 +123,15 @@ modules/
 - **Maximize `modules/shared/`** — platform-specific modules only for genuine differences (e.g., 1Password SSH agent path, homebrew, macOS system.defaults)
 - **Prefer native home-manager modules** (`programs.*`) over `home.file` when available
 - **Package source priority:** nixpkgs shared → nixpkgs platform-specific → homebrew casks → Mac App Store (mas)
-- **Brew-preferred exceptions:** 1Password, Emacs (macOS native patches), Ghostty (macOS app integration)
+- **Brew-preferred exceptions:** 1Password, Ghostty (macOS app integration). Emacs is nix-owned (emacs-overlay + macport) — see `modules/shared/home/emacs.nix`
 - **Language tooling belongs in project devShells**, not in the system config — only editor-universal tools (`nixd`, `nixfmt`, `shfmt`, `shellcheck`) stay global
 - **Config-only HM modules** (`package = null`) provide global defaults (e.g., `programs.ruff`) while project devShells provide the binary; `home.file` serves the same role for tools without HM modules (e.g., `.clang-format`)
 - **Zed uses `load_direnv = "shell_hook"`** to discover project-provided LSPs/formatters automatically
 
 ### Guardrails
 
-- **Don't run `just rebuild`** unless explicitly asked — it mutates the live system
+- **Don't run rebuilds yourself** — neither `just rebuild` nor the personal `nr*` aliases; applying mutates the live system
+- **Don't commit during exploratory work** — leave the working tree dirty so commits can be shaped in magit (trim/atomize) after the apply
 - **Don't modify `flake.lock`** directly — that's `just update`'s job
 - **Don't add packages to platform modules** without first checking if they work in `modules/shared/`
 - **Don't create new top-level modules** without discussing placement — the structure is intentional
@@ -153,7 +168,7 @@ Two mechanisms, split by trust model:
 
 ### Config files
 
-`config/` holds imported TOML/YAML configs (Starship prompt, Helix themes). Referenced via `lib.importTOML` in modules. `config/agents.md` is the global agent instructions file deployed to home directories.
+`config/` holds files that modules deploy or import as-is: the Emacs config, Helix themes (`lib.importTOML`), editorconfig, clang-format, karabiner.json, the Zen userChrome/userContent CSS, the dprint plugin selector, the wallpaper. `config/agents.md` is the global agent instructions file deployed to the agents' home paths; `config/claude-settings.json` is Claude Code's settings.
 
 ## Theming
 
@@ -164,10 +179,7 @@ Two mechanisms, split by trust model:
 
 ## Custom packages
 
-- **`pkgs/mdbase-tasknotes/`** — npm CLI packaged via `buildNpmPackage` + `fetchurl` from npm registry
-  - Requires a locally-generated `package-lock.json` stored in repo (npm tarballs lack lockfiles)
-  - Version bump workflow: update `version`, `hash` (via `nix-prefetch-url`), and `npmDepsHash` (let builder error tell you the correct hash)
-  - Monitor for GitHub releases with prebuilt binaries — could simplify packaging
+- **`pkgs/sgram-tui/`** — the only custom package (pinned to upstream's latest tag; not in nixpkgs). `mdbase-tasknotes` was removed 2026-09 (never used; tasks live in org).
 
 ## Bootstrap
 
@@ -189,10 +201,8 @@ Interim homelab running NixOS-WSL on the existing Windows desktop. Config is lar
 
 **Remaining:**
 
-1. Bootstrap NixOS-WSL on gaming PC (import tarball, switch to `trfwsl` host)
-2. Enable remaining services: Jellyfin, Jellyseerr, Immich (modules exist, not yet enabled)
-3. Windows-side: scheduled task to auto-start WSL, `.wslconfig` for mirrored networking
-4. Test Tailscale on eduroam (DERP relay fallback over 443)
+1. Windows-side: scheduled task to auto-start WSL, `.wslconfig` for mirrored networking (the daily flake.lock pipeline only runs while the PC is on — it has been silent since 2026-06-08)
+2. Test Tailscale on eduroam (DERP relay fallback over 443)
 
 **Constraints:** WSL doesn't auto-start with Windows, networking is NAT'd by default (use mirrored mode or Tailscale), no direct disk/hardware access, Windows updates can kill WSL. Acceptable for an interim setup.
 
@@ -227,7 +237,7 @@ on-push CI:    eval all 3 hosts + formatting check (safety net)
 
 - `scripts/auto-update.sh` — pipeline logic (phases 0–7)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
-- `modules/darwin/home/auto-rebuild.nix` — launchd agent for trfmbp
+- `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp (unattended; user sudo is Touch ID-only)
 
 **Manual trigger:** `sudo systemctl start auto-update` on trfwsl
 
