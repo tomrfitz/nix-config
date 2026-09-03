@@ -381,7 +381,7 @@
 ;; `major-mode-remap-alist' (yaml-ts-mode adds its own auto-mode entry).
 ;; Grammars come from Nix (emacs.nix), so never offer to build one.
 (setopt treesit-enabled-modes t
-        treesit-auto-install-grammar nil)
+        treesit-auto-install-grammar 'never)
 
 ;; Fontify at the richest level — adds variables, function-call names,
 ;; operators, brackets, and delimiters (the default 3 leaves these the
