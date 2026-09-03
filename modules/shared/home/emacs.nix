@@ -15,8 +15,11 @@ let
   # nixpkgs' emacs (31.x, cached) on both platforms. The darwin macport
   # (Mitsuharu's patches, 30.2.50 with no 31 in sight) was dropped 2026-09-03:
   # the 30/31 split constrained init.el, and the NS build covers the config
-  # (appearance hook, modifiers, pixel-scroll-precision-mode). Icon overlay via
-  # runCommand on darwin: no emacs rebuild on nixpkgs bumps, just a cp pass.
+  # (modifiers, pixel-scroll-precision-mode; system dark/light is polled by
+  # auto-dark — upstream NS has no appearance hook, that's an emacs-plus
+  # patch we'd have to apply here at the cost of a local Emacs build). Icon
+  # overlay via runCommand on darwin: no emacs rebuild on nixpkgs bumps, just
+  # a cp pass.
   emacsBase = pkgs.emacs;
 
   # Derive the package set from `use-package` declarations in init.el.

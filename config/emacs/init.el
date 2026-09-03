@@ -114,40 +114,23 @@
     (add-to-list 'custom-theme-load-path themes-dir)
     (add-to-list 'load-path themes-dir))
 
-(defun tf/apply-theme (appearance)
-    "Load the appropriate Flexoki variant for APPEARANCE (`light' or `dark').
-A broken theme file should not abort startup — log and continue."
-    (mapc #'disable-theme custom-enabled-themes)
-    (condition-case err
-        (pcase appearance
-            ('light (load-theme 'flexoki-light t))
-            ('dark  (load-theme 'flexoki-dark t)))
-        (error (message "tf/apply-theme: %s" (error-message-string err)))))
+;; macOS: follow the system appearance. Upstream GNU Emacs has no change
+;; notification for it — `ns-system-appearance-change-functions' is an
+;; emacs-plus patch, never in nixpkgs' NS build — so auto-dark polls via
+;; in-process AppleScript (`ns-do-applescript', 5 s). It uses the hook
+;; automatically if that patch is ever applied in emacs.nix.
+(use-package auto-dark
+    :ensure t
+    :if (eq system-type 'darwin)
+    :custom (auto-dark-themes '((flexoki-dark) (flexoki-light)))
+    :init (auto-dark-mode))
 
-(cond
-    ;; macOS, NS build (Emacs 29+): the system appearance hook hands us
-    ;; `light' or `dark' directly.
-    ((boundp 'ns-system-appearance-change-functions)
-        (add-hook 'ns-system-appearance-change-functions #'tf/apply-theme)
-        (tf/apply-theme ns-system-appearance))
-    ;; macOS, macport build: its own hook + `mac-application-state'.
-    ((and (eq system-type 'darwin) (fboundp 'mac-application-state))
-        (defun tf/mac-appearance ()
-            "Return macOS effective appearance as `light' or `dark'."
-            (let ((a (plist-get (mac-application-state) :appearance)))
-                (if (and a (string-match-p "Dark" a)) 'dark 'light)))
-        (add-hook 'mac-effective-appearance-change-hook
-            (lambda () (tf/apply-theme (tf/mac-appearance))))
-        (tf/apply-theme (tf/mac-appearance)))
-    ;; Linux: noctalia theme if generated (hosts with the noctalia shell),
-    ;; flexoki-dark fallback elsewhere (e.g. trfwsl's headless daemon).
-    ;; themes/ is already on custom-theme-load-path (see above).
-    ((eq system-type 'gnu/linux)
-        (if (file-exists-p (expand-file-name "themes/noctalia-theme.el" user-emacs-directory))
-            (load-theme 'noctalia t)
-            (load-theme 'flexoki-dark t)))
-    ;; Fallback
-    (t (load-theme 'flexoki-dark t)))
+;; Linux: noctalia theme if generated (hosts with the noctalia shell),
+;; flexoki-dark fallback elsewhere (e.g. trfwsl's headless daemon).
+(when (eq system-type 'gnu/linux)
+    (if (file-exists-p (expand-file-name "themes/noctalia-theme.el" user-emacs-directory))
+        (load-theme 'noctalia t)
+        (load-theme 'flexoki-dark t)))
 
 ;; ── Completion ────────────────────────────────────────────────────────
 (use-package vertico
@@ -156,7 +139,8 @@ A broken theme file should not abort startup — log and continue."
 
 ;; Completion UI at the TOP of the frame: on the laptop, hands on the
 ;; keyboard cover the bottom of the display, where the minibuffer lives.
-;; (TTY/daemon frames degrade to the plain minibuffer automatically.)
+;; (Emacs 31 supports child frames on TTYs, so `emacsclient -t' frames get
+;; the popup too — posframe falls back to the minibuffer only where it can't.)
 (use-package vertico-posframe
     :ensure t
     :after vertico
