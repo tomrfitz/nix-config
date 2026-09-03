@@ -149,17 +149,17 @@ For temporary workarounds blocked on upstream changes, use this marker in commen
 
 ### Platform-conditional pattern
 
-When a package needs different sources per platform, use `pkgs.stdenv.isDarwin` in a shared module rather than duplicating across platform modules:
+When a package needs different sources per platform, use `pkgs.stdenv.hostPlatform.isDarwin` in a shared module rather than duplicating across platform modules:
 
 ```nix
 # package = null means "installed outside nix" (e.g., via brew cask on macOS)
-package = lib.mkIf pkgs.stdenv.isDarwin null;
+package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
 ```
 
 For packages that only exist on one platform, use `lib.optionals`:
 
 ```nix
-home.packages = [ ... ] ++ lib.optionals (!pkgs.stdenv.isDarwin) [ pkgs.element-desktop ];
+home.packages = [ ... ] ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ pkgs.element-desktop ];
 ```
 
 ### Secrets

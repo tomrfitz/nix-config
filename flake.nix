@@ -70,6 +70,7 @@
     emacs-overlay = {
       url = "github:nix-community/emacs-overlay";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.nixpkgs-stable.follows = "nixpkgs"; # only upstream's hydraJobs use it
     };
     # Mattpocock's curated skill collection — consumed by pi via
     # modules/shared/home/pi.nix; pi's recursive SKILL.md discovery walks
@@ -307,7 +308,7 @@
                 pkgs.just
                 pkgs.sops
               ]
-              ++ pkgs.lib.optionals pkgs.stdenv.isDarwin [
+              ++ pkgs.lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
                 defaults2nix.packages.${system}.default
               ];
           };

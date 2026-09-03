@@ -7,7 +7,7 @@
   programs.ghostty = {
     enable = true;
     enableZshIntegration = true;
-    package = lib.mkIf pkgs.stdenv.isDarwin null;
+    package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
     settings = {
       theme = "light:Flexoki Light,dark:Flexoki Dark";
       font-size = 12;
