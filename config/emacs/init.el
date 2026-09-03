@@ -28,13 +28,6 @@
     (setq exec-path-from-shell-arguments '("-l"))
     (exec-path-from-shell-initialize))
 
-;; ── macOS modifiers ─────────────────────────────────────────────────
-;; The NS build already maps Cmd→Super, Option→Meta (so M-x = Option-x).
-;; The macport defaulted Cmd→Meta, Option→Alt; this only fires there.
-(when (boundp 'mac-command-modifier)
-    (setq mac-command-modifier 'super
-          mac-option-modifier 'meta))
-
 ;; ── Identity ──────────────────────────────────────────────────────────
 (setq user-full-name "Thomas FitzGerald"
     user-mail-address "tomrfitz@gmail.com")
@@ -45,7 +38,14 @@
 (savehist-mode 1)
 (recentf-mode 1)
 (save-place-mode 1)
-(global-auto-revert-mode 1)
+;; The GUI app is the server (see Server below): a force-quit would drop
+;; both lists, so flush them every 5 min (Emacs 31 options; :set handlers,
+;; hence setopt).
+(setopt recentf-autosave-interval 300
+        save-place-autosave-interval 300)
+;; Emacs 31: revert VCS-tracked files only — reliable after magit operations,
+;; and it stops watching every untracked scratch buffer (newcomers-presets).
+(vc-auto-revert-mode 1)
 (global-so-long-mode 1)
 (global-goto-address-mode 1)
 (winner-mode 1)
@@ -55,6 +55,9 @@
 ;; Code buffers only (purcell/Doom) — org, dired and the agenda stay clean.
 (add-hook 'prog-mode-hook #'display-line-numbers-mode)
 (show-paren-mode 1)
+;; Core's own modern-defaults list (newcomers-presets theme, Emacs 31).
+(context-menu-mode 1)
+(electric-pair-mode 1)
 
 ;; Redirect auto-saves out of working trees (lockfiles/backups disabled
 ;; below). make-directory is required: Emacs does not create the
@@ -64,9 +67,13 @@
   (setq auto-save-file-name-transforms `((".*" ,auto-save-dir t))))
 
 (setq use-short-answers t
-    ;; Cmd-Q / C-x C-c really quit (macport default); confirm, since the
-    ;; GUI app is also the server. recentf/save-place restore context.
+    ;; Cmd-Q / C-x C-c really quit; confirm, since the GUI app is also the
+    ;; server. recentf/save-place restore context.
     confirm-kill-emacs 'y-or-n-p
+    ;; newcomers-presets: don't lose the system clipboard to a kill; yank
+    ;; where point is, not where the mouse is.
+    save-interprogram-paste-before-kill t
+    mouse-yank-at-point t
     create-lockfiles nil
     make-backup-files nil
     custom-file (expand-file-name "custom.el" user-emacs-directory)
@@ -299,9 +306,9 @@
 (global-set-key (kbd "C-c h") #'eglot-inlay-hints-mode)
 
 ;; Subprocess I/O sized for LSP payloads (numpy/torch hovers are large):
-;; 1 MB reads, no adaptive buffering — minimal-emacs.d / Doom-LSP baseline.
-(setq read-process-output-max (* 1024 1024)
-      process-adaptive-read-buffering nil)
+;; 1 MB reads — minimal-emacs.d / Doom-LSP baseline. (Adaptive read
+;; buffering is off by default since Emacs 31.)
+(setq read-process-output-max (* 1024 1024))
 
 ;; Register LSP servers not built into eglot.
 ;; Python: `rass` (the global rassumfrassum multiplexer) fans out to ty + ruff,
@@ -369,16 +376,12 @@
     :ensure nil
     :init (editorconfig-mode 1))
 
-;; Tree-sitter modes. Grammars come from Nix (emacs.nix), so no installer
-;; package: just route the classic modes to their ts twins (the Emacs 29+
-;; built-in remap — all treesit-auto effectively did here). yaml has no
-;; classic mode to remap, so it gets an auto-mode entry instead.
-(setq major-mode-remap-alist
-    '((python-mode . python-ts-mode)
-      (js-json-mode . json-ts-mode)
-      (conf-toml-mode . toml-ts-mode)
-      (sh-mode . bash-ts-mode)))
-(add-to-list 'auto-mode-alist '("\\.ya?ml\\'" . yaml-ts-mode))
+;; Tree-sitter modes. Every built-in ts mode registers itself in
+;; `treesit-major-mode-remap-alist' (Emacs 31); `t' remaps them all into
+;; `major-mode-remap-alist' (yaml-ts-mode adds its own auto-mode entry).
+;; Grammars come from Nix (emacs.nix), so never offer to build one.
+(setopt treesit-enabled-modes t
+        treesit-auto-install-grammar nil)
 
 ;; Fontify at the richest level — adds variables, function-call names,
 ;; operators, brackets, and delimiters (the default 3 leaves these the
@@ -393,6 +396,8 @@
 ;; traceback, M-g M-n jumps to the failing line, `g' re-runs.
 (add-hook 'python-base-mode-hook
     (lambda () (setq-local compile-command "python main.py")))
+;; Follow output until the first error, then stop there (newcomers-presets).
+(setq compilation-scroll-output 'first-error)
 
 ;; ── Org ───────────────────────────────────────────────────────────────
 ;; %(sexp) helper for the assignment template: a titled link for the URL on
@@ -493,7 +498,8 @@
 
 ;; ── Dired ────────────────────────────────────────────────────────────
 (setq delete-by-moving-to-trash t
-      dired-dwim-target t)
+      dired-dwim-target t
+      dired-auto-revert-buffer t)
 (add-hook 'dired-mode-hook #'dired-hide-details-mode)
 
 ;; ── Terminal ──────────────────────────────────────────────────────────
