@@ -114,7 +114,7 @@ modules/
 - WSL GPU / container runtime: `modules/nixos/system/wsl-gpu.nix`
 - Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
 - Configure editors: `modules/shared/home/editors.nix`
-- Browsers: Zen is primary (`modules/shared/home/zen.nix`); extension/policy manifest in `browser-policies.nix` (live on Linux, documentation on darwin where brew apps ignore it); Helium via cask; Safari native; Linux base Firefox in `modules/nixos/home/desktop.nix`.
+- Browsers: Zen is primary (`modules/shared/home/zen.nix`); extension/policy manifest in `browser-policies.nix` (live on both platforms: on darwin home-manager writes the policies to macOS defaults, which the brew cask reads); Helium via cask; Safari native; Linux base Firefox in `modules/nixos/home/desktop.nix`.
 - Git settings (shared): `modules/shared/home/git.nix`
 - Git settings (1Password signing): `modules/darwin/home/git.nix`
 - Fontconfig defaults: `modules/shared/home/fonts.nix`
