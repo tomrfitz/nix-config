@@ -91,6 +91,11 @@
 
 ;; Trackpad: per-pixel smooth scrolling (the macport did this natively).
 (pixel-scroll-precision-mode 1)
+;; No gesture zoom: a stray pinch or Ctrl-wheel text-scales whichever buffer
+;; is under the pointer (the vertico posframe, say) into illegibility.
+;; C-x C-M-= / C-x C-= remain for deliberate scaling.
+(keymap-global-unset "<pinch>")
+(setq mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
 
 ;; Load custom file if it exists (keeps init.el clean)
 (when (file-exists-p custom-file)
