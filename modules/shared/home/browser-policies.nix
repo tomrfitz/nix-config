@@ -1,6 +1,7 @@
-# Shared policies for the Firefox-family browsers home-manager wraps: Zen, and
-# base Firefox on the Linux desktop. On darwin Zen is a brew cask (package =
-# null), so this file is documentation there — extensions ride Firefox Sync.
+# Shared policies for the Firefox-family browsers home-manager configures: Zen
+# everywhere and base Firefox on the Linux desktop. They are live on darwin too:
+# home-manager writes them to macOS defaults (EnterprisePoliciesEnabled), which
+# the brew cask reads — verified with `defaults read app.zen-browser.zen`.
 let
   amo = slug: {
     installation_mode = "normal_installed";
@@ -10,8 +11,8 @@ in
 {
   sharedPolicies = {
     DisableTelemetry = true;
-    # Only nix-wrapped (Linux) builds see this, and they cannot self-update —
-    # leaving updates on just produces failed-update prompts.
+    # nix-wrapped (Linux) builds cannot self-update — leaving updates on just
+    # produces failed-update prompts. zen.nix flips this back off on darwin.
     DisableAppUpdate = true;
     DisableFirefoxStudies = true;
     DisablePocket = true;

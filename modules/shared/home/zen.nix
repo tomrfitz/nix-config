@@ -12,7 +12,11 @@ in
   programs.zen-browser = {
     enable = true;
     package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
-    policies = sharedPolicies;
+    # The policies are live on darwin too: home-manager writes them to macOS
+    # defaults (EnterprisePoliciesEnabled) even with package = null. The brew
+    # cask is never upgraded by activation, so leave Zen's own updater on there.
+    policies =
+      sharedPolicies // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin { DisableAppUpdate = false; };
     nativeMessagingHosts = [ pkgs._1password-gui ];
 
     profiles.default = {
@@ -524,7 +528,7 @@ in
   # which causes Zen to loop on "Changes not saved". Replace the symlink with a
   # mutable copy after link generation so Zen can update it freely.
   # macOS only: the path is the macOS profile dir, and on Linux the nix-wrapped
-  # Zen uses ~/.zen. `run` keeps the copy honest under `--dry-run`.
+  # Zen uses $XDG_CONFIG_HOME/zen. `run` keeps the copy honest under `--dry-run`.
   home.activation.makeZenProfilesMutable = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
     lib.hm.dag.entryAfter [ "linkGeneration" ] ''
       zenProfiles="${config.home.homeDirectory}/Library/Application Support/zen/profiles.ini"
