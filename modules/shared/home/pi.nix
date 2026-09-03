@@ -1,5 +1,6 @@
-# pi (earendil-works) coding agent — wires npm community packages and the repo-local resource
-# bundle into pi's expected directories.
+# pi (earendil-works) coding agent — nixpkgs' pi-coding-agent through home-manager's
+# programs.pi-coding-agent, plus the npm community packages and the repo-local resource
+# bundle wired into pi's expected directories. Configured on every host.
 #
 # Three integration paths, owning separate lanes:
 #   - **npm community packages**: installed via `pi install npm:<pkg>` on activation. Pi tracks
@@ -12,30 +13,26 @@
 #     `git checkout`. A rebuild is only required when the wiring itself changes (e.g. adding
 #     a new top-level skill folder). Lifecycle is nix's.
 #   - **Third-party skills** (mattpocock/skills): consumed via the `mattpocock-skills` flake
-#     input, symlinked into ~/.pi/agent/skills/mattpocock/. Pi walks SKILL.md recursively so
-#     the whole upstream catalog (engineering/, productivity/, etc.) is exposed. Updates land
-#     via `nix flake update'; the lockfile pins the version.
+#     input — only the skills upstream promotes in its plugin manifest, each symlinked into
+#     ~/.pi/agent/skills/mattpocock/<name>/ (its draft and deprecated dirs stay out, as the
+#     upstream ADR intends). Updates land with the lock bump.
 #
-# ~/.pi/agent/settings.json is left unmanaged (pi writes its own runtime state). Global
-# instructions (~/.pi/agent/AGENTS.md) are wired with the other agents in default.nix.
+# ~/.pi/agent/settings.json is left unmanaged (pi writes its own runtime state; the module
+# only writes it when `settings` is non-empty). Global instructions (~/.pi/agent/AGENTS.md)
+# come from the module's `context`, the same file the other agents get.
 #
 # npm installs are guarded idempotently: skip if already in the registry, warn + retry next
 # rebuild on failure, bounded by timeout.
-#
-# Darwin-only: pi is only used interactively on the daily driver, and this keeps npm/CLI steps
-# out of the headless trfwsl rebuild pipeline.
 {
   config,
   lib,
   pkgs,
-  isDarwin,
   mattpocock-skills,
   ...
 }:
 let
   jq = lib.getExe pkgs.jq;
   timeout = "${pkgs.coreutils}/bin/timeout";
-  piExe = "${pkgs.llm-agents.pi}/bin/pi";
 
   # Community packages installed into ~/.pi/agent/npm/ and tracked in settings.json.
   piPackages = [
@@ -47,10 +44,12 @@ let
     "@juicesharp/rpiv-btw" # /btw side-conversation channel — ephemeral side questions without polluting the main session
   ];
 
+  # Runs the unwrapped package with npm on PATH: activation must not depend on
+  # the wrapped profile binary already being linked.
   installPkg = pkg: ''
     if ! ${jq} -e '(.packages // []) | map(if type == "string" then . else (.source // "") end) | any(test("${pkg}"))' \
          "$HOME/.pi/agent/settings.json" >/dev/null 2>&1; then
-      run env PATH="${pkgs.nodejs}/bin:$PATH" ${timeout} 180 ${piExe} install npm:${pkg} \
+      run env PATH="${pkgs.nodejs}/bin:$PATH" ${timeout} 180 ${pkgs.pi-coding-agent}/bin/pi install npm:${pkg} \
         || echo "pi: 'pi install ${pkg}' failed — will retry next rebuild" >&2
     fi
   '';
@@ -60,19 +59,32 @@ let
   # the `nix-config` segment here (or factor it out into a shared binding / env var).
   piRes = "${config.home.homeDirectory}/nix-config/pi-resources";
   link = path: config.lib.file.mkOutOfStoreSymlink "${piRes}/${path}";
+
+  # Upstream's promoted skills, read from its plugin manifest so renames track.
+  promoted = (lib.importJSON "${mattpocock-skills}/.claude-plugin/plugin.json").skills;
+  promotedLinks = lib.listToAttrs (
+    map (
+      p:
+      lib.nameValuePair ".pi/agent/skills/mattpocock/${baseNameOf p}" {
+        source = "${mattpocock-skills}/${lib.removePrefix "./" p}";
+      }
+    ) promoted
+  );
 in
 {
-  home.activation = lib.mkIf isDarwin {
-    installPiPackages = lib.hm.dag.entryAfter [ "writeBoundary" ] (
-      lib.concatStringsSep "\n" (map installPkg piPackages)
-    );
+  programs.pi-coding-agent = {
+    enable = true;
+    context = ../../../config/agents.md;
+    extraPackages = [ pkgs.nodejs ]; # `pi install npm:` needs npm on pi's PATH
   };
 
-  home.file = lib.mkIf isDarwin {
+  home.activation.installPiPackages = lib.hm.dag.entryAfter [ "writeBoundary" ] (
+    lib.concatStringsSep "\n" (map installPkg piPackages)
+  );
+
+  home.file = {
     ".pi/agent/skills/obsidian-vault".source = link "skills/obsidian-vault";
-    # Third-party skills from the flake input — not vendored. Pi walks
-    # SKILL.md recursively so the whole upstream tree is exposed.
-    ".pi/agent/skills/mattpocock".source = "${mattpocock-skills}/skills";
     ".pi/agent/prompts/simplify.md".source = link "prompts/simplify.md";
-  };
+  }
+  // promotedLinks;
 }

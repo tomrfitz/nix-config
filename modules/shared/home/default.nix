@@ -1,4 +1,4 @@
-{ config, ... }:
+{ config, lib, ... }:
 {
   imports = [
     ./packages.nix
@@ -121,9 +121,12 @@
   # ── Agent instructions (each tool looks for instructions at a different path) ──
   xdg.configFile."AGENTS.md".source = ../../../config/agents.md; # generic / Gemini
   xdg.configFile."opencode/AGENTS.md".source = ../../../config/agents.md; # OpenCode
-  home.file.".claude/CLAUDE.md".source = ../../../config/agents.md; # Claude Code
-  home.file.".claude/settings.json".source = ../../../config/claude-settings.json;
-  home.file.".pi/agent/AGENTS.md".source = ../../../config/agents.md; # pi (earendil-works); settings.json left writable (pi owns its state)
+  # Claude Code and pi get theirs through their home-manager modules (pi: pi.nix).
+  programs.claude-code = {
+    enable = true;
+    settings = lib.importJSON ../../../config/claude-settings.json;
+    context = ../../../config/agents.md;
+  };
 
   # ── Templates ──────────────────────────────────────────────────────────
   xdg.configFile."nix/flake-template.nix".source = ../../../config/flake-template.nix;

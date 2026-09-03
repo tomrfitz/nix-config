@@ -1,6 +1,6 @@
 # pi-resources
 
-Author-owned [pi](https://github.com/earendil-works/pi) skills and prompt templates managed declaratively in this repo. Wired into `~/.pi/agent/{skills,prompts}/` via out-of-store symlinks declared in `modules/shared/home/pi.nix` (darwin-only).
+Author-owned [pi](https://github.com/earendil-works/pi) skills and prompt templates managed declaratively in this repo. Wired into `~/.pi/agent/{skills,prompts}/` via out-of-store symlinks declared in `modules/shared/home/pi.nix`.
 
 Pi reads through the symlinks live — edits here take effect on the next pi restart with no rebuild needed. Reverts are `git checkout pi-resources/...`. A rebuild is only required when the wiring itself changes (e.g. adding a new top-level skill folder requires a new `home.file` entry in `pi.nix`).
 
@@ -23,6 +23,6 @@ Skill discovery follows pi's auto-discovery rule for `~/.pi/agent/skills/`: ever
 
 ## Third-party skills (not vendored)
 
-`mattpocock/skills` is consumed via the `mattpocock-skills` flake input declared in `flake.nix`, **not** vendored into this repo. `modules/shared/home/pi.nix` symlinks the upstream `skills/` tree to `~/.pi/agent/skills/mattpocock/`; pi's recursive `SKILL.md` discovery exposes the full upstream catalog (`engineering/`, `productivity/`, `personal/`, `misc/`, `in-progress/`).
+`mattpocock/skills` is consumed via the `mattpocock-skills` flake input declared in `flake.nix`, **not** vendored into this repo. `modules/shared/home/pi.nix` symlinks only the skills upstream promotes in its plugin manifest (`.claude-plugin/plugin.json`) to `~/.pi/agent/skills/mattpocock/<name>/`; its draft, deprecated and misc directories stay out, as upstream intends, and renames track automatically.
 
 Updates land via `nix flake update`; `flake.lock` pins the commit. License (MIT) is upstream at <https://github.com/mattpocock/skills/blob/main/LICENSE>.
