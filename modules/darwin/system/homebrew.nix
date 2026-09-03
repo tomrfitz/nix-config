@@ -16,7 +16,6 @@ _: {
     casks = [
       # browsers
       "arc"
-      "firefox@nightly"
       "google-chrome@canary"
       "helium-browser"
       "orion"
