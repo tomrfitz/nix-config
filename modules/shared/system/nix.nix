@@ -11,6 +11,10 @@
   nix.package = pkgs.lixPackageSets.stable.lix.overrideAttrs {
     doInstallCheck = pkgs.stdenv.hostPlatform.isLinux;
   };
+  # Flakes only: no channels, so no dead channels entry on the Nix search path
+  # (impure evaluations warned that root's channels profile does not exist).
+  nix.channel.enable = false;
+
   nix.settings = {
     experimental-features = [
       "nix-command"
