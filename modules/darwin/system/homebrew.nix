@@ -52,7 +52,7 @@ _: {
       "tailscale-app"
       "netnewswire"
       "ollama-app"
-      "onyx@beta"
+      "onyx" # the @beta cask requires macOS 27
       "oversight"
       "pearcleaner"
       "pika"
