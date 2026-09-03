@@ -29,10 +29,6 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.home-manager.follows = "home-manager";
     };
-    noctalia = {
-      url = "github:noctalia-dev/noctalia";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
     sops-nix = {
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -87,7 +83,6 @@
       treefmt-nix,
       nixos-wsl,
       zen-browser,
-      noctalia,
       sops-nix,
       disko,
       nix-topology,
@@ -221,7 +216,6 @@
             ./modules/shared/home
             ./modules/shared/home/desktop.nix
             ./modules/nixos/home/desktop.nix
-            noctalia.homeModules.default
           ];
         };
         trfwsl = {

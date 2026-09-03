@@ -291,6 +291,8 @@ in
   };
 
   # ── Noctalia (desktop shell + theming engine) ────────────────────────
+  # nixpkgs' package through home-manager's programs.noctalia (the flake
+  # input only tracked HEAD; its module was option-for-option the same).
   # v5: config.toml holds the declarative defaults; runtime tweaks persist
   # separately in $XDG_STATE_HOME/noctalia/settings.toml and win on merge.
   # v4→v5 regressions (no v5 equivalent yet): tailscale bar plugin (v5
@@ -306,6 +308,7 @@ in
       shell = {
         font_family = "Atkinson Hyperlegible Next";
         setup_wizard_enabled = false;
+        launch_apps_as_systemd_services = true; # recommended alongside systemd.enable
       };
 
       theme = {
@@ -370,7 +373,7 @@ in
       widget = {
         clock.format = "{:%H:%M %a, %b %d}";
         workspaces = {
-          display = "id";
+          label_source = "id";
           hide_when_empty = false;
         };
       };
