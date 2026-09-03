@@ -1,26 +1,13 @@
+{ pkgs, ... }:
 {
-  pkgs,
-  config,
-  ...
-}:
-{
-  # XDG user directories — Linux only (macOS manages these natively)
+  # XDG user directories — Linux only (macOS manages these natively).
+  # All paths use home-manager defaults, which match the freedesktop spec
+  # (xdg-user-dirs 0.20+, including the new Projects directory).
   xdg.userDirs = {
     enable = !pkgs.stdenv.isDarwin;
     createDirectories = true;
-    setSessionVariables = false;
-
-    desktop = "${config.home.homeDirectory}/Desktop";
-    documents = "${config.home.homeDirectory}/Documents";
-    download = "${config.home.homeDirectory}/Downloads";
-    music = "${config.home.homeDirectory}/Music";
-    pictures = "${config.home.homeDirectory}/Pictures";
-    publicShare = "${config.home.homeDirectory}/Public";
-    templates = "${config.home.homeDirectory}/Templates";
-    videos = "${config.home.homeDirectory}/Videos";
-
-    extraConfig = {
-      DEVELOPER = "${config.home.homeDirectory}/Developer";
-    };
+    # Export XDG_*_DIR into the shell env so tools that consult env vars
+    # (rather than reading user-dirs.dirs directly) see the paths.
+    setSessionVariables = true;
   };
 }

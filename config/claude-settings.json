@@ -1,7 +1,10 @@
 {
     "model": "opus",
-    "enabledPlugins": {
-        "github@claude-plugins-official": true
+    "permissions": {
+        "defaultMode": "auto"
+    },
+    "env": {
+        "DISABLE_AUTOUPDATER": "1"
     },
     "syntaxHighlightingDisabled": false,
     "effortLevel": "medium"

@@ -1,6 +1,6 @@
 # Global AGENTS.md
 
-Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md`, `~/.claude/CLAUDE.md`, and `~/.config/opencode/AGENTS.md` by home-manager.
+Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md`, `~/.claude/CLAUDE.md`, `~/.config/opencode/AGENTS.md`, and `~/.pi/agent/AGENTS.md` by home-manager.
 
 ## Principles
 
@@ -71,8 +71,11 @@ Code should work for its author first, be maintainable and accessible to them ov
   ---
   date created: 2025-09-21, 18:42:24
   date modified: 2025-09-21, 18:42:48
+  author: <agent-name>  # ONLY when written by an agent; omit for user's own notes
   ---
   ```
+
+  The optional `author` field flags agent-authored notes so they're easy to distinguish from the user's own. Pick a stable, self-chosen name (e.g. the model id or a project-specific persona) and keep using it consistently. Omit the field entirely when the user is the author.
 
   Use `[[wikilinks]]` for internal references.
 - The user values long-term collaboration patterns over per-session efficiency — leave good context for next time

@@ -3,16 +3,25 @@
   projectRootFile = "flake.nix";
 
   programs.nixfmt.enable = true;
+  # shfmt reads indent/simplify from config/editorconfig (root symlink), the
+  # same source Zed and the global dprint fallback use; flags would override it.
   programs.shfmt = {
     enable = true;
-    indent_size = 4;
+    useEditorConfig = true;
   };
   programs.just.enable = true;
   programs.statix.enable = true;
+  # Lint, not format: fails fmt-check on shellcheck warnings and errors.
+  programs.shellcheck = {
+    enable = true;
+    severity = "warning";
+  };
 
-  # dprint formats md/json/yaml/toml and (importantly) code blocks embedded in
-  # markdown via the same plugins. Plugins come from nixpkgs so this stays
-  # sandbox-safe (no plugin URL fetches at format/eval time).
+  # dprint formats md/json/yaml/toml and (importantly) dispatches code blocks
+  # embedded in markdown to the matching WASM plugin. Plugins come from
+  # nixpkgs so this stays sandbox-safe (no plugin URL fetches at format/eval
+  # time). The plugin selector is shared with modules/shared/home/dprint.nix
+  # via config/dprint-plugins.nix.
   # Plugin docs: https://dprint.dev/plugins/
   programs.dprint = {
     enable = true;
@@ -36,19 +45,13 @@
     ];
     settings = {
       lineWidth = 80;
-      plugins = pkgs.dprint-plugins.getPluginList (
-        plugins: with plugins; [
-          dprint-plugin-markdown
-          dprint-plugin-json
-          dprint-plugin-toml
-          g-plane-pretty_yaml
-        ]
-      );
-      # dprint plugin defaults: json=2, toml=2, yaml(pretty_yaml)=2,
-      # markdown lineWidth=80 + emphasis/list defaults are fine as-is.
-      # Only override json+toml indent to match the rest of the repo's 4-space style.
+      # 4-space indent across all formats; per-plugin defaults are 2, so set
+      # both at the top level and individually for the ones we care about most.
+      indentWidth = 4;
+      plugins = pkgs.dprint-plugins.getPluginList (import ./config/dprint-plugins.nix);
       json.indentWidth = 4;
       toml.indentWidth = 4;
+      typescript.quoteStyle = "preferDouble";
     };
   };
   # markdownlint-cli2 stays as an advisory linter (no --fix) for rules dprint

@@ -1,4 +1,5 @@
 {
+  config,
   pkgs,
   lib,
   ...
@@ -254,11 +255,10 @@
         "Shell Script" = {
           formatter.external = {
             command = "shfmt";
+            # Indent and simplify come from .editorconfig (found via --filename).
             arguments = [
               "--filename"
               "{buffer_path}"
-              "--indent"
-              "4"
             ];
           };
         };
@@ -277,11 +277,12 @@
         SQL = {
           formatter.external = {
             command = "sql-formatter";
+            # Same style file dprint's exec plugin uses (written by dprint.nix).
             arguments = [
               "--language"
               "transactsql"
-              "-c"
-              ''{"tabWidth":4,"keywordCase":"upper","dataTypeCase":"upper","functionCase":"upper"}''
+              "--config"
+              "${config.xdg.configHome}/sql-formatter/config.json"
             ];
           };
         };

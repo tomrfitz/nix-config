@@ -5,6 +5,9 @@
 }:
 {
   nixpkgs.config.allowUnfree = true;
+  # REVISIT(upstream): drop the doInstallCheck override on macOS once lix#1101
+  # (fork safety on macOS Sequoia/Tahoe) lands — retargeted to milestone 2.97.
+  # ref: https://git.lix.systems/lix-project/lix/issues/1101; checked: 2026-08-26
   nix.package = pkgs.lixPackageSets.stable.lix.overrideAttrs {
     doInstallCheck = pkgs.stdenv.hostPlatform.isLinux;
   };
@@ -13,7 +16,9 @@
       "nix-command"
       "flakes"
     ];
-    accept-flake-config = true;
+    # Keep ~/.nix-defexpr, ~/.nix-profile, ~/.nix-channels out of $HOME;
+    # relocate to ~/.local/state/nix per XDG Base Directory spec.
+    use-xdg-base-directories = true;
     # Trigger GC mid-build if free space drops below 25 GB, stop at 50 GB
     min-free = 26843545600;
     max-free = 53687091200;
