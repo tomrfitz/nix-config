@@ -4,13 +4,17 @@ host := `hostname`
 nh_cmd := if host == "trfmbp" { "darwin" } else { "os" }
 system := if host == "trfmbp" { "aarch64-darwin" } else { "x86_64-linux" }
 
+# nh derives the target from macOS's LocalHostName, which the OS silently
+# renames on a network clash (seen: trfmbp-2) — pass the flake host explicitly.
+nh_host := "-H " + host
+
 # Apply the current configuration
 rebuild:
-    nh {{ nh_cmd }} switch
+    nh {{ nh_cmd }} switch {{ nh_host }}
 
 # Build the system closure without activating (local working tree, keep-going)
 check:
-    nh {{ nh_cmd }} build --flake . -- --keep-going
+    nh {{ nh_cmd }} build . {{ nh_host }} --keep-going
 
 # Garbage collect old generations and unreferenced store paths
 clean:
@@ -31,7 +35,7 @@ rollback:
 
 # Update flake inputs and rebuild
 update:
-    nh {{ nh_cmd }} switch --update
+    nh {{ nh_cmd }} switch {{ nh_host }} --update
 
 # Format all files (nix, toml, shell, json, md, yaml, justfile)
 fmt:
