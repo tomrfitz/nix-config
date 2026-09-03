@@ -45,9 +45,11 @@
       gnutar
       gnugrep
       gawk
+      aria2 # xcodes uses it for parallel downloads
       pandoc
       tldr
       witr
+      termdown
       streamlink # launched by Chatterino ("open in streamlink", player = IINA), never from a shell
 
     ]

@@ -12,6 +12,7 @@ _: {
     casks = [
       # browsers
       "helium-browser"
+      "orion" # Kagi's browser — paying member, keeping an eye on it
       "zen@twilight"
 
       # dev tools
@@ -19,6 +20,8 @@ _: {
       "xcodes-app"
       # communication
       "element"
+      "signal"
+      "wechat"
       "zoom"
 
       # productivity
@@ -28,6 +31,7 @@ _: {
       # media
       "musicbrainz-picard"
       "plex"
+      "plex-htpc" # sometimes the better ultrawide player
 
       # utilities
       "1password"
@@ -48,6 +52,8 @@ _: {
       "tailscale-app"
       "netnewswire"
       "ollama-app"
+      "onyx@beta"
+      "oversight"
       "pearcleaner"
       "pika"
       "shottr"
@@ -61,6 +67,7 @@ _: {
       "steam"
 
       # science / education
+      "calibre"
       "zotero"
 
       # system / network
@@ -71,6 +78,9 @@ _: {
       # "pear" — moved to nix (pear-desktop in shared/home/desktop.nix)
       "sf-symbols"
       "tabtab"
+
+      # misc
+      "handy"
 
       # fonts (not in nixpkgs — Apple proprietary)
       "font-sf-mono"
