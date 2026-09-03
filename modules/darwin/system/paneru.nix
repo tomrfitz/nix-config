@@ -1,4 +1,18 @@
 {
+  config,
+  lib,
+  user,
+  ...
+}:
+{
+  # paneru's module logs to /tmp, which macOS empties at boot — so the one
+  # time the log mattered (the 2026-09-03 input freeze that ended in a forced
+  # restart) it was gone. Keep it under ~/Library/Logs instead.
+  launchd.user.agents.paneru.serviceConfig = {
+    StandardOutPath = lib.mkForce "${config.users.users.${user}.home}/Library/Logs/paneru.log";
+    StandardErrorPath = lib.mkForce "${config.users.users.${user}.home}/Library/Logs/paneru.err.log";
+  };
+
   services.paneru = {
     enable = true;
     settings = {
