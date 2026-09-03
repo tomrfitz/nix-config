@@ -33,13 +33,13 @@ let name = "hello";
 var old = true;
 
 // Import/export (red)
-import { useState } from 'react';
+import { useState } from "react";
 export default App;
-import * as fs from 'fs';
+import * as fs from "fs";
 
 // Functions (orange)
 function greet(name) {
-  return `Hello, ${name}!`;  // template literal, ${} magenta
+    return `Hello, ${name}!`; // template literal, ${} magenta
 }
 const arrow = (x) => x * 2;
 console.log(greet("world"));
@@ -77,37 +77,37 @@ const escaped = "line1\nline2\ttab";
 ```typescript
 // TypeScript type annotations (yellow)
 interface User {
-  name: string;
-  age: number;
-  active: boolean;
+    name: string;
+    age: number;
+    active: boolean;
 }
 
 type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 
 class Service implements User {
-  private name: string;
-  public age: number;
-  readonly active: boolean = true;
+    private name: string;
+    public age: number;
+    readonly active: boolean = true;
 
-  constructor(name: string) {
-    this.name = name;  // this = magenta
-  }
+    constructor(name: string) {
+        this.name = name; // this = magenta
+    }
 
-  async fetch(): Promise<User[]> {
-    return [];
-  }
+    async fetch(): Promise<User[]> {
+        return [];
+    }
 }
 
 // Decorators (magenta)
-@Component({ selector: 'app' })
+@Component({ selector: "app" })
 class AppComponent {}
 
 // Enum
 enum Direction {
-  Up,
-  Down,
-  Left,
-  Right,
+    Up,
+    Down,
+    Left,
+    Right,
 }
 ```
 
@@ -122,24 +122,27 @@ import os
 from pathlib import Path
 from typing import Optional, List
 
+
 # Functions (orange)
 def greet(name: str) -> str:
     """Docstring should be tx-3 italic (doc-comment scope, same color as regular comments)"""
     return f"Hello, {name}!"  # f-string interpolation
 
+
 # Class
 class User:
     def __init__(self, name: str, age: int = 0):
-        self.name = name   # self = magenta
+        self.name = name  # self = magenta
         self.age = age
 
-    @staticmethod       # decorator = magenta
+    @staticmethod  # decorator = magenta
     def create(name: str) -> "User":
         return User(name)
 
     @property
     def display(self) -> str:
         return f"{self.name} ({self.age})"
+
 
 # Booleans/None (magenta)
 flag = True
@@ -151,9 +154,11 @@ pi = 3.14159
 count = 42
 big = 1_000_000
 
+
 # Type hints (should be yellow via support.type)
 def process(items: List[str], count: Optional[int] = None) -> bool:
     pass
+
 
 # Lambda
 fn = lambda x, y: x + y
@@ -358,44 +363,44 @@ WHERE id = 42;
 /* Comment (tx-3) */
 
 /* Selectors (yellow) */
-.container { }
-#main { }
-.btn:hover { }
-.btn::after { }
+.container {}
+#main {}
+.btn:hover {}
+.btn::after {}
 
 /* Properties (blue), values (orange), units (purple) */
 .card {
-  display: flex;
-  flex-direction: column;
-  padding: 16px;
-  margin: 0 auto;
-  max-width: 800px;
-  font-size: 1.125rem;
-  line-height: 1.5;
-  color: #333;
-  background-color: rgba(255, 255, 255, 0.95);
-  border: 1px solid transparent;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  transition: transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    padding: 16px;
+    margin: 0 auto;
+    max-width: 800px;
+    font-size: 1.125rem;
+    line-height: 1.5;
+    color: #333;
+    background-color: rgba(255, 255, 255, 0.95);
+    border: 1px solid transparent;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
 }
 
 /* Media query */
 @media (max-width: 768px) {
-  .card {
-    padding: 8px;
-  }
+    .card {
+        padding: 8px;
+    }
 }
 
 /* Custom properties */
 :root {
-  --color-primary: #205EA6;
-  --spacing-md: 16px;
+    --color-primary: #205ea6;
+    --spacing-md: 16px;
 }
 
 /* Important */
 .override {
-  color: red !important;
+    color: red !important;
 }
 ```
 
@@ -473,27 +478,27 @@ name: flexoki-theme
 version: 0.1.0
 
 services:
-  web:
-    image: nginx:latest
-    ports:
-      - "80:80"
-      - "443:443"
-    environment:
-      NODE_ENV: production
-      DEBUG: "false"
-      MAX_CONNECTIONS: 100
-    volumes:
-      - ./data:/app/data
-    deploy:
-      replicas: 3
-      restart_policy:
-        condition: on-failure
+    web:
+        image: nginx:latest
+        ports:
+            - "80:80"
+            - "443:443"
+        environment:
+            NODE_ENV: production
+            DEBUG: "false"
+            MAX_CONNECTIONS: 100
+        volumes:
+            - ./data:/app/data
+        deploy:
+            replicas: 3
+            restart_policy:
+                condition: on-failure
 
-  db:
-    image: postgres:15
-    environment:
-      POSTGRES_PASSWORD: secret
-      POSTGRES_DB: myapp
+    db:
+        image: postgres:15
+        environment:
+            POSTGRES_PASSWORD: secret
+            POSTGRES_DB: myapp
 ```
 
 ## TOML
@@ -572,16 +577,18 @@ path = "src/main.rs"
 ```xml
 <?xml version="1.0" encoding="UTF-8"?>
 <configuration>
-  <appSettings>
-    <add key="ApiUrl" value="https://api.example.com" />
-    <add key="MaxRetries" value="3" />
-    <add key="Enabled" value="true" />
-  </appSettings>
-  <connectionStrings>
-    <add name="Default"
-         connectionString="Server=localhost;Database=mydb"
-         providerName="System.Data.SqlClient" />
-  </connectionStrings>
-  <!-- Comment -->
+    <appSettings>
+        <add key="ApiUrl" value="https://api.example.com" />
+        <add key="MaxRetries" value="3" />
+        <add key="Enabled" value="true" />
+    </appSettings>
+    <connectionStrings>
+        <add
+            name="Default"
+            connectionString="Server=localhost;Database=mydb"
+            providerName="System.Data.SqlClient"
+        />
+    </connectionStrings>
+    <!-- Comment -->
 </configuration>
 ```

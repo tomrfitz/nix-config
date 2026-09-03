@@ -1,4 +1,4 @@
-{ ... }:
+{ config, ... }:
 {
   imports = [
     ./packages.nix
@@ -10,14 +10,19 @@
     ./fonts.nix
     ./notes.nix
     ./ruff.nix
+    ./dprint.nix
     ./opencode.nix
+    ./pi.nix
     ./xdg-dirs.nix
+    ./xdg-compliance.nix
     ./1password-ssh.nix
   ];
 
   home.stateVersion = "24.11";
 
   xdg.enable = true;
+  # Ask HM modules to prefer XDG paths over $HOME for their own state/config.
+  home.preferXdgDirectories = true;
 
   # ── Session environment ────────────────────────────────────────────────
   home.sessionVariables = {
@@ -101,18 +106,14 @@
   programs.ssh = {
     enable = true;
     enableDefaultConfig = false;
-    matchBlocks = {
-      "*".extraOptions = {
-        AddKeysToAgent = "yes";
-      };
-      "github.com".extraOptions = {
+    settings = {
+      "*".AddKeysToAgent = "yes";
+      "github.com" = {
         ControlMaster = "auto";
         ControlPath = "~/.ssh/sockets/%r@%h-%p";
         ControlPersist = "3600";
       };
-      "trfnix trfwsl trflab" = {
-        forwardAgent = true;
-      };
+      "trfnix trfwsl trflab".ForwardAgent = true;
     };
   };
 
@@ -124,6 +125,7 @@
   xdg.configFile."opencode/AGENTS.md".source = ../../../config/agents.md; # OpenCode
   home.file.".claude/CLAUDE.md".source = ../../../config/agents.md; # Claude Code
   home.file.".claude/settings.json".source = ../../../config/claude-settings.json;
+  home.file.".pi/agent/AGENTS.md".source = ../../../config/agents.md; # pi (earendil-works); settings.json left writable (pi owns its state)
 
   # ── Templates ──────────────────────────────────────────────────────────
   xdg.configFile."nix/flake-template.nix".source = ../../../config/flake-template.nix;
@@ -131,42 +133,15 @@
   # ── Dotfiles managed via config/ ────────────────────────────────────────
   home.file.".clang-format".source = ../../../config/clang-format;
 
+  # Deliberately a file, not HM's `editorconfig.settings`: the repo-root
+  # symlink to config/editorconfig is what shfmt's useEditorConfig reads in
+  # treefmt/CI, where no ~/.editorconfig exists.
   home.file.".editorconfig".source = ../../../config/editorconfig;
   home.file.".hushlogin".text = "";
 
-  # markdownlint-cli2 config (shared by Zed ext, obsidian-markdownlint, CLI)
-  home.file.".markdownlint-cli2.jsonc".text = builtins.toJSON {
-    config = {
-      MD009 = true;
-      MD012 = true;
-      MD022 = true;
-      MD023 = true;
-      MD026 = {
-        punctuation = ".,;:!";
-      };
-      MD029 = {
-        style = "ordered";
-      };
-      MD030 = true;
-      MD031 = true;
-      MD034 = true;
-      MD047 = true;
-      MD049 = {
-        style = "consistent";
-      };
-      MD050 = {
-        style = "consistent";
-      };
-
-      # Relaxations for Obsidian compatibility
-      MD013 = false;
-      MD024 = {
-        siblings_only = true;
-      };
-      MD025 = false;
-      MD033 = false;
-    };
-  };
+  # markdownlint-cli2 config (shared by Zed ext, obsidian-markdownlint, CLI):
+  # the repo-root file is the single source; treefmt reads it in place.
+  home.file.".markdownlint-cli2.jsonc".source = ../../../.markdownlint-cli2.jsonc;
 
   programs.home-manager.enable = true;
 
@@ -189,7 +164,7 @@
       git = {
         max_concurrency = 2;
         repos = [
-          "~/Developer/*"
+          "${config.xdg.userDirs.projects}/*"
         ];
       };
     };

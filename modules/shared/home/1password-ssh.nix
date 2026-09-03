@@ -31,9 +31,7 @@ in
   # On plain NixOS, omit IdentityAgent so SSH falls back to SSH_AUTH_SOCK —
   # this preserves forwarded agents from SSH sessions while defaulting to
   # 1Password locally (via zsh envExtra).
-  programs.ssh.matchBlocks."*".extraOptions = lib.mkIf (isDarwin || isWSL) {
-    IdentityAgent = identityAgent;
-  };
+  programs.ssh.settings."*".IdentityAgent = lib.mkIf (isDarwin || isWSL) identityAgent;
 
   # macOS doesn't have a declarative system-level authorized_keys module,
   # so keep it in HM.
