@@ -60,20 +60,6 @@ eval-all:
     nix eval .#nixosConfigurations.trfnix.config.system.build.toplevel.drvPath --raw
     nix eval .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath --raw
 
-# Build rendered topology diagrams for the current architecture
-topology:
-    nix build path:.#topology.{{ system }}.config.output
-
-# Build the generated disko script for trfnix
-[linux]
-disko-trfnix-script:
-    nix build path:.#nixosConfigurations.trfnix.config.system.build.diskoScript
-
-# Dry-run disko for trfnix (prints script path, does not execute)
-[linux]
-disko-trfnix-dry-run:
-    nix run github:nix-community/disko -- --mode destroy,format,mount --dry-run --flake path:.#trfnix
-
 # Regenerate trfnix facter report
 [linux]
 facter-trfnix:
@@ -82,7 +68,7 @@ facter-trfnix:
 # Take a macOS defaults snapshot
 [macos]
 snapshot name:
-    nix develop --command ./scripts/snapshot-defaults.sh snapshot {{ name }}
+    ./scripts/snapshot-defaults.sh snapshot {{ name }}
 
 # Diff two macOS defaults snapshots
 [macos]
