@@ -30,6 +30,12 @@
         nrsr = "${nh} switch --refresh";
         nrsl = "${nh} switch ~/nix-config";
         nrb = "${nh} build";
+        # Upgrade everything: switch from the remote flake, then what nix does not
+        # own — on macOS the casks (greedy: self-updating ones too) and App Store
+        # apps. Activation itself never upgrades casks, by design.
+        nru =
+          "${nh} switch --refresh"
+          + lib.optionalString pkgs.stdenv.hostPlatform.isDarwin " && brew update && brew upgrade --greedy && mas upgrade";
 
         # 1Password CLI helpers
         oprun = "op run --";

@@ -68,7 +68,7 @@ All decided 2026-09-03: disko and nix-topology dropped (re-add from their templa
 ## Deferred (trigger → action)
 
 - **Lock bumps** → nothing pending. (kagi.nix was deleted in commit 3 on 2026-09-03; it lives in git history, and `programs.mcp` would be the way back.)
-- **Winter break** → probable-tier cuts: helix (+ its theme TOMLs), `ruff.nix` (language tooling belongs in project flakes), `vesktop.nix` (+ audacity/pear-desktop; chatterino2 stays — used sometimes, per user 2026-09-03), topgrade, dix + `just diff`, the font hoard (keep Atkinson + symbols/emoji/CJK/pretendard), stale casks (daisydisk, pearcleaner, loop, netnewswire, element, sf-symbols, zoom, one of xcodes-app/xcodes, KakaoTalk, RapidClick), rarely-used packages (yazi, mcrcon, nix-init, pandoc, tldr, witr, lazygit, htop). Then the no-rename structure wins: split the 200-line `shared/home/default.nix`, merge darwin git/zsh/topgrade into shared via `isDarwin`, colocate `config/` assets with their modules, devShell → `shell.nix`.
+- **Winter break** → probable-tier cuts: helix (+ its theme TOMLs), `ruff.nix` (language tooling belongs in project flakes), `vesktop.nix` (+ audacity/pear-desktop; chatterino2 stays — used sometimes, per user 2026-09-03), dix + `just diff`, the font hoard (keep Atkinson + symbols/emoji/CJK/pretendard), stale casks (daisydisk, pearcleaner, loop, netnewswire, element, sf-symbols, zoom, one of xcodes-app/xcodes, KakaoTalk, RapidClick), rarely-used packages (yazi, mcrcon, nix-init, pandoc, tldr, witr, lazygit, htop). Then the no-rename structure wins: split the 200-line `shared/home/default.nix`, merge darwin git/zsh/topgrade into shared via `isDarwin`, colocate `config/` assets with their modules, devShell → `shell.nix`.
 - **Only if the itch survives the structure wins** → the full `features/` layout rename (the `feature-colocation` branch + `stash@{0}` are the blueprint: flat `features/<name>/{default,home,darwin,nixos}.nix` + explicit `profiles/`; re-derive with `git mv`, never merge the branch; delete both afterwards).
 - **When the next assignment write-up hurts** → the remaining Emacs salvage items from `emacs-overhaul-1f5cf88.patch` (org QoL block first; then LSP extras, cape/consult-dir, jinx — nix side is ready: enchant AppleSpell + aspell en/it).
 - **When a month passes with no daemon run** → the auto-rebuild wake gap (the Mac sleeps through 06:30; StartInterval fallback or accept-and-document).
@@ -78,7 +78,7 @@ All decided 2026-09-03: disko and nix-topology dropped (re-add from their templa
 
 ## Maintenance rhythm (~2 h/month)
 
-- Monthly: lock bump, glance at the watchlist, switch. Two things break silently: LocalHostName drift (`nh … Did you mean trfmbp?` → `sudo scutil --set LocalHostName trfmbp`) and upstream overlay/option renames (eval fails — read the error, it names the attribute).
+- Monthly: lock bump, glance at the watchlist, switch, then `nru` for the casks and App Store apps (activation never upgrades them; topgrade was dropped 2026-09-03 for that alias). Two things break silently: LocalHostName drift (`nh … Did you mean trfmbp?` → `sudo scutil --set LocalHostName trfmbp`) and upstream overlay/option renames (eval fails — read the error, it names the attribute).
 - Check `/tmp/auto-rebuild.log` has runs; if the trfwsl pipeline is quiet, the PC is off.
 - A switch that changes paneru or uninstalls many apps: quit paneru first, `paneru restart` after (Steps 3 has the why).
 - Add nothing without a usage reason; the August audit showed 20%+ of the config was one-week experiments.

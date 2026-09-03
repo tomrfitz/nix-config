@@ -32,7 +32,7 @@ Project templates: `nix flake init -t ~/nix-config#python-uv` bootstraps a Pytho
 
 - `nh darwin switch` — rebuild from remote (uses cached tarball; add `--refresh` to force re-fetch after a push)
 - `nh darwin switch .` — local iteration escape hatch (dirty/uncommitted changes; flakeref is positional in nh 4.x)
-- `nh darwin switch --refresh` — force re-fetch from remote (what topgrade runs); does **not** bump `flake.lock`
+- `nh darwin switch --refresh` — force re-fetch from remote (what `nru` runs first); does **not** bump `flake.lock`
 - `nh darwin switch --refresh --update` — force re-fetch + bump inputs (what `just update` runs)
 
 Personal `nr*` aliases (declared in `modules/shared/home/shell.nix`):
@@ -41,6 +41,7 @@ Personal `nr*` aliases (declared in `modules/shared/home/shell.nix`):
 - `nrsr` — switch with `--refresh` (force re-fetch the remote flake tarball)
 - `nrsl` — switch from the local working tree (`~/nix-config`); use for dirty/iterative work
 - `nrb` — build only (no activation)
+- `nru` — upgrade everything: switch from remote, then `brew update && brew upgrade --greedy && mas upgrade` (macOS; activation never upgrades casks by design)
 
 The `justfile` defers to `NH_FLAKE` for switches; `check` builds the local tree and every nh recipe passes `-H` (see the hostname note above):
 
@@ -91,7 +92,7 @@ modules/
     home/          # packages, shell, git, editors, emacs, ghostty, zen, browser-policies, obsidian, notes, desktop, pi, dprint, xdg-*, etc.
   darwin/          # macOS-only
     system/        # homebrew.nix, settings.nix (system.defaults), security.nix, paneru.nix, auto-rebuild.nix
-    home/          # zsh.nix, git.nix (1Password signing), topgrade.nix
+    home/          # zsh.nix, git.nix (1Password signing)
   nixos/           # Linux-only
     system/        # desktop.nix, hardening.nix, homelab/, auto-update.nix, remote-build-cache.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh
     home/          # desktop.nix (niri + noctalia theming)

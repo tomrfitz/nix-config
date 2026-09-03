@@ -144,28 +144,4 @@
   # the repo-root file is the single source; treefmt reads it in place.
   home.file.".markdownlint-cli2.jsonc".source = ../../../.markdownlint-cli2.jsonc;
 
-  # ── Topgrade ──────────────────────────────────────────────────────────
-  programs.topgrade = {
-    enable = true;
-    settings = {
-      misc = {
-        pre_sudo = false;
-        disable = [
-          "nix"
-          "home_manager"
-          "pip3"
-        ];
-        cleanup = true;
-        skip_notify = true;
-        no_retry = true;
-        no_self_update = true;
-      };
-      git = {
-        max_concurrency = 2;
-        repos = [
-          "${config.xdg.userDirs.projects}/*"
-        ];
-      };
-    };
-  };
 }
