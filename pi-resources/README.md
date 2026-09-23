@@ -19,7 +19,7 @@ Skill discovery follows pi's auto-discovery rule for `~/.pi/agent/skills/`: ever
 ## Author-owned content
 
 - `skills/obsidian-vault/` — agent guidance for reading/writing the Obsidian vault at `$OBSD` (transitioning to `$NOTES`; see `TODO.md` Emacs migration plan), including the `author:` frontmatter convention for agent-written notes.
-- `prompts/simplify.md` — `/simplify` slash command. Three-angle review of the current diff (reuse, quality, efficiency) via parallel `reviewer` subagents.
+- `prompts/simplify.md` — `/simplify` slash command. Three-angle review of the current diff (reuse, quality, efficiency) by one `reviewer` subagent.
 
 ## Third-party skills (not vendored)
 
