@@ -1,9 +1,17 @@
 _: {
   homebrew = {
     enable = true;
-    onActivation.autoUpdate = false;
-    onActivation.upgrade = false;
+    # Every switch updates Homebrew and upgrades everything it manages,
+    # including casks that update themselves (greedy) and App Store apps.
+    # Casks whose uninstall step quits their app close it on upgrade, and brew
+    # does not relaunch it; .pkg casks ask for Touch ID.
+    onActivation.autoUpdate = true;
+    onActivation.upgrade = true;
     onActivation.cleanup = "uninstall";
+    # Stream the upgrades' own output (downloads, installer steps); without it
+    # brew bundle captures that and prints one line per package.
+    onActivation.extraFlags = [ "--verbose" ];
+    greedyCasks = true;
 
     brews = [
       "mole"
@@ -26,7 +34,12 @@ _: {
 
       # productivity
       "claude"
-      "microsoft-office"
+      # Microsoft AutoUpdate patches Office in place; a greedy upgrade would
+      # reinstall the whole multi-GB .pkg for every version bump instead.
+      {
+        name = "microsoft-office";
+        greedy = false;
+      }
 
       # media
       "musicbrainz-picard"
@@ -74,7 +87,10 @@ _: {
       "rustdesk"
       "folding-at-home"
       "google-drive"
-      "microsoft-auto-update"
+      {
+        name = "microsoft-auto-update"; # updates itself; see microsoft-office
+        greedy = false;
+      }
       # "pear" — moved to nix (pear-desktop in shared/home/desktop.nix)
       "sf-symbols"
       "tabtab"
