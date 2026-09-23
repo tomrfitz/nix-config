@@ -1,18 +1,86 @@
+# ~/.clang-format (clang-tools 21 via nixpkgs). Applies to any file under
+# $HOME with no closer .clang-format. A formatter only runs on files you
+# format, so this file can be opinionated where ~/.clang-tidy cannot: the
+# goal is one shape per construct, so a reader never has to disambiguate.
+# clang-format owns layout; the clang-tidy checks own the semantic half.
+# Anything not listed is the LLVM default.
 BasedOnStyle: LLVM
+
 # Indentation
 IndentWidth: 4
 UseTab: Never
 TabWidth: 4
+IndentCaseLabels: true
+IndentGotoLabels: false
+IndentPPDirectives: AfterHash
 
 # Line Length
 ColumnLimit: 80
 
 # Empty Lines - separate code blocks
 MaxEmptyLinesToKeep: 1
-KeepEmptyLinesAtTheStartOfBlocks: true
+KeepEmptyLines:
+    AtEndOfFile: false
+    AtStartOfBlock: true
+    AtStartOfFile: false
 SeparateDefinitionBlocks: Always
+InsertNewlineAtEOF: true
 
+# ── One shape per construct ─────────────────────────────────────────────
+# Every control-flow body gets braces, on its own lines. No `if (x) y;`,
+# no `for (...) f();`, no `{ return x; }` squeezed on one line. Docs caveat
+# for InsertBraces, RemoveParentheses, RemoveSemicolon and EnumTrailingComma:
+# they work without full semantic info, so clang-tidy's checks stay the
+# authority; these just make the fix happen at format time. Short `case`
+# labels are the one deliberate exception (see the alignment block).
+InsertBraces: true
+AllowShortFunctionsOnASingleLine: None
+AllowShortLambdasOnASingleLine: Empty
+AllowShortEnumsOnASingleLine: false
+AllowShortCaseExpressionOnASingleLine: true
+AllowShortCaseLabelsOnASingleLine: true
+AllowAllArgumentsOnNextLine: false
+AllowAllParametersOfDeclarationOnNextLine: false
+BinPackArguments: false
+BinPackParameters: OnePerLine
+
+# Redundant punctuation is noise; missing punctuation is ambiguity.
+# `return (x);` → `return x;`; `};` after a function → `}`.
+RemoveParentheses: ReturnStatement
+RemoveSemicolon: true
+EnumTrailingComma: Insert
+
+# Operators: break so the operator starts the continuation line (the reader
+# sees *why* the line continues before reading what), and never mix
+# precedence levels on one wrapped line.
+BreakBeforeBinaryOperators: NonAssignment
+BreakBinaryOperations: RespectPrecedence
+AlignOperands: AlignAfterOperator
+
+# Types read left-to-right: `int* p` — the pointer is part of the type, not
+# the name — and one declaration per line (clang-tidy readability-isolate-
+# declaration) so `int* a, b;` cannot exist. East const: qualifiers after
+# the type.
+PointerAlignment: Left
+ReferenceAlignment: Left
+QualifierAlignment: Custom
+QualifierOrder:
+    [inline, static, constexpr, friend, type, const, volatile, restrict]
+
+# Templates / attributes / initializers: one clause per line.
 BreakTemplateDeclarations: Yes
+BreakAfterAttributes: Always
+PackConstructorInitializers: Never
+BreakConstructorInitializers: BeforeComma
+BreakInheritanceList: BeforeComma
+
+# Numbers: 1'000'000 not 1000000; 0xDEAD'BEEF not 0xDEADBEEF.
+IntegerLiteralSeparator:
+    Binary: 4
+    Decimal: 3
+    DecimalMinDigits: 5
+    Hex: 4
+    HexMinDigits: 6
 
 # Include Sorting - C++ libs, then using namespace std, then C libs
 SortUsingDeclarations: Lexicographic
@@ -28,15 +96,15 @@ IncludeCategories:
     - Regex: '^".*"$' # Project headers
       Priority: 3
 
-# Alignment
+# Alignment. AlignConsecutive* trades diff stability for column scanning —
+# renaming one variable re-indents its neighbours. Short case labels stay
+# allowed so AlignConsecutiveShortCaseStatements has something to align.
 AlignTrailingComments:
     Kind: Always
     OverEmptyLines: 2
 AlignConsecutiveDeclarations:
     Enabled: true
     AcrossEmptyLines: false
-    # AlignFunctionPointers: true
-    # AlignFunctionDeclarations: true
 AlignConsecutiveShortCaseStatements:
     Enabled: true
     AcrossEmptyLines: false
@@ -48,15 +116,8 @@ AlignConsecutiveAssignments:
     AlignCompound: true
     PadOperators: true
 AlignArrayOfStructures: Right
+AlignEscapedNewlines: Left
 
-# East const style: qualifiers after type
-QualifierAlignment: Custom
-QualifierOrder:
-    [inline, static, constexpr, friend, type, const, volatile, restrict]
-# Simple formatting preferences
-# AllowShortIfStatementsOnASingleLine: true
-# AllowShortLoopsOnASingleLine: true
-# AllowShortFunctionsOnASingleLine: true
-# AllowShortBlocksOnASingleLine: true
-AllowShortCaseExpressionOnASingleLine: true
-AllowShortCaseLabelsOnASingleLine: true
+# Closing-brace comments for every namespace (`} // namespace foo`); clangd's
+# BlockEnd inlay hint does the same for other blocks without editing the file.
+ShortNamespaceLines: 0

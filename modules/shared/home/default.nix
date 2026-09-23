@@ -1,4 +1,9 @@
-{ config, lib, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
 {
   imports = [
     ./packages.nix
@@ -132,7 +137,17 @@
   xdg.configFile."nix/flake-template.nix".source = ../../../config/flake-template.nix;
 
   # ── Dotfiles managed via config/ ────────────────────────────────────────
+  # C/C++ floor; templates/cpp layers the strict tier. clangd reads its user
+  # config from ~/Library/Preferences/clangd/ on macOS (XDG is ignored there)
+  # and from $XDG_CONFIG_HOME/clangd/ on Linux.
   home.file.".clang-format".source = ../../../config/clang-format;
+  home.file.".clang-tidy".source = ../../../config/clang-tidy;
+  home.file."Library/Preferences/clangd/config.yaml" = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
+    source = ../../../config/clangd.yaml;
+  };
+  xdg.configFile."clangd/config.yaml" = lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
+    source = ../../../config/clangd.yaml;
+  };
 
   # Deliberately a file, not HM's `editorconfig.settings`: the repo-root
   # symlink to config/editorconfig is what shfmt's useEditorConfig reads in
