@@ -6,15 +6,34 @@
 }:
 let
   inherit (import ./browser-policies.nix) sharedPolicies;
-  profile = config.programs.zen-browser.profiles.default;
+  cfg = config.programs.zen-browser;
+  profile = cfg.profiles.default;
+  profilesIni = "${cfg.configPath}/profiles.ini";
+  # Zen re-adds its bundled search engines, visible, whenever it rewrites
+  # search.json; declaring them hidden keeps the list to the four below.
+  hiddenEngines =
+    lib.genAttrs
+      [
+        "google"
+        "bing"
+        "ddg"
+        "amazondotcom-us"
+        "ebay"
+        "wikipedia"
+        "perplexity"
+      ]
+      (_: {
+        metaData.hidden = true;
+      });
 in
 {
   programs.zen-browser = {
     enable = true;
     package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
     # The policies are live on darwin too: home-manager writes them to macOS
-    # defaults (EnterprisePoliciesEnabled) even with package = null. The brew
-    # cask is never upgraded by activation, so leave Zen's own updater on there.
+    # defaults (EnterprisePoliciesEnabled) even with package = null. Switches
+    # upgrade the brew cask, but only as often as you switch, so leave Zen's own
+    # updater on there for the days in between.
     policies =
       sharedPolicies // lib.optionalAttrs pkgs.stdenv.hostPlatform.isDarwin { DisableAppUpdate = false; };
     # Linux only: on darwin the cask talks to the 1Password app directly, and
@@ -27,6 +46,10 @@ in
       name = "default";
       path = "default";
       isDefault = true;
+      # The "Profile Groups" database this profile uses (the one Zen created on
+      # 2026-09-21). Unset, Zen can orphan its group and start a new one when
+      # profiles.ini is rewritten; nine orphans had piled up.
+      storeId = "c609abfd";
 
       # ── Settings ─────────────────────────────────────────────────────
       settings = {
@@ -126,7 +149,8 @@ in
             ];
             definedAliases = [ "@hm" ];
           };
-        };
+        }
+        // hiddenEngines;
       };
 
       # ── Containers ─────────────────────────────────────────────────
@@ -526,20 +550,23 @@ in
     };
   };
 
-  # Zen Browser requires write access to profiles.ini (to store install hashes
-  # and lock flags). Home-manager deploys it as a read-only nix store symlink,
-  # which causes Zen to loop on "Changes not saved". Replace the symlink with a
-  # mutable copy after link generation so Zen can update it freely.
-  # macOS only: the path is the macOS profile dir, and on Linux the nix-wrapped
-  # Zen uses $XDG_CONFIG_HOME/zen. `run` keeps the copy honest under `--dry-run`.
-  home.activation.makeZenProfilesMutable = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
+  # macOS Zen needs write access to profiles.ini (install hashes, lock flags)
+  # and loops on "Changes not saved" when it is a read-only store link, so on
+  # darwin the generated file is installed as a writable copy, and only when
+  # its content changed. Linking it and copying over the link, as before, left
+  # a regular file in HM's way: every activation moved it to a .hm-backup, and
+  # a content change with that backup present failed the activation. The
+  # nix-wrapped Zen on Linux reads the link fine.
+  # REVISIT(upstream): link it on darwin too once the module writes profiles.ini
+  #   writable itself. ref: https://github.com/0xc000022070/zen-browser-flake/issues/285; checked: 2026-09-22
+  home.file.${profilesIni}.enable = !pkgs.stdenv.hostPlatform.isDarwin;
+  home.activation.zenProfilesIni = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
     lib.hm.dag.entryAfter [ "linkGeneration" ] ''
-      zenProfiles="${config.home.homeDirectory}/Library/Application Support/zen/profiles.ini"
-      if [ -L "$zenProfiles" ]; then
-        realPath=$(readlink "$zenProfiles")
-        run rm "$zenProfiles"
-        run cp "$realPath" "$zenProfiles"
-        run chmod u+w "$zenProfiles"
+      target=${lib.escapeShellArg profilesIni}
+      generated=${config.home.file.${profilesIni}.source}
+      if [ -L "$target" ] || ! cmp -s "$generated" "$target"; then
+        run rm -f "$target"
+        run install -m 644 "$generated" "$target"
       fi
     ''
   );
