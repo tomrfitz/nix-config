@@ -45,7 +45,7 @@ Use Obsidian `[[wikilinks]]` for cross-references. Wikilinks resolve by filename
 Before writing a note, scan the vault to understand its existing organization (folders, naming, tags). The user's conventions may evolve; don't assume.
 
 ```bash
-fd -e md . "$OBSD" | head -30
+fd -t d --max-depth 2 . "$OBSD"
 ls "$OBSD/Notes/" 2>/dev/null
 ```
 
