@@ -48,7 +48,7 @@
       # 4-space indent across all formats; per-plugin defaults are 2, so set
       # both at the top level and individually for the ones we care about most.
       indentWidth = 4;
-      plugins = pkgs.dprint-plugins.getPluginList (import ./config/dprint-plugins.nix);
+      plugins = (import ./config/dprint-plugins.nix pkgs).paths;
       json.indentWidth = 4;
       toml.indentWidth = 4;
       typescript.quoteStyle = "preferDouble";
