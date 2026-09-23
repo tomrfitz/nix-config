@@ -173,16 +173,29 @@
           set +a
         }
 
-        # ── nixify (bootstrap direnv + flake for a project) ──
+        # ── nixify [template] (project bootstrap) ──
+        # Templates are this flake's `templates` outputs (default, python-uv,
+        # cpp); they carry the files. This wrapper does the imperative tail that
+        # `nix flake init` cannot: git init, intent-to-add the files it wrote (a
+        # flake only sees tracked files; hunks stay unstaged for magit), an
+        # .envrc fallback, and direnv allow.
         nixify() {
-          if [[ ! -f flake.nix ]]; then
-            install -m 644 "''${XDG_CONFIG_HOME:-$HOME/.config}/nix/flake-template.nix" flake.nix
-            echo "Created flake.nix"
+          local flake="''${NIXIFY_FLAKE:-$HOME/nix-config}" template="''${1:-default}" out
+          local -a files
+          if [[ -f flake.nix ]]; then
+            echo "flake.nix exists; not applying template '$template'" >&2
+          else
+            out=$(nix flake init -t "$flake#$template" 2>&1) || { print -r -- "$out" >&2; return 1; }
+            print -r -- "$out"
+            files=(''${(f)"$(print -r -- "$out" | sed -n 's/^wrote: //p')"})
           fi
           if [[ ! -f .envrc ]]; then
             echo "use flake" > .envrc
-            direnv allow
+            files+=(.envrc)
           fi
+          git rev-parse --is-inside-work-tree >/dev/null 2>&1 || git init -q
+          (( $#files )) && git add --intent-to-add --force -- "''${files[@]}"
+          direnv allow
         }
 
         # ── Edit command buffer (Ctrl+X Ctrl+E) ──

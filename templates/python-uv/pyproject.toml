@@ -1,14 +1,88 @@
 # Minimal non-package project (what `uv init --bare` generates): no
 # [build-system], so `uv sync` installs the dependencies but never the project
 # itself — the grader takes bare .py files.
-#
-# No [tool.ruff] table: ruff then falls back to ~/.config/ruff/ruff.toml (the
-# home-manager programs.ruff config). If a project needs overrides, start the
-# table with `extend = "~/.config/ruff/ruff.toml"` — a [tool.ruff] table
-# without it shadows the user config entirely.
 [project]
 name = "project" # rename (kebab-case)
 version = "0.1.0"
 # Course target is 3.14; the exact build is pinned in .python-version
 requires-python = "==3.14.*"
 dependencies = []
+
+# ── ruff: project tier over the global floor ─────────────────────────────
+# `extend` layers this table over ~/.config/ruff/ruff.toml (the home-manager
+# programs.ruff floor). Without it, a [tool.ruff] table shadows the floor
+# entirely. The floor is what you'd accept in anyone's script; this tier is
+# what a fresh project of your own can afford from day one.
+[tool.ruff]
+extend = "~/.config/ruff/ruff.toml"
+
+[tool.ruff.lint]
+extend-select = [
+    # ── Explicit types at every boundary (ty checks them; ruff makes sure they exist) ──
+    "ANN", # every def has parameter + return annotations; no bare Any
+    "FA", # `from __future__ import annotations` where new syntax needs it
+    "TC", # imports used only for typing go under TYPE_CHECKING
+    # ── Call sites you can read without opening the callee ──
+    "FBT", # no positional booleans: f(True) → f(strict=True)
+    "ARG", # unused arguments (a parameter that lies about being used)
+    "PLC", # pylint conventions
+    "PLR", # magic values, too-many-*, comparison-with-itself…
+    "PLR0916", # too-many-boolean-expressions (preview; explicit so max-bool-expr is live)
+    "PLR1702", # too-many-nested-blocks (preview; explicit so max-nested-blocks is live)
+    # ── Exception shape, paths, tests, imports ──
+    "EM", # exception messages as variables, not inline strings
+    "TRY", # no vanilla raise, no return in try, …
+    "PTH", # pathlib over os.path string surgery
+    "PT", # pytest style
+    "TID", # no relative imports
+    # ── Things that shouldn't reach a commit ──
+    "ERA", # commented-out code
+    "T20", # print()
+    "TD", # TODO shape: colon + description
+]
+extend-ignore = [
+    "TRY003", # long messages inline are fine once EM forces a variable
+    "TD002", # no author tag: solo repo
+    "TD003", # no issue link: tasks live in org, not a tracker
+]
+# Fixes that delete code are a human decision; the diagnostic still shows.
+unfixable = ["ERA001", "T201"]
+
+[tool.ruff.lint.extend-per-file-ignores]
+"tests/**" = ["ANN", "FBT", "PLR2004"]
+
+[tool.ruff.lint.flake8-annotations]
+mypy-init-return = true # __init__ may omit `-> None`
+suppress-dummy-args = true
+
+[tool.ruff.lint.flake8-type-checking]
+strict = true
+# Classes that evaluate annotations at runtime: imports they need must stay
+# out of TYPE_CHECKING. Extend when adding attrs/SQLModel/typer models.
+runtime-evaluated-base-classes = ["pydantic.BaseModel"]
+
+[tool.ruff.lint.flake8-tidy-imports]
+ban-relative-imports = "all"
+
+[tool.ruff.lint.flake8-unused-arguments]
+ignore-variadic-names = true
+
+[tool.ruff.lint.flake8-pytest-style]
+fixture-parentheses = false
+mark-parentheses = false
+
+[tool.ruff.lint.pylint]
+max-args = 6
+max-positional-args = 3 # past that, callers must use keywords
+max-branches = 12
+max-returns = 6
+max-statements = 50
+max-nested-blocks = 4
+max-bool-expr = 4
+allow-magic-value-types = ["str", "bytes"]
+
+[tool.ruff.lint.isort]
+force-single-line = true # one name per line: grep/diff-friendly
+force-sort-within-sections = true
+order-by-type = false
+required-imports = ["from __future__ import annotations"]

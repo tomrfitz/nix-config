@@ -253,26 +253,44 @@
         }
       );
 
-      # ── Templates (nix flake init -t github:tomrfitz/nix-config#python-uv) ──
-      templates.python-uv = {
-        path = ./templates/python-uv;
-        description = "Python devShell: uv-managed interpreter + venv, ruff and ty on PATH for eglot (rass)";
-        welcomeText = ''
-          # python-uv
+      # ── Templates (`nixify [name]` = nix flake init -t ~/nix-config#<name> + the git/direnv tail) ──
+      # Each template layers the strict lint tier over the global floor: ruff via
+      # `extend`, clang-tidy via `InheritParentConfig`, clangd by project-over-user merge.
+      templates = {
+        default = {
+          path = ./templates/default;
+          description = "Bare devShell flake: add packages";
+        };
+        python-uv = {
+          path = ./templates/python-uv;
+          description = "Python devShell: uv-managed interpreter + venv, ruff and ty on PATH for eglot (rass); strict ruff tier over the global floor";
+          welcomeText = ''
+            # python-uv
 
-          Next steps (from the project directory):
+            `nixify` follows this with `git init`, intent-to-add of these files,
+            and `direnv allow`. Then, from the project directory:
 
-          1. `git init` — flakes only see tracked files, and git filtering keeps
-             `.venv/` out of the Nix store copy.
-          2. Set `name` in `pyproject.toml`; bump `.python-version` if the course
-             target moves.
-          3. Starter code with a `requirements.txt`: `uv add -r requirements.txt`.
-          4. `direnv allow` — the shellHook runs `uv sync` (downloads the pinned
-             CPython once) and activates `.venv`.
+            1. Set `name` in `pyproject.toml`; bump `.python-version` if the
+               course target moves.
+            2. Starter code with a `requirements.txt`: `uv add -r requirements.txt`.
+            3. The shellHook runs `uv sync` (downloads the pinned CPython once)
+               and activates `.venv`.
 
-          Ruff uses `~/.config/ruff/ruff.toml` automatically; add a `[tool.ruff]`
-          table only with `extend = "~/.config/ruff/ruff.toml"` as its first line.
-        '';
+            `[tool.ruff]` extends `~/.config/ruff/ruff.toml` (the floor) with the
+            project tier; keep `extend` as its first line.
+          '';
+        };
+        cpp = {
+          path = ./templates/cpp;
+          description = "C++ devShell: clang-tools on PATH; strict clang-tidy/clangd tier over the global floor";
+          welcomeText = ''
+            # cpp
+
+            `.clang-tidy` inherits `~/.clang-tidy` and `.clangd` merges over the
+            user clangd config; both add the strict tier. Add the compiler and
+            build system to `flake.nix`: the devShell ships only clang-tools.
+          '';
+        };
       };
     };
 }

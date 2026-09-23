@@ -1,0 +1,26 @@
+# Project tier. clangd merges this over the user config (the floor in
+# nix-config/config/clangd.yaml). Editor-only; never touches the real build.
+CompileFlags:
+  Add:
+    - -Wpedantic
+    - -Wshadow-all
+    # Numbers that silently change value.
+    - -Wconversion
+    - -Wsign-conversion
+    - -Wimplicit-int-conversion
+    - -Wshorten-64-to-32
+    - -Wdouble-promotion
+    - -Wfloat-equal
+    # Every enumerator named; a `default:` doesn't silence it.
+    - -Wswitch-enum
+    - -Wunreachable-code-aggressive
+    - -Wredundant-parens
+    - -Wextra-semi
+
+Diagnostics:
+  # Every used symbol's header included directly (the floor only flags
+  # unused includes).
+  MissingIncludes: Strict
+  ClangTidy:
+    # misc-const-correctness is classified slow; Loose still skips it.
+    FastCheckFilter: None

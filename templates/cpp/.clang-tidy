@@ -1,0 +1,149 @@
+# Project tier over ~/.clang-tidy (the floor in nix-config/config/clang-tidy).
+# InheritParentConfig appends these checks and merges the options; delete
+# that line to opt out of the floor entirely.
+#
+# Everything here is cheap to satisfy on day one and brutal to retrofit,
+# which is exactly why it is a template, not a global default.
+---
+InheritParentConfig: true
+Checks:
+  # ── Explicitness: say what you mean, where you mean it ──────────────────
+  - readability-implicit-bool-conversion
+  - readability-qualified-auto
+  - readability-else-after-return
+  - readability-magic-numbers
+  - readability-make-member-function-const
+  - readability-non-const-parameter
+  - readability-function-size
+  - readability-function-cognitive-complexity
+  - readability-identifier-naming
+  - readability-use-std-min-max
+  - readability-use-concise-preprocessor-directives
+  - google-build-using-namespace
+
+  # ── Core Guidelines: ownership, bounds, casts that hide intent ──────────
+  - cppcoreguidelines-pro-type-const-cast
+  - cppcoreguidelines-pro-type-reinterpret-cast
+  - cppcoreguidelines-prefer-member-initializer
+  - cppcoreguidelines-avoid-goto
+  - cppcoreguidelines-avoid-do-while
+  - cppcoreguidelines-avoid-non-const-global-variables
+  - cppcoreguidelines-avoid-const-or-ref-data-members
+  - cppcoreguidelines-macro-usage
+  - cppcoreguidelines-no-malloc
+  - cppcoreguidelines-owning-memory
+  - cppcoreguidelines-pro-bounds-array-to-pointer-decay
+  - cppcoreguidelines-pro-bounds-pointer-arithmetic
+  - cppcoreguidelines-pro-type-union-access
+  - cppcoreguidelines-pro-type-vararg
+  - cppcoreguidelines-special-member-functions
+  - hicpp-multiway-paths-covered
+
+  # ── Modern spellings that carry more information than the old ones ─────
+  - modernize-avoid-bind
+  - modernize-avoid-c-arrays
+  - modernize-loop-convert
+  - modernize-raw-string-literal
+  - modernize-use-nodiscard
+  - modernize-use-default-member-init
+  - modernize-use-designated-initializers
+  - modernize-use-std-numbers
+  - modernize-use-std-print
+  - modernize-use-std-format
+  - modernize-use-constraints
+  - modernize-use-ranges
+  - modernize-use-transparent-functors
+  - modernize-concat-nested-namespaces
+  - modernize-min-max-use-initializer-list
+  - modernize-return-braced-init-list
+  # modernize-use-trailing-return-type: `auto f(int) -> int`, postfix types
+  #   like Rust/TS. Consistent but divisive; opt in per project.
+  # modernize-use-auto: deliberately OFF — it hides types.
+
+  # ── Linkage and const: the invisible made visible ──────────────────────
+  - misc-const-correctness
+  - misc-use-internal-linkage
+  - misc-use-anonymous-namespace
+  - misc-unused-parameters
+  - misc-non-private-member-variables-in-classes
+  - performance-avoid-endl
+  - performance-enum-size
+
+CheckOptions:
+  # `if (ptr)` → `if (ptr != nullptr)`, `if (n)` → `if (n != 0)`.
+  readability-implicit-bool-conversion.AllowPointerConditions: false
+  readability-implicit-bool-conversion.AllowIntegerConditions: false
+  # `auto*` / `auto&` when the deduced type is a pointer/reference.
+  readability-qualified-auto.AddConstToQualified: true
+  readability-else-after-return.WarnOnUnfixable: false
+  readability-else-after-return.WarnOnConditionVariables: false
+  # Named constants instead of literals; small counts and powers of two exempt.
+  readability-magic-numbers.IgnoredIntegerValues: '0;1;2;3;4;10;100'
+  readability-magic-numbers.IgnoredFloatingPointValues: '0.0;0.5;1.0;2.0;10.0;100.0'
+  readability-magic-numbers.IgnorePowersOf2IntegerValues: true
+  readability-magic-numbers.IgnoreBitFieldsWidths: true
+  readability-magic-numbers.IgnoreTypeAliases: true
+  readability-magic-numbers.IgnoreUserDefinedLiterals: true
+  # Size limits are a legibility budget, not a style rule.
+  readability-function-size.LineThreshold: 80
+  readability-function-size.StatementThreshold: 60
+  readability-function-size.BranchThreshold: 12
+  readability-function-size.ParameterThreshold: 6
+  readability-function-size.NestingThreshold: 4
+  readability-function-cognitive-complexity.Threshold: 25
+  readability-function-cognitive-complexity.IgnoreMacros: true
+
+  # Naming: the most taste-dependent block here. Google-ish — CamelCase
+  # types, snake_case functions and variables, trailing `_` on non-public
+  # members, UPPER_CASE constants and macros. Edit freely; the point is that
+  # a name's case tells you its kind.
+  readability-identifier-naming.NamespaceCase: lower_case
+  readability-identifier-naming.ClassCase: CamelCase
+  readability-identifier-naming.StructCase: CamelCase
+  readability-identifier-naming.UnionCase: CamelCase
+  readability-identifier-naming.EnumCase: CamelCase
+  readability-identifier-naming.EnumConstantCase: CamelCase
+  readability-identifier-naming.TypeAliasCase: CamelCase
+  readability-identifier-naming.TypedefCase: CamelCase
+  readability-identifier-naming.TemplateParameterCase: CamelCase
+  readability-identifier-naming.ConceptCase: CamelCase
+  readability-identifier-naming.FunctionCase: lower_case
+  readability-identifier-naming.MethodCase: lower_case
+  readability-identifier-naming.VariableCase: lower_case
+  readability-identifier-naming.ParameterCase: lower_case
+  readability-identifier-naming.MemberCase: lower_case
+  readability-identifier-naming.PrivateMemberSuffix: '_'
+  readability-identifier-naming.ProtectedMemberSuffix: '_'
+  readability-identifier-naming.GlobalConstantCase: UPPER_CASE
+  readability-identifier-naming.ConstexprVariableCase: UPPER_CASE
+  readability-identifier-naming.StaticConstantCase: UPPER_CASE
+  readability-identifier-naming.MacroDefinitionCase: UPPER_CASE
+  readability-identifier-naming.IgnoreMainLikeFunctions: true
+
+  # Floor checks whose strict knobs belong here, not in the floor.
+  bugprone-argument-comment.StrictMode: true
+  bugprone-argument-comment.CommentBoolLiterals: true
+  bugprone-argument-comment.CommentNullPtrs: true
+  bugprone-narrowing-conversions.PedanticMode: true
+
+  cppcoreguidelines-special-member-functions.AllowSoleDefaultDtor: true
+  cppcoreguidelines-special-member-functions.AllowMissingMoveFunctionsWhenCopyIsDeleted: true
+  cppcoreguidelines-avoid-do-while.IgnoreMacros: true
+  cppcoreguidelines-macro-usage.AllowedRegexp: '^(DEBUG_|NDEBUG$)'
+  hicpp-multiway-paths-covered.WarnOnMissingElse: false
+
+  modernize-use-designated-initializers.IgnoreSingleElementAggregates: false
+  modernize-use-designated-initializers.RestrictToPODTypes: false
+  modernize-use-override.IgnoreDestructors: false
+  modernize-loop-convert.MinConfidence: reasonable
+  modernize-loop-convert.NamingStyle: lower_case
+  modernize-raw-string-literal.DelimiterStem: str
+
+  misc-const-correctness.AnalyzeValues: true
+  misc-const-correctness.AnalyzeReferences: true
+  misc-const-correctness.AnalyzePointers: true
+  misc-const-correctness.WarnPointersAsValues: false
+  misc-const-correctness.TransformValues: true
+  misc-const-correctness.TransformReferences: true
+  misc-const-correctness.TransformPointersAsValues: false
+  misc-non-private-member-variables-in-classes.IgnoreClassesWithAllMemberVariablesBeingPublic: true
