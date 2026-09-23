@@ -35,8 +35,7 @@
             "Bash(darwin-rebuild switch:*)",
             "Bash(sudo darwin-rebuild switch:*)",
             "Bash(nixos-rebuild switch:*)",
-            "Bash(sudo nixos-rebuild switch:*)",
-            "Bash(topgrade:*)"
+            "Bash(sudo nixos-rebuild switch:*)"
         ]
     }
 }
