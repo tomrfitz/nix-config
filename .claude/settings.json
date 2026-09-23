@@ -23,8 +23,7 @@
             "Bash(nix search:*)",
             "Bash(nix flake check)",
             "Bash(nix flake show:*)",
-            "Bash(nixfmt:*)",
-            "Bash(nvd diff:*)"
+            "Bash(nixfmt:*)"
         ],
         "ask": [
             "Bash(just rebuild:*)",
