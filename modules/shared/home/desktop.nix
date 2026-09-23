@@ -83,6 +83,14 @@
 
     userSettings = {
       agent_servers = {
+        # Claude Code over ACP: the agent path the Anthropic subscription covers.
+        claude-acp = {
+          type = "registry";
+          default_config_options = {
+            model = "opus[1m]";
+            effort = "high";
+          };
+        };
         opencode.type = "registry";
         github-copilot.type = "registry";
       };
@@ -118,9 +126,15 @@
         };
       };
       notification_panel.default_width = 300.0;
-      outline_panel.folder_icons = true;
+      outline_panel = {
+        folder_indicator = "icon";
+        dock = "right";
+      };
+      collaboration_panel.dock = "right";
+      semantic_tokens = "combined";
       agent = {
         default_width = 400.0;
+        tool_permissions.default = "allow";
         inline_assistant_model = {
           provider = "copilot_chat";
           model = "claude-opus-4.6";
@@ -178,7 +192,7 @@
         hide_hidden = false;
         hide_root = true;
         git_status = true;
-        folder_icons = true;
+        folder_indicator = "icon";
         file_icons = true;
         entry_spacing = "comfortable";
         dock = "right";
@@ -200,6 +214,7 @@
       calls.mute_on_join = true;
       edit_predictions = {
         mode = "subtle";
+        allow_data_collection = "no";
         copilot = {
           enable_next_edit_suggestions = true;
           proxy = null;
