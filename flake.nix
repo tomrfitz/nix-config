@@ -95,6 +95,10 @@
             useGlobalPkgs = true;
             useUserPackages = true;
             backupFileExtension = "hm-backup";
+            # Apps that rewrite a managed file (Zen's containers.json and
+            # search.json) leave a fresh backup on every switch; replacing the
+            # old one beats failing the switch, unattended ones included.
+            overwriteBackup = true;
             extraSpecialArgs = specialArgs;
             users.${user}.imports = [
               zen-browser.homeModules.twilight
