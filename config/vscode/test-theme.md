@@ -409,23 +409,23 @@ WHERE id = 42;
 ```html
 <!DOCTYPE html>
 <html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Test Page</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
-  <div class="container" id="app" data-theme="dark">
-    <h1>Hello World</h1>
-    <p>Paragraph with <strong>bold</strong> and <em>italic</em>.</p>
-    <a href="https://example.com" target="_blank">Link</a>
-    <img src="image.png" alt="Description" />
-    <input type="text" placeholder="Enter text" disabled />
-    <!-- Comment -->
-  </div>
-  <script src="app.js"></script>
-</body>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Test Page</title>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div class="container" id="app" data-theme="dark">
+            <h1>Hello World</h1>
+            <p>Paragraph with <strong>bold</strong> and <em>italic</em>.</p>
+            <a href="https://example.com" target="_blank">Link</a>
+            <img src="image.png" alt="Description" />
+            <input type="text" placeholder="Enter text" disabled />
+            <!-- Comment -->
+        </div>
+        <script src="app.js"></script>
+    </body>
 </html>
 ```
 
