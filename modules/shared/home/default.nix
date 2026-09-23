@@ -133,9 +133,6 @@
     context = ../../../config/agents.md;
   };
 
-  # ── Templates ──────────────────────────────────────────────────────────
-  xdg.configFile."nix/flake-template.nix".source = ../../../config/flake-template.nix;
-
   # ── Dotfiles managed via config/ ────────────────────────────────────────
   # C/C++ floor; templates/cpp layers the strict tier. clangd reads its user
   # config from ~/Library/Preferences/clangd/ on macOS (XDG is ignored there)
