@@ -9,7 +9,7 @@
     ./emacs.nix
     ./fonts.nix
     ./notes.nix
-    ./ruff.nix
+    ./python.nix
     ./dprint.nix
     ./opencode.nix
     ./pi.nix
