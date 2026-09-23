@@ -176,6 +176,18 @@ apply_nixos() {
     sudo nixos-rebuild switch --flake ".#${host}"
 }
 
+# On macOS the Claude Code CLI comes from Anthropic's native installer, which
+# keeps it updated; home-manager owns only its config (claude-code.nix).
+install_claude_code() {
+    [[ -x $HOME/.local/bin/claude ]] && return 0
+    info "Installing Claude Code (native installer)..."
+    # home-manager already puts ~/.local/bin on PATH for new shells; passing it
+    # here too keeps the installer from reaching for the shell rc files.
+    if ! curl -fsSL https://claude.ai/install.sh | PATH="$HOME/.local/bin:$PATH" bash; then
+        warn "Claude Code install failed; rerun: curl -fsSL https://claude.ai/install.sh | bash"
+    fi
+}
+
 main() {
     if [[ ${1:-} == "--help" || ${1:-} == "-h" ]]; then
         usage
@@ -205,6 +217,7 @@ main() {
             die "Pick a listed host or pass one explicitly: $(basename "$0") <hostname>"
         fi
         apply_darwin "$host"
+        install_claude_code
     else
         if ! nix_cmd eval --raw ".#nixosConfigurations.${host}.config.system.build.toplevel.drvPath" >/dev/null 2>&1; then
             warn "NixOS host '$host' not found in flake."

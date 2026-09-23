@@ -16,6 +16,7 @@
     ./notes.nix
     ./python.nix
     ./dprint.nix
+    ./claude-code.nix
     ./opencode.nix
     ./pi.nix
     ./xdg-dirs.nix
@@ -126,12 +127,8 @@
   # ── Agent instructions (each tool looks for instructions at a different path) ──
   xdg.configFile."AGENTS.md".source = ../../../config/agents.md; # generic / Gemini
   xdg.configFile."opencode/AGENTS.md".source = ../../../config/agents.md; # OpenCode
-  # Claude Code and pi get theirs through their home-manager modules (pi: pi.nix).
-  programs.claude-code = {
-    enable = true;
-    settings = lib.importJSON ../../../config/claude-settings.json;
-    context = ../../../config/agents.md;
-  };
+  # Claude Code and pi get theirs through their home-manager modules
+  # (claude-code.nix, pi.nix).
 
   # ── Dotfiles managed via config/ ────────────────────────────────────────
   # C/C++ floor; templates/cpp layers the strict tier. clangd reads its user
