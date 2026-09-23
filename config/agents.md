@@ -74,7 +74,7 @@ Code should work for its author first, be maintainable and accessible to them ov
   ---
   ```
 
-  The optional `author` field flags agent-authored notes so they're easy to distinguish from the user's own. Pick a stable, self-chosen name (e.g. the model id or a project-specific persona) and keep using it consistently. Omit the field entirely when the user is the author.
+  The optional `author` field flags agent-authored notes so they're easy to distinguish from the user's own. Pick a stable, self-chosen name (e.g. the harness name, such as `claude` or `pi`, or a project-specific persona; a model id changes with every release) and keep using it consistently. Omit the field entirely when the user is the author. Reference notes (mostly web clips) also carry `author`, as a list of the source's authors — that isn't an agent marker.
 
   Use `[[wikilinks]]` for internal references.
 - The user values long-term collaboration patterns over per-session efficiency — leave good context for next time

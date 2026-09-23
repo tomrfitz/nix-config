@@ -17,7 +17,7 @@ Agent-written notes go to **`$OBSD/Notes/`**. The rest of the vault is the user'
 
 ## Frontmatter convention
 
-Every note in this vault uses YAML frontmatter with creation and modification timestamps. Agent-authored notes add an `author` field so they're easy to distinguish from the user's own.
+Most notes in this vault carry YAML frontmatter with creation and modification timestamps, and every note you write gets them. Agent-authored notes add an `author` field so they're easy to distinguish from the user's own.
 
 ```yaml
 ---
@@ -28,7 +28,8 @@ author: <agent-name>  # ONLY when written by an agent; omit for user's own notes
 ```
 
 - **Absent `author`** → written by the user.
-- **Present `author`** → written by an agent. Pick a stable, self-chosen name (the model id, a project persona, anything consistent) and reuse it across sessions so the user can grep their notes by source.
+- **`author` set to one name** → written by an agent. Pick a stable, self-chosen name (the harness name such as `claude` or `pi`, or a project persona — not a model id, which changes every release) and reuse it across sessions so the user can grep their notes by source.
+- **`author` set to a list** → a reference note (mostly web clips); the list names the source's authors, not an agent.
 - Timestamps are local time, format `YYYY-MM-DD, HH:MM:SS`. Generate with `date '+%Y-%m-%d, %H:%M:%S'`.
 
 This convention is also documented in the global `AGENTS.md` (the source of truth — `config/agents.md` in the nix-config repo).
