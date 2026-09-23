@@ -34,8 +34,9 @@
           Minute = 30;
         }
       ];
-      StandardOutPath = "/tmp/auto-rebuild.log";
-      StandardErrorPath = "/tmp/auto-rebuild.log";
+      # Not /tmp: macOS empties it at boot, which hid whether this had ever run.
+      StandardOutPath = "/var/log/auto-rebuild.log";
+      StandardErrorPath = "/var/log/auto-rebuild.log";
     };
   };
 }
