@@ -114,7 +114,7 @@ modules/
 - Enable homelab services: `hosts/trfwsl/default.nix` (via `services.<name>.enable`)
 - WSL GPU / container runtime: `modules/nixos/system/wsl-gpu.nix`
 - Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
-- Configure editors: `modules/shared/home/editors.nix`
+- Configure editors: Zed in `modules/shared/home/desktop.nix`, Helix in `modules/shared/home/editors.nix`, Emacs in `modules/shared/home/emacs.nix`
 - Claude Code: settings in `config/claude-settings.json`, wiring in `modules/shared/home/claude-code.nix`
 - Python global tooling (ruff floor, ty): `modules/shared/home/python.nix`; project tier: `templates/python-uv/pyproject.toml`
 - C/C++ floor: `config/clang-format`, `config/clang-tidy`, `config/clangd.yaml`; project tier: `templates/cpp/`
@@ -172,7 +172,7 @@ home.packages = [ ... ] ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ 
 Two mechanisms, split by trust model:
 
 - **1Password** — user-space secrets where a human is present to unlock (SSH agent, vault-backed credentials, `op://` references). Used on all platforms.
-- **sops-nix** — service-level secrets that must be available without user interaction (homelab API keys, tunnel tokens, VPN credentials). Age-encrypted in `secrets/`, decrypted to `/run/secrets/` at activation. Age keys derived from SSH host keys.
+- **sops-nix** — service-level secrets that must be available without user interaction (homelab API keys, tunnel tokens, VPN credentials). Age-encrypted in `secrets/`, decrypted to `/run/secrets/` at activation. Each host's age key is derived from its SSH host key; the admin key is a standalone age key (`~/.config/sops/age/keys.txt` on trfmbp).
 
 ### Config files
 
@@ -187,7 +187,7 @@ Two mechanisms, split by trust model:
 
 ## Custom packages
 
-- **`pkgs/sgram-tui/`** — the only custom package (pinned to upstream's latest tag; not in nixpkgs). `mdbase-tasknotes` was removed 2026-09 (never used; tasks live in org).
+- **`pkgs/sgram-tui/`** — the only custom package (pinned to upstream's latest tag; not in nixpkgs).
 
 ## Bootstrap
 
