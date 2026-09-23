@@ -253,19 +253,20 @@
     :hook ((org-mode markdown-mode) . olivetti-mode))
 
 ;; ── pi (coding agent) ────────────────────────────────────────────────
-;; Emacs frontend for the pi CLI. The `pi` binary is provided system-wide
+;; Emacs frontend for the pi CLI (pilish; MELPA renamed it from
+;; pi-coding-agent on 2026-09-06). The `pi` binary is provided system-wide
 ;; via nix (@earendil-works/pi-coding-agent); the Emacs package only
 ;; needs to find it on PATH.
-(use-package pi-coding-agent
+(use-package pilish
     :ensure t
     :defer t
-    :commands (pi-coding-agent)
-    :init (defalias 'pi 'pi-coding-agent)
+    :commands (pilish)
+    :init (defalias 'pi 'pilish)
     :config
     ;; Grammars are provided by nix (treesit-grammars.with-all-grammars);
     ;; suppress the first-run install prompt. Set on load (not :custom) so this
     ;; on-demand agent isn't pulled into startup just to apply the setting.
-    (setq pi-coding-agent-essential-grammar-action 'warn))
+    (setq pilish-essential-grammar-action 'warn))
 
 ;; ── Git ───────────────────────────────────────────────────────────────
 (use-package magit
