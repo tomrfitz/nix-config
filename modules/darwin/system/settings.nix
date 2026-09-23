@@ -1,7 +1,40 @@
-{ user, ... }:
+{ lib, user, ... }:
 let
   homeDirectory = "/Users/${user}";
   homeManagerAppsDirectory = "${homeDirectory}/Applications/Home Manager Apps";
+
+  # Sandboxed apps keep their preferences in ~/Library/Containers, which only
+  # a process with Full Disk Access may write. An interactive switch inherits
+  # the terminal's; the unattended auto-rebuild daemon (root, from launchd) has
+  # none, and neither does a fresh Mac's Terminal. Under CustomUserPreferences
+  # a denied write aborts the whole activation (after /etc has switched), so
+  # these are written below with nix-darwin's own command, but a denial only
+  # warns.
+  sandboxedAppPreferences = {
+    "com.apple.Safari" = {
+      AutoFillFromAddressBook = false;
+      AutoFillPasswords = false;
+      AutoFillFromiCloudKeychain = false;
+      AutoFillMiscellaneousForms = false;
+      EnableNarrowTabs = true; # Compact tab bar
+      SearchProviderShortName = "Google";
+      ShowSidebarInNewWindows = false;
+    };
+    "com.apple.mail" = {
+      AutoSelectFont = false; # Don't match reply font to original message
+      NSFont = "AtkinsonHyperlegibleNext-Regular";
+      NSFontSize = 12;
+      NSFixedPitchFont = "AtkinsonHyperlegibleMono-Regular";
+      NSFixedPitchFontSize = 12;
+    };
+  };
+
+  # Same form as nix-darwin's userDefaults writes (modules/system/defaults-write.nix).
+  writeUserDefault =
+    domain: key: value:
+    ''launchctl asuser "$(id -u -- ${lib.escapeShellArg user})" sudo --user=${lib.escapeShellArg user} -- defaults write ${lib.escapeShellArg domain} ${lib.escapeShellArg key} ${
+      lib.escapeShellArg (lib.generators.toPlist { escape = true; } value)
+    }'';
 in
 {
   system.defaults = {
@@ -151,15 +184,6 @@ in
         HideDesktop = true; # Hide desktop when clicking wallpaper
         AppWindowGroupingBehavior = true; # Group windows by app
       };
-      "com.apple.Safari" = {
-        AutoFillFromAddressBook = false;
-        AutoFillPasswords = false;
-        AutoFillFromiCloudKeychain = false;
-        AutoFillMiscellaneousForms = false;
-        EnableNarrowTabs = true; # Compact tab bar
-        SearchProviderShortName = "Google";
-        ShowSidebarInNewWindows = false;
-      };
       "com.apple.finder" = {
         ShowSidebar = true;
         CreateDesktop = false; # disable desktop icon layer (fixes paneru tiling Finder's AXUnknown window)
@@ -167,13 +191,17 @@ in
       "com.apple.spaces" = {
         "spans-displays" = false; # Independent spaces per display
       };
-      "com.apple.mail" = {
-        AutoSelectFont = false; # Don't match reply font to original message
-        NSFont = "AtkinsonHyperlegibleNext-Regular";
-        NSFontSize = 12;
-        NSFixedPitchFont = "AtkinsonHyperlegibleMono-Regular";
-        NSFixedPitchFontSize = 12;
-      };
     };
   };
+
+  # Sandboxed apps (see sandboxedAppPreferences): inside the `if` condition a
+  # failed write doesn't trip the activation's `set -e`; the first denial skips
+  # the rest of that domain, which would be denied the same way.
+  system.activationScripts.postActivation.text = lib.concatStrings (
+    lib.mapAttrsToList (domain: prefs: ''
+      if ! { ${lib.concatStringsSep " && " (lib.mapAttrsToList (writeUserDefault domain) prefs)}; }; then
+        echo >&2 "warning: ${domain} preferences not written (no Full Disk Access; expected when unattended)"
+      fi
+    '') sandboxedAppPreferences
+  );
 }
