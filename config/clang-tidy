@@ -1,0 +1,150 @@
+# ~/.clang-tidy — the floor: every C/C++ file under $HOME with no closer
+# .clang-tidy, third-party checkouts included. clangd reads it for editor
+# diagnostics; the clang-tidy CLI reads it too. A project .clang-tidy with
+# `InheritParentConfig: true` adds to it (templates/cpp does); one without
+# replaces it.
+#
+# Floor rule: a check earns its place here only if its diagnostic is one you
+# would accept in someone else's code — the construct reads one way and
+# compiles another, or the spelling is deprecated. Style, naming, size
+# budgets, and anything that fires on every free function belong to the
+# project tier in templates/cpp/.clang-tidy.
+#
+# Overlap policy: one authority per construct. C-style casts are
+# google-readability-casting alone (the cppcoreguidelines cousin is a
+# subset); alias pairs (bugprone-/cppcoreguidelines-narrowing-conversions,
+# modernize-use-override/cppcoreguidelines-explicit-virtual-functions, …)
+# are listed once — clang-tidy and clangd merge alias diagnostics, but each
+# alias still costs a full matcher pass.
+---
+HeaderFilterRegex: '.*'
+WarningsAsErrors: ''
+FormatStyle: file
+Checks:
+  - -*
+
+  # ── Reads one way, compiles another ────────────────────────────────────
+  # The whole bugprone group is floor-grade by definition; the two exclusions
+  # are the noisy one and the slow one.
+  - bugprone-*
+  - -bugprone-easily-swappable-parameters
+  - -bugprone-unchecked-optional-access
+  # The static analyzer (null derefs, use-after-free, dead stores). Inert in
+  # clangd, which never runs it; this is for `clang-tidy` from a terminal or CI.
+  - clang-analyzer-*
+
+  # ── Shape: one way to read a block ─────────────────────────────────────
+  - readability-braces-around-statements
+  - readability-misleading-indentation
+  - readability-isolate-declaration
+  - readability-avoid-nested-conditional-operator
+  - readability-math-missing-parentheses
+  - readability-operators-representation
+  - readability-simplify-boolean-expr
+  - readability-redundant-control-flow
+  - readability-redundant-declaration
+  - readability-redundant-casting
+  - readability-redundant-inline-specifier
+  - readability-redundant-member-init
+  - readability-redundant-smartptr-get
+  - readability-redundant-string-cstr
+  - readability-redundant-string-init
+  - readability-redundant-preprocessor
+  - readability-avoid-unconditional-preprocessor-if
+  - readability-duplicate-include
+
+  # ── Explicitness with no taste component ───────────────────────────────
+  - readability-uppercase-literal-suffix
+  - readability-named-parameter
+  - readability-inconsistent-declaration-parameter-name
+  - readability-suspicious-call-argument
+  - readability-enum-initial-value
+  - readability-const-return-type
+  - readability-static-accessed-through-instance
+  - readability-static-definition-in-anonymous-namespace
+  - readability-container-size-empty
+  - readability-container-contains
+  - readability-container-data-pointer
+  - readability-string-compare
+  - readability-ambiguous-smartptr-reset-call
+  - readability-reference-to-constructed-temporary
+
+  # ── Casts, conversions, implicit constructors ──────────────────────────
+  - google-explicit-constructor
+  - google-readability-casting
+  - google-default-arguments
+  - google-global-names-in-headers
+  - cppcoreguidelines-pro-type-static-cast-downcast
+  - cppcoreguidelines-init-variables
+  - cppcoreguidelines-pro-type-member-init
+  - cppcoreguidelines-slicing
+  - cppcoreguidelines-misleading-capture-default-by-value
+  - cppcoreguidelines-missing-std-forward
+  - cppcoreguidelines-rvalue-reference-param-not-moved
+  - cppcoreguidelines-virtual-class-destructor
+  - hicpp-exception-baseclass
+
+  # ── Deprecated spellings and drop-in modern replacements ───────────────
+  - modernize-use-nullptr
+  - modernize-use-override
+  - modernize-use-using
+  - modernize-use-bool-literals
+  - modernize-use-equals-default
+  - modernize-use-equals-delete
+  - modernize-use-emplace
+  - modernize-use-noexcept
+  - modernize-use-starts-ends-with
+  - modernize-use-integer-sign-comparison
+  - modernize-use-scoped-lock
+  - modernize-use-uncaught-exceptions
+  - modernize-make-unique
+  - modernize-make-shared
+  - modernize-deprecated-headers
+  - modernize-deprecated-ios-base-aliases
+  - modernize-redundant-void-arg
+  - modernize-replace-auto-ptr
+  - modernize-replace-random-shuffle
+  - modernize-shrink-to-fit
+  - modernize-type-traits
+  - modernize-unary-static-assert
+
+  # ── Linkage, includes, identifiers: the invisible made visible ─────────
+  - misc-include-cleaner
+  - misc-definitions-in-headers
+  - misc-header-include-cycle
+  - misc-unused-using-decls
+  - misc-unused-alias-decls
+  - misc-redundant-expression
+  - misc-static-assert
+  - misc-misleading-identifier
+  - misc-misleading-bidirectional
+  - misc-misplaced-const
+  - misc-new-delete-overloads
+  - misc-non-copyable-objects
+  - misc-throw-by-value-catch-by-reference
+  - misc-unconventional-assign-operator
+  - misc-uniqueptr-reset-release
+  - misc-confusable-identifiers
+
+  # ── Performance checks whose fixes also read better ────────────────────
+  - performance-*
+  - -performance-avoid-endl
+  - -performance-enum-size
+
+CheckOptions:
+  # Braces on everything, including one-line bodies (0 = no exemption).
+  readability-braces-around-statements.ShortStatementLines: 0
+  # One spelling per operator: the traditional tokens, for every operator
+  # that has an alternative (`and`, `not`, `bitor`, `and_eq`, …).
+  readability-operators-representation.BinaryOperators: '&&;&=;&;|;~;!;!=;||;|=;^;^='
+  readability-operators-representation.OverloadedOperators: '&&;&=;&;|;~;!;!=;||;|=;^;^='
+  readability-suspicious-call-argument.MinimumIdentifierNameLength: 3
+  readability-inconsistent-declaration-parameter-name.Strict: true
+  readability-enum-initial-value.AllowExplicitZeroFirstInitialValue: true
+  readability-enum-initial-value.AllowExplicitSequentialInitialValues: true
+  bugprone-unused-return-value.CheckedReturnTypes: '::std::error_code;::std::error_condition;::std::errc;::std::expected;::std::optional'
+  bugprone-suspicious-enum-usage.StrictMode: true
+  bugprone-signed-char-misuse.DiagnoseSignedUnsignedCharComparisons: true
+  cppcoreguidelines-init-variables.IncludeStyle: llvm
+  # Moving a trivially copyable value is harmless; don't nag about it.
+  performance-move-const-arg.CheckTriviallyCopyableMove: false

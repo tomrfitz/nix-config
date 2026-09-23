@@ -1,0 +1,65 @@
+# clangd user config — the floor for every C/C++ file under $HOME with no
+# closer .clangd, third-party checkouts included. Editor-only: nothing here
+# touches a real build. modules/shared/home/default.nix deploys it to the
+# path clangd actually reads: ~/Library/Preferences/clangd/config.yaml on
+# macOS (clangd ignores XDG there) and ~/.config/clangd/config.yaml on
+# Linux. A project .clangd merges over it; templates/cpp ships the strict
+# tier.
+#
+# Floor rule: only diagnostics you would accept in someone else's checkout —
+# code that reads one way and compiles another. Volume knobs (-Wconversion,
+# -Wpedantic, -Wswitch-enum, missing-include enforcement) are the template's.
+
+CompileFlags:
+    Add:
+        - -Wall
+        - -Wextra
+        # Names that mean two things depending on scope.
+        - -Wshadow
+        # Control flow that reads one way and runs another.
+        - -Wimplicit-fallthrough
+        - -Wmisleading-indentation
+        - -Wdangling-else
+        - -Wcomma
+        - -Wloop-analysis
+        - -Wself-assign
+        - -Wself-move
+        - -Wduplicate-enum
+        - -Wnull-dereference
+        - -Wformat=2
+        - -Wundef
+        - -Wcast-qual
+        - -Wcast-align
+        # Class semantics invisible at the call site.
+        - -Wnon-virtual-dtor
+        - -Woverloaded-virtual
+        - -Wdeprecated-copy-dtor
+        # Only fires on annotated code; free otherwise.
+        - -Wthread-safety
+
+# Includes: clangd's own cleaner flags unused includes by default
+# (UnusedIncludes: Strict); MissingIncludes is the noisy half and lives in the
+# template. misc-include-cleaner from ~/.clang-tidy never runs inside clangd.
+#
+# Semantic lint checks come from ~/.clang-tidy, which clangd also reads.
+# ClangTidy.FastCheckFilter stays at its default (Strict): the floor has no
+# slow checks. The template sets None, because misc-const-correctness is
+# classified slow and Loose still skips it.
+
+# Rendering only: draws the facts the source leaves implicit. Zero cost on
+# foreign code, so it belongs to the floor.
+InlayHints:
+    Enabled: Yes
+    # `f(/*count=*/3)` without writing the comment.
+    ParameterNames: Yes
+    # `auto x` shows `: std::vector<int>` — auto without hiding the type.
+    DeducedTypes: Yes
+    # `{.x = 1, .y = 2}` shown for positional aggregate init.
+    Designators: Yes
+    # `} // if`, `} // for`, `} // namespace`: the brace says what it closes.
+    BlockEnd: Yes
+    DefaultArguments: Yes
+
+Hover:
+    # `size_t (aka unsigned long)` — the alias and what it really is.
+    ShowAKA: Yes
