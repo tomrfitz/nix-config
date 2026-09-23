@@ -61,7 +61,7 @@ just clean         # nh clean all (old generations + unreferenced store paths)
 just sops-edit     # edit secrets/trfwsl.yaml (HOST=... for another host)
 ```
 
-**Validation:** There are no tests. Correctness = `just check` (build without activating) or `just eval` succeeding. Use `just eval-all` to gate cross-platform changes. Do not run `just rebuild` unless explicitly asked — it mutates the live system.
+**Validation:** There are no tests. Correctness = `just check` (build without activating) or `just eval` succeeding. Use `just eval-all` to gate cross-platform changes.
 
 **Important:** Nix flakes only see files tracked by git. When adding new files referenced by the flake (e.g., config files used in `home.file` or `source`), you must `git add` them before `just eval` or `just check` will work.
 
