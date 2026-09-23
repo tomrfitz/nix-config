@@ -28,20 +28,21 @@ nh derives the target host from macOS's `LocalHostName`, which the OS silently r
 
 A switch that changes paneru or uninstalls many apps can wedge paneru's event tap (every click freezes input until a forced restart — seen 2026-09-03): quit paneru before switching and run `paneru restart` after. Its logs are in `~/Library/Logs/paneru.err.log`.
 
-Project templates: `nix flake init -t ~/nix-config#python-uv` bootstraps a Python devShell (uv-managed interpreter + venv, ruff and ty on PATH for eglot). See `templates/`.
+Project templates: `nixify [default|python-uv|cpp]` runs `nix flake init -t ~/nix-config#<name>` and then the tail nix cannot do (git init, intent-to-add of the written files, `.envrc` fallback, `direnv allow`). Templates carry the strict lint tier over the global floor. See `templates/`.
 
 - `nh darwin switch` — rebuild from remote (uses cached tarball; add `--refresh` to force re-fetch after a push)
 - `nh darwin switch .` — local iteration escape hatch (dirty/uncommitted changes; flakeref is positional in nh 4.x)
-- `nh darwin switch --refresh` — force re-fetch from remote (what `nru` runs first); does **not** bump `flake.lock`
+- `nh darwin switch --refresh` — force re-fetch from remote (what `nrsr` runs); does **not** bump `flake.lock`
 - `nh darwin switch --refresh --update` — force re-fetch + bump inputs (what `just update` runs)
 
 Personal `nr*` aliases (declared in `modules/shared/home/shell.nix`):
 
 - `nrs` — switch from remote `NH_FLAKE` (daily-driver path)
 - `nrsr` — switch with `--refresh` (force re-fetch the remote flake tarball)
-- `nrsl` — switch from the local working tree (`~/nix-config`); use for dirty/iterative work
+- `nrsl` — switch from the local working tree (`~/nix-config`); use for dirty/iterative work. It lasts only until the next switch from remote `main` (`nrs`, or the 06:30 daemon), which puts `main`'s build back: push to keep it
 - `nrb` — build only (no activation)
-- `nru` — upgrade everything: switch from remote, then `brew update && brew upgrade --greedy && mas upgrade` (macOS; activation never upgrades casks by design)
+
+On macOS every switch also updates Homebrew and upgrades every managed cask (greedy, so self-updating ones too) and App Store app (`modules/darwin/system/homebrew.nix`). A cask upgrade can quit its running app, and `.pkg` casks ask for Touch ID.
 
 The `justfile` defers to `NH_FLAKE` for switches; `check` builds the local tree and every nh recipe passes `-H` (see the hostname note above):
 
@@ -68,7 +69,7 @@ just sops-edit     # edit secrets/trfwsl.yaml (HOST=... for another host)
 
 ### Flake structure
 
-`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks, nix-index-database, mattpocock-skills (pi skills). Claude Code, pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules.
+`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks, nix-index-database, mattpocock-skills (pi skills). pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules; Claude Code is configured by home-manager everywhere, but on macOS its binary comes from Anthropic's native installer (nixpkgs on Linux) — see `modules/shared/home/claude-code.nix`.
 
 ### Hosts are thin wiring
 
@@ -89,7 +90,7 @@ Keep host files concise, idiomatic, portable, and composable:
 modules/
   shared/          # Cross-platform (maximized — put everything here first)
     system/        # nix.nix, user.nix
-    home/          # packages, shell, git, editors, emacs, ghostty, zen, browser-policies, obsidian, notes, desktop, pi, dprint, xdg-*, etc.
+    home/          # packages, shell, git, editors, emacs, ghostty, zen, browser-policies, obsidian, notes, desktop, claude-code, pi, dprint, xdg-*, etc.
   darwin/          # macOS-only
     system/        # homebrew.nix, settings.nix (system.defaults), security.nix, paneru.nix, auto-rebuild.nix
     home/          # zsh.nix, git.nix (1Password signing)
@@ -114,7 +115,11 @@ modules/
 - WSL GPU / container runtime: `modules/nixos/system/wsl-gpu.nix`
 - Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
 - Configure editors: `modules/shared/home/editors.nix`
-- Browsers: Zen is primary (`modules/shared/home/zen.nix`); extension/policy manifest in `browser-policies.nix` (live on both platforms: on darwin home-manager writes the policies to macOS defaults, which the brew cask reads); Helium via cask; Safari native; Linux base Firefox in `modules/nixos/home/desktop.nix`.
+- Claude Code: settings in `config/claude-settings.json`, wiring in `modules/shared/home/claude-code.nix`
+- Python global tooling (ruff floor, ty): `modules/shared/home/python.nix`; project tier: `templates/python-uv/pyproject.toml`
+- C/C++ floor: `config/clang-format`, `config/clang-tidy`, `config/clangd.yaml`; project tier: `templates/cpp/`
+- Universal formatter front (dprint, exec-wrapped CLIs, fence tag map): `modules/shared/home/dprint.nix`
+- Browsers: Zen is primary (`modules/shared/home/zen.nix`); extension/policy manifest in `browser-policies.nix` (live on both platforms: on darwin home-manager writes the policies to macOS defaults, which the brew cask reads); Helium via cask; Orion via cask (the one extra, as a paying Kagi member); Safari native; Linux base Firefox in `modules/nixos/home/desktop.nix`.
 - Git settings (shared): `modules/shared/home/git.nix`
 - Git settings (1Password signing): `modules/darwin/home/git.nix`
 - Fontconfig defaults: `modules/shared/home/fonts.nix`
@@ -125,9 +130,9 @@ modules/
 - **Maximize `modules/shared/`** — platform-specific modules only for genuine differences (e.g., 1Password SSH agent path, homebrew, macOS system.defaults)
 - **Prefer native home-manager modules** (`programs.*`) over `home.file` when available
 - **Package source priority:** nixpkgs shared → nixpkgs platform-specific → homebrew casks → Mac App Store (mas)
-- **Brew-preferred exceptions:** 1Password, Ghostty (macOS app integration). Emacs is nix-owned (emacs-overlay, nixpkgs emacs 31 on both platforms) — see `modules/shared/home/emacs.nix`
+- **Brew-preferred exceptions:** 1Password, Ghostty (macOS app integration). **Vendor-installer exception:** the Claude Code CLI on macOS (Anthropic's native installer keeps it current alongside the desktop app's bundled copy, which shares `~/.claude`); home-manager still owns its config via `package = null`. Emacs is nix-owned (emacs-overlay, nixpkgs emacs 31 on both platforms) — see `modules/shared/home/emacs.nix`
 - **Language tooling belongs in project devShells**, not in the system config — only editor-universal tools (`nixd`, `nixfmt`, `shfmt`, `shellcheck`) stay global
-- **Config-only HM modules** (`package = null`) provide global defaults (e.g., `programs.ruff`) while project devShells provide the binary; `home.file` serves the same role for tools without HM modules (e.g., `.clang-format`)
+- **Global floor vs project tier**: global lint configs (`programs.ruff`, `~/.clang-tidy`, the clangd user config) hold only rules you would accept in someone else's checkout; `templates/*` carry the strict tier and layer it with ruff `extend`, clang-tidy `InheritParentConfig`, and clangd's project-over-user merge. Formatters (`~/.clang-format`, `ruff format`) can be opinionated globally since they only run on files you format. ruff and ty are nix-owned globally (`modules/shared/home/python.nix`) so loose scripts get editor diagnostics; project devShells pin their own copies, which win on PATH
 - **Zed uses `load_direnv = "shell_hook"`** to discover project-provided LSPs/formatters automatically
 
 ### Guardrails
@@ -171,7 +176,7 @@ Two mechanisms, split by trust model:
 
 ### Config files
 
-`config/` holds files that modules deploy or import as-is: the Emacs config, Helix themes (`lib.importTOML`), editorconfig, clang-format, karabiner.json, the Zen userChrome/userContent CSS, the dprint plugin selector, the wallpaper. `config/agents.md` is the global agent instructions file deployed to the agents' home paths; `config/claude-settings.json` is Claude Code's settings.
+`config/` holds files that modules deploy or import as-is: the Emacs config, Helix themes (`lib.importTOML`), editorconfig, clang-format, clang-tidy, clangd.yaml (deployed to `~/Library/Preferences/clangd/` on macOS, since clangd ignores XDG there), karabiner.json, the Zen userChrome/userContent CSS, the dprint plugin selector, the wallpaper. `config/agents.md` is the global agent instructions file deployed to the agents' home paths; `config/claude-settings.json` is Claude Code's settings.
 
 ## Theming
 
@@ -192,7 +197,7 @@ Fresh machine setup (darwin or NixOS):
 bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/main/scripts/bootstrap.sh)
 ```
 
-The script handles: Xcode CLT (darwin), Lix installation, repo clone, and first `darwin-rebuild`/`nixos-rebuild`. The manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
+The script handles: Xcode CLT (darwin), Lix installation, repo clone, first `darwin-rebuild`/`nixos-rebuild`, and Claude Code's native installer (darwin). The manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
 
 ## Roadmap
 
@@ -240,7 +245,7 @@ on-push CI:    eval all 3 hosts + formatting check (safety net)
 
 - `scripts/auto-update.sh` — pipeline logic (phases 0–7)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
-- `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp (unattended; user sudo is Touch ID-only)
+- `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp (unattended; user sudo is Touch ID-only). Log: `/var/log/auto-rebuild.log`. It fires at 06:30 Mac-local time, or on the next wake if the Mac slept through it. It has no Full Disk Access, so only interactive switches write the sandboxed apps' preferences (Safari, Mail; `settings.nix`), and the daemon logs a warning instead
 
 **Manual trigger:** `sudo systemctl start auto-update` on trfwsl
 
