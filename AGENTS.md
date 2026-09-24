@@ -42,7 +42,7 @@ Personal `nr*` aliases (declared in `modules/shared/home/shell.nix`):
 - `nrsl` — switch from the local working tree (`~/nix-config`); use for dirty/iterative work. It lasts only until the next switch from remote `main` (`nrs`, or the 06:30 daemon), which puts `main`'s build back: push to keep it
 - `nrb` — build only (no activation)
 
-On macOS every switch also updates Homebrew and upgrades every managed cask (greedy, so self-updating ones too) and App Store app (`modules/darwin/system/homebrew.nix`). A cask upgrade can quit its running app, and `.pkg` casks ask for Touch ID.
+On macOS a switch installs and removes Homebrew casks to match the Brewfile but upgrades nothing, so the unattended 06:30 switch can finish (some cask upgrades need sudo). `nrs`, `nrsr` and `nrsl` then upgrade: `brew bundle` against `/etc/homebrew/Brewfile` (greedy, so self-updating casks too, except Microsoft's two) and `mas upgrade` (`modules/darwin/system/homebrew.nix`). A cask upgrade can quit its running app, and `.pkg` casks ask for Touch ID.
 
 The `justfile` defers to `NH_FLAKE` for switches; `check` builds the local tree and every nh recipe passes `-H` (see the hostname note above):
 
