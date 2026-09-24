@@ -20,15 +20,21 @@
     shellAliases =
       let
         nh = if pkgs.stdenv.hostPlatform.isDarwin then "nh darwin" else "nh os";
+        # On macOS a switch installs and removes casks but upgrades nothing
+        # (modules/darwin/system/homebrew.nix), so the interactive switches
+        # upgrade afterwards, where Touch ID can answer brew's sudo prompts.
+        # brew bundle keeps each cask's greedy flag, unlike brew upgrade
+        # --greedy, and reads the Brewfile the switch just activated.
+        upgradeApps = lib.optionalString pkgs.stdenv.hostPlatform.isDarwin " && brew bundle --file=/etc/homebrew/Brewfile --verbose && mas upgrade";
       in
       {
         ls = "eza --group-directories-first --icons --hyperlink";
         ll = "eza -l --group-directories-first --icons --hyperlink --time-style=long-iso --git";
 
         # Rebuild shortcuts (nix rebuild switch/build)
-        nrs = "${nh} switch";
-        nrsr = "${nh} switch --refresh";
-        nrsl = "${nh} switch ~/nix-config";
+        nrs = "${nh} switch" + upgradeApps;
+        nrsr = "${nh} switch --refresh" + upgradeApps;
+        nrsl = "${nh} switch ~/nix-config" + upgradeApps;
         nrb = "${nh} build";
 
         # 1Password CLI helpers

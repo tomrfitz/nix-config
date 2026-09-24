@@ -1,16 +1,23 @@
-_: {
+{ config, ... }:
+{
   homebrew = {
     enable = true;
-    # Every switch updates Homebrew and upgrades everything it manages,
-    # including casks that update themselves (greedy) and App Store apps.
-    # Casks whose uninstall step quits their app close it on upgrade, and brew
-    # does not relaunch it; .pkg casks ask for Touch ID.
+    # A switch installs and removes what the Brewfile lists but upgrades
+    # nothing: some cask upgrades need sudo (WeChat's chgrp on its bundle),
+    # which the unattended 06:30 switch cannot answer, and a failed upgrade
+    # stops activation before home-manager. The interactive nr* aliases
+    # (modules/shared/home/shell.nix) upgrade afterwards. autoUpdate stays on
+    # so a newly listed cask installs at its latest version.
     onActivation.autoUpdate = true;
-    onActivation.upgrade = true;
+    onActivation.upgrade = false;
     onActivation.cleanup = "uninstall";
-    # Stream the upgrades' own output (downloads, installer steps); without it
-    # brew bundle captures that and prints one line per package.
+    # Stream brew's own output (downloads, installer steps); without it brew
+    # bundle captures that and prints one line per package.
     onActivation.extraFlags = [ "--verbose" ];
+    # Every cask is `greedy` in the Brewfile unless it opts out, so the
+    # aliases' brew bundle also upgrades casks that update themselves. An
+    # upgrade quits the running app and brew does not relaunch it; .pkg casks
+    # ask for Touch ID.
     greedyCasks = true;
 
     brews = [
@@ -118,4 +125,10 @@ _: {
       # "iA Writer" = 775737590; # requires purchase
     };
   };
+
+  # The active generation's Brewfile at a stable path, for the aliases'
+  # upgrade step. A store path (what homebrew.global.brewfile exports) would
+  # be baked into an already-running shell and, right after a switch, name the
+  # previous generation's Brewfile, reinstalling a cask the switch just removed.
+  environment.etc."homebrew/Brewfile".text = config.homebrew.brewfile;
 }
