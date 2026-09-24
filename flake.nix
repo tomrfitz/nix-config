@@ -54,6 +54,12 @@
       url = "github:mattpocock/skills";
       flake = false;
     };
+    # Hermes Agent, on trial on the Mac (modules/shared/home/packages.nix).
+    # Upstream's own nixpkgs is kept: its uv2nix build is tested against it.
+    hermes-agent = {
+      url = "github:NousResearch/hermes-agent";
+      inputs.home-manager.follows = "home-manager";
+    };
   };
 
   outputs =
@@ -71,6 +77,7 @@
       nix-index-database,
       emacs-overlay,
       mattpocock-skills,
+      hermes-agent,
     }:
     let
       inherit (nixpkgs) lib;
@@ -136,6 +143,7 @@
               email
               sshPublicKey
               mattpocock-skills
+              hermes-agent
               ;
             hostName = name;
             inherit isWSL;

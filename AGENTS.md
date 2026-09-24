@@ -69,7 +69,7 @@ just sops-edit     # edit secrets/trfwsl.yaml (HOST=... for another host)
 
 ### Flake structure
 
-`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks, nix-index-database, mattpocock-skills (pi skills). pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules; Claude Code is configured by home-manager everywhere, but on macOS its binary comes from Anthropic's native installer (nixpkgs on Linux) — see `modules/shared/home/claude-code.nix`.
+`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks, nix-index-database, mattpocock-skills (pi skills), hermes-agent (on trial on the Mac, with its own nixpkgs). pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules; Claude Code is configured by home-manager everywhere, but on macOS its binary comes from Anthropic's native installer (nixpkgs on Linux) — see `modules/shared/home/claude-code.nix`.
 
 ### Hosts are thin wiring
 
