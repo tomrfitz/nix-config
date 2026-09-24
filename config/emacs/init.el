@@ -288,10 +288,11 @@
 
 ;; ── LSP (eglot — built-in) ───────────────────────────────────────────
 ;; Auto-start for any language with an LSP server on $PATH.
-;; sql-mode excluded — no reliable SQL LSP; formatting via sqlformat package.
+;; sql-mode and emacs-lisp-mode excluded — SQL has no reliable LSP;
+;; Emacs Lisp uses the built-in Eldoc support instead.
 (add-hook 'prog-mode-hook
     (lambda ()
-        (unless (derived-mode-p 'sql-mode)
+        (unless (derived-mode-p 'sql-mode 'emacs-lisp-mode)
             (eglot-ensure))))
 ;; No envrc retry hook needed: eglot-ensure defers its connect to
 ;; post-command-hook, which runs after envrc has applied the devShell env
