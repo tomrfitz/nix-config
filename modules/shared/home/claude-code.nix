@@ -5,12 +5,26 @@
 # so a nix-pinned CLI would only trail both against shared state. Linux keeps
 # nixpkgs, which patches the prebuilt binary for NixOS and wraps it with
 # DISABLE_AUTOUPDATER.
-{ lib, pkgs, ... }:
+{
+  config,
+  lib,
+  pkgs,
+  ...
+}:
+let
+  cfg = config.programs.claude-code;
+in
 {
   programs.claude-code = {
     enable = true;
     package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
-    settings = lib.importJSON ../../../config/claude-settings.json;
     context = ../../../config/agents.md;
   };
+
+  # settings.json links out of the store into the working tree, not through
+  # `settings`: Claude Code writes it at runtime (/effort, /model, permission
+  # answers), which a read-only store file refuses with EACCES. Its edits land
+  # in the repo as a diff to keep or revert.
+  home.file."${cfg.configDir}/settings.json".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/config/claude-settings.json";
 }
