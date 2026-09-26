@@ -116,6 +116,7 @@ modules/
 - Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
 - Configure editors: Zed in `modules/shared/home/desktop.nix`, Helix in `modules/shared/home/editors.nix`, Emacs in `modules/shared/home/emacs.nix`
 - Claude Code: settings in `config/claude-settings.json`, wiring in `modules/shared/home/claude-code.nix`
+- MCP servers: `programs.mcp` (Claude Code picks them up via `enableMcpIntegration`); the Zotero server, its CLI (both uvx-wrapped) and the Linux app in `modules/shared/home/zotero.nix`, which also merges the server into the Claude desktop app's config on darwin
 - Python global tooling (ruff floor, ty): `modules/shared/home/python.nix`; project tier: `templates/python-uv/pyproject.toml`
 - C/C++ floor: `config/clang-format`, `config/clang-tidy`, `config/clangd.yaml`; project tier: `templates/cpp/`
 - Universal formatter front (dprint, exec-wrapped CLIs, fence tag map): `modules/shared/home/dprint.nix`

@@ -10,6 +10,7 @@
     ./ghostty.nix
     ./vesktop.nix
     ./obsidian.nix
+    ./zotero.nix
   ];
 
   # ── GUI packages ──────────────────────────────────────────────────────
@@ -45,7 +46,6 @@
       pretendard
     ]
     ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
-      zotero # brew cask on darwin (firefox-esr build failures on aarch64-darwin)
       picard # brew cask "musicbrainz-picard" on darwin (qtwayland dep)
       rustdesk # brew cask on darwin (badPlatforms)
       element-desktop # brew cask on darwin (actool/Xcode build dep)
