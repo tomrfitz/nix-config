@@ -19,6 +19,9 @@ in
     enable = true;
     package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
     context = ../../../config/agents.md;
+    # Servers declared in programs.mcp (zotero.nix) reach Claude Code through
+    # the generated `hm` plugin, as mcp__plugin_hm_<server>__<tool>.
+    enableMcpIntegration = true;
   };
 
   # settings.json links out of the store into the working tree, not through

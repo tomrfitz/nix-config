@@ -1,7 +1,23 @@
 {
     "model": "opus[1m]",
     "permissions": {
-        "defaultMode": "auto"
+        "defaultMode": "auto",
+        "allow": [
+            "mcp__plugin_hm_zotero__zotero_get_*",
+            "mcp__plugin_hm_zotero__zotero_search_*",
+            "mcp__plugin_hm_zotero__zotero_advanced_search",
+            "mcp__plugin_hm_zotero__zotero_semantic_search",
+            "mcp__plugin_hm_zotero__zotero_read_pdf_pages",
+            "mcp__plugin_hm_zotero__zotero_synthesize_annotations",
+            "mcp__plugin_hm_zotero__zotero_export_bibliography",
+            "mcp__plugin_hm_zotero__zotero_write_capabilities"
+        ],
+        "ask": [
+            "mcp__plugin_hm_zotero__zotero_delete_item",
+            "mcp__plugin_hm_zotero__zotero_delete_collection",
+            "mcp__plugin_hm_zotero__zotero_delete_annotation",
+            "mcp__plugin_hm_zotero__zotero_batch_update"
+        ]
     },
     "effortLevel": "medium"
 }
