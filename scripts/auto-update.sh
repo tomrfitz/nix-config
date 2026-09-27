@@ -32,8 +32,10 @@ echo
 
 # ── Phase 4: Build x86 closures (implicitly evals trfwsl + trfnix) ─────
 echo "==> Phase 4: Building trfwsl and trfnix closures"
-TRFWSL_PATH=$(nix build .#nixosConfigurations.trfwsl.config.system.build.toplevel --print-out-paths --no-link)
-TRFNIX_PATH=$(nix build .#nixosConfigurations.trfnix.config.system.build.toplevel --print-out-paths --no-link)
+# Out-links are GC roots: without them the nightly nix-gc deletes the trfnix
+# closure and every run re-downloads all of it (~6 GiB).
+TRFWSL_PATH=$(nix build .#nixosConfigurations.trfwsl.config.system.build.toplevel --print-out-paths --out-link "${WORK_DIR}/result-trfwsl")
+TRFNIX_PATH=$(nix build .#nixosConfigurations.trfnix.config.system.build.toplevel --print-out-paths --out-link "${WORK_DIR}/result-trfnix")
 echo "    trfwsl: ${TRFWSL_PATH}"
 echo "    trfnix: ${TRFNIX_PATH}"
 
