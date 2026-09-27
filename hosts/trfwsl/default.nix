@@ -36,8 +36,18 @@
     paths.booksRoot = "/mnt/k/data/media/books";
     vpn = {
       enable = true;
+      # Nearest city to the PC. Unpinned, every reconnect picks
+      # any US relay; a Salt Lake City exit crawled to cache.nixos.org.
+      location = [
+        "us"
+        "<city>"
+      ];
 
       excludedServices = [
+        # Substitution and fetches only touch public caches. Root's nix CLI
+        # bypasses the daemon, so auto-update sets NIX_REMOTE=daemon.
+        "nix-daemon"
+
         # tailscaled needs split-tunnel bypass so it can reach the control
         # plane during initial auth — the nftables fwmark rules alone don't
         # cover bootstrap before tailscale0 exists

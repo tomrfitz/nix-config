@@ -66,7 +66,12 @@ in
           "network-online.target"
           "atticd.service"
         ];
-        environment.DEPLOY_KEY_PATH = config.sops.secrets."github/deploy-key".path;
+        environment = {
+          DEPLOY_KEY_PATH = config.sops.secrets."github/deploy-key".path;
+          # Root's nix CLI opens the store directly; going through nix-daemon
+          # gives builds and fetches its network path (split-tunneled on trfwsl).
+          NIX_REMOTE = "daemon";
+        };
         serviceConfig = {
           Type = "oneshot";
           ExecStartPre = "+${pkgs.writeShellScript "attic-config-setup" ''

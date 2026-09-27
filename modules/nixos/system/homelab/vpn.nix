@@ -34,6 +34,16 @@ in
       # (e.g. immich's units are immich-server/immich-machine-learning).
       description = "systemd service names whose internet traffic bypasses the VPN via split tunneling.";
     };
+
+    location = lib.mkOption {
+      type = lib.types.listOf lib.types.str;
+      default = [ ];
+      example = [
+        "us"
+        "<city>"
+      ];
+      description = "Relay constraint for `mullvad relay set location` (country, then optional city and hostname). Empty leaves the daemon's saved constraint alone.";
+    };
   };
 
   config = lib.mkIf (cfg.enable && vpn.enable) {
@@ -134,6 +144,9 @@ in
           # Mullvad's own DNS (100.64.0.7) is unreachable despite the tunnel
           # working — cause unknown. Route DNS through tunnel to Cloudflare instead.
           ${mullvad} dns set custom 1.1.1.1 1.0.0.1
+        ''
+        + lib.optionalString (vpn.location != [ ]) ''
+          ${mullvad} relay set location ${lib.escapeShellArgs vpn.location}
         '';
       }
       # Register excluded services' PIDs with Mullvad split tunnel after they start
