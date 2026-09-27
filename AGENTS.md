@@ -11,12 +11,12 @@ A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tra
 | Hostname | Platform | Role | Status |
 | -------- | ---------------- | ---------------------------------------- | ------ |
 | `trfmbp` | aarch64-darwin | Daily driver (M1 Pro MacBook Pro) | Active |
-| `trfnix` | x86_64-linux | NixOS testbed (Samsung laptop) | Active |
+| `trfnix` | x86_64-linux | NixOS testbed (Samsung laptop) | Dormant |
 | `trfwsl` | x86_64-linux WSL | Interim homelab on gaming PC, later dev | Active |
 | `trflab` | x86_64-linux | Dedicated homelab server | Future |
 | `trfvm` | TBD | Scratch/sandbox VM | Future |
 
-The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful for prototyping NixOS service configs. `trfwsl` runs the homelab stack via NixOS-WSL (see Roadmap for remaining work).
+The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful for prototyping NixOS service configs (and the only host that exercises the Linux desktop modules); it has been powered off since ~2026-03, so the daily pipeline only evaluates it. `trfwsl` runs the homelab stack via NixOS-WSL (see Roadmap for remaining work).
 
 ## Commands
 
@@ -232,12 +232,13 @@ Interim homelab running NixOS-WSL on the existing Windows desktop. Config is lar
 
 ### Auto-update pipeline
 
-`trfwsl` runs a daily pipeline that updates flake.lock, builds x86 closures, caches to Attic, and pushes to main. Other hosts rebuild on schedule.
+`trfwsl` runs a daily pipeline that updates flake.lock, evaluates the other hosts, builds and switches itself, caches to Attic, and pushes to main. Other hosts rebuild on schedule.
 
 ```text
-04:45  trfwsl: update flake.lock → eval all 3 hosts → build trfwsl + trfnix
+04:45  trfwsl: update flake.lock → eval trfmbp + trfnix → build trfwsl
                → push to Attic → switch trfwsl → commit + push flake.lock to main
-06:30  trfnix: nixos-rebuild switch from remote main (Attic cache hits)
+06:30  trfnix: nixos-rebuild switch from remote main (when powered on; no
+               Attic hits while the pipeline skips its build)
 06:30  trfmbp: nh darwin switch --refresh from remote main (local darwin build)
 on-push CI:    eval all 3 hosts + formatting check (safety net)
 ```
@@ -248,7 +249,7 @@ on-push CI:    eval all 3 hosts + formatting check (safety net)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
 - `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp (unattended; user sudo is Touch ID-only). Log: `/var/log/auto-rebuild.log`. It fires at 06:30 Mac-local time, or on the next wake if the Mac slept through it. It has no Full Disk Access, so only interactive switches write the sandboxed apps' preferences (Safari, Mail; `settings.nix`), and the daemon logs a warning instead
 
-On trfwsl, Nix traffic bypasses Mullvad: nix-daemon is split-tunneled, and the pipeline sets `NIX_REMOTE=daemon` because root's nix CLI would otherwise open the store directly and stay in the tunnel. The Phase 4 outputs are GC roots (`/var/lib/auto-update/result-*`), so the 03:15 `nix-gc` keeps the previous closures and a run downloads only what changed. Without the roots, each run re-downloaded trfnix's ~6 GiB closure, and on a slow relay that hit the 90-minute `TimeoutStartSec` (2026-09-27).
+On trfwsl, Nix traffic bypasses Mullvad: nix-daemon is split-tunneled, and the pipeline sets `NIX_REMOTE=daemon` because root's nix CLI would otherwise open the store directly and stay in the tunnel. Phase 4's output is a GC root (`/var/lib/auto-update/result-trfwsl`), so the 03:15 `nix-gc` keeps it and a run downloads only what changed. Before that, the pipeline also built trfnix with `--no-link`, so each run re-downloaded trfnix's ~6 GiB closure; on a slow relay that hit the 90-minute `TimeoutStartSec` (2026-09-27). When trfnix comes back, restore its build and Attic push with an out-link of its own.
 
 **Manual trigger:** `sudo systemctl start auto-update` on trfwsl
 

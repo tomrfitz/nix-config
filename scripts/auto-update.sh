@@ -25,23 +25,26 @@ cd "${REPO_DIR}"
 echo "==> Phase 2: Updating flake inputs"
 nix flake update
 
-# ── Phase 3: Eval darwin (can't build on linux) ─────────────────────────
-echo "==> Phase 3: Evaluating trfmbp (cross-platform eval check)"
+# ── Phase 3: Eval hosts not built here ──────────────────────────────────
+# trfmbp can't build on linux. trfnix has been powered off since ~2026-03, so
+# its ~6 GiB closure would feed a cache nothing pulls from; build and push it
+# again once it's back in use.
+echo "==> Phase 3: Evaluating trfmbp and trfnix"
 nix eval .#darwinConfigurations.trfmbp.system --raw
 echo
+nix eval .#nixosConfigurations.trfnix.config.system.build.toplevel --raw
+echo
 
-# ── Phase 4: Build x86 closures (implicitly evals trfwsl + trfnix) ─────
-echo "==> Phase 4: Building trfwsl and trfnix closures"
-# Out-links are GC roots: without them the nightly nix-gc deletes the trfnix
-# closure and every run re-downloads all of it (~6 GiB).
+# ── Phase 4: Build trfwsl ───────────────────────────────────────────────
+echo "==> Phase 4: Building trfwsl closure"
+# The out-link is a GC root: the nightly nix-gc keeps this build even if the
+# switch below fails, and the next run fetches only what changed.
 TRFWSL_PATH=$(nix build .#nixosConfigurations.trfwsl.config.system.build.toplevel --print-out-paths --out-link "${WORK_DIR}/result-trfwsl")
-TRFNIX_PATH=$(nix build .#nixosConfigurations.trfnix.config.system.build.toplevel --print-out-paths --out-link "${WORK_DIR}/result-trfnix")
 echo "    trfwsl: ${TRFWSL_PATH}"
-echo "    trfnix: ${TRFNIX_PATH}"
 
 # ── Phase 5: Push to Attic ──────────────────────────────────────────────
 echo "==> Phase 5: Pushing to Attic cache"
-attic push "${ATTIC_CACHE}" "${TRFWSL_PATH}" "${TRFNIX_PATH}"
+attic push "${ATTIC_CACHE}" "${TRFWSL_PATH}"
 
 # ── Phase 6: Switch trfwsl ──────────────────────────────────────────────
 echo "==> Phase 6: Switching trfwsl"
