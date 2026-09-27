@@ -102,10 +102,12 @@
           bundle_id = "com.apple.finder";
           floating = true;
         };
-        # Emacs child frames (corfu/eldoc popups) — title is empty or
-        # starts with " *" (internal buffer names)
+        # Emacs child frames, which paneru otherwise tiles as columns beside
+        # the main frame: posframe titles its frames "posframe" (the
+        # vertico-posframe minibuffer) and corfu names its "EmacsCorfuGUI"
+        # (completion and popupinfo).
         emacs-childframe = {
-          title = "^( \\*.*|)$";
+          title = "^(posframe|EmacsCorfuGUI)$";
           bundle_id = "org.gnu.Emacs";
           floating = true;
         };
