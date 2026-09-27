@@ -83,7 +83,7 @@ All decided 2026-09-03: disko and nix-topology dropped (re-add from their templa
 ## Maintenance rhythm (~2 h/month)
 
 - Monthly: lock bump, glance at the watchlist, switch with an `nr*` alias. Since 2026-09-24 activation only installs and removes casks, and the aliases upgrade them (`brew bundle`, greedy; Microsoft's two are left to Microsoft AutoUpdate) and the App Store apps; a bare `nh darwin switch` upgrades nothing. Two things break silently: LocalHostName drift (`nh … Did you mean trfmbp?` → `sudo scutil --set LocalHostName trfmbp`) and upstream overlay/option renames (eval fails — read the error, it names the attribute).
-- Check `/var/log/auto-rebuild.log` has runs (it lived in `/tmp` until 2026-09-22, which macOS empties at boot) and that they finished: after a complete activation `readlink -f /nix/var/nix/profiles/system` equals `readlink /run/current-system`. If the trfwsl pipeline is quiet, the PC is off.
+- Check `/var/log/auto-rebuild.log` has runs (it lived in `/tmp` until 2026-09-22, which macOS empties at boot) and that they finished: after a complete activation `readlink -f /nix/var/nix/profiles/system` equals `readlink /run/current-system`. If the trfwsl pipeline is quiet, the PC is off or trfwsl's network is down (DNS failed on every run from 2026-09-16 to 09-25, and the failure mail can't send then either); `journalctl -u auto-update -o short-iso | grep '==>'` shows how far each run got.
 - A switch that changes paneru or uninstalls many apps: quit paneru first, `paneru restart` after (Steps 3 has the why).
 - Add nothing without a usage reason; the August audit showed 20%+ of the config was one-week experiments.
 - Read the `nh` diff before activating: a bump once added the 540 MiB nix 1Password GUI to the darwin closure through Zen's `nativeMessagingHosts` (home-manager started building them even with the cask); surprise ADDED lines are the tell.
@@ -93,8 +93,10 @@ All decided 2026-09-03: disko and nix-topology dropped (re-add from their templa
 
 ### Phase 1 — NixOS-WSL (`trfwsl`) — remaining
 
-- [ ] Windows-side: scheduled task to auto-start WSL, `.wslconfig` for mirrored networking (the pipeline dies whenever the PC is off)
-- [ ] Test Tailscale on eduroam (DERP relay fallback over 443)
+- [ ] Post-boot Tailscale race: tailscaled's data path is dead after every boot until `sudo tailscale down && sudo tailscale up` (a 28-day outage ended 2026-09-26). The fix belongs in `vpn.nix`
+- [ ] `.wslconfig` for mirrored networking (it only sets `vmIdleTimeout=-1`; optional while Tailscale covers access)
+- [x] Windows scheduled task to auto-start WSL: `Start-NixOS-WSL` (boot trigger, highest privileges)
+- [x] Tailscale on eduroam: no direct path, falls back to DERP over 443 (checked 2026-09-27)
 
 ### Phase 2 — Dedicated NixOS server (`trflab`)
 

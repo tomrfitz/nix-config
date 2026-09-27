@@ -204,16 +204,16 @@ The script handles: Xcode CLT (darwin), Lix installation, repo clone, first `dar
 
 ### Phase 1 — NixOS-WSL on gaming PC (`trfwsl`)
 
-Interim homelab running NixOS-WSL on the existing Windows desktop. Config is largely complete — host runs Plex, full *arr stack, sabnzbd, tautulli, recyclarr, minecraft, bookshelf, with Mullvad VPN + Tailscale coexistence, Cloudflare tunnel, sops-nix secrets, and ollama.
+Interim homelab running NixOS-WSL on the existing Windows desktop. Config is largely complete — host runs Plex, full *arr stack, sabnzbd, tautulli, recyclarr, minecraft, bookshelf, with Mullvad VPN + Tailscale coexistence, Cloudflare tunnel, sops-nix secrets, and ollama. These services hold no data yet: the live homelab is still Windows-native Plex and \*arr on the PC's DrivePool (`K:\data\media`).
 
-**Done:** nixos-wsl input, host config, WSL module, homelab service modules, media path config (NTFS mounts), Tailscale, Mullvad VPN with nftables split-tunnel, Cloudflare tunnel, sops-nix secrets.
+**Done:** nixos-wsl input, host config, WSL module, homelab service modules, media path config (NTFS mounts), Tailscale (on eduroam it falls back to DERP relays over 443, which works), Mullvad VPN with nftables split-tunnel, Cloudflare tunnel, sops-nix secrets, the Windows `Start-NixOS-WSL` scheduled task (boot trigger, runs whether or not anyone is logged on).
 
 **Remaining:**
 
-1. Windows-side: scheduled task to auto-start WSL, `.wslconfig` for mirrored networking (the daily flake.lock pipeline only runs while the PC is on — it has been silent since 2026-06-08)
-2. Test Tailscale on eduroam (DERP relay fallback over 443)
+1. Post-boot Tailscale race: after every trfwsl boot, tailscaled's data path stays dead until a manual `sudo tailscale down && sudo tailscale up` (a 28-day outage ended 2026-09-26). The fix belongs in `modules/nixos/system/homelab/vpn.nix`
+2. `.wslconfig` for mirrored networking (it only sets `vmIdleTimeout=-1`; optional while Tailscale covers access)
 
-**Constraints:** WSL doesn't auto-start with Windows, networking is NAT'd by default (use mirrored mode or Tailscale), no direct disk/hardware access, Windows updates can kill WSL. Acceptable for an interim setup.
+**Constraints:** WSL starts only through the Windows scheduled task, networking is NAT'd by default (use mirrored mode or Tailscale), no direct disk/hardware access, Windows updates can kill WSL. Acceptable for an interim setup.
 
 ### Phase 2 — Dedicated NixOS server (`trflab`)
 
