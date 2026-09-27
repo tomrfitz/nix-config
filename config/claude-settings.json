@@ -1,7 +1,5 @@
 {
-    "model": "opus[1m]",
     "permissions": {
-        "defaultMode": "auto",
         "allow": [
             "mcp__plugin_hm_zotero__zotero_get_*",
             "mcp__plugin_hm_zotero__zotero_search_*",
@@ -17,7 +15,16 @@
             "mcp__plugin_hm_zotero__zotero_delete_collection",
             "mcp__plugin_hm_zotero__zotero_delete_annotation",
             "mcp__plugin_hm_zotero__zotero_batch_update"
-        ]
+        ],
+        "defaultMode": "auto"
     },
-    "effortLevel": "medium"
+    "model": "opus",
+    "effortLevel": "medium",
+    "modelSettings": {
+        "claude-opus-5-5": {
+            "effortLevel": "xhigh"
+        }
+    },
+    "theme": "auto",
+    "agentPushNotifEnabled": false
 }
