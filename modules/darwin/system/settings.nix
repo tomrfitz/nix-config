@@ -15,6 +15,7 @@ let
       AutoFillFromAddressBook = false;
       AutoFillPasswords = false;
       AutoFillFromiCloudKeychain = false;
+      AutoFillCreditCardData = false;
       AutoFillMiscellaneousForms = false;
       EnableNarrowTabs = true; # Compact tab bar
       SearchProviderShortName = "Google";
@@ -102,6 +103,9 @@ in
       ShowMountedServersOnDesktop = false;
       ShowRemovableMediaOnDesktop = false;
       NewWindowTarget = "Home";
+      CreateDesktop = false; # Disable Finder's desktop icon layer (breaks Paneru tiling)
+      ShowPathbar = true;
+      ShowStatusBar = true;
     };
 
     # ── Trackpad ─────────────────────────────────────────────────────────
@@ -146,6 +150,13 @@ in
       closeViewScrollWheelToggle = true; # Ctrl+scroll to zoom
     };
 
+    # ── Window manager ───────────────────────────────────────────────────
+    WindowManager = {
+      AppWindowGroupingBehavior = true;
+      EnableTiledWindowMargins = false; # No gaps between tiled windows
+      HideDesktop = true; # Hide desktop when clicking wallpaper
+    };
+
     # ── Custom preferences (no typed nix-darwin options) ─────────────────
     CustomUserPreferences = {
       # Extra NSGlobalDomain keys without typed nix-darwin options
@@ -174,19 +185,14 @@ in
       };
       "com.apple.desktopservices" = {
         DSDontWriteNetworkStores = true;
+        DSDontWriteUSBStores = true;
       };
       "com.apple.controlcenter" = {
         # 1 = In Full Screen Only
         AutoHideMenuBarOption = 1;
       };
-      "com.apple.WindowManager" = {
-        EnableTiledWindowMargins = false; # No gaps between tiled windows
-        HideDesktop = true; # Hide desktop when clicking wallpaper
-        AppWindowGroupingBehavior = true; # Group windows by app
-      };
       "com.apple.finder" = {
         ShowSidebar = true;
-        CreateDesktop = false; # disable desktop icon layer (fixes paneru tiling Finder's AXUnknown window)
       };
       "com.apple.spaces" = {
         "spans-displays" = false; # Independent spaces per display
