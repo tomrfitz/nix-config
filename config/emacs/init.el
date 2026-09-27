@@ -425,7 +425,9 @@
     ;; agenda) that editorconfig skips. editorconfig-exclude-modes is a
     ;; no-op in the 2026 editorconfig rewrite, so we set 8 rather than
     ;; trying to exempt org.
-    :hook (org-mode . (lambda () (setq-local tab-width 8)))
+    :hook ((org-mode . (lambda () (setq-local tab-width 8)))
+              ;; Show a block's :file result (a Graphviz SVG) right after C-c C-c.
+              (org-babel-after-execute . org-link-preview-refresh))
     :bind (("C-c c" . org-capture)
               ("C-c a" . org-agenda)
               ("C-c l" . org-store-link)
@@ -452,6 +454,8 @@
     (org-refile-targets '((org-agenda-files :maxlevel . 2)))
     (org-refile-use-outline-path 'file)
     (org-outline-path-complete-in-steps nil)
+    ;; Babel: Elisp (the default) plus Graphviz `dot' blocks (graphviz from emacs.nix).
+    (org-babel-load-languages '((emacs-lisp . t) (dot . t)))
     ;; C-c a w: the week (Monday start) with deadlines 14 days out — OMSCS
     ;; posts milestones about two weeks ahead — then every undated TODO.
     (org-agenda-custom-commands

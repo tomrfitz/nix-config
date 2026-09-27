@@ -79,6 +79,8 @@ in
       d.en
       d.it
     ]))
+    # `dot' for org-babel's Graphviz blocks.
+    pkgs.graphviz
   ];
 
   # Emacs as a server.
