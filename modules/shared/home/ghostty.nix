@@ -30,6 +30,9 @@
       keybind = [
         "global:shift+ctrl+backquote=new_window"
         "global:ctrl+backquote=toggle_quick_terminal"
+        # Windows and splits, not native tabs: paneru tiles a tab group as one
+        # column and never scrolls it into view on Cmd-Tab or Dock focus.
+        "super+t=new_window"
       ];
       focus-follows-mouse = true;
       # REVISIT(upstream): restore `macos-titlebar-style = "tabs"` once a stable
