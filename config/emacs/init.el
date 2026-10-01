@@ -93,9 +93,14 @@
 (pixel-scroll-precision-mode 1)
 ;; No gesture zoom: a stray pinch or Ctrl-wheel text-scales whichever buffer
 ;; is under the pointer (the vertico posframe, say) into illegibility.
-;; C-x C-M-= / C-x C-= remain for deliberate scaling.
-(keymap-global-unset "<pinch>")
-(setq mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
+;; C-x C-M-= / C-x C-= remain for deliberate scaling. `setopt', not `setq':
+;; mwheel is preloaded, and only the option's :set re-syncs the bindings it
+;; made at dump time. The freed events go to `ignore' so a Ctrl-held swipe
+;; doesn't echo "C-<wheel-up> is undefined".
+(setopt mouse-wheel-scroll-amount '(1 ((shift) . hscroll)))
+(dolist (key '("<pinch>" "C-<pinch>" "C-<wheel-up>" "C-<wheel-down>"
+                  "C-<wheel-left>" "C-<wheel-right>"))
+    (keymap-global-set key #'ignore))
 
 ;; Load custom file if it exists (keeps init.el clean)
 (when (file-exists-p custom-file)
