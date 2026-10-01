@@ -1,4 +1,5 @@
 {
+  lib,
   pkgs,
   user,
   ...
@@ -8,9 +9,15 @@
   # REVISIT(upstream): drop the doInstallCheck override on macOS once lix#1101
   # (fork safety on macOS Sequoia/Tahoe) lands — retargeted to milestone 2.97.
   # ref: https://git.lix.systems/lix-project/lix/issues/1101; checked: 2026-08-26
-  nix.package = pkgs.lixPackageSets.stable.lix.overrideAttrs {
+  # REVISIT(upstream): drop the NIX_LDFLAGS backport once nixpkgs-unstable
+  # carries it (Apple's ld rejects 2.95.3's `-z,noexecstack`).
+  # ref: https://github.com/NixOS/nixpkgs/pull/568529; checked: 2026-09-30
+  nix.package = pkgs.lixPackageSets.stable.lix.overrideAttrs (old: {
     doInstallCheck = pkgs.stdenv.hostPlatform.isLinux;
-  };
+    env = old.env // {
+      NIX_LDFLAGS = lib.optionalString pkgs.stdenv.hostPlatform.isElf "-z,noexecstack";
+    };
+  });
   # Flakes only: no channels, so no dead channels entry on the Nix search path
   # (impure evaluations warned that root's channels profile does not exist).
   nix.channel.enable = false;
