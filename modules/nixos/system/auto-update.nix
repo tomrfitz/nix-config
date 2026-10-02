@@ -69,7 +69,8 @@ in
         environment = {
           DEPLOY_KEY_PATH = config.sops.secrets."github/deploy-key".path;
           # Root's nix CLI opens the store directly; going through nix-daemon
-          # gives builds and fetches its network path (split-tunneled on trfwsl).
+          # gives builds and fetches its network path (split-tunneled when the
+          # homelab VPN is on).
           NIX_REMOTE = "daemon";
         };
         serviceConfig = {

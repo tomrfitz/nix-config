@@ -16,7 +16,7 @@ A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tra
 | `trflab` | x86_64-linux | Dedicated homelab server | Future |
 | `trfvm` | TBD | Scratch/sandbox VM | Future |
 
-The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful for prototyping NixOS service configs (and the only host that exercises the Linux desktop modules); it has been powered off since ~2026-03, so the daily pipeline only evaluates it. `trfwsl` runs the homelab stack via NixOS-WSL (see Roadmap for remaining work).
+The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful for prototyping NixOS service configs (and the only host that exercises the Linux desktop modules); it has been powered off since ~2026-03, so the daily pipeline only evaluates it. `trfwsl` runs NixOS-WSL with Tailscale, ollama, Attic and the auto-update pipeline; its homelab is off until trflab (see Roadmap).
 
 ## Commands
 
@@ -111,7 +111,7 @@ modules/
 - Linux system services: `modules/nixos/system/default.nix`
 - Homelab shared config: `modules/nixos/system/homelab/default.nix`
 - Homelab per-service conventions: `modules/nixos/system/homelab/<service>.nix`
-- Enable homelab services: `hosts/trfwsl/default.nix` (via `services.<name>.enable`)
+- Enable homelab services: the homelab host's file, via `trf.homelab` and `services.<name>.enable` (no host runs it since 2026-10-01; trfwsl's last declaration is `git show 4cc4662:hosts/trfwsl/default.nix`)
 - WSL GPU / container runtime: `modules/nixos/system/wsl-gpu.nix`
 - Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
 - Configure editors: Zed in `modules/shared/home/desktop.nix`, Helix in `modules/shared/home/editors.nix`, Emacs in `modules/shared/home/emacs.nix`
@@ -204,13 +204,15 @@ The script handles: Xcode CLT (darwin), Lix installation, repo clone, first `dar
 
 ### Phase 1 — NixOS-WSL on gaming PC (`trfwsl`)
 
-Interim homelab running NixOS-WSL on the existing Windows desktop. Config is largely complete — host runs Plex, full *arr stack, sabnzbd, tautulli, recyclarr, minecraft, bookshelf, with Mullvad VPN + Tailscale coexistence, Cloudflare tunnel, sops-nix secrets, and ollama. These services hold no data yet: the live homelab is still Windows-native Plex and \*arr on the PC's DrivePool (`K:\data\media`).
+Interim homelab running NixOS-WSL on the existing Windows desktop. The config ran Plex, full *arr stack, sabnzbd, tautulli, recyclarr, minecraft, bookshelf, with Mullvad VPN + Tailscale coexistence, Cloudflare tunnel, sops-nix secrets, and ollama, but those services never held data: the live homelab is still Windows-native Plex and \*arr on the PC's DrivePool (`K:\data\media`).
+
+**The homelab is off on trfwsl since 2026-10-01.** WSL's 6.18 kernel can't host Mullvad's split tunneling (net_cls v1 mounts fail with `EPERM`, and the cgroup2 mode needs `CONFIG_NFT_SOCKET`, which WSL doesn't build). Without it Mullvad's firewall dropped tailscaled and every excluded service, from the 2026-09-29 boot until 10-01. The modules stay ready for trflab; trfwsl's last declaration is `git show 4cc4662:hosts/trfwsl/default.nix`. With the VPN module gone, trfwsl's NixOS firewall is on again (iptables backend).
 
 **Done:** nixos-wsl input, host config, WSL module, homelab service modules, media path config (NTFS mounts), Tailscale (on eduroam it falls back to DERP relays over 443, which works), Mullvad VPN with nftables split-tunnel, Cloudflare tunnel, sops-nix secrets, the Windows `Start-NixOS-WSL` scheduled task (boot trigger, runs whether or not anyone is logged on).
 
 **Remaining:**
 
-1. Post-boot Tailscale race: after every trfwsl boot, tailscaled's data path stays dead until a manual `sudo tailscale down && sudo tailscale up` (a 28-day outage ended 2026-09-26). The fix belongs in `modules/nixos/system/homelab/vpn.nix`
+1. Post-boot Tailscale race: after trfwsl boots, tailscaled stayed dead until a manual `sudo tailscale down && sudo tailscale up` (a 28-day outage ended 2026-09-26). Mullvad was the likely cause; after the next reboot without it, confirm Tailscale comes up on its own
 2. `.wslconfig` for mirrored networking (it only sets `vmIdleTimeout=-1`; optional while Tailscale covers access)
 
 **Constraints:** WSL starts only through the Windows scheduled task, networking is NAT'd by default (use mirrored mode or Tailscale), no direct disk/hardware access, Windows updates can kill WSL. Acceptable for an interim setup.
@@ -249,7 +251,7 @@ on-push CI:    eval all 3 hosts + formatting check (safety net)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
 - `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp (unattended; user sudo is Touch ID-only). Log: `/var/log/auto-rebuild.log`. It fires at 06:30 Mac-local time, or on the next wake if the Mac slept through it. It has no Full Disk Access, so only interactive switches write the sandboxed apps' preferences (Safari, Mail; `settings.nix`), and the daemon logs a warning instead
 
-On trfwsl, Nix traffic bypasses Mullvad: nix-daemon is split-tunneled, and the pipeline sets `NIX_REMOTE=daemon` because root's nix CLI would otherwise open the store directly and stay in the tunnel. Phase 4's output is a GC root (`/var/lib/auto-update/result-trfwsl`), so the 03:15 `nix-gc` keeps it and a run downloads only what changed. Before that, the pipeline also built trfnix with `--no-link`, so each run re-downloaded trfnix's ~6 GiB closure; on a slow relay that hit the 90-minute `TimeoutStartSec` (2026-09-27). When trfnix comes back, restore its build and Attic push with an out-link of its own.
+The pipeline sets `NIX_REMOTE=daemon`, so its fetches take nix-daemon's network path; root's nix CLI would otherwise open the store directly. When the homelab VPN is on, that path is split-tunneled around Mullvad. Phase 4's output is a GC root (`/var/lib/auto-update/result-trfwsl`), so the 03:15 `nix-gc` keeps it and a run downloads only what changed. Before that, the pipeline also built trfnix with `--no-link`, so each run re-downloaded trfnix's ~6 GiB closure; on a slow relay that hit the 90-minute `TimeoutStartSec` (2026-09-27). When trfnix comes back, restore its build and Attic push with an out-link of its own.
 
 **Manual trigger:** `sudo systemctl start auto-update` on trfwsl
 

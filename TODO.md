@@ -94,7 +94,7 @@ All decided 2026-09-03: disko and nix-topology dropped (re-add from their templa
 
 ### Phase 1 — NixOS-WSL (`trfwsl`) — remaining
 
-- [ ] Post-boot Tailscale race: tailscaled's data path is dead after every boot until `sudo tailscale down && sudo tailscale up` (a 28-day outage ended 2026-09-26). The fix belongs in `vpn.nix`
+- [ ] Post-boot Tailscale race: tailscaled stayed dead after boot until `sudo tailscale down && sudo tailscale up` (a 28-day outage ended 2026-09-26). Mullvad was the likely cause, and the homelab (with Mullvad) is off on trfwsl since 2026-10-01: after the next reboot, confirm Tailscale comes up on its own
 - [ ] `.wslconfig` for mirrored networking (it only sets `vmIdleTimeout=-1`; optional while Tailscale covers access)
 - [x] Windows scheduled task to auto-start WSL: `Start-NixOS-WSL` (boot trigger, highest privileges)
 - [x] Tailscale on eduroam: no direct path, falls back to DERP over 443 (checked 2026-09-27)
@@ -103,10 +103,10 @@ All decided 2026-09-03: disko and nix-topology dropped (re-add from their templa
 
 Hardware: i5-12400 + B660M DDR4 mATX + 32GB; reuse Fractal Focus G Mini, NH-U9S (LGA1700 kit), EVGA 550 G2, GTX 1070 (ollama only — Quick Sync handles Plex), existing drives. Memtest overnight before committing.
 
-- [ ] Add `trflab` host to the flake (swap the WSL module for hardware config; reuse the homelab modules; swap NTFS mount paths for ZFS dataset paths in `configRoot`/`mediaRoot`)
+- [ ] Add `trflab` host to the flake (swap the WSL module for hardware config; reuse the homelab modules, starting from trfwsl's last declaration in `git show 4cc4662:hosts/trfwsl/default.nix`; swap NTFS mount paths for ZFS dataset paths in `configRoot`/`mediaRoot`)
 - [ ] Headless NVIDIA for the 1070; auto-rebuild via systemd timer
 - [ ] Storage: ZFS pool on the new drive; mount the old DrivePool drives (file-level NTFS pooling, files under hidden `PoolPart.*`) individually and rsync media in; dedupe if duplication was on; verify checksums; reformat old drives into the pool; pick mirror vs raidz by final drive count
-- [ ] Migrate services: stateless (recyclarr, openbooks, VPN, tunnel, tailscale) just rebuild; SQLite services (*arr, sabnzbd, qbittorrent, plex, jellyfin, seerr, tautulli, calibre, bookshelf, minecraft) stop → rsync `/var/lib/homelab/<svc>` → start; Postgres (immich, spliit) pg_dump/restore — re-run Immich ML jobs rather than migrating pgvecto.rs embeddings; re-point the Cloudflare tunnel; Plex may need a re-claim
+- [ ] Migrate services (trfwsl's copies never held data and are off since 2026-10-01; the data lives in the Windows-native apps): stateless (recyclarr, openbooks, VPN, tunnel, tailscale) just rebuild; SQLite services (*arr, sabnzbd, qbittorrent, plex, jellyfin, seerr, tautulli, calibre, bookshelf, minecraft) stop → rsync `/var/lib/homelab/<svc>` → start; Postgres (immich, spliit) pg_dump/restore — re-run Immich ML jobs rather than migrating pgvecto.rs embeddings; re-point the Cloudflare tunnel; Plex may need a re-claim
 - [ ] Consider a backup job now (restic/borgmatic) — doubles as a migration dry-run
 - [ ] Demote `trfwsl` to a dev environment
 
