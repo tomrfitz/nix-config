@@ -87,7 +87,7 @@ How the rules work together:
 
 **Root cause:** The nftables rules from Problem 3 handle steady-state traffic, but they rely on either `tailscale0` existing (incoming chain) or tailscaled setting fwmark `0x80000` on its packets (outgoing chain). During initial authentication — before the tunnel is established — tailscaled's control plane traffic may not carry the fwmark, and `tailscale0` doesn't exist yet. Mullvad's lockdown blocks these unrecognized packets.
 
-**Solution:** Add tailscaled to Mullvad's PID-based split tunnel via `vpn.excludedServices`. This registers tailscaled's PID with `mullvad split-tunnel add $MAINPID` on startup, exempting its outbound traffic from lockdown. The systemd service ordering (`after = [ "mullvad-daemon.service" ]`) ensures Mullvad is ready to accept the split-tunnel registration.
+**Solution:** Add tailscaled to Mullvad's PID-based split tunnel via `vpn.excludedServices`. This registers tailscaled's PID with `mullvad split-tunnel add $MAINPID` on startup, exempting its outbound traffic from lockdown. The systemd service ordering (`after = [ "mullvad-daemon.service" ]`) holds the service until the daemon's postStart readiness loop finishes. The registration retries for 30 s; if the daemon still refuses, it logs the error and leaves the service running through the tunnel (before 2026-10, a refusing daemon crash-looped cloudflared, immich and tandoor, and the restart loop failed the 2026-09-30 switch).
 
 PID-based and nftables approaches are complementary:
 

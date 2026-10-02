@@ -101,6 +101,16 @@ in
     systemd.services =
       let
         mullvad = "${config.services.mullvad-vpn.package}/bin/mullvad";
+        # Best effort: retry while the daemon settles, then leave the service
+        # running through the tunnel. A failed ExecStartPost kills the service,
+        # and a Restart= loop fails every switch while the daemon refuses.
+        splitTunnelAdd = pkgs.writeShellScript "mullvad-split-tunnel-add" ''
+          for _ in {1..30}; do
+            err=$(${mullvad} split-tunnel add "$1" 2>&1) && exit 0
+            ${lib.getExe' pkgs.coreutils "sleep"} 1
+          done
+          echo "split-tunnel add $1 failed, leaving it in the tunnel: $err" >&2
+        '';
       in
       {
         # ── Policy routing for Tailscale replies ──────────────────────
@@ -157,7 +167,7 @@ in
             after = [ "mullvad-daemon.service" ];
             wants = [ "mullvad-daemon.service" ];
             serviceConfig.ExecStartPost = [
-              "+${mullvad} split-tunnel add $MAINPID"
+              "+${splitTunnelAdd} $MAINPID"
             ];
           };
         }) vpn.excludedServices
