@@ -10,10 +10,9 @@
   wsl = {
     enable = true;
     defaultUser = user;
-    interop = {
-      register = true;
-      includePath = true;
-    };
+    # No interop.register: WSL 2.9+ keeps its own .exe handler and makes
+    # binfmt_misc read-only, so re-registering it only fails systemd-binfmt
+    # and every switch (https://github.com/nix-community/NixOS-WSL/issues/1109).
   };
 
   trf.wsl.gpu.enable = true;
