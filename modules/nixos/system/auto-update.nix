@@ -104,8 +104,16 @@ in
               ${pkgs.systemd}/bin/journalctl -u nixos-rebuild-switch-to-configuration \
                 --since "1 hour ago" -n 200 --no-pager || true
               echo ""
-              echo "--- currently failed units ---"
-              ${pkgs.systemd}/bin/systemctl --failed --no-pager --no-legend || true
+              # Restart= loops sit in auto-restart, which `systemctl --failed`
+              # misses but switch-to-configuration counts as failed.
+              echo "--- failed and restart-looping units ---"
+              for unit in $(${pkgs.systemd}/bin/systemctl list-units --all --plain --no-legend \
+                --state=failed,auto-restart | ${lib.getExe' pkgs.coreutils "cut"} -d' ' -f1); do
+                [ "$unit" = auto-update.service ] && continue
+                echo ""
+                echo "## $unit"
+                ${pkgs.systemd}/bin/journalctl -u "$unit" -n 20 --no-pager || true
+              done
             } | ${pkgs.msmtp}/bin/msmtp -a default tomrfitz@gmail.com
           '';
         };
