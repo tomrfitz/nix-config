@@ -98,6 +98,7 @@ All decided 2026-09-03: disko and nix-topology dropped (re-add from their templa
 - [ ] `.wslconfig` for mirrored networking (it only sets `vmIdleTimeout=-1`; optional while Tailscale covers access)
 - [x] Windows scheduled task to auto-start WSL: `Start-NixOS-WSL` (boot trigger, highest privileges)
 - [x] Tailscale on eduroam: no direct path, falls back to DERP over 443 (checked 2026-09-27)
+- [x] Out-of-band path to trfwsl through the Windows host (2026-10-01)
 
 ### Phase 2 — Dedicated NixOS server (`trflab`)
 
