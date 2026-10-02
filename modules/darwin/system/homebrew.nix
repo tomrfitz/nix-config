@@ -58,14 +58,12 @@
       "activitywatch"
       "karabiner-elements"
       "batfi"
-      "betterdisplay"
       "daisydisk"
       "thaw"
       "keepingyouawake"
       "keyclu"
       "linearmouse"
       "lookaway"
-      "loop"
       "maccy"
       "macs-fan-control"
       "macusb" # bootable USBs: Windows (splits install.wim), Linux, macOS
@@ -106,7 +104,6 @@
       }
       # "pear" — moved to nix (pear-desktop in shared/home/desktop.nix)
       "sf-symbols"
-      "tabtab"
 
       # misc
       "handy"
