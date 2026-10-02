@@ -9,7 +9,6 @@
 let
   cfg = config.trf.wsl.gpu;
   wslLibPath = "/usr/lib/wsl/lib";
-  mkWslLibEnv = enabled: lib.mkIf enabled { LD_LIBRARY_PATH = lib.mkForce wslLibPath; };
 in
 {
   options.trf.wsl.gpu.enable = lib.mkEnableOption "WSL GPU passthrough and container runtime wiring";
@@ -49,9 +48,21 @@ in
 
     # New Ollama module expects GPU flavor via package selection.
     services.ollama.package = lib.mkDefault pkgs.ollama-cuda;
-    systemd.services.ollama.environment = mkWslLibEnv config.services.ollama.enable;
-    systemd.services.plex.environment = mkWslLibEnv config.services.plex.enable;
-    systemd.services.jellyfin.environment = mkWslLibEnv config.services.jellyfin.enable;
+    # Guard the whole unit: an environment alone would define an empty one.
+    systemd.services = lib.mkMerge (
+      map
+        (
+          svc:
+          lib.mkIf config.services.${svc}.enable {
+            ${svc}.environment.LD_LIBRARY_PATH = lib.mkForce wslLibPath;
+          }
+        )
+        [
+          "ollama"
+          "plex"
+          "jellyfin"
+        ]
+    );
 
     environment.systemPackages = with pkgs; [
       libva-utils
