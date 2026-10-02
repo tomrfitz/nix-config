@@ -42,6 +42,7 @@ let
     "pi-intercom" # Direct session-to-session messaging; required for the contact_supervisor escalation tool in pi-subagents children
     "pi-hermes-memory" # Persistent memory across sessions with FTS5 search, auto-consolidation, and secret scanning
     "@juicesharp/rpiv-btw" # /btw side-conversation channel — ephemeral side questions without polluting the main session
+    "pi-claude-bridge" # claude-bridge/* models: Claude Code via the Agent SDK on the logged-in subscription (pi's own Anthropic login bills extra usage)
   ];
 
   # Runs the unwrapped package with npm on PATH: activation must not depend on
@@ -87,5 +88,11 @@ in
     ".pi/agent/skills/obsidian-vault".source = link "skills/obsidian-vault";
     ".pi/agent/skills/mattpocock".source = promotedSkills;
     ".pi/agent/prompts/simplify.md".source = link "prompts/simplify.md";
+    # Read-only is fine: the bridge writes this file only to dismiss its startup
+    # notice, which never shows while both keys are set.
+    ".pi/agent/claude-bridge.json".text = builtins.toJSON {
+      provider.plan = "max";
+      askClaude.enabled = false;
+    };
   };
 }
