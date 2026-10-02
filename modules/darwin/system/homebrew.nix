@@ -68,6 +68,7 @@
       "loop"
       "maccy"
       "macs-fan-control"
+      "macusb" # bootable USBs: Windows (splits install.wim), Linux, macOS
       "mullvad-vpn"
       "tailscale-app"
       "netnewswire"
@@ -79,6 +80,11 @@
       "shottr"
       "stats"
       "syntax-highlight"
+      # Leave its window features off (layout, maximize, focus follows mouse)
+      # for paneru, and its Homebrew manager, app updates and uninstaller for
+      # the Brewfile: cleanup = "uninstall" removes what it installs and the
+      # next switch reinstalls a cask it removes.
+      "vorssaint"
 
       # editors / writing
       "zed"
@@ -115,6 +121,7 @@
       "Dark Reader for Safari" = 1438243180;
       "Flighty" = 1358823008;
       "Hand Mirror" = 1502839586;
+      "Headjust" = 6759303637;
       "KakaoTalk" = 869223134;
       "One Thing" = 1604176982;
       "RapidClick" = 419891002;
