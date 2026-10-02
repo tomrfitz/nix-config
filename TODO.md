@@ -100,6 +100,13 @@ All decided 2026-09-03: disko and nix-topology dropped (re-add from their templa
 - [x] Tailscale on eduroam: no direct path, falls back to DERP over 443 (checked 2026-09-27)
 - [x] Out-of-band path to trfwsl through the Windows host (2026-10-01)
 
+### Homelab apps
+
+The live apps run on the Windows PC until trflab; its state and Windows-side work are in the user's private notes.
+
+- [ ] Recyclarr for the richest selection (user's goal): `homelab/recyclarr.nix` still uses `include: template:`, and recyclarr is now v8.7.2; research v8's config and guide pinning, then convert. Run it against the Windows Sonarr/Radarr so the same config carries to trflab
+- [ ] Remote access, designed once for trflab: Tautulli outside the tailnet, Cloudflare tunnels for Spliit and others (the `cloudflared` homelab module exists)
+
 ### Phase 2 — Dedicated NixOS server (`trflab`)
 
 Hardware: i5-12400 + B660M DDR4 mATX + 32GB; reuse Fractal Focus G Mini, NH-U9S (LGA1700 kit), EVGA 550 G2, GTX 1070 (ollama only — Quick Sync handles Plex), existing drives. Memtest overnight before committing.
@@ -122,7 +129,7 @@ Applied so far: nix-owned build (emacs-overlay, use-package as the package sourc
 
 ## Unmanaged (macOS)
 
-Installed outside nix and used (inventory 2026-10-02): Overcast (an iPad app from the App Store; `mas` can't see iOS apps, so `masApps` can't declare it), GlobalProtect (Georgia Tech VPN), TinkerTool + BresinkSoftwareUpdater (no cask; kept for spotting new macOS settings), Subway Builder (paid, no cask), Tern (Stencil's terminal, closed beta), MacTap (v2.1.2 from github.com/jaskirat1616/mactap-app; no cask and no updater, so updates are a manual re-download), Xcode (via `xcodes`). IINA is nix-installed (`modules/darwin/home/default.nix`). On disk, undecided: Wizard101, FlixorMac (a Plex client, never opened), Riot Client (left by the 2026-09-03 league-of-legends cut, with ~800 MB in `/Users/Shared/Riot Games`). ZenNotes (trial over — the app, `~/.config/zennotes` and its Application Support folder are leftovers to delete). Pear Desktop is nix-installed (`pear-desktop`); the manual `/Applications/Pear Desktop.app` is a duplicate to delete by hand. Login items are set in System Settings, not nix: One Thing, Ghostty, BatFi, Stats, Maccy, Mullvad, Google Drive, ActivityWatch, LookAway, Shottr, Pika, KeyClu, Velja, Macs Fan Control, KeepingYouAwake. Post-bootstrap manual steps: `xcodes install --latest`, Apple ID, 1Password, iCloud.
+Installed outside nix and used (inventory 2026-10-02): Overcast (an iPad app from the App Store; `mas` can't see iOS apps, so `masApps` can't declare it), GlobalProtect (Georgia Tech VPN), TinkerTool + BresinkSoftwareUpdater (no cask; kept for spotting new macOS settings), Subway Builder (paid, no cask), Tern (Stencil's terminal, closed beta), MacTap (v2.1.2 from github.com/jaskirat1616/mactap-app; no cask and no updater, so updates are a manual re-download), Xcode (via `xcodes`). IINA and Pear Desktop are nix-installed (`modules/darwin/home/default.nix`; `pear-desktop` in `shared/home/desktop.nix` still builds as `YouTube Music.app`). Login items are set in System Settings, not nix: One Thing, Ghostty, BatFi, Stats, Maccy, Mullvad, Google Drive, ActivityWatch, LookAway, Shottr, Pika, KeyClu, Velja, Macs Fan Control, KeepingYouAwake. Post-bootstrap manual steps: `xcodes install --latest`, Apple ID, 1Password, iCloud.
 
 ## Evidence and decisions of record (folded from the audit docs, 2026-09-01)
 
