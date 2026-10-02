@@ -54,7 +54,6 @@ in
     systemd.services.jellyfin.environment = mkWslLibEnv config.services.jellyfin.enable;
 
     environment.systemPackages = with pkgs; [
-      cudaPackages.cudatoolkit
       libva-utils
       nvidia-container-toolkit
       vulkan-tools
