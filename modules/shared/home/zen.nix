@@ -225,6 +225,8 @@ in
       pins =
         let
           s = profile.spaces;
+          # The homelab's tailnet host: the Windows apps until trflab is up.
+          lab = "http://tomrfitz-pc";
         in
         {
           # ── Home essentials ──
@@ -297,100 +299,56 @@ in
             position = 8;
           };
 
-          # ── Homelab: media servers ──
+          # ── Homelab ── only what runs on Windows today. trfwsl's fuller list (Jellyfin,
+          # Jellyseerr, Immich, Bookshelf, Bazarr, Calibre, Tandoor, Spliit) is in
+          # `git show a722f8b:modules/shared/home/zen.nix` for trflab.
           Plex = {
             id = "{88265c48-a298-4d0a-85f8-2d4cb17131b4}";
-            url = "http://trfwsl:32400/web/";
+            url = "${lab}:32400/web/";
             workspace = s.Lab.id;
             position = 0;
           };
-          Jellyfin = {
-            id = "{d4e7a1c3-5b2f-4a89-9c6d-8e3f2a1b0c5d}";
-            url = "http://trfwsl:8096/";
+          Tautulli = {
+            id = "{98441c65-8f0b-4e8c-850f-d74941e15f21}";
+            url = "${lab}:8181/";
             workspace = s.Lab.id;
             position = 1;
           };
-          Tautulli = {
-            id = "{98441c65-8f0b-4e8c-850f-d74941e15f21}";
-            url = "http://trfwsl:8181/";
+          Sonarr = {
+            id = "{01aa9f31-036a-4831-a955-f25bf107e9f6}";
+            url = "${lab}:8989/";
             workspace = s.Lab.id;
             position = 2;
           };
-          Jellyseerr = {
-            id = "{a7c3e5f1-9d2b-4f86-8a1c-6e4d3b2a0f9e}";
-            url = "http://trfwsl:5055/";
+          Radarr = {
+            id = "{ac5052b3-9b4d-4a2f-8d31-c7efc88e5d67}";
+            url = "${lab}:7878/";
             workspace = s.Lab.id;
             position = 3;
           };
-          Immich = {
-            id = "{b8d4f2a6-1e3c-4b97-9d5a-7f6e8c3b2d1a}";
-            url = "http://trfwsl:2283/";
+          Lidarr = {
+            id = "{32b376e2-3a62-4e24-bdf0-585631717e67}";
+            url = "${lab}:8686/";
             workspace = s.Lab.id;
             position = 4;
           };
-
-          # ── Homelab: library management ──
-          Sonarr = {
-            id = "{01aa9f31-036a-4831-a955-f25bf107e9f6}";
-            url = "http://trfwsl:8989/";
+          Readarr = {
+            id = "{24875b71-2158-4334-afa5-0c1e9be92399}";
+            url = "${lab}:8787/";
             workspace = s.Lab.id;
             position = 5;
           };
-          Radarr = {
-            id = "{ac5052b3-9b4d-4a2f-8d31-c7efc88e5d67}";
-            url = "http://trfwsl:7878/";
+          Prowlarr = {
+            id = "{f37d8f1f-8f7e-46a5-90f8-7481b77be7bd}";
+            url = "${lab}:9696/";
             workspace = s.Lab.id;
             position = 6;
           };
-          Lidarr = {
-            id = "{32b376e2-3a62-4e24-bdf0-585631717e67}";
-            url = "http://trfwsl:8686/";
-            workspace = s.Lab.id;
-            position = 7;
-          };
-          Bookshelf = {
-            id = "{24875b71-2158-4334-afa5-0c1e9be92399}";
-            url = "http://trfwsl:8787/";
-            workspace = s.Lab.id;
-            position = 8;
-          };
-          Bazarr = {
-            id = "{2a42da54-8a2d-442a-8439-5eea547cbed2}";
-            url = "http://trfwsl:6767/series";
-            workspace = s.Lab.id;
-            position = 9;
-          };
-
-          # ── Homelab: downloads & utilities ──
           SABnzbd = {
             id = "{0dab148c-07e5-4863-8b7b-8f10258f4d4f}";
-            url = "http://trfwsl:8080/";
+            url = "${lab}:8080/";
             workspace = s.Lab.id;
-            position = 10;
-          };
-          "Calibre Server" = {
-            id = "{79fa38f7-7aca-4401-9cff-82d8f0d32024}";
-            url = "http://trfwsl:8180/";
-            workspace = s.Lab.id;
-            position = 11;
-          };
-          "Calibre Web" = {
-            id = "{c5a9d3e7-2f1b-4c86-8d4a-9e7f6b3a1c2d}";
-            url = "http://trfwsl:8083/";
-            workspace = s.Lab.id;
-            position = 12;
-          };
-          "Tandoor Recipes" = {
-            id = "{e6b8c4d2-3a1f-4e95-9c7d-5f2a8b6e4d3c}";
-            url = "http://trfwsl:8099/";
-            workspace = s.Lab.id;
-            position = 13;
-          };
-          Spliit = {
-            id = "{f9c7d5e3-4b2a-4f86-8e1c-6a3d9b7f2e5a}";
-            url = "http://trfwsl:3000/";
-            workspace = s.Lab.id;
-            position = 14;
+            position = 7;
           };
 
           # ── Games folders ──
