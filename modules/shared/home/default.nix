@@ -118,6 +118,18 @@
         ControlPersist = "3600";
       };
       "trfnix trfwsl trflab".ForwardAgent = true;
+      # trfwsl's Windows host, reached over the tailnet. Needs the PC's OpenSSH
+      # DefaultShell set to PowerShell (wsl.exe there rejects sshd's `-c`); then
+      # one-shots work: ssh tomrfitz-pc 'wsl.exe -d NixOS -e <cmd>'.
+      "tomrfitz-pc".User = ''"thomas fitzgerald"'';
+      # Interactive shell in trfwsl through Windows, for when trfwsl's own
+      # Tailscale is down.
+      "trfwsl-oob" = {
+        HostName = "tomrfitz-pc";
+        User = ''"thomas fitzgerald"'';
+        RemoteCommand = "wsl.exe -d NixOS";
+        RequestTTY = "yes";
+      };
     };
   };
 
