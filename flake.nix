@@ -163,6 +163,11 @@
                 emacs-overlay.overlays.default
               ]
               ++ overlays;
+              # The commit each generation is built from: `<sha>` from the GitHub
+              # flake, `<sha>-dirty` for nrsl from a dirty tree. Read it with
+              # darwin-version/nixos-version --configuration-revision; the repo's
+              # SessionStart hook reports it to agents.
+              system.configurationRevision = self.rev or self.dirtyRev or null;
             }
           ]
           ++ sharedSystemModules
