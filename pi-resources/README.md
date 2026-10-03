@@ -9,7 +9,7 @@ Pi reads through the symlinks live — edits here take effect on the next pi res
 ```text
 pi-resources/
     skills/
-        obsidian-vault/   # author-owned
+        org-notes/        # author-owned
     prompts/
         simplify.md       # author-owned
 ```
@@ -18,7 +18,7 @@ Skill discovery follows pi's auto-discovery rule for `~/.pi/agent/skills/`: ever
 
 ## Author-owned content
 
-- `skills/obsidian-vault/` — agent guidance for reading/writing the Obsidian vault at `$OBSD` (transitioning to `$NOTES`; see `TODO.md` Emacs migration plan), including the `author:` frontmatter convention for agent-written notes.
+- `skills/org-notes/` — agent guidance for reading and writing the org notes at `$NOTES`, including the `#+author:` convention for agent-written notes. The Obsidian vault at `$OBSD` is a read-only archive.
 - `prompts/simplify.md` — `/simplify` slash command. Three-angle review of the current diff (reuse, quality, efficiency) by one `reviewer` subagent.
 
 ## Third-party skills (not vendored)

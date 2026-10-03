@@ -85,7 +85,7 @@ in
   );
 
   home.file = {
-    ".pi/agent/skills/obsidian-vault".source = link "skills/obsidian-vault";
+    ".pi/agent/skills/org-notes".source = link "skills/org-notes";
     ".pi/agent/skills/mattpocock".source = promotedSkills;
     ".pi/agent/prompts/simplify.md".source = link "prompts/simplify.md";
     # Read-only is fine: the bridge writes this file only to dismiss its startup
