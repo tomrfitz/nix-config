@@ -13,6 +13,7 @@
 }:
 let
   cfg = config.programs.claude-code;
+  link = path: config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/${path}";
 in
 {
   programs.claude-code = {
@@ -24,10 +25,19 @@ in
     enableMcpIntegration = true;
   };
 
-  # settings.json links out of the store into the working tree, not through
-  # `settings`: Claude Code writes it at runtime (/effort, /model, permission
-  # answers), which a read-only store file refuses with EACCES. Its edits land
-  # in the repo as a diff to keep or revert.
-  home.file."${cfg.configDir}/settings.json".source =
-    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/config/claude-settings.json";
+  home.file = {
+    # settings.json links out of the store into the working tree, not through
+    # `settings`: Claude Code writes it at runtime (/effort, /model, permission
+    # answers), which a read-only store file refuses with EACCES. Its edits land
+    # in the repo as a diff to keep or revert.
+    "${cfg.configDir}/settings.json".source = link "config/claude-settings.json";
+    # Run by `statusLine` in settings.json.
+    "${cfg.configDir}/statusline.sh".source = link "config/claude-statusline.sh";
+    # Skills for every project, linked like pi-resources rather than through
+    # `programs.claude-code.skills`: edits apply without a rebuild, and a new
+    # skill needs no intent-to-add to be visible to the flake.
+    "${cfg.configDir}/skills/handoff".source = link "config/skills/handoff";
+    "${cfg.configDir}/skills/recall".source = link "config/skills/recall";
+    "${cfg.configDir}/skills/zotero".source = link "config/skills/zotero";
+  };
 }

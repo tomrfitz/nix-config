@@ -42,6 +42,10 @@
       "secrets/**"
       ".sops.yaml"
       "**/package-lock.json"
+      # Claude Code rewrites its live settings (linked here out of the store)
+      # as 2-space JSON at runtime; keep its format rather than churn on every
+      # /model or permission answer.
+      "config/claude-settings.json"
     ];
     settings = {
       lineWidth = 80;

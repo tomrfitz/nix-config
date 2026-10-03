@@ -1,30 +1,64 @@
 {
-    "permissions": {
-        "allow": [
-            "mcp__plugin_hm_zotero__zotero_get_*",
-            "mcp__plugin_hm_zotero__zotero_search_*",
-            "mcp__plugin_hm_zotero__zotero_advanced_search",
-            "mcp__plugin_hm_zotero__zotero_semantic_search",
-            "mcp__plugin_hm_zotero__zotero_read_pdf_pages",
-            "mcp__plugin_hm_zotero__zotero_synthesize_annotations",
-            "mcp__plugin_hm_zotero__zotero_export_bibliography",
-            "mcp__plugin_hm_zotero__zotero_write_capabilities"
-        ],
-        "ask": [
-            "mcp__plugin_hm_zotero__zotero_delete_item",
-            "mcp__plugin_hm_zotero__zotero_delete_collection",
-            "mcp__plugin_hm_zotero__zotero_delete_annotation",
-            "mcp__plugin_hm_zotero__zotero_batch_update"
-        ],
-        "defaultMode": "auto"
-    },
-    "model": "opus",
-    "effortLevel": "medium",
-    "modelSettings": {
-        "claude-opus-5-5": {
-            "effortLevel": "xhigh"
-        }
-    },
-    "theme": "auto",
-    "agentPushNotifEnabled": false
+  "cleanupPeriodDays": 365,
+  "permissions": {
+    "allow": [
+      "mcp__plugin_hm_zotero__zotero_get_*",
+      "mcp__plugin_hm_zotero__zotero_search_*",
+      "mcp__plugin_hm_zotero__zotero_advanced_search",
+      "mcp__plugin_hm_zotero__zotero_semantic_search",
+      "mcp__plugin_hm_zotero__zotero_read_pdf_pages",
+      "mcp__plugin_hm_zotero__zotero_synthesize_annotations",
+      "mcp__plugin_hm_zotero__zotero_export_bibliography",
+      "mcp__plugin_hm_zotero__zotero_write_capabilities"
+    ],
+    "ask": [
+      "mcp__plugin_hm_zotero__zotero_delete_item",
+      "mcp__plugin_hm_zotero__zotero_delete_collection",
+      "mcp__plugin_hm_zotero__zotero_delete_annotation",
+      "mcp__plugin_hm_zotero__zotero_batch_update"
+    ],
+    "defaultMode": "auto"
+  },
+  "model": "opus",
+  "statusLine": {
+    "type": "command",
+    "command": "~/.claude/statusline.sh"
+  },
+  "effortLevel": "medium",
+  "modelSettings": {
+    "claude-opus-5-5": {
+      "effortLevel": "xhigh"
+    }
+  },
+  "theme": "auto",
+  "agentPushNotifEnabled": false,
+  "autoMode": {
+    "environment": [
+      "### Org-wide",
+      "**Organization**: None configured",
+      "**Cloud provider(s)**: None configured",
+      "**Repository visibility**: Public — tomrfitz/nix-config (github.com) is a public repository",
+      "**Internal sharing / snippet hosting**: None configured — treat public paste/gist services as outside the trust boundary",
+      "**Secrets management**: 1Password (op-ssh-sign used for commit signing in this repo's land skill); .envrc files present (templates/cpp/.envrc, templates/default/.envrc, templates/python-uv/.envrc, ./.envrc) suggest direnv-based local secrets/config",
+      "**Default / protected branches**: main (default). No rulesets or protected-branch rules listed via gh — note CI (.github/workflows) runs on main pushes per repo docs, but gh reports no classic protection or rulesets configured",
+      "**CI/CD deploy targets**: None configured",
+      "**Network posture**: None configured",
+      "**Host containment**: None configured — assume Claude Code runs on an ordinary developer machine with open internet",
+      "**Source control**: The trusted repo (tomrfitz/nix-config) and its remote (github.com:tomrfitz/nix-config.git) only — public repo, so only this repo's own work should be pushed there",
+      "**Trusted internal domains**: None configured",
+      "**Trusted cloud buckets**: None configured",
+      "**Key internal services**: None configured",
+      "**Internal package registry**: None configured",
+      "**Sensitive data locations & audiences**: any file or store holding personal data, confidential business data, credentials, regulated data, or similarly sensitive material; preserve exact handles when known and share only with audiences cleared at the [named+specifics] bar. Note: .envrc files in this repo (./.envrc, templates/cpp/.envrc, templates/default/.envrc, templates/python-uv/.envrc) may hold local secrets/config — treat as sensitive",
+      "**Data retention / declassification**: None configured",
+      "**Sensitive remote targets**: any namespace, host, or container whose name carries `prod` or `production` as a whole word or name segment",
+      "**Protected deployment namespaces / environments**: None configured — fall back to the Sensitive remote targets heuristic",
+      "**Protected IaC scopes**: IAM, RBAC, networking, quota, and node-pool resources; anything whose name or tag carries `prod` or `production` as a whole word or name segment",
+      "### User-specific",
+      "**Primary use of Claude Code**: software development (personal Nix/dotfiles configuration management — nix-config repo)",
+      "**Trusted repo**: tomrfitz/nix-config (github.com:tomrfitz/nix-config.git), the working directory for this session — public repo, so only this repo's own work is OK to push; confidential material should not be committed here since visibility does not clear secrets/sensitive data regardless",
+      "**Org-specific CLIs**: None configured — repo-local tooling observed in usage: nix, nixfmt, hm (home-manager), nd, emacsclient, tailscale, op (1Password CLI)",
+      "routine under tomrfitz/ prefix: git and nix operations within ~/nix-config (and its declared remote) are routine for this user"
+    ]
+  }
 }
