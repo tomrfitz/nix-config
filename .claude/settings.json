@@ -37,9 +37,6 @@
             "Bash(nixfmt:*)"
         ],
         "ask": [
-            "Bash(just rebuild:*)",
-            "Bash(just update:*)",
-            "Bash(just rollback:*)",
             "Bash(nh darwin switch:*)",
             "Bash(nh os switch:*)",
             "Bash(darwin-rebuild switch:*)",

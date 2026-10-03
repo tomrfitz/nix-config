@@ -1,4 +1,6 @@
-# nix-config task runner
+# nix-config task runner for repo-local work: checks, formatting, snapshots.
+# Switches, rollbacks and lock bumps belong to the user (the nr* aliases in
+# modules/shared/home/shell.nix).
 
 host := `hostname`
 nh_cmd := if host == "trfmbp" { "darwin" } else { "os" }
@@ -8,42 +10,19 @@ system := if host == "trfmbp" { "aarch64-darwin" } else { "x86_64-linux" }
 # renames on a network clash (seen: trfmbp-2) — pass the flake host explicitly.
 nh_host := "-H " + host
 
-# Apply the current configuration
-rebuild:
-    nh {{ nh_cmd }} switch {{ nh_host }}
-
 # Build the system closure without activating (local working tree, keep-going)
 check:
     nh {{ nh_cmd }} build . {{ nh_host }} --keep-going
-
-# Garbage collect old generations and unreferenced store paths
-clean:
-    nh clean all
-
-# Edit sops-encrypted secrets file for a host (default: trfwsl)
-sops-edit host="trfwsl":
-    sops secrets/{{ host }}.yaml
-
-# Rollback to the previous generation
-[linux]
-rollback:
-    sudo nixos-rebuild switch --rollback
-
-[macos]
-rollback:
-    sudo darwin-rebuild switch --rollback
-
-# Update flake inputs and rebuild
-update:
-    nh {{ nh_cmd }} switch {{ nh_host }} --update
 
 # Format all files (nix, toml, shell, json, md, yaml, justfile)
 fmt:
     nix fmt
 
+# CI's sandboxed check: it sees only tracked files, and unlike `nix fmt -- --ci`
+# (which formats in place, then fails) it changes nothing.
 # Check formatting without modifying
 fmt-check:
-    nix fmt -- --ci
+    nix build --no-link .#checks.{{ system }}.formatting
 
 # Evaluate config (catches syntax/eval errors without building)
 [macos]
