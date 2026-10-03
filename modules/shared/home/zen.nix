@@ -41,6 +41,9 @@ in
     # nix 1Password GUI into the closure for nothing.
     nativeMessagingHosts = lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ pkgs._1password-gui ];
 
+    # To reset this profile, move its whole directory aside and sign in to Sync
+    # again. Deleting prefs.js alone also drops extensions.webextensions.uuids:
+    # every extension gets a new moz-extension:// origin and loses its storage.
     profiles.default = {
       id = 0;
       name = "default";
@@ -226,6 +229,8 @@ in
         let
           s = profile.spaces;
           # The homelab's tailnet host: the Windows apps until trflab is up.
+          # A bare MagicDNS name, which the tailnet's search domain completes,
+          # keeps the tailnet's name out of this public repo.
           lab = "http://tomrfitz-pc";
         in
         {
@@ -301,7 +306,7 @@ in
 
           # ── Homelab ── only what runs on Windows today. trfwsl's fuller list (Jellyfin,
           # Jellyseerr, Immich, Bookshelf, Bazarr, Calibre, Tandoor, Spliit) is in
-          # `git show a722f8b:modules/shared/home/zen.nix` for trflab.
+          # `git show 183ad2a:modules/shared/home/zen.nix` for trflab.
           Plex = {
             id = "{88265c48-a298-4d0a-85f8-2d4cb17131b4}";
             url = "${lab}:32400/web/";
