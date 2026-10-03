@@ -56,6 +56,11 @@
   programs.zed-editor = {
     enable = true;
     package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
+    # Each switch merges userSettings over the live settings.json (declared keys
+    # win), which keeps keys set in Zed's UI. Change settings here, not in the
+    # live file. A key Zed has since renamed comes back on every switch, and
+    # Zed's migrator rewrites it each time, leaving a new settings_backup.json:
+    # that file is the sign to update the key below.
     mutableUserSettings = true;
 
     extensions = [

@@ -10,11 +10,14 @@
 ;;
 ;; To add a package: write a `(use-package foo :ensure t ...)` block
 ;; here and rebuild. To experiment locally without committing, use
-;; `nrsl' from this working tree.
+;; `nrsl' from this working tree. In a deferred block, set variables
+;; with `setq' in `:config': `:custom' loads the package at startup.
+;; To check this file, load it in batch (`emacs --batch -l init.el');
+;; byte-compiling it runs the `:ensure' installs at compile time.
 (setq use-package-ensure-function 'ignore)
 
 ;; ── Shell environment ───────────────────────────────────────────────
-;; launchd daemon on macOS inherits a minimal PATH; sync from login shell.
+;; GUI apps on macOS inherit launchd's minimal PATH; sync from login shell.
 ;; system-type check works in --daemon mode (where window-system is nil).
 (use-package exec-path-from-shell
     :ensure t

@@ -15,6 +15,8 @@ let
   # about twice a week. uvx resolves the latest release from PyPI at launch
   # instead (its cache serves it offline), on nix's Python. The [pdf] extra
   # adds page images, layout and outlines; [semantic] would pull in torch.
+  # @latest with no supply-chain cooldown is the user's choice (2026-09-25);
+  # UV_EXCLUDE_NEWER="7 days" would add one.
   uvxZotero =
     bin:
     pkgs.writeShellApplication {
@@ -48,6 +50,10 @@ in
   ]
   ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ pkgs.zotero ];
 
+  # Claude Code's permission rules for these tools are in
+  # config/claude-settings.json (reads allowed; deletes and batch_update ask).
+  # Allow, ask and deny rules resolve before auto mode's classifier, and a
+  # partial glob needs the literal mcp__plugin_hm_zotero__ prefix before it.
   programs.mcp = {
     enable = true;
     servers.zotero = server // {

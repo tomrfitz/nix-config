@@ -27,5 +27,5 @@
   services.ollama.enable = true;
 
   # No homelab until trflab: Mullvad's split tunneling can't run on WSL's
-  # 6.18 kernel. Last declaration: `git show 4cc4662:hosts/trfwsl/default.nix`.
+  # 6.18 kernel. Last declaration: `git show 76e9d16:hosts/trfwsl/default.nix`.
 }

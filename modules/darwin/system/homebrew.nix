@@ -19,6 +19,9 @@
     # upgrade quits the running app and brew does not relaunch it; .pkg casks
     # ask for Touch ID.
     greedyCasks = true;
+    # A third-party tap needs the submodule form, { name = "user/tap";
+    # trusted = true; }: since Homebrew 6.0, brew bundle refuses casks from an
+    # untrusted tap, and only at activation (eval and build still pass).
 
     brews = [
       "mole"

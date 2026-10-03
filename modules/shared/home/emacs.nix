@@ -91,6 +91,11 @@ in
   #           (Chosen when the macport could not open GUI frames from launchd;
   #           the NS build could run `services.emacs` as a user agent instead —
   #           revisit if the GUI-app-as-server arrangement ever annoys.)
+  # A switch changes nothing in a running server: quit it (M-x kill-emacs, or
+  # `emacsclient -e '(kill-emacs)'`), then relaunch. To see what a server is
+  # running, ask it (`emacsclient -e`); `ps` shows the bare Emacs path even for
+  # the wrapped build. The socket is $TMPDIR/emacs$UID/server, so a shell with
+  # another TMPDIR (an agent's sandbox) needs `--socket-name=<absolute path>`.
   services.emacs = {
     enable = !pkgs.stdenv.hostPlatform.isDarwin;
     package = emacs;

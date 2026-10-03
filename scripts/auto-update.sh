@@ -28,7 +28,7 @@ nix flake update
 # ── Phase 3: Eval hosts not built here ──────────────────────────────────
 # trfmbp can't build on linux. trfnix has been powered off since ~2026-03, so
 # its ~6 GiB closure would feed a cache nothing pulls from; build and push it
-# again once it's back in use.
+# again once it's back in use, with an out-link of its own (see Phase 4).
 echo "==> Phase 3: Evaluating trfmbp and trfnix"
 nix eval .#darwinConfigurations.trfmbp.system --raw
 echo

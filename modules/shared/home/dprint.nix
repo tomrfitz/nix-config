@@ -18,7 +18,8 @@ let
 
   # Process plugin — fetched from URL with checksum pin. Not in nixpkgs because
   # it's a per-platform binary (not WASM), but the JSON manifest is hash-pinned
-  # so reproducibility is preserved.
+  # so reproducibility is preserved. dprint loads no process plugin without
+  # that @sha256; on a version bump, its first run prints the one it expects.
   execPlugin = "https://plugins.dprint.dev/exec-0.6.2.json@df98f54ffd3092b8a841aedd6d098a2651f16d0a796a40535774f1a8b4b9d463";
 in
 {

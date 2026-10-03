@@ -11,6 +11,12 @@
 # Both survive Mullvad reconnects — Mullvad only manages its own tables/rules.
 # Ref: https://mullvad.net/en/help/split-tunneling-with-linux-advanced
 # Ref: https://theorangeone.net/posts/tailscale-mullvad/
+#
+# Not on WSL 3.0 (kernel 6.18, since 2026-09-29): split tunneling needs net_cls
+# v1, whose mounts fail with EPERM there, or cgroup2 mode, which needs
+# CONFIG_NFT_SOCKET (unset in WSL's kernel; nixpkgs builds mullvad without the
+# cgroup2 feature anyway). Without it Mullvad's firewall drops tailscaled and
+# every excluded service, which is why trfwsl runs no homelab since 2026-10-01.
 {
   config,
   lib,

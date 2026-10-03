@@ -9,7 +9,8 @@ let
   # none, and neither does a fresh Mac's Terminal. Under CustomUserPreferences
   # a denied write aborts the whole activation (after /etc has switched), so
   # these are written below with nix-darwin's own command, but a denial only
-  # warns.
+  # warns. ref: https://lapcatsoftware.com/articles/containers.html,
+  # https://github.com/nix-darwin/nix-darwin/issues/1111
   sandboxedAppPreferences = {
     "com.apple.Safari" = {
       AutoFillFromAddressBook = false;
