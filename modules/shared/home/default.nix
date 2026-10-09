@@ -20,6 +20,7 @@
     ./anthropic-api-key.nix
     ./opencode.nix
     ./pi.nix
+    ./omp.nix
     ./xdg-dirs.nix
     ./xdg-compliance.nix
     ./1password-ssh.nix

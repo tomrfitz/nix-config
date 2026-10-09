@@ -75,11 +75,12 @@
     ++ lib.optionals pkgs.stdenv.hostPlatform.isDarwin [
       xcodes
 
-      # Agent harnesses on trial (2026-09-23), bare: no config; state lives in
-      # ~/.omp and ~/.hermes. Run them on other providers: omp's Claude login
-      # impersonates Claude Code (never `/login anthropic` there), and Hermes
-      # reaches the subscription only through an experimental plugin (TODO.md).
-      omp
+      # Hermes Agent, on trial since 2026-09-23 (omp, the other one, is in
+      # omp.nix), bare: state lives in ~/.hermes. It can't use the Max API
+      # credits yet: it sends Console keys with the sk-ant-usr- prefix as
+      # Claude Code OAuth tokens, and with no key at all its anthropic provider
+      # borrows Claude Code's own login, which the terms forbid. So leave that
+      # provider unselected until the fix lands (TODO.md, Upstream Watchlist).
       # minimal: the CLI, TUI and web UI. upstream's default adds the optional
       # integrations (voice, TTS, messaging, ...), whose torch/onnxruntime
       # stack builds from source here: its nixpkgs' python3.12 set is uncached.
