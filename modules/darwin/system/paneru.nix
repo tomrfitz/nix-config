@@ -111,6 +111,15 @@
           bundle_id = "org.gnu.Emacs";
           floating = true;
         };
+        # The Hyper+C capture popup (init.el `tf/popup-org-capture'): floating,
+        # top centre, two thirds wide and a third high. Unanchored at the end:
+        # Emacs appends "  —  (cols × rows)" to the title while it is resized.
+        emacs-capture = {
+          title = "^org-capture";
+          bundle_id = "org.gnu.Emacs";
+          floating = true;
+          grid = "6:3:1:0:4:1";
+        };
       };
     };
   };

@@ -42,9 +42,13 @@ let
     ];
   };
 
-  # Icon overlay on macOS — wraps the packaged build. cp -a preserves the
-  # emacsWithPackages wrapper script and the .app bundle; we only overwrite
-  # Emacs.icns.
+  # Icon overlay on macOS — a copy of the packaged build with our Emacs.icns.
+  # The Dock shows the icon of the bundle the *running* binary sits in, and
+  # emacsWithPackages' Emacs.app only wraps: its script execs the binary in
+  # nixpkgs' own bundle, which has the stock icon. So the binary (3.6 MB; its
+  # lisp and libexec paths are absolute) is copied into this bundle, with the
+  # native-lisp link Emacs resolves next to it, and the wrapper script becomes
+  # the bundle's executable, pointed at the copy. Still no Emacs rebuild.
   emacs =
     if pkgs.stdenv.hostPlatform.isDarwin then
       pkgs.runCommand "emacs-with-icon"
@@ -57,7 +61,15 @@ let
           mkdir -p $out
           cp -a ${emacsWithPkgs}/. $out/
           chmod -R u+w $out
-          cp ${icon} $out/Applications/Emacs.app/Contents/Resources/Emacs.icns
+          app=$out/Applications/Emacs.app/Contents
+          base=${emacsBase}/Applications/Emacs.app/Contents
+          cp ${icon} $app/Resources/Emacs.icns
+          cp $base/MacOS/Emacs $app/MacOS/Emacs-unwrapped
+          ln -s "$(readlink -f $base/native-lisp)" $app/native-lisp
+          mv $app/MacOS/.Emacs-wrapped $app/MacOS/Emacs
+          substituteInPlace $app/MacOS/Emacs \
+            --replace-fail "$base/MacOS/Emacs" "$app/MacOS/Emacs-unwrapped" \
+            --replace-fail "${emacsWithPkgs}/Applications/Emacs.app/Contents/MacOS/" "$app/MacOS/"
         ''
     else
       emacsWithPkgs;
@@ -83,29 +95,45 @@ in
     pkgs.graphviz
   ];
 
-  # Emacs as a server.
-  #   NixOS — a systemd user daemon (`emacs --daemon`).
-  #   macOS — no launchd daemon: the GUI Emacs.app you launch from your session
-  #           (Dock/Spotlight) calls (server-start) in init.el and IS the
-  #           canonical server; `emacsclient' and Dock re-clicks attach to it.
-  #           (Chosen when the macport could not open GUI frames from launchd;
-  #           the NS build could run `services.emacs` as a user agent instead —
-  #           revisit if the GUI-app-as-server arrangement ever annoys.)
-  # A switch changes nothing in a running server: quit it (M-x kill-emacs, or
-  # `emacsclient -e '(kill-emacs)'`), then relaunch. To see what a server is
-  # running, ask it (`emacsclient -e`); `ps` shows the bare Emacs path even for
-  # the wrapped build. The socket is $TMPDIR/emacs$UID/server, so a shell with
-  # another TMPDIR (an agent's sandbox) needs `--socket-name=<absolute path>`.
+  # Emacs as a daemon on both platforms: a systemd user service on NixOS, a
+  # launchd agent (`emacs --fg-daemon`, org.nix-community.home.emacs) on
+  # macOS, so Emacs is always up and frames come and go like a menu-bar
+  # app's windows (Hyper+E / Hyper+C in config/karabiner.json; Cmd-Q closes
+  # the frames, see init.el). The macport could not open GUI frames from
+  # launchd, so macOS ran the GUI app as the server until the NS build
+  # replaced it; a hand-launched Emacs.app still becomes the server when the
+  # daemon is down.
+  # A switch changes nothing in a running daemon: restart it with
+  # `launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs` (NixOS:
+  # `systemctl --user restart emacs`). M-x kill-emacs stops it until the next
+  # login or kickstart. To see what a server is running, ask it
+  # (`emacsclient -e`); `ps` shows the bare Emacs path even for the wrapped
+  # build. The socket is $TMPDIR/emacs$UID/server, so a shell with another
+  # TMPDIR (an agent's sandbox) needs `--socket-name=<absolute path>`.
   services.emacs = {
-    enable = !pkgs.stdenv.hostPlatform.isDarwin;
+    enable = true;
     package = emacs;
   };
 
-  # macOS: apps launched via LaunchServices (clicking Emacs.app) don't source
-  # hm-session-vars.sh, so they lack TERMINFO — and `emacsclient -t' TTY frames
-  # would then fail to resolve TERM=xterm-ghostty (Ghostty installs that entry
-  # only under ~/.local/share/terminfo). Publish it into the GUI login session
-  # so the server inherits it. `launchctl setenv' returns immediately; no daemon.
+  # macOS: launchd jobs and apps launched via LaunchServices don't source
+  # hm-session-vars.sh, so they lack TERMINFO — and `emacsclient -t' TTY
+  # frames would then fail to resolve TERM=xterm-ghostty (Ghostty installs
+  # that entry only under ~/.local/share/terminfo). The daemon gets it in its
+  # own environment (no race with the setenv agent at login); the setenv
+  # agent publishes it to the GUI session for a hand-launched Emacs.app.
+  # Start the daemon from the executable inside Emacs.app, not bin/emacs:
+  # outside the bundle macOS reports no bundle ID (app name "emacs"), so
+  # paneru's org.gnu.Emacs rules miss its frames and tile the posframe
+  # minibuffer beside the main frame.
+  launchd.agents.emacs.config.ProgramArguments = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
+    lib.mkForce [
+      "${emacs}/Applications/Emacs.app/Contents/MacOS/Emacs"
+      "--fg-daemon"
+    ]
+  );
+  launchd.agents.emacs.config.EnvironmentVariables = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
+    TERMINFO = "${config.xdg.dataHome}/terminfo";
+  };
   launchd.agents.emacs-gui-env = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     enable = true;
     config = {

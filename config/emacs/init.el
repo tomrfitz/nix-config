@@ -41,9 +41,9 @@
 (savehist-mode 1)
 (recentf-mode 1)
 (save-place-mode 1)
-;; The GUI app is the server (see Server below): a force-quit would drop
-;; both lists, so flush them every 5 min (Emacs 31 options; :set handlers,
-;; hence setopt).
+;; Emacs is a long-lived daemon (see Server below): a crash or a forced
+;; restart would drop both lists, so flush them every 5 min (Emacs 31
+;; options; :set handlers, hence setopt).
 (setopt recentf-autosave-interval 300
         save-place-autosave-interval 300)
 ;; Emacs 31: revert VCS-tracked files only — reliable after magit operations,
@@ -70,8 +70,8 @@
   (setq auto-save-file-name-transforms `((".*" ,auto-save-dir t))))
 
 (setq use-short-answers t
-    ;; Cmd-Q / C-x C-c really quit; confirm, since the GUI app is also the
-    ;; server. recentf/save-place restore context.
+    ;; Quitting the daemon itself (M-x kill-emacs) ends every frame and
+    ;; client, so confirm. recentf/save-place restore context.
     confirm-kill-emacs 'y-or-n-p
     ;; newcomers-presets: don't lose the system clipboard to a kill; yank
     ;; where point is, not where the mouse is.
@@ -143,11 +143,22 @@
 ;; emacs-plus patch, never in nixpkgs' NS build — so auto-dark polls via
 ;; in-process AppleScript (`ns-do-applescript', 5 s). It uses the hook
 ;; automatically if that patch is ever applied in emacs.nix.
+;; Its AppleScript detection needs an NS frame, which the daemon only has
+;; once a client opens one, so under the daemon it starts with that frame.
+(defun tf/auto-dark-start ()
+    "Enable `auto-dark-mode' once a graphical frame exists."
+    (when (display-graphic-p)
+        (remove-hook 'server-after-make-frame-hook #'tf/auto-dark-start)
+        (auto-dark-mode)))
+
 (use-package auto-dark
     :ensure t
     :if (eq system-type 'darwin)
     :custom (auto-dark-themes '((flexoki-dark) (flexoki-light)))
-    :init (auto-dark-mode))
+    :init
+    (if (daemonp)
+        (add-hook 'server-after-make-frame-hook #'tf/auto-dark-start)
+        (auto-dark-mode)))
 
 ;; Linux: noctalia theme if generated (hosts with the noctalia shell),
 ;; flexoki-dark fallback elsewhere (e.g. trfwsl's headless daemon).
@@ -477,6 +488,15 @@
     (org-id-locations-file
         (expand-file-name ".org-id-locations" org-directory))
     (org-time-stamp-custom-formats '("<%Y-%m-%d>" . "<%Y-%m-%d %H:%M>"))
+    ;; Clocking (C-c C-x C-i / C-o; I / O in the agenda): a running clock
+    ;; survives a restart, a 0:00 entry is dropped, and after 15 idle
+    ;; minutes org asks what to do with the time away. C-c C-x C-j jumps
+    ;; back to the clocked task.
+    (org-clock-persist t)
+    (org-clock-in-resume t)
+    (org-clock-out-remove-zero-time-clocks t)
+    (org-clock-idle-time 15)
+    (org-clock-report-include-clocking-task t)
     ;; Refile: vertico-powered flat completion across org files
     (org-refile-targets '((org-agenda-files :maxlevel . 2)))
     (org-refile-use-outline-path 'file)
@@ -488,15 +508,6 @@
     (org-agenda-custom-commands
         '(("w" "Week"
               ((agenda "" ((org-agenda-span 'week)
-    ;; Clocking (C-c C-x C-i / C-o; I / O in the agenda): a running clock
-    ;; survives a restart, a 0:00 entry is dropped, and after 15 idle
-    ;; minutes org asks what to do with the time away. C-c C-x C-j jumps
-    ;; back to the clocked task.
-    (org-clock-persist t)
-    (org-clock-in-resume t)
-    (org-clock-out-remove-zero-time-clocks t)
-    (org-clock-idle-time 15)
-    (org-clock-report-include-clocking-task t)
                            (org-agenda-start-on-weekday 1)
                            (org-deadline-warning-days 14)))
                (todo "TODO" ((org-agenda-overriding-header "Unscheduled")
@@ -580,12 +591,69 @@
                 (project-remember-project (project-current nil dir))))))
 
 ;; ── Server ──────────────────────────────────────────────────────────
-;; macOS has no launchd daemon (see modules/shared/home/emacs.nix): the GUI
-;; Emacs.app you launch from your session is the canonical server, so start it
-;; here. On NixOS the systemd `emacs --daemon' already runs a server (and
-;; `daemonp' is non-nil), so skip there to avoid a double-start.
-(when (and (eq system-type 'darwin) (not (daemonp)))
+;; Emacs runs as a daemon on both platforms (launchd on macOS, systemd on
+;; NixOS; modules/shared/home/emacs.nix), and frames come and go through
+;; emacsclient. An Emacs.app started by hand while the daemon is down
+;; becomes the server instead.
+(unless (daemonp)
     (require 'server)
     (unless (server-running-p) (server-start)))
+
+;; Cmd-Q closes the graphical frames and leaves the daemon running, like a
+;; menu-bar app; M-x kill-emacs really quits (see emacs.nix to restart it).
+(defun tf/close-frames ()
+    "Offer to save buffers, then delete every graphical frame."
+    (interactive)
+    (save-some-buffers)
+    (dolist (frame (frame-list))
+        (when (and (display-graphic-p frame) (not (frame-parent frame)))
+            (delete-frame frame t))))
+(when (daemonp)
+    (keymap-global-set "s-q" #'tf/close-frames))
+
+;; Global hotkeys (Karabiner, config/karabiner.json) call these through
+;; emacsclient. macOS leaves a frame made by `emacsclient -c' behind the
+;; frontmost app, so each one asks for focus.
+(defun tf/raise-frame ()
+    "Focus an existing graphical frame; return nil when there is none.
+Hyper+E: emacsclient -e (tf/raise-frame), else a new frame through
+emacsclient -n -c -e (tf/focus-new-frame)."
+    (when-let* ((frame (seq-find (lambda (f)
+                                     (and (display-graphic-p f)
+                                          (frame-visible-p f)
+                                          (not (frame-parent f))))
+                                 (frame-list))))
+        (select-frame-set-input-focus frame)
+        t))
+
+(defun tf/focus-new-frame ()
+    "Focus this new frame and show the startup buffer (the week agenda).
+`emacsclient -c -e' skips `initial-buffer-choice', so this applies it."
+    (select-frame-set-input-focus (selected-frame))
+    (when (functionp initial-buffer-choice)
+        (switch-to-buffer (funcall initial-buffer-choice))))
+
+(defun tf/popup-org-capture ()
+    "Run `org-capture' in this popup frame; the frame closes with the capture.
+Hyper+C: emacsclient -n -c -F ((name . \"org-capture\") (tf-popup . t))
+-e (tf/popup-org-capture). Prot's technique
+(https://protesilaos.com/codelog/2024-09-19-emacs-command-popup-frame-emacsclient/),
+with the frame made by emacsclient: `make-frame' from the daemon's
+terminal frame fails on macOS."
+    (select-frame-set-input-focus (selected-frame))
+    (switch-to-buffer (get-buffer-create " *capture-popup*"))
+    (condition-case nil
+        (org-capture)
+        ((error quit) (delete-frame))))
+
+(defun tf/popup-frame-p ()
+    "Non-nil when the selected frame is a capture popup."
+    (frame-parameter nil 'tf-popup))
+
+;; The capture buffer takes the whole popup, and the popup goes with it.
+(add-hook 'org-capture-mode-hook
+    (lambda () (when (tf/popup-frame-p) (delete-other-windows))))
+(add-hook 'org-capture-after-finalize-hook
+    (lambda () (when (tf/popup-frame-p) (delete-frame))))
 
 ;;; init.el ends here

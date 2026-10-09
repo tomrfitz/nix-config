@@ -52,6 +52,49 @@
                                 ]
                             }
                         ]
+                    },
+                    {
+                        "description": "Hyper+E → focus or open an Emacs frame; Hyper+C → org-capture popup (init.el)",
+                        "manipulators": [
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "e",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "command",
+                                            "control",
+                                            "option",
+                                            "shift"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "shell_command": "ec=/etc/profiles/per-user/tomrfitz/bin/emacsclient; [ \"$($ec -e '(tf/raise-frame)')\" = t ] || $ec -n -c -e '(tf/focus-new-frame)'"
+                                    }
+                                ]
+                            },
+                            {
+                                "type": "basic",
+                                "from": {
+                                    "key_code": "c",
+                                    "modifiers": {
+                                        "mandatory": [
+                                            "command",
+                                            "control",
+                                            "option",
+                                            "shift"
+                                        ]
+                                    }
+                                },
+                                "to": [
+                                    {
+                                        "shell_command": "/etc/profiles/per-user/tomrfitz/bin/emacsclient -n -c -F '((name . \"org-capture\") (tf-popup . t) (fullscreen) (width . 100) (height . 20))' -e '(tf/popup-org-capture)'"
+                                    }
+                                ]
+                            }
+                        ]
                     }
                 ]
             },

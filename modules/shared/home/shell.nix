@@ -88,14 +88,13 @@
       '')
 
       ''
-        # `e`: attach a terminal frame to the Emacs server. On macOS the server
-        # is the GUI Emacs.app (no background daemon) — if it isn't up yet,
-        # launch it the way the Dock would and wait. On Linux the systemd
-        # `emacs --daemon' is always running, so this is just `emacsclient -t'.
+        # `e`: attach a terminal frame to the Emacs daemon. On macOS, M-x
+        # kill-emacs stops the launchd agent until the next login, so start
+        # it again if it is down and wait for the socket.
         e () {${lib.optionalString pkgs.stdenv.hostPlatform.isDarwin ''
 
           if ! emacsclient -e t >/dev/null 2>&1; then
-            open -a "$HOME/Applications/Home Manager Apps/Emacs.app"
+            launchctl kickstart "gui/$(id -u)/org.nix-community.home.emacs"
             until emacsclient -e t >/dev/null 2>&1; do sleep 0.1; done
           fi''}
           emacsclient -t "$@"
