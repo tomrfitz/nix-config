@@ -113,6 +113,7 @@ modules/
 - Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
 - Configure editors: Zed in `modules/shared/home/desktop.nix`, Helix in `modules/shared/home/editors.nix`, Emacs in `modules/shared/home/emacs.nix`
 - Claude Code: settings in `config/claude-settings.json`, status line in `config/claude-statusline.sh`, wiring in `modules/shared/home/claude-code.nix`
+- Other agent harnesses: pi in `modules/shared/home/pi.nix` (with `pi-resources/`), omp in `omp.nix`, Hermes in `packages.nix`; the Anthropic API key pi and omp read (Max's monthly API credits; 1Password, never exported) in `anthropic-api-key.nix`
 - Agent skills: for every project in `config/skills/` (linked into `~/.claude/skills/` by `claude-code.nix`); for this repo only in `.claude/skills/`
 - MCP servers: `programs.mcp` (Claude Code picks them up via `enableMcpIntegration`); the Zotero server, its CLI (both uvx-wrapped) and the Linux app in `modules/shared/home/zotero.nix`, which also merges the server into the Claude desktop app's config on darwin
 - Python global tooling (ruff floor, ty): `modules/shared/home/python.nix`; project tier: `templates/python-uv/pyproject.toml`
