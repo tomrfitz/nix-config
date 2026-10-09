@@ -2,13 +2,17 @@
 # programs.pi-coding-agent, plus the npm community packages and the repo-local resource
 # bundle wired into pi's expected directories. Configured on every host.
 #
+# Models: `anthropic/*` runs on the Max plan's monthly API credits, with the key from
+# 1Password (anthropic-api-key.nix); `claude-bridge/*` (pi-claude-bridge) runs Claude Code
+# through the Agent SDK on the Max login and draws plan limits instead.
+#
 # Three integration paths, owning separate lanes:
-#   - **npm community packages**: installed via `pi install npm:<pkg>` on activation. Pi tracks
-#     them in its own settings.json registry and resolves them through its bundled npm. Lifecycle
-#     is pi's (it updates them via its own commands).
-#   - **Repo-local resources** (author-owned skills + prompts) in ../../../pi-resources/:
-#     exposed under ~/.pi/agent/{skills,prompts}/ via out-of-store symlinks pointing at the
-#     working tree. Pi's user-scope auto-discovery picks them up. Edits to files in
+#   - **npm community packages**: declared in settings.json `packages` (below). pi installs
+#     any missing one at startup into ~/.pi/agent/npm/ and resolves it through its bundled
+#     npm; `pi update --extensions` moves them to their latest releases. Lifecycle is pi's.
+#   - **Repo-local resources** (author-owned skills and prompts) in
+#     ../../../pi-resources/: exposed under ~/.pi/agent/ via out-of-store symlinks pointing
+#     at the working tree. Pi's user-scope auto-discovery picks them up. Edits to files in
 #     pi-resources/ take effect on the next pi restart with no rebuild needed; reverts are
 #     `git checkout`. A rebuild is only required when the wiring itself changes (e.g. adding
 #     a new top-level skill folder). Lifecycle is nix's.
@@ -17,12 +21,12 @@
 #     ~/.pi/agent/skills/mattpocock/<name>/ (its draft and deprecated dirs stay out, as the
 #     upstream ADR intends). Updates land with the lock bump.
 #
-# ~/.pi/agent/settings.json is left unmanaged (pi writes its own runtime state; the module
-# only writes it when `settings` is non-empty). Global instructions (~/.pi/agent/AGENTS.md)
-# come from the module's `context`, the same file the other agents get.
-#
-# npm installs are guarded idempotently: skip if already in the registry, warn + retry next
-# rebuild on failure, bounded by timeout.
+# settings.json and auth.json stay writable: pi writes runtime state into both (logins,
+# the model you pick, `pi install`), and a read-only settings.json breaks `pi install` and
+# re-shows the changelog every launch. So activation merges only the keys declared here
+# into them (objects key by key, lists replaced); pi keeps the rest, and a `/model` pick
+# lasts until the next switch. Global instructions (~/.pi/agent/AGENTS.md) come from the
+# module's `context`, the same file the other agents get.
 {
   config,
   lib,
@@ -31,29 +35,65 @@
   ...
 }:
 let
-  jq = lib.getExe pkgs.jq;
-  timeout = "${pkgs.coreutils}/bin/timeout";
-
-  # Community packages installed into ~/.pi/agent/npm/ and tracked in settings.json.
+  # Community packages, kept in ~/.pi/agent/npm/.
   piPackages = [
     "pi-subagents" # Subagent orchestration — chains, parallel, builtin agents (scout/researcher/planner/worker/reviewer/oracle/...)
     "pi-web-access" # Web search + fetch + GitHub clone + PDF + YouTube; backs the researcher builtin
     "pi-lens" # Real-time LSP + formatters + auto-fix + secrets scan + read-before-edit guard on every write/edit
     "pi-intercom" # Direct session-to-session messaging; required for the contact_supervisor escalation tool in pi-subagents children
-    "pi-hermes-memory" # Persistent memory across sessions with FTS5 search, auto-consolidation, and secret scanning
+    "pi-hermes-memory" # Persistent memory across sessions with FTS5 search, auto-consolidation, and secret scanning (not on claude-bridge models, which drop pi's system prompt edits)
     "@juicesharp/rpiv-btw" # /btw side-conversation channel — ephemeral side questions without polluting the main session
-    "pi-claude-bridge" # claude-bridge/* models: Claude Code via the Agent SDK on the logged-in subscription (pi's own Anthropic login bills extra usage)
+    "pi-claude-bridge" # claude-bridge/* models: Claude Code via the Agent SDK on the Max login (plan limits, not API credits)
   ];
 
-  # Runs the unwrapped package with npm on PATH: activation must not depend on
-  # the wrapped profile binary already being linked.
-  installPkg = pkg: ''
-    if ! ${jq} -e '(.packages // []) | map(if type == "string" then . else (.source // "") end) | any(test("${pkg}"))' \
-         "$HOME/.pi/agent/settings.json" >/dev/null 2>&1; then
-      run env PATH="${pkgs.nodejs}/bin:$PATH" ${timeout} 180 ${pkgs.pi-coding-agent}/bin/pi install npm:${pkg} \
-        || echo "pi: 'pi install ${pkg}' failed — will retry next rebuild" >&2
-    fi
-  '';
+  settings = {
+    defaultProvider = "anthropic";
+    defaultModel = "claude-opus-5-5";
+    defaultThinkingLevel = "high";
+    enableInstallTelemetry = false;
+    packages = map (p: "npm:${p}") piPackages;
+    # Cheaper models for the roles that read a lot and decide little.
+    subagents.agentOverrides = {
+      researcher = {
+        model = "anthropic/claude-sonnet-5-5";
+        thinking = "medium";
+      };
+      reviewer = {
+        model = "anthropic/claude-sonnet-5-5";
+        thinking = "medium";
+      };
+      scout = {
+        model = "anthropic/claude-haiku-5-5";
+        thinking = "low";
+      };
+    };
+  };
+
+  # pi runs a `!command` key when the provider is first used and caches it for the
+  # process lifetime: https://pi.dev/docs/latest/providers
+  auth.anthropic = {
+    type = "api_key";
+    key = "!${config.home.profileDirectory}/bin/anthropic-api-key";
+  };
+
+  # Deep-merge `attrs` into ~/.pi/agent/<name>; write only on a change, mode 600 (auth.json
+  # holds the other providers' logins).
+  mergeInto =
+    name: attrs:
+    let
+      own = pkgs.writeText "pi-${name}" (builtins.toJSON attrs);
+      f = "${config.home.homeDirectory}/.pi/agent/${name}";
+    in
+    ''
+      merged=$(mktemp)
+      if [ -s "${f}" ]; then base="${f}"; else base=<(echo '{}'); fi
+      if ${lib.getExe pkgs.jq} -s '.[0] * .[1]' "$base" ${own} > "$merged"; then
+        cmp -s "$merged" "${f}" || run install -D -m 600 "$merged" "${f}"
+      else
+        echo "pi: could not merge the declared keys into ${f}" >&2
+      fi
+      rm -f "$merged"
+    '';
 
   # Out-of-store symlinks pointing at the working tree. Edits flow through the symlink to the
   # repo and back — the working tree IS the declared state. If you relocate the repo, change
@@ -80,9 +120,10 @@ in
     extraPackages = [ pkgs.nodejs ]; # `pi install npm:` needs npm on pi's PATH
   };
 
-  home.activation.installPiPackages = lib.hm.dag.entryAfter [ "writeBoundary" ] (
-    lib.concatStringsSep "\n" (map installPkg piPackages)
-  );
+  home.activation.piSettings = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    ${mergeInto "settings.json" settings}
+    ${mergeInto "auth.json" auth}
+  '';
 
   home.file = {
     ".pi/agent/skills/org-notes".source = link "skills/org-notes";

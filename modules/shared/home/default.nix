@@ -17,6 +17,7 @@
     ./python.nix
     ./dprint.nix
     ./claude-code.nix
+    ./anthropic-api-key.nix
     ./opencode.nix
     ./pi.nix
     ./xdg-dirs.nix
