@@ -89,6 +89,7 @@
 
       # editors / writing
       "zed"
+      "zed-delta"
 
       # gaming
       "steam"
