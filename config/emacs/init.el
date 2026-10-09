@@ -488,6 +488,15 @@
     (org-agenda-custom-commands
         '(("w" "Week"
               ((agenda "" ((org-agenda-span 'week)
+    ;; Clocking (C-c C-x C-i / C-o; I / O in the agenda): a running clock
+    ;; survives a restart, a 0:00 entry is dropped, and after 15 idle
+    ;; minutes org asks what to do with the time away. C-c C-x C-j jumps
+    ;; back to the clocked task.
+    (org-clock-persist t)
+    (org-clock-in-resume t)
+    (org-clock-out-remove-zero-time-clocks t)
+    (org-clock-idle-time 15)
+    (org-clock-report-include-clocking-task t)
                            (org-agenda-start-on-weekday 1)
                            (org-deadline-warning-days 14)))
                (todo "TODO" ((org-agenda-overriding-header "Unscheduled")
@@ -507,7 +516,8 @@
           ("i" "Inbox" entry (file "inbox.org")
               "* %?\n%U\n")
           ("t" "Task" entry (file+headline "todo.org" "Inbox")
-              "* TODO %?\n%U\n"))))
+              "* TODO %?\n%U\n")))
+    (org-clock-persistence-insinuate))
 
 ;; Startup surface: the week agenda ("what is due"), not a portal of recent
 ;; files. Only consulted when Emacs starts without file arguments.
