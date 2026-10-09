@@ -111,7 +111,11 @@
 
 ;; ── Indentation ───────────────────────────────────────────────────────
 (setq-default indent-tabs-mode nil
-    tab-width 4)
+    tab-width 4
+    ;; No soft wrapping anywhere: it breaks org and markdown tables, and
+    ;; olivetti (below) keeps text centred instead. Long lines scroll
+    ;; horizontally.
+    truncate-lines t)
 (setq tab-always-indent 'complete)
 
 ;; ── Fonts ─────────────────────────────────────────────────────────────
@@ -253,12 +257,26 @@
     ;; Purely cosmetic line-pulse on navigation — no need at first paint.
     :init (run-with-idle-timer 0.1 nil (lambda () (pulsar-global-mode 1))))
 
-;; Prose only (EWS): centering code fought split windows and needed a pi
-;; exemption. Elsewhere toggle by hand with M-x olivetti-mode.
+;; Centre text in every editing buffer. A fixed width means the margins
+;; vanish on their own once a split makes the window narrower than the
+;; body, so a lone window is centred and a split is not. Centring code
+;; used to fight splits because of two things fixed here: olivetti turns
+;; on `visual-line-mode' by default (on-hook emptied; nothing soft-wraps,
+;; see `truncate-lines'), and diff-hl drew its markers in the margin
+;; olivetti uses (it uses the fringe now). 104 = the 100-column code limit
+;; plus the line-number gutter.
 (use-package olivetti
     :ensure t
-    :custom (olivetti-body-width 100)
-    :hook ((org-mode markdown-mode) . olivetti-mode))
+    :custom
+    (olivetti-body-width 104)
+    (olivetti-mode-on-hook nil)
+    :hook ((prog-mode text-mode conf-mode org-agenda-mode) . olivetti-mode))
+
+;; Breathing room around frame edges, between windows and in the mode line
+;; (Prot); its defaults, and it handles daemon frames itself.
+(use-package spacious-padding
+    :ensure t
+    :init (spacious-padding-mode 1))
 
 ;; ── pi (coding agent) ────────────────────────────────────────────────
 ;; Emacs frontend for the pi CLI (pilish; MELPA renamed it from
@@ -291,8 +309,9 @@
     ;; the global modes up just after the first frame, off the startup path.
     (run-with-idle-timer 0.1 nil (lambda () (require 'diff-hl)))
     :config
-    (global-diff-hl-mode)
-    (diff-hl-margin-mode))
+    ;; Fringe markers (the GUI default), not `diff-hl-margin-mode': olivetti
+    ;; centres text with the window margins.
+    (global-diff-hl-mode))
 
 ;; ── LSP (eglot — built-in) ───────────────────────────────────────────
 ;; Auto-start for any language with an LSP server on $PATH.
