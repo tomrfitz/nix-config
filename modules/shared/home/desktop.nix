@@ -229,15 +229,11 @@
       };
       disable_ai = false;
       calls.mute_on_join = true;
+      # Zeta, Zed's own model: unlimited on the Zed Student plan.
       edit_predictions = {
+        provider = "zed";
         mode = "subtle";
         allow_data_collection = "no";
-        copilot = {
-          enable_next_edit_suggestions = true;
-          proxy = null;
-          proxy_no_verify = null;
-          enterprise_uri = null;
-        };
       };
       format_on_save = "on";
       tab_size = 4;
