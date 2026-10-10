@@ -26,8 +26,9 @@ let
   # Single source of truth: add a `(use-package foo :ensure t ...)` block
   # in init.el and the parser picks it up on next rebuild.
   # `alwaysEnsure = false` (the post-API-break default) honors per-block
-  # `:ensure` annotations — critical so the `:ensure nil` on `org` keeps the
-  # built-in version instead of shadowing it with the MELPA package.
+  # `:ensure` annotations, so the `:ensure nil` on `org` asks for no ELPA copy.
+  # org-modern depends on org, though, which brings GNU ELPA's org (the
+  # official release, a few patches ahead) and shadows the built-in one.
   # emacsWithPackagesFromUsePackage is a top-level helper added by emacs-overlay
   # (see overlays/default.nix in nix-community/emacs-overlay).
   emacsWithPkgs = pkgs.emacsWithPackagesFromUsePackage {
@@ -93,6 +94,8 @@ in
     ]))
     # `dot' for org-babel's Graphviz blocks.
     pkgs.graphviz
+    # Grammar and style for org and markdown, through Eglot (init.el, Writing).
+    pkgs.harper
     # agent-shell's Claude Code backend (init.el). nixpkgs points it at its own
     # claude-code; on macOS it gets Anthropic's installed CLI instead, the copy
     # the rest of the Mac runs (claude-code.nix).
@@ -107,7 +110,16 @@ in
       else
         pkgs.claude-agent-acp
     )
-  ];
+  ]
+  # jinx spellchecks through Enchant, which on Linux needs a dictionary;
+  # macOS has the system spellchecker (enchant.ordering below).
+  ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ pkgs.hunspellDicts.en_US ];
+
+  # Enchant's default ordering tries hunspell, nuspell and aspell, none of
+  # which has a dictionary here; AppleSpell is the macOS spellchecker.
+  xdg.configFile."enchant/enchant.ordering" = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
+    text = "*:AppleSpell,hunspell,nuspell,aspell\n";
+  };
 
   # Emacs as a daemon on both platforms: a systemd user service on NixOS, a
   # launchd agent (`emacs --fg-daemon`, org.nix-community.home.emacs) on

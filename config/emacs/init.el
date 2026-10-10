@@ -550,6 +550,105 @@
     :ensure t
     :bind ("C-c n l" . org-cliplink))
 
+;; ── Writing ──────────────────────────────────────────────────────────
+;; Prose checks for org and markdown (both derive from text-mode, as do
+;; commit messages): jinx for spelling, Harper for grammar and style. Org
+;; structure is checked on demand with the built-in M-x org-lint (Org's
+;; maintainers advise against running it on every edit). C-c w toggles an
+;; iA Writer-like writing mode.
+
+;; Spelling through Enchant: the macOS spellchecker (enchant.ordering,
+;; emacs.nix), hunspell on Linux. Per-mode activation and keys as in jinx's
+;; README.
+(use-package jinx
+    :ensure t
+    :hook (text-mode . jinx-mode)
+    :bind (("M-$" . jinx-correct)
+              ("C-M-$" . jinx-languages)))
+
+;; Harper over Eglot, configured as in Harper's Emacs guide. Its absolute path
+;; is resolved at startup like rass's, so a devShell's PATH can't hide it.
+;; Spelling stays with jinx; ToDoHyphen would flag every TODO keyword.
+;; eglot-ensure connects only when a buffer is visited, so agenda files opened
+;; in the background stay idle.
+(defvar tf/harper-program (executable-find "harper-ls")
+    "Absolute path to harper-ls, resolved at startup.")
+(when tf/harper-program
+    (with-eval-after-load 'eglot
+        (add-to-list 'eglot-server-programs
+            `(((org-mode :language-id "org")
+                  (markdown-mode :language-id "markdown")
+                  (gfm-mode :language-id "markdown"))
+                 . (,tf/harper-program "--stdio")))
+        (setq-default eglot-workspace-configuration
+            '(:harper-ls (:dialect "American"
+                             :linters (:SpellCheck :json-false
+                                       :ToDoHyphen :json-false)))))
+    (add-hook 'org-mode-hook #'eglot-ensure)
+    (add-hook 'markdown-mode-hook #'eglot-ensure))
+
+;; Writing mode: logos-focus-mode (Prot) hides the mode line and quiets the
+;; fringe; `tf/writing-mode' adds the rest through `logos-focus-mode-hook',
+;; the extension point the logos manual documents, and logos undoes each
+;; change on exit:
+;; - focus dims all but the current sentence (iA Writer's Focus Mode);
+;; - a 72-column soft-wrapped measure;
+;; - the cursor line kept centred (typewriter scrolling) with the scroll
+;;   margin capped at half the window, per the Emacs manual's Auto Scrolling;
+;; - mixed-pitch sets prose in Atkinson Next and keeps tables and code
+;;   monospaced, so tables still line up;
+;; - org-modern draws headings, lists and blocks as typography. Emphasis
+;;   markers stay visible (org-hide-emphasis-markers, Org above).
+(use-package focus
+    :ensure t
+    :defer t
+    :custom
+    (focus-mode-to-thing '((prog-mode . defun) (text-mode . sentence))))
+
+(use-package mixed-pitch
+    :ensure t
+    :defer t)
+
+(use-package org-modern
+    :ensure t
+    :defer t)
+
+(defun tf/writing-mode ()
+    "Extend `logos-focus-mode' into a writing mode."
+    (when logos-focus-mode
+        ;; sentence-end-double-space: single-spaced sentences, so focus can
+        ;; find them. Each variable is made local first: logos sets the value
+        ;; before localizing it, which would otherwise change the global value
+        ;; of a variable that is not automatically buffer-local.
+        (pcase-dolist (`(,var . ,val) '((olivetti-body-width . 72)
+                                       (scroll-margin . 999)
+                                       (maximum-scroll-margin . 0.5)
+                                       (sentence-end-double-space . nil)))
+            (make-local-variable var)
+            (logos-set-buffer-local-value var val))
+        (logos-set-mode-arg 'visual-line-mode 1)
+        (logos-set-mode-arg 'focus-mode 1)
+        (logos-set-mode-arg 'mixed-pitch-mode 1)
+        (when (derived-mode-p 'org-mode)
+            (logos-set-mode-arg 'org-modern-mode 1)))
+    ;; Runs on exit too: olivetti redraws only on window changes, so ask it
+    ;; to apply the new or restored width.
+    (when (bound-and-true-p olivetti-mode)
+        (olivetti-reset-all-windows)))
+
+(use-package logos
+    :ensure t
+    :bind ("C-c w" . logos-focus-mode)
+    :custom
+    (logos-hide-mode-line t)
+    (logos-hide-header-line t)
+    (logos-hide-buffer-boundaries t)
+    (logos-hide-fringe t)
+    :hook ((logos-focus-mode . tf/writing-mode)
+              ;; From the logos manual: re-match the hidden fringe when
+              ;; auto-dark swaps themes.
+              (enable-theme-functions . logos-update-fringe-in-buffers)))
+
 ;; ── PDF ───────────────────────────────────────────────────────────────
 ;; Course readings in-Emacs. doc-view can't work here (no mutool/gs/pdftoppm
 ;; on PATH); pdf-tools ships its own epdfinfo server, built by nixpkgs.
