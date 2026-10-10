@@ -69,6 +69,16 @@
   (make-directory auto-save-dir t)
   (setq auto-save-file-name-transforms `((".*" ,auto-save-dir t))))
 
+;; Prose saves itself: org and markdown buffers (and commit messages) write
+;; to their own file after 5 s idle, as a notes app does, so a daemon
+;; restart loses nothing and no recover-file step is needed. Built-in
+;; auto-save-visited-mode, limited by its predicate (the option's docstring
+;; shows an Org-only example): code buffers keep explicit saves, since
+;; saving one runs Eglot's format-on-save mid-edit. The auto-saves above
+;; still cover everything else.
+(setopt auto-save-visited-predicate (lambda () (derived-mode-p 'text-mode)))
+(auto-save-visited-mode 1)
+
 (setq use-short-answers t
     ;; Quitting the daemon itself (M-x kill-emacs) ends every frame and
     ;; client, so confirm. recentf/save-place restore context.
