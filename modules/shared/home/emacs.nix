@@ -93,6 +93,20 @@ in
     ]))
     # `dot' for org-babel's Graphviz blocks.
     pkgs.graphviz
+    # agent-shell's Claude Code backend (init.el). nixpkgs points it at its own
+    # claude-code; on macOS it gets Anthropic's installed CLI instead, the copy
+    # the rest of the Mac runs (claude-code.nix).
+    (
+      if pkgs.stdenv.hostPlatform.isDarwin then
+        pkgs.claude-agent-acp.override {
+          claude-code = pkgs.writeShellApplication {
+            name = "claude";
+            text = ''exec "$HOME/.local/bin/claude" "$@"'';
+          };
+        }
+      else
+        pkgs.claude-agent-acp
+    )
   ];
 
   # Emacs as a daemon on both platforms: a systemd user service on NixOS, a
