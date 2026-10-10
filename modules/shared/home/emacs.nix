@@ -129,9 +129,14 @@ in
   # launchd, so macOS ran the GUI app as the server until the NS build
   # replaced it; a hand-launched Emacs.app still becomes the server when the
   # daemon is down.
-  # A switch changes nothing in a running daemon: restart it with
-  # `launchctl kickstart -k gui/$(id -u)/org.nix-community.home.emacs` (NixOS:
-  # `systemctl --user restart emacs`). M-x kill-emacs stops it until the next
+  # On macOS a switch that changes the Emacs package restarts the daemon
+  # (home-manager reloads any launchd agent whose plist changed, and the plist
+  # names the package), discarding unsaved buffers; save before switching.
+  # A config-only change (init.el) leaves the running daemon alone, as does
+  # every switch on NixOS (home-manager's unit sets X-RestartIfChanged =
+  # false). Restart it by hand then: `launchctl kickstart -k
+  # gui/$(id -u)/org.nix-community.home.emacs` (NixOS: `systemctl --user
+  # restart emacs`). M-x kill-emacs stops it until the next
   # login or kickstart. To see what a server is running, ask it
   # (`emacsclient -e`); `ps` shows the bare Emacs path even for the wrapped
   # build. The socket is $TMPDIR/emacs$UID/server, so a shell with another
