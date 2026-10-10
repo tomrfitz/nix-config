@@ -137,31 +137,43 @@
       };
       collaboration_panel.dock = "right";
       semantic_tokens = "combined";
-      agent = {
-        default_width = 400.0;
-        tool_permissions.default = "allow";
-        inline_assistant_model = {
-          provider = "copilot_chat";
-          model = "claude-opus-4.6";
+      # Zed's own agent runs on the Max plan's API credits (anthropic-api-key.nix),
+      # with the key entered in Zed's LLM Providers settings, which keep it in the
+      # macOS keychain. Never ANTHROPIC_API_KEY: the Claude Agent above would pick
+      # it up and leave the plan. Zed lists the models from the API, so new IDs
+      # need no available_models entry. Each task gets the model pi uses for the
+      # same role (pi.nix).
+      agent =
+        let
+          claude =
+            model: extra:
+            {
+              provider = "anthropic";
+              inherit model;
+            }
+            // extra;
+        in
+        {
+          default_width = 400.0;
+          tool_permissions.default = "allow";
+          default_model = claude "claude-opus-5-5" {
+            enable_thinking = true;
+            effort = "high";
+          };
+          subagent_model = claude "claude-sonnet-5-5" { };
+          inline_assistant_model = claude "claude-sonnet-5-5" { effort = "medium"; };
+          commit_message_model = claude "claude-haiku-5-5" { };
+          thread_summary_model = claude "claude-haiku-5-5" { };
+          favorite_models = map (m: claude m { }) [
+            "claude-fable-5-1"
+            "claude-opus-5-5"
+            "claude-sonnet-5-5"
+            "claude-haiku-5-5"
+          ];
+          use_modifier_to_send = false;
+          default_profile = "write";
+          dock = "left";
         };
-        favorite_models = [
-          {
-            provider = "copilot_chat";
-            model = "gpt-5.2";
-          }
-          {
-            provider = "google";
-            model = "gemini-3-pro-preview";
-          }
-        ];
-        use_modifier_to_send = false;
-        default_profile = "write";
-        dock = "left";
-        default_model = {
-          provider = "zed.dev";
-          model = "claude-sonnet-4-5";
-        };
-      };
       ui_font_size = lib.mkForce 14.0;
       tasks.prefer_lsp = true;
       tab_bar.show = true;
