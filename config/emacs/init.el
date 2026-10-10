@@ -361,6 +361,23 @@
 (add-hook 'eglot-managed-mode-hook (lambda () (eglot-inlay-hints-mode -1)))
 (global-set-key (kbd "C-c h") #'eglot-inlay-hints-mode)
 
+;; Eglot binds no keys by default. C-c e for its commands (C-c l, the usual
+;; lsp-mode-style prefix, is org-store-link here); code actions cover
+;; Harper's prose fixes too.
+(use-package eglot
+    :ensure nil
+    :bind (:map eglot-mode-map
+              ("C-c e a" . eglot-code-actions)
+              ("C-c e r" . eglot-rename)))
+
+;; Step through diagnostics with M-n / M-p, as the Flymake manual suggests.
+;; In markdown buffers these take over markdown-mode's next/previous link.
+(use-package flymake
+    :ensure nil
+    :bind (:map flymake-mode-map
+              ("M-n" . flymake-goto-next-error)
+              ("M-p" . flymake-goto-prev-error)))
+
 ;; Subprocess I/O sized for LSP payloads (numpy/torch hovers are large):
 ;; 1 MB reads — minimal-emacs.d / Doom-LSP baseline. (Adaptive read
 ;; buffering is off by default since Emacs 31.)
