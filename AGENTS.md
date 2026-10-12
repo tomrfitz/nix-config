@@ -219,13 +219,7 @@ Open items: TODO.md § Homelab.
 
 ### Phase 2 — Dedicated NixOS server (`trflab`)
 
-Decided 2026-09-26. The plan of record (parts, prices, migration runbook) is a Claude Doc linked from the user's private notes.
-
-**Hardware:** i5-12400 (Quick Sync handles Plex transcode) on an ASRock B760M Pro-A D4 in the Fractal Focus G Mini, with a 512 GB NVMe boot drive. Reuses the Noctua NH-U9S (LGA 1700 kit), the 2×8 GB DDR4, the EVGA 550 G2 and the GTX 1070 for light ollama, which needs the `legacy_580` driver (`config.boot.kernelPackages.nvidiaPackages.legacy_580`) with `hardware.nvidia.open = false` (CUDA 13 and PyTorch 2.15 drop Pascal).
-
-**Storage:** direct-attached, no NAS. mergerfs + SnapRAID with one parity disk over ext4 data disks (`services.snapraid`); app state stays on the NVMe. The first purchase is 2 × 14 TB; a drive bigger than the parity becomes the new parity. Media moves off the DrivePool drives by rsync (file-level NTFS pooling, so each drive reads on its own). Growth is capped by cost, not need (media is kept as an archive), so layouts compare on cost per added TB.
-
-Steps: TODO.md § Phase 2. Tailscale carries over unchanged.
+Decided 2026-09-26: an i5-12400 box with direct-attached mergerfs + SnapRAID storage, reusing the GTX 1070 for light ollama. Parts, storage layout and steps: TODO.md § Phase 2; the plan of record (prices, migration runbook) is a Claude Doc linked from the user's private notes. Tailscale carries over unchanged.
 
 ## Automation
 

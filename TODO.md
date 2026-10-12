@@ -135,7 +135,10 @@ The live apps run on the Windows PC until trflab; its state and Windows-side wor
 
 ### Phase 2 — Dedicated NixOS server (`trflab`)
 
-Hardware and storage were decided 2026-09-26 (AGENTS.md § Roadmap; the plan doc is linked from the user's private notes). Memtest the reused DDR4 overnight before committing.
+Decided 2026-09-26; the plan doc (prices, migration runbook) is linked from the user's private notes. Memtest the reused DDR4 overnight before committing.
+
+- **Hardware:** i5-12400 (Quick Sync handles Plex transcode) on an ASRock B760M Pro-A D4 in the Fractal Focus G Mini, with a 512 GB NVMe boot drive. Reuses the Noctua NH-U9S (LGA 1700 kit), the 2×8 GB DDR4, the EVGA 550 G2 and the GTX 1070 for light ollama, which needs the `legacy_580` driver (`config.boot.kernelPackages.nvidiaPackages.legacy_580`) with `hardware.nvidia.open = false` (CUDA 13 and PyTorch 2.15 drop Pascal).
+- **Storage:** direct-attached, no NAS. mergerfs + SnapRAID with one parity disk over ext4 data disks (`services.snapraid`); app state stays on the NVMe. The first purchase is 2 × 14 TB; a drive bigger than the parity becomes the new parity. Media moves off the DrivePool drives by rsync (file-level NTFS pooling, so each drive reads on its own). Growth is capped by cost, not need (media is kept as an archive), so layouts compare on cost per added TB.
 
 - [ ] Add `trflab` host to the flake (swap the WSL module for hardware config; reuse the homelab modules, starting from trfwsl's last declaration in `git show 76e9d16:hosts/trfwsl/default.nix`; swap NTFS mount paths for the mergerfs pool's paths in `configRoot`/`mediaRoot`)
 - [ ] Headless NVIDIA for the 1070 (`legacy_580`, `hardware.nvidia.open = false`); auto-rebuild via systemd timer
