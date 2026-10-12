@@ -1,5 +1,6 @@
 {
   lib,
+  pkgs,
   user,
   isWSL,
   ...
@@ -106,8 +107,13 @@
   };
 
   # ── Terminfo ──────────────────────────────────────────────────────────
-  # Extra terminfo entries so SSH sessions from Ghostty/foot/kitty work.
-  environment.enableAllTerminfo = true;
+  # Terminfo for the terminals that SSH in (ncurses already ships foot's).
+  # Not enableAllTerminfo: it builds every terminal in nixpkgs for its entry,
+  # and one that fails on Hydra (contour, rxvt-unicode) stalls auto-update.
+  environment.systemPackages = map (p: p.terminfo) [
+    pkgs.ghostty
+    pkgs.kitty
+  ];
 
   # ── 1Password CLI ────────────────────────────────────────────────────
   programs._1password.enable = true;
