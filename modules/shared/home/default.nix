@@ -142,7 +142,13 @@
   xdg.configFile."AGENTS.md".source = ../../../config/agents.md; # generic / Gemini
   xdg.configFile."opencode/AGENTS.md".source = ../../../config/agents.md; # OpenCode
   # Claude Code and pi get theirs through their home-manager modules
-  # (claude-code.nix, pi.nix).
+  # (claude-code.nix, pi.nix). Codex CLI too: with preferXdgDirectories its home
+  # is ~/.config/codex (CODEX_HOME), and with no settings declared it keeps its
+  # own config.toml. The ChatGPT app's Codex ignores CODEX_HOME and uses ~/.codex.
+  programs.codex = {
+    enable = true;
+    context = ../../../config/agents.md;
+  };
 
   # ── Dotfiles managed via config/ ────────────────────────────────────────
   # C/C++ floor; templates/cpp layers the strict tier. clangd reads its user
