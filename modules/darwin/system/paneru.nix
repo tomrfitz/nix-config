@@ -97,6 +97,15 @@
           bundle_id = "com.1password.1password";
           floating = true;
         };
+        # Ghostty's quick terminal: the one Ghostty window that is a panel
+        # (subrole AXFloatingWindow; ordinary windows are AXStandardWindow).
+        # Its title is the cwd, so only the subrole tells it apart.
+        ghostty-quick-terminal = {
+          title = ".*";
+          bundle_id = "com.mitchellh.ghostty";
+          subrole = "AXFloatingWindow";
+          floating = true;
+        };
         finder = {
           title = ".*";
           bundle_id = "com.apple.finder";
