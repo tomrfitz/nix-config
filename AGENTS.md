@@ -114,7 +114,7 @@ modules/
 - Configure editors: Zed in `modules/shared/home/desktop.nix`, Helix in `modules/shared/home/editors.nix`, Emacs in `modules/shared/home/emacs.nix`
 - Claude Code: settings in `config/claude-settings.json`, status line in `config/claude-statusline.sh`, wiring in `modules/shared/home/claude-code.nix`
 - Other agent harnesses: pi in `modules/shared/home/pi.nix` (with `pi-resources/`), omp in `omp.nix`, Hermes in `packages.nix`; the Anthropic API key pi and omp read (Max's monthly API credits; 1Password, never exported) in `anthropic-api-key.nix`
-- Agent skills: for every project in `config/skills/` (linked into `~/.claude/skills/` by `claude-code.nix`); for this repo only in `.claude/skills/`
+- Agent skills: for every project in `config/skills/` (linked into `~/.claude/skills/` by `claude-code.nix`, and as `~/.agents/skills`, which omp and pi read, by `default.nix`); for this repo only in `.claude/skills/`. omp's global instructions come from the same `config/agents.md` (`omp.nix`); its memory settings (Mnemopi, auto-retain off) live in its own `~/.omp/agent/config.yml`
 - MCP servers: `programs.mcp` (Claude Code picks them up via `enableMcpIntegration`); the Zotero server, its CLI (both uvx-wrapped) and the Linux app in `modules/shared/home/zotero.nix`, which also merges the server into the Claude desktop app's config on darwin
 - Python global tooling (ruff floor, ty): `modules/shared/home/python.nix`; project tier: `templates/python-uv/pyproject.toml`
 - C/C++ floor: `config/clang-format`, `config/clang-tidy`, `config/clangd.yaml`; project tier: `templates/cpp/`

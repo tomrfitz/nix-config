@@ -141,14 +141,20 @@
   # ── Agent instructions (each tool looks for instructions at a different path) ──
   xdg.configFile."AGENTS.md".source = ../../../config/agents.md; # generic / Gemini
   xdg.configFile."opencode/AGENTS.md".source = ../../../config/agents.md; # OpenCode
-  # Claude Code and pi get theirs through their home-manager modules
-  # (claude-code.nix, pi.nix). Codex CLI too: with preferXdgDirectories its home
+  # Claude Code, pi and omp get theirs through their own modules (claude-code.nix,
+  # pi.nix, omp.nix). Codex CLI too: with preferXdgDirectories its home
   # is ~/.config/codex (CODEX_HOME), and with no settings declared it keeps its
   # own config.toml. The ChatGPT app's Codex ignores CODEX_HOME and uses ~/.codex.
   programs.codex = {
     enable = true;
     context = ../../../config/agents.md;
   };
+
+  # Skills for every project, in the Agent Skills user directory that omp and pi
+  # read; Claude Code links the same folders into ~/.claude/skills itself.
+  # Out of store, so edits and new skills apply without a rebuild.
+  home.file.".agents/skills".source =
+    config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/config/skills";
 
   # ── Dotfiles managed via config/ ────────────────────────────────────────
   # C/C++ floor; templates/cpp layers the strict tier. clangd reads its user

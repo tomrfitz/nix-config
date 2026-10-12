@@ -5,7 +5,10 @@
 # Claude Pro/Max login forges Claude Code's billing header.
 #
 # omp reads models.yml but never writes it; the rest of its state (config.yml
-# with the model roles, agent.db with the logins) stays its own in ~/.omp/agent.
+# with the model roles and memory settings, agent.db with the logins) stays its
+# own in ~/.omp/agent. It reads user-level instructions from AGENTS.md here
+# (~/.config/AGENTS.md is not one of its paths) and the shared skills from
+# ~/.agents/skills (default.nix).
 {
   config,
   lib,
@@ -15,7 +18,10 @@
 lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
   home.packages = [ pkgs.omp ];
 
-  home.file.".omp/agent/models.yml".source = (pkgs.formats.yaml { }).generate "omp-models.yml" {
-    providers.anthropic.apiKey = "!${config.home.profileDirectory}/bin/anthropic-api-key";
+  home.file = {
+    ".omp/agent/AGENTS.md".source = ../../../config/agents.md;
+    ".omp/agent/models.yml".source = (pkgs.formats.yaml { }).generate "omp-models.yml" {
+      providers.anthropic.apiKey = "!${config.home.profileDirectory}/bin/anthropic-api-key";
+    };
   };
 }

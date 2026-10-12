@@ -1,6 +1,6 @@
 # Global AGENTS.md
 
-Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md`, `~/.claude/CLAUDE.md`, `~/.config/opencode/AGENTS.md`, and `~/.pi/agent/AGENTS.md` by home-manager.
+Project-agnostic guidance for AI coding agents. Deployed to `~/.config/AGENTS.md`, `~/.claude/CLAUDE.md`, `~/.omp/agent/AGENTS.md`, `~/.config/opencode/AGENTS.md`, `~/.pi/agent/AGENTS.md` and Codex's home by home-manager.
 
 ## Principles
 
@@ -70,7 +70,7 @@ Code should work for its author first, be maintainable and accessible to them ov
 
 ## Continuity
 
-- Private context about the user (work, study, preferences, privacy rules) is in @~/Documents/notes/agent-context.org (Claude Code imports it; other agents should read it at the start of a session). It stays out of repos because some are public.
+- Private context about the user (work, study, preferences, privacy rules) is in @~/Documents/notes/agent-context.org (Claude Code and omp expand that import; other agents should read it at the start of a session). It stays out of repos because some are public.
 - Treat AGENTS.md, memory files, and project docs as imperfect but valuable persistence. Record only what would change a future decision; when an entry goes stale, correct or delete it rather than appending history, which git already keeps.
 - Put knowledge where every reader that needs it will look: repo rules in AGENTS.md, the reason for a piece of code in a comment beside it, procedures in skills, open work in TODO.md, research in notes. Agent memory is the narrowest channel (one harness, one project), so it holds the least.
 - Fix inaccurate docs you come across, after verifying the new fact. A change that encodes a decision (retiring a host, changing a status) is the user's call: raise it instead.
