@@ -136,8 +136,13 @@ in
   # every switch on NixOS (home-manager's unit sets X-RestartIfChanged =
   # false). Restart it by hand then: `launchctl kickstart -k
   # gui/$(id -u)/org.nix-community.home.emacs` (NixOS: `systemctl --user
-  # restart emacs`). M-x kill-emacs stops it until the next
-  # login or kickstart. To see what a server is running, ask it
+  # restart emacs`). On macOS launchd restarts it after any exit: the
+  # module's KeepAlive (restart on crash or a non-zero exit) left it down
+  # after a clean quit (Dock or app-menu Quit, M-x kill-emacs, all exit 0)
+  # until the next login, so edits went to no Emacs at all. A launchd stop
+  # (SIGTERM) still runs kill-emacs-hook, so a running org clock persists.
+  # To stop it for good, `launchctl bootout gui/$(id -u)/org.nix-community.home.emacs`.
+  # To see what a server is running, ask it
   # (`emacsclient -e`); `ps` shows the bare Emacs path even for the wrapped
   # build. The socket is $TMPDIR/emacs$UID/server, so a shell with another
   # TMPDIR (an agent's sandbox) needs `--socket-name=<absolute path>`.
@@ -161,6 +166,9 @@ in
       "${emacs}/Applications/Emacs.app/Contents/MacOS/Emacs"
       "--fg-daemon"
     ]
+  );
+  launchd.agents.emacs.config.KeepAlive = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
+    lib.mkForce true
   );
   launchd.agents.emacs.config.EnvironmentVariables = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     TERMINFO = "${config.xdg.dataHome}/terminfo";
