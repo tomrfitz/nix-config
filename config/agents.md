@@ -37,6 +37,7 @@ Code should work for its author first, be maintainable and accessible to them ov
 ## Validation & side effects
 
 - Prefer dry-run/check before apply; never mutate live systems without explicit request
+- The user's machines are declarative (nix, home-manager, a per-project flake and direnv). Use the tools the dev shell puts on `PATH`; never install imperatively (`uvx`, `uv tool install`, `pip install`, `npm install -g`, `cargo install`, `brew install`). If a tool is missing, ask for it to be added to the flake or nix config.
 - Understand which commands are idempotent (read-only queries, formatting checks) vs stateful (installs, deployments, database migrations)
 - Treat verifiable literals (version numbers, dates, commit SHAs, hashes, release tags) as facts to confirm from an authoritative source in-repo or upstream docs before acting (especially before commit-message rewrites or release metadata edits)
 
@@ -73,6 +74,7 @@ Code should work for its author first, be maintainable and accessible to them ov
 - Private context about the user (work, study, preferences, privacy rules) is in @~/Documents/notes/agent-context.org (Claude Code and omp expand that import; other agents should read it at the start of a session). It stays out of repos because some are public.
 - Treat AGENTS.md, memory files, and project docs as imperfect but valuable persistence. Record only what would change a future decision; when an entry goes stale, correct or delete it rather than appending history, which git already keeps.
 - Put knowledge where every reader that needs it will look: repo rules in AGENTS.md, the reason for a piece of code in a comment beside it, procedures in skills, open work in TODO.md, research in notes. Agent memory is the narrowest channel (one harness, one project), so it holds the least.
+- That rule binds every harness memory tool: Claude Code's auto-memory and subagent `memory:` directories, omp's `retain`/`learn`, pi-hermes-memory. Edit the file that owns a fact first; store a memory only for what fits no file, and never copy a file's content into one. Subagents read the AGENTS.md/CLAUDE.md chain but not the main conversation's memory, so anything a delegated worker needs must live in a file. Skills you write go to `~/nix-config/config/skills/` (every harness reads them), not to a harness's own skill store; omp's `managed-skills` are drafts to promote there or delete.
 - Fix inaccurate docs you come across, after verifying the new fact. A change that encodes a decision (retiring a host, changing a status) is the user's call: raise it instead.
 - When the topic shifts or the session grows long (around 300k tokens), propose a handoff (`/handoff` where available) and a fresh session.
 - Distinguish facts (test status, file paths) from understanding (why a design decision was made, what the user's goals are) — both matter, but understanding is harder to capture and more valuable to try
