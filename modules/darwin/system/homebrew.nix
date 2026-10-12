@@ -43,6 +43,9 @@
       "zoom"
 
       # productivity
+      # Also the Codex app since OpenAI folded it in (codex-app is deprecated).
+      # Cask, not nixpkgs: the nix build trails by months and can't self-update.
+      "chatgpt"
       "claude"
       # Microsoft AutoUpdate patches Office in place; a greedy upgrade would
       # reinstall the whole multi-GB .pkg for every version bump instead.
