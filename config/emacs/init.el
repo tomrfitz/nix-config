@@ -593,6 +593,14 @@
     :bind (("M-$" . jinx-correct)
               ("C-M-$" . jinx-languages)))
 
+;; No dictionary word completion: since Emacs 30 text-mode adds
+;; `ispell-completion-at-point' (from /usr/share/dict/web2 on macOS), so
+;; corfu-auto popped a word list over nearly every word typed in prose. Each
+;; time that popup hid, paneru moved focus to another window (it gives focus
+;; away whenever a tracked window disappears, focused or not). Spelling
+;; suggestions are jinx's job (M-$).
+(setopt text-mode-ispell-word-completion nil)
+
 ;; Harper over Eglot, configured as in Harper's Emacs guide. Its absolute path
 ;; is resolved at startup like rass's, so a devShell's PATH can't hide it.
 ;; Spelling stays with jinx; ToDoHyphen would flag every TODO keyword.
