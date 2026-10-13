@@ -65,8 +65,6 @@
       "karabiner-elements"
       "batfi"
       "daisydisk"
-      "thaw"
-      "keepingyouawake"
       "keyclu"
       "linearmouse"
       "lookaway"
@@ -78,17 +76,11 @@
       "netnewswire"
       "ollama-app"
       "onyx" # the @beta cask requires macOS 27
-      "oversight"
       "pearcleaner"
       "pika"
       "shottr"
       "stats"
       "syntax-highlight"
-      # Leave its window features off (layout, maximize, focus follows mouse)
-      # for paneru, and its Homebrew manager, app updates and uninstaller for
-      # the Brewfile: cleanup = "uninstall" removes what it installs and the
-      # next switch reinstalls a cask it removes.
-      "vorssaint"
 
       # editors / writing
       "zed"
@@ -127,10 +119,8 @@
       "Hand Mirror" = 1502839586;
       "Headjust" = 6759303637;
       "KakaoTalk" = 869223134;
-      "One Thing" = 1604176982;
       "RapidClick" = 419891002;
       "Steam Link" = 1246969117;
-      "Tot" = 1491071483;
       "Userscripts" = 1463298887;
       "Velja" = 1607635845;
       # "iA Writer" = 775737590; # requires purchase

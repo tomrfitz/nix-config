@@ -62,7 +62,6 @@ in
       # productivity & tools
       "firefox@tampermonkey.net" = amo "tampermonkey";
       "clipper@obsidian.md" = amo "web-clipper-obsidian";
-      "notes@mozilla.com" = amo "notes-by-firefox";
       "sabre@simplify.jobs" = amo "simplify-jobs";
       "{cb31ec5d-c49a-4e5a-b240-16c767444f62}" = amo "indie-wiki-buddy";
       "historia@eros.man" = amo "historia";
