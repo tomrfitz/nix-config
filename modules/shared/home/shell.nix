@@ -260,7 +260,6 @@
   programs.starship = {
     enable = true;
     enableZshIntegration = true;
-    enableNushellIntegration = true;
     settings = {
       command_timeout = 500;
       scan_timeout = 30;
