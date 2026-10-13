@@ -2,19 +2,12 @@ _: {
   fonts.fontconfig = {
     enable = true;
     defaultFonts = {
-      sansSerif = [
-        "Atkinson Hyperlegible Next"
-        "Pretendard"
-        "Noto Sans CJK SC"
-      ];
+      sansSerif = [ "Sarasa UI SC" ];
       serif = [
         "Iosevka Etoile"
-        "Noto Sans CJK SC"
+        "Sarasa UI SC"
       ];
-      monospace = [
-        "Atkinson Hyperlegible Mono"
-        "Noto Sans Mono CJK SC"
-      ];
+      monospace = [ "Sarasa Fixed SC" ];
       emoji = [ "Noto Color Emoji" ];
     };
   };

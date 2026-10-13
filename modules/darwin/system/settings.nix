@@ -24,9 +24,9 @@ let
     };
     "com.apple.mail" = {
       AutoSelectFont = false; # Don't match reply font to original message
-      NSFont = "AtkinsonHyperlegibleNext-Regular";
+      NSFont = "Sarasa-UI-SC-Regular";
       NSFontSize = 12;
-      NSFixedPitchFont = "AtkinsonHyperlegibleMono-Regular";
+      NSFixedPitchFont = "Sarasa-Fixed-SC-Regular";
       NSFixedPitchFontSize = 12;
     };
   };

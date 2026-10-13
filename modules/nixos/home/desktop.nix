@@ -306,7 +306,7 @@ in
 
     settings = {
       shell = {
-        font_family = "Atkinson Hyperlegible Next";
+        font_family = "Sarasa UI SC";
         setup_wizard_enabled = false;
         launch_apps_as_systemd_services = true; # recommended alongside systemd.enable
       };

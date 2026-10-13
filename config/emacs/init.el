@@ -129,18 +129,16 @@
 (setq tab-always-indent 'complete)
 
 ;; ── Fonts ─────────────────────────────────────────────────────────────
+;; Sarasa carries Latin, Greek, Cyrillic, Hangul, kana and Han in one font,
+;; with CJK at exactly two Latin cells, so no fontset fallback is needed.
+;; Fixed: Iosevka Latin, no ligatures. UI: Inter Latin, narrow quotes.
+;; SC picks mainland Han forms; Hangul is the same in every orthography.
 (set-face-attribute 'default nil
-    :family "Atkinson Hyperlegible Mono"
+    :family "Sarasa Fixed SC"
     :height 140)
 (set-face-attribute 'variable-pitch nil
-    :family "Atkinson Hyperlegible Next"
+    :family "Sarasa UI SC"
     :height 140)
-
-;; CJK fallback: Pretendard (Korean) → Noto Sans CJK SC (Chinese/shared)
-(dolist (script '(hangul kana han cjk-misc))
-    (set-fontset-font t script (font-spec :family "Pretendard") nil 'prepend))
-(dolist (script '(han cjk-misc))
-    (set-fontset-font t script (font-spec :family "Noto Sans CJK SC") nil 'append))
 
 ;; ── Theme ─────────────────────────────────────────────────────────────
 ;; Local Flexoki theme (spec-corrected); platform-aware dark/light switching.
@@ -630,7 +628,7 @@
 ;; - a 72-column soft-wrapped measure;
 ;; - the cursor line kept centred (typewriter scrolling) with the scroll
 ;;   margin capped at half the window, per the Emacs manual's Auto Scrolling;
-;; - mixed-pitch sets prose in Atkinson Next and keeps tables and code
+;; - mixed-pitch sets prose in Sarasa UI and keeps tables and code
 ;;   monospaced, so tables still line up;
 ;; - org-modern draws headings, lists and blocks as typography. Emphasis
 ;;   markers stay visible (org-hide-emphasis-markers, Org above).

@@ -23,7 +23,7 @@
       bold-is-bright = true;
       cursor-style = "bar";
       font-thicken = true;
-      font-family = "Atkinson Hyperlegible Mono";
+      font-family = "Sarasa Fixed SC";
       quick-terminal-position = "center";
       # Keep remote SSH sessions usable when hosts don't yet have Ghostty terminfo.
       shell-integration-features = "ssh-env,ssh-terminfo";

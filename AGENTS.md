@@ -186,7 +186,7 @@ Two mechanisms, split by trust model:
 
 - **Linux theming engine:** Noctalia — wallpaper-derived Material You colors, template-based app theming (GTK, Qt, foot, Ghostty, Emacs, Vesktop), auto dark/light scheduling, night light, app launcher
 - **macOS theming:** native system appearance (Ghostty and Zed respond to system dark/light preference); Flexoki theme for Zed/Emacs
-- **Fonts:** Atkinson Hyperlegible Next (sans), Atkinson Hyperlegible Mono (monospace), fontconfig defaults in `modules/shared/home/fonts.nix`
+- **Fonts:** Sarasa Gothic SC orthography everywhere (since 2026-10-13): `Sarasa Fixed SC` (monospace; Iosevka Latin, no ligatures, CJK at exactly two cells) and `Sarasa UI SC` (sans; Inter Latin). One family covers Latin, Greek, Cyrillic, Hangul, kana and Han, so no CJK fallback fonts or fontsets. Fontconfig defaults in `modules/shared/home/fonts.nix`
 - **Emacs:** Noctalia-generated theme on Linux, Flexoki fallback on macOS
 
 ## Custom packages

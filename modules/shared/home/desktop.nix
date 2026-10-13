@@ -29,6 +29,7 @@
 
       # fonts
       aporetic
+      # Obsidian's appearance.json still names Atkinson; drop with Obsidian.
       atkinson-hyperlegible-mono
       atkinson-hyperlegible-next
       fira-code
@@ -42,8 +43,7 @@
       monaspace
       nerd-fonts.symbols-only
       noto-fonts-color-emoji
-      noto-fonts-cjk-sans
-      pretendard
+      sarasa-gothic
     ]
     ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [
       picard # brew cask "musicbrainz-picard" on darwin (qtwayland dep)
@@ -247,12 +247,10 @@
         diagnostics = false;
         metrics = false;
       };
-      buffer_font_family = lib.mkForce "Atkinson Hyperlegible Mono";
-      ui_font_family = lib.mkForce "Atkinson Hyperlegible Mono";
-      terminal.font_family = lib.mkForce "Atkinson Hyperlegible Mono";
+      buffer_font_family = lib.mkForce "Sarasa Fixed SC";
+      ui_font_family = lib.mkForce "Sarasa Fixed SC";
+      terminal.font_family = lib.mkForce "Sarasa Fixed SC";
       bottom_dock_layout = "right_aligned";
-      buffer_font_features.calt = true;
-      ui_font_features.calt = true;
       inlay_hints = {
         show_background = false;
         show_type_hints = true;
