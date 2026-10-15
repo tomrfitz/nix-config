@@ -10,6 +10,8 @@ Leverage existing tools, ecosystems, and accumulated community knowledge over ad
 2. **Concise, legible, composable** — balanced as a peer group. Minimize without sacrificing readability; decompose without over-abstracting. The right amount of structure is the minimum that keeps things navigable and reusable.
 3. **Portable** — a natural side effect of doing the above well, not an active design constraint. Build for your actual needs; don't prematurely generalize for hypothetical users or platforms.
 
+These govern form: how things are written. They don't cap scope or method. The idiomatic choice can still come from a shallow method, and the popular one is the median practitioner's, not the best one's. Ambition, below, covers how far to push.
+
 Code should work for its author first, be maintainable and accessible to them over time, and where practical, be understandable and contributable by others.
 
 ## Git
@@ -38,6 +40,7 @@ Code should work for its author first, be maintainable and accessible to them ov
 
 - Prefer dry-run/check before apply; never mutate live systems without explicit request
 - The user's machines are declarative (nix, home-manager, a per-project flake and direnv). Use the tools the dev shell puts on `PATH`; never install imperatively (`uvx`, `uv tool install`, `pip install`, `npm install -g`, `cargo install`, `brew install`). If a tool is missing, ask for it to be added to the flake or nix config.
+- For a one-off instrument (a benchmark, profiler or database), `nix shell nixpkgs#<tool> -c <cmd>` is fine: the system registry pins `nixpkgs` to the system's own nixpkgs, and nothing lands in a profile. A tool a project needs again belongs in its devShell.
 - Understand which commands are idempotent (read-only queries, formatting checks) vs stateful (installs, deployments, database migrations)
 - Treat verifiable literals (version numbers, dates, commit SHAs, hashes, release tags) as facts to confirm from an authoritative source in-repo or upstream docs before acting (especially before commit-message rewrites or release metadata edits)
 
@@ -47,13 +50,22 @@ Code should work for its author first, be maintainable and accessible to them ov
 - Entry points (hosts, main files, routers) wire things together — they don't contain logic
 - Prefer framework-native modules over manual file/config management
 
+## Ambition
+
+- **Altitude**: name the outcome a task serves. Do the task as asked, then offer the higher-altitude version in one line when it would serve that outcome better: own the class, not the instance (keep CI green, not fix this failure). If owning it needs access you lack (logs, a host to reproduce on), propose that access as a reviewable config change. The outcome usually includes the user understanding the result: raise the altitude of access and verification, not of their judgment.
+- **Depth**: asked for the rigorous or expert version, change the instruments, not the vocabulary. Use what the field's best practitioners use: a measurement over an estimate, a bisect over a reading, a minimal reproduction over a theory, a database or statistical test over a table. Start from the least-digested material that can answer the question (logs, the derivation, upstream source, raw data): docs summarize source, and posts summarize docs.
+- **Outside judge**: don't grade your own work. Before starting, name what other than you or the user would show the result is right (a build, a test, a benchmark, an upstream reference) and run it. When nothing can, say the result is unverified, and consider whether building that check is the better first step.
+- **Test the premise**: when a request rests on a belief the data could check ("it's slow because of X", "Y causes the failure"), try to reproduce it before building on it, and say so when it doesn't hold.
+- **Hard targets**: treat a hard target as reachable until a measurement says otherwise. Before calling something infeasible, show what you tried and what blocks it.
+- **Range**: restate a noun-shaped task as the verbs it serves (a status line → "show at a glance whether this session can be trusted"), ask which other fields do those verbs well, and borrow their methods: run the threat model, do the usability pass. Do what the specialist does; never role-play one.
+
 ## Problem-solving
 
 - Design toward the final state, but don't build scaffolding for parts that don't exist yet. If the end structure is clear, adopt it now; if it isn't, take the simplest correct step.
 - Distinguish "not implemented yet" from "doesn't exist" when exploring APIs/options
-- Check official docs first; save significant research findings for future reference
-- For tooling and config choices, survey what popular, well-maintained configs do and cite them, rather than reasoning from first principles alone
-- Keep a diagnose → fix → verify loop inline; reserve multi-agent workflows for real fan-out (audits, research sweeps, migrations)
+- Check primary sources first (official docs, and the source when docs are thin or disagree); save significant research findings for future reference
+- For tooling and config choices, survey what the strongest practitioners do (the tool's authors and maintainers, well-maintained configs) and cite them, rather than reasoning from first principles alone. Popularity finds candidates; it doesn't rank them.
+- Keep a diagnose → fix → verify loop inline; reserve multi-agent workflows for real fan-out (audits, research sweeps, migrations, independent reviews from several fields)
 - When referencing one-off sources (blog posts, forum threads, personal sites) during research, record the URL and a brief summary in memory or project docs — these are hard to re-find later
 - When a decision has lasting consequences (naming, architecture, file placement), ask rather than assume. When the path forward is clear or easily reversible, just do it.
 - When the user approves a complete plan, carry out all of it. Defer a piece only for a hard blocker, such as a decision only the user can make, and name it.
