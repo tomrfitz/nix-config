@@ -616,9 +616,39 @@
         (setq-default eglot-workspace-configuration
             '(:harper-ls (:dialect "American"
                              :linters (:SpellCheck :json-false
-                                       :ToDoHyphen :json-false)))))
+                                       :ToDoHyphen :json-false))))
+        (advice-add 'eglot-flymake-backend :around #'tf/harper-filter-org-tables))
     (add-hook 'org-mode-hook #'eglot-ensure)
     (add-hook 'markdown-mode-hook #'eglot-ensure))
+
+;; Harper's org parser reads table rows as prose: cell padding trips Spaces,
+;; short rule rows trip Dashes, and the rows run together into one sentence
+;; that trips LongSentences (harper-ls then drops every lint that sentence
+;; overlaps). Those three are dropped where they start in an Org table, so
+;; they stay on for prose and other lints in cells still show. Eglot has no
+;; diagnostics filter, hence the advice on its Flymake backend.
+;; REVISIT(upstream): drop this once Harper's org parser lints table cells the
+;; way its Markdown parser does (no issue filed yet); ref:
+;; https://github.com/Automattic/harper/blob/master/harper-core/src/parsers/org_mode.rs;
+;; checked: 2026-10-17
+(defun tf/harper-org-table-misfire-p (diag)
+    "Non-nil if DIAG is a Harper lint set off by Org table syntax."
+    (let ((lsp (alist-get 'eglot-lsp-diag (flymake-diagnostic-data diag))))
+        (and (equal (plist-get lsp :source) "Harper")
+            (member (plist-get lsp :code) '("Spaces" "LongSentences" "Dashes"))
+            (with-current-buffer (flymake-diagnostic-buffer diag)
+                (org-with-point-at (flymake-diagnostic-beg diag)
+                    (org-at-table-p))))))
+
+(defun tf/harper-filter-org-tables (backend report-fn &rest args)
+    "Call Eglot's Flymake BACKEND, dropping Harper's misfires on Org tables."
+    (apply backend
+        (if (derived-mode-p 'org-mode)
+            (lambda (diags &rest props)
+                (apply report-fn
+                    (seq-remove #'tf/harper-org-table-misfire-p diags) props))
+            report-fn)
+        args))
 
 ;; Writing mode: logos-focus-mode (Prot) hides the mode line and quiets the
 ;; fringe; `tf/writing-mode' adds the rest through `logos-focus-mode-hook',
