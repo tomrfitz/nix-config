@@ -10,6 +10,15 @@ let
   # get passed as part of the arg. Use a config file instead — same content,
   # works for both editor and CLI paths.
   sqlFormatterConfig = "${config.xdg.configHome}/sql-formatter/config.json";
+  texFmtConfig = (pkgs.formats.toml { }).generate "tex-fmt.toml" {
+    tabsize = 4;
+    # Indentation only: rewrapping prose reflows a paragraph on every edit.
+    wrap = false;
+    # fvextra Verbatim environment from my report templates
+    # (\DefineVerbatimEnvironment{transcript}{Verbatim}{…}); indenting it
+    # would put the spaces into the PDF.
+    verbatims = [ "transcript" ];
+  };
   # WASM plugins from nixpkgs — sandbox-safe, no plugin URL fetches at runtime.
   # The selector is shared with treefmt.nix (config/dprint-plugins.nix) so the
   # two lists cannot drift.
@@ -89,6 +98,7 @@ in
         "**/*.sql"
         "**/*.sh"
         "**/*.bash"
+        "**/*.tex"
       ];
       excludes = [
         "flake.lock"
@@ -155,6 +165,15 @@ in
             ];
             stdin = true;
           }
+          {
+            # tex-fmt finds tex-fmt.toml from cwd or the git root, not from the
+            # file path, then falls back to the global file below. No .cls,
+            # .sty or .bib: class files often come from a publisher or course
+            # and must stay byte-identical, and .bib files are exports.
+            command = "tex-fmt --stdin";
+            exts = [ "tex" ];
+            stdin = true;
+          }
         ];
       };
 
@@ -174,6 +193,8 @@ in
         bash = "sh";
         shell = "sh";
         sql = "sql";
+        latex = "tex";
+        tex = "tex";
       };
     }
   );
@@ -186,7 +207,23 @@ in
     functionCase = "upper";
   };
 
-  # clang-format is needed by the exec plugin; ruff comes from python.nix and
-  # the rest from packages.nix.
-  home.packages = [ pkgs.clang-tools ];
+  # Global floor for tex-fmt (used by dprint exec and Zed); a project's own
+  # tex-fmt.toml replaces it whole. tex-fmt reads its user config from
+  # ~/Library/Application Support/ on macOS (the `dirs` crate ignores XDG
+  # there) and from $XDG_CONFIG_HOME on Linux.
+  home.file."Library/Application Support/tex-fmt/tex-fmt.toml" =
+    lib.mkIf pkgs.stdenv.hostPlatform.isDarwin
+      {
+        source = texFmtConfig;
+      };
+  xdg.configFile."tex-fmt/tex-fmt.toml" = lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) {
+    source = texFmtConfig;
+  };
+
+  # clang-format and tex-fmt are needed by the exec plugin; ruff comes from
+  # python.nix and the rest from packages.nix.
+  home.packages = [
+    pkgs.clang-tools
+    pkgs.tex-fmt
+  ];
 }

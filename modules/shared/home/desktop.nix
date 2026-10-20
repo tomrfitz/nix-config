@@ -312,6 +312,16 @@
             ];
           };
         };
+        LaTeX = {
+          # tex-fmt itself, as dprint's exec plugin runs it, not texlab's
+          # formatting: texlab defaults to latexindent and passes --wraplen
+          # over tex-fmt.toml. Zed also treats .cls and .sty as LaTeX, so save
+          # a vendored class file with `workspace: save without format`.
+          formatter.external = {
+            command = "tex-fmt";
+            arguments = [ "--stdin" ];
+          };
+        };
         Python = {
           language_servers = [
             "ty"
