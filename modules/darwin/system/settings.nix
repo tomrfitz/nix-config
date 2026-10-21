@@ -1,4 +1,9 @@
-{ lib, user, ... }:
+{
+  config,
+  lib,
+  user,
+  ...
+}:
 let
   homeDirectory = "/Users/${user}";
   homeManagerAppsDirectory = "${homeDirectory}/Applications/Home Manager Apps";
@@ -39,6 +44,13 @@ let
     }'';
 in
 {
+  # home-manager's session variables reach shells only; apps launched from the
+  # Dock or Finder take their environment from launchd. Claude Code's XDG
+  # config directory (claude-code.nix) has to reach the desktop app's Code tab
+  # and the editors' ACP agents too, or they fall back to ~/.claude.
+  launchd.user.envVariables.CLAUDE_CONFIG_DIR =
+    config.home-manager.users.${user}.programs.claude-code.configDir;
+
   system.defaults = {
     # ── Global (NSGlobalDomain) ──────────────────────────────────────────
     NSGlobalDomain = {

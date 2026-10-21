@@ -318,7 +318,7 @@
 ;; (emacs.nix). The default authentication, :login, uses Claude Code's own
 ;; login and blanks ANTHROPIC_API_KEY for the agent, so sessions draw on the
 ;; Max plan, as Zed's Claude Agent does. Model and effort come from
-;; ~/.claude/settings.json.
+;; ~/.config/claude/settings.json.
 (use-package agent-shell
     :ensure t
     :defer t

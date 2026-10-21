@@ -151,7 +151,7 @@
   };
 
   # Skills for every project, in the Agent Skills user directory that omp and pi
-  # read; Claude Code links the same folders into ~/.claude/skills itself.
+  # read; Claude Code links the same folders into its own config directory.
   # Out of store, so edits and new skills apply without a rebuild.
   home.file.".agents/skills".source =
     config.lib.file.mkOutOfStoreSymlink "${config.home.homeDirectory}/nix-config/config/skills";

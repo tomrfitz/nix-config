@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Claude Code status line: model · effort │ context │ plan limits │ git │ session.
 # Claude Code pipes the session JSON on stdin (https://code.claude.com/docs/en/statusline);
-# linked to ~/.claude/statusline.sh by modules/shared/home/claude-code.nix.
+# linked to ~/.config/claude/statusline.sh by modules/shared/home/claude-code.nix.
 
 input=$(cat)
 

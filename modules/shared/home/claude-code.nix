@@ -1,10 +1,10 @@
 # Claude Code — home-manager owns the config on every host; who owns the binary
 # depends on the platform. On macOS it is Anthropic's native installer
 # (~/.local/bin/claude, self-updating; scripts/bootstrap.sh runs it): the
-# desktop app bundles its own self-updating copy and reads the same ~/.claude,
-# so a nix-pinned CLI would only trail both against shared state. Linux keeps
-# nixpkgs, which patches the prebuilt binary for NixOS and wraps it with
-# DISABLE_AUTOUPDATER.
+# desktop app bundles its own self-updating copy and reads the same config
+# directory, so a nix-pinned CLI would only trail both against shared state.
+# Linux keeps nixpkgs, which patches the prebuilt binary for NixOS and wraps
+# it with DISABLE_AUTOUPDATER.
 {
   config,
   lib,
@@ -20,6 +20,10 @@ in
     enable = true;
     package = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin null;
     context = ../../../config/agents.md;
+    # XDG rather than ~/.claude. Off the legacy default, home-manager exports
+    # CLAUDE_CONFIG_DIR to shells; GUI apps (the desktop app's Code tab, Zed,
+    # Emacs) get it from launchd, in modules/darwin/system/settings.nix.
+    configDir = "${config.xdg.configHome}/claude";
     # Servers declared in programs.mcp (zotero.nix) reach Claude Code through
     # the generated `hm` plugin, as mcp__plugin_hm_<server>__<tool>.
     enableMcpIntegration = true;

@@ -9,19 +9,19 @@ Search past work for a topic and report what was found, with dates and where it 
 
 ## Sources
 
-1. **Docs and memory.** `rg -n -i '<topic>' AGENTS.md TODO.md` in the current repo, then the project's memory directory (`~/.claude/projects/<cwd with / replaced by ->/memory/`). In omp, also its `recall` tool (Mnemopi; project plus global bank).
+1. **Docs and memory.** `rg -n -i '<topic>' AGENTS.md TODO.md` in the current repo, then the project's memory directory (`${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects/<cwd with / replaced by ->/memory/`; `~/.config/claude` here). In omp, also its `recall` tool (Mnemopi; project plus global bank).
 2. **Org notes.** `rg -n -i '<topic>' "${NOTES:-$HOME/Documents/notes}" -g '*.org'`. Older notes sit read-only in the Obsidian vault: `rg -l -i '<topic>' "$OBSD" --type md`.
 3. **Claude Code CLI prompt history** (every prompt typed in the CLI since 2026-01; the desktop app doesn't write it):
 
    ```bash
-   rg -i '<topic>' ~/.claude/history.jsonl |
+   rg -i '<topic>' "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/history.jsonl" |
      jq -r '"\(.timestamp/1000 | strftime("%Y-%m-%d")) \(.project) \(.display[0:200])"'
    ```
 
-4. **Claude Code transcripts** in `~/.claude/projects/*/*.jsonl`. CLI sessions are kept for `cleanupPeriodDays`; desktop sessions are kept indefinitely. Find candidate files first, then pull only the matching text, never whole transcripts:
+4. **Claude Code transcripts** in `${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects/*/*.jsonl`. CLI sessions are kept for `cleanupPeriodDays`; desktop sessions are kept indefinitely. Find candidate files first, then pull only the matching text, never whole transcripts:
 
    ```bash
-   rg -l -i '<topic>' ~/.claude/projects/*/*.jsonl
+   rg -l -i '<topic>' "${CLAUDE_CONFIG_DIR:-$HOME/.claude}"/projects/*/*.jsonl
    jq -r --arg q '<topic>' '
      select(.type == "user" or .type == "assistant")
      | (.message.content // "" | if type == "string" then . else (map(select(.type == "text") | .text) | join(" ")) end) as $t
