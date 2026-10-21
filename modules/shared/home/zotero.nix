@@ -2,7 +2,8 @@
 # firefox-esr build fails on aarch64-darwin) and 54yyyu/zotero-mcp, which
 # gives agents the library as an MCP server (`zotero-mcp serve`) and a CLI
 # (`zotero-cli`). Imported by desktop.nix: local mode needs Zotero running on
-# the same host.
+# the same host. The Linux app's Firefox ESR runtime needs the insecure-package
+# opt-in in modules/nixos/system/desktop.nix.
 {
   config,
   lib,

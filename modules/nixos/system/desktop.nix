@@ -101,6 +101,17 @@
   '';
   environment.etc."1password/custom_allowed_browsers".mode = "0755";
 
+  # ── Zotero runtime ────────────────────────────────────────────────────
+  # Zotero 10 (modules/shared/home/zotero.nix) runs on Firefox ESR 140, past
+  # end of life since 2026-10-13, and nixpkgs marks that runtime insecure
+  # until users opt in. The exact name keeps the opt-in to this one build:
+  # any other insecure runtime fails eval again. The darwin cask bundles the
+  # same ESR.
+  # REVISIT(upstream): drop this once nixpkgs' zotero leaves
+  # firefox-esr-140-bin (Zotero 11, on ESR 153).
+  # ref: https://github.com/NixOS/nixpkgs/pull/572466; checked: 2026-10-21
+  nixpkgs.config.permittedInsecurePackages = [ "firefox-esr-140-bin-unwrapped-140.17.0esr" ];
+
   # ── Face authentication (howdy) ───────────────────────────────────────
   services.linux-enable-ir-emitter = {
     enable = true;
