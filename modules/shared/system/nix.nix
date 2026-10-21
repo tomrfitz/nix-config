@@ -59,4 +59,18 @@
     options = "--delete-older-than 30d";
   };
   nix.optimise.automatic = true;
+
+  # Distrust the root over eMudhra's eight intermediates, whose private keys
+  # can be computed from their certificates; their Sectigo cross-signs chain to
+  # AAA Certificate Services, which this bundle already rejects for TLS. Covers
+  # everything that reads /etc/ssl/certs, nix's own fetches included. Gated
+  # because NSS 3.131.1 removes the root and buildcatrust fails on a
+  # blacklisted name the store no longer has.
+  # REVISIT(upstream): delete once the locked nixpkgs has cacert >= 3.131.1.
+  # ref: https://github.com/NixOS/nixpkgs/commit/f903b8803795; checked: 2026-10-21
+  security.pki.caCertificateBlacklist =
+    lib.optionals (lib.versionOlder pkgs.cacert.version "3.131.1")
+      [
+        "emSign ECC Root CA - G3"
+      ];
 }
