@@ -234,6 +234,7 @@ Decided 2026-09-26: an i5-12400 box with direct-attached mergerfs + SnapRAID sto
                Attic hits while the pipeline skips its build)
 06:30  trfmbp: nh darwin switch --refresh from remote main (local darwin build)
 on-push CI:    eval all 3 hosts + formatting check (safety net)
+daily CI:      fail if trfwsl hasn't pushed flake.lock for 48 h (watchdog)
 ```
 
 **Key files:**
@@ -248,7 +249,7 @@ on-push CI:    eval all 3 hosts + formatting check (safety net)
 
 **Diagnose a build failure from the Mac:** `nix eval --raw --no-write-lock-file --override-input nixpkgs github:NixOS/nixpkgs/<rev> .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath`, then `nix-store -q --requisites <drv> | rg <name>`; `nix path-info --store <cache-url> <outpath>` tells whether a cache has it.
 
-**Failure notification:** email to `tomrfitz@gmail.com` via msmtp/Gmail relay (sops secret `mail/app-pass`)
+**Failure notification:** email to `tomrfitz@gmail.com` via msmtp/Gmail relay (sops secret `mail/app-pass`). It needs trfwsl's network, which most failed runs lacked, so `.github/workflows/auto-update-watchdog.yml` checks from GitHub's side: it fails, and GitHub mails whoever last edited its cron line, once the pipeline has gone 48 h without pushing `flake.lock`; the SessionStart hook reports the same gap. While the pipeline is off on purpose, `gh workflow disable auto-update-watchdog.yml` (re-enabling routes its mail to whoever re-enables it).
 
 ### Naming convention
 

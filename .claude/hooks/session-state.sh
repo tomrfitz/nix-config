@@ -42,4 +42,14 @@ else
     machine="$host runs ${rev:0:7}, which is not on the upstream branch"
 fi
 
+# trfwsl's pipeline pushes a flake.lock bump daily; the same check as
+# .github/workflows/auto-update-watchdog.yml, against the last fetch.
+pipeline=""
+if last=$(git log -1 --author='^trfwsl auto-update' --format='%ct %cs' origin/main -- flake.lock 2>/dev/null) && [ -n "$last" ]; then
+    days=$((($(date +%s) - ${last% *}) / 86400))
+    pipeline="trfwsl's auto-update last pushed flake.lock on ${last#* }"
+    [ "$days" -ge 2 ] && pipeline+=", $days days ago as of the last fetch: stalled, since a healthy run pushes daily"
+fi
+
 printf 'Repo and machine state at session start (.claude/hooks/session-state.sh):\n- %s\n- %s\n' "$repo" "$machine"
+if [ -n "$pipeline" ]; then printf -- '- %s\n' "$pipeline"; fi

@@ -1,0 +1,34 @@
+name: Auto-update watchdog
+
+# trfwsl's auto-update pipeline pushes a flake.lock bump to main once a day
+# (scripts/auto-update.sh). Its failure mail goes out over trfwsl's own network,
+# which most failed runs lacked, and a host that is off sends nothing. This
+# looks for the push from outside; a failed scheduled run is GitHub's mail to
+# whoever last edited the cron line.
+on:
+    schedule:
+        # UTC, hours after the 04:45 run in trfwsl's time zone, and off the
+        # hour, when GitHub delays scheduled runs most.
+        - cron: "17 14 * * *"
+    workflow_dispatch:
+
+jobs:
+    lock-age:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+              with:
+                  fetch-depth: 0
+
+            # One missed run (the PC off at 04:45 and caught up later) passes;
+            # two in a row fail.
+            - name: Check the pipeline's last flake.lock push
+              run: |
+                  last=$(git log -1 --author='^trfwsl auto-update' --format=%ct -- flake.lock)
+                  : "${last:?no flake.lock commit by trfwsl auto-update}"
+                  hours=$((($(date +%s) - last) / 3600))
+                  echo "trfwsl's auto-update last pushed flake.lock ${hours} h ago"
+                  if [ "$hours" -ge 48 ]; then
+                      echo "::error::No flake.lock push from trfwsl for ${hours} h; read journalctl -u auto-update there"
+                      exit 1
+                  fi
