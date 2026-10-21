@@ -20,7 +20,7 @@
       obsidian
 
       slack
-      audacity
+      # audacity
 
       prismlauncher
       chatterino2
