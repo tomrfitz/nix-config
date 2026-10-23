@@ -6,7 +6,7 @@
   ...
 }:
 let
-  inherit (pkgs.stdenv) isDarwin;
+  inherit (pkgs.stdenv.hostPlatform) isDarwin;
   notesPath = "${config.home.homeDirectory}/Documents/notes";
   notesRepo = "git@github.com:tomrfitz/notes.git"; # private
   # On macOS, keep git objects outside iCloud (same pattern as obsidian.nix)

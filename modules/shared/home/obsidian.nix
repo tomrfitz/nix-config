@@ -5,7 +5,7 @@
   ...
 }:
 let
-  inherit (pkgs.stdenv) isDarwin;
+  inherit (pkgs.stdenv.hostPlatform) isDarwin;
   vaultRepo = "git@github.com:tomrfitz/Obsidian.git";
   vaultPath =
     if isDarwin then

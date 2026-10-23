@@ -242,18 +242,10 @@
       ''
     ];
 
-    plugins = [
-      {
-        name = "zsh-autosuggestions";
-        src = pkgs.zsh-autosuggestions;
-        file = "share/zsh-autosuggestions/zsh-autosuggestions.zsh";
-      }
-      {
-        name = "zsh-fast-syntax-highlighting";
-        src = pkgs.zsh-fast-syntax-highlighting;
-        file = "share/zsh/plugins/fast-syntax-highlighting/fast-syntax-highlighting.plugin.zsh";
-      }
-    ];
+    # Native options load autosuggestions early and fast-syntax-highlighting
+    # last, after every widget initContent defines.
+    autosuggestion.enable = true;
+    fastSyntaxHighlighting.enable = true;
   };
 
   # ── Starship ───────────────────────────────────────────────────────────

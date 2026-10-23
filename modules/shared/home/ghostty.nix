@@ -20,7 +20,7 @@
       window-padding-y = 8;
       window-save-state = "always";
       window-theme = "system";
-      bold-is-bright = true;
+      bold-color = "bright";
       cursor-style = "bar";
       font-thicken = true;
       font-family = "Sarasa Fixed SC";

@@ -15,8 +15,7 @@
     GOPATH = "${config.xdg.dataHome}/go";
     GOMODCACHE = "${config.xdg.cacheHome}/go/mod";
 
-    # Node
-    NPM_CONFIG_USERCONFIG = "${config.xdg.configHome}/npm/npmrc";
+    # Node (npm's rc: programs.npm below)
     NODE_REPL_HISTORY = "${config.xdg.stateHome}/node/repl_history";
 
     # Python (3.13+ honors PYTHON_HISTORY natively)
@@ -48,12 +47,17 @@
     GNUPGHOME = "${config.xdg.dataHome}/gnupg";
   };
 
-  # npm reads NPM_CONFIG_USERCONFIG for its rc, but cache/prefix/logs default
-  # to $HOME-relative paths — relocate those inside the rc itself.
-  xdg.configFile."npm/npmrc".text = ''
-    prefix=''${XDG_DATA_HOME}/npm
-    cache=''${XDG_CACHE_HOME}/npm
-    init-module=''${XDG_CONFIG_HOME}/npm/config/npm-init.js
-    logs-dir=''${XDG_STATE_HOME}/npm/logs
-  '';
+  # With preferXdgDirectories the rc lands in ~/.config/npm/npmrc and the module
+  # sets NPM_CONFIG_USERCONFIG; cache/prefix/logs default to $HOME-relative
+  # paths, so the rc relocates them. No package: node comes from devShells.
+  programs.npm = {
+    enable = true;
+    package = null;
+    settings = {
+      prefix = "${config.xdg.dataHome}/npm";
+      cache = "${config.xdg.cacheHome}/npm";
+      init-module = "${config.xdg.configHome}/npm/config/npm-init.js";
+      logs-dir = "${config.xdg.stateHome}/npm/logs";
+    };
+  };
 }
