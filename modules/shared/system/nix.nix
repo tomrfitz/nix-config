@@ -6,18 +6,24 @@
 }:
 {
   nixpkgs.config.allowUnfree = true;
-  # REVISIT(upstream): drop the doInstallCheck override on macOS once lix#1101
-  # (fork safety on macOS Sequoia/Tahoe) lands — retargeted to milestone 2.97.
-  # ref: https://git.lix.systems/lix-project/lix/issues/1101; checked: 2026-08-26
-  # REVISIT(upstream): drop the NIX_LDFLAGS backport once nixpkgs-unstable
-  # carries it (Apple's ld rejects 2.95.3's `-z,noexecstack`).
-  # ref: https://github.com/NixOS/nixpkgs/pull/568529; checked: 2026-09-30
-  nix.package = pkgs.lixPackageSets.stable.lix.overrideAttrs (old: {
-    doInstallCheck = pkgs.stdenv.hostPlatform.isLinux;
-    env = old.env // {
-      NIX_LDFLAGS = lib.optionalString pkgs.stdenv.hostPlatform.isElf "-z,noexecstack";
-    };
-  });
+  # Unmodified, so it comes from cache.nixos.org: any override (as the old
+  # darwin doInstallCheck one) makes every Lix bump a local build.
+  nix.package = pkgs.lixPackageSets.stable.lix;
+  # The tools that wrap a nix of their own, built against Lix instead of
+  # CppNix (https://lix.systems/add-to-config/). Spelled as the overrides
+  # lixPackageSets itself applies: inheriting its attributes recurses, since
+  # the set builds them from the final package set. Same derivations, so all
+  # cached. comma stays on CppNix: its Lix build isn't cached.
+  nixpkgs.overlays = [
+    (final: prev: {
+      nix-direnv = prev.nix-direnv.override { nix = final.lixPackageSets.stable.lix; };
+      nurl = prev.nurl.override { nix = final.lixPackageSets.stable.lix; };
+      nix-init = prev.nix-init.override {
+        nix = final.lixPackageSets.stable.lix;
+        inherit (final) nurl;
+      };
+    })
+  ];
   # Flakes only: no channels, so no dead channels entry on the Nix search path
   # (impure evaluations warned that root's channels profile does not exist).
   nix.channel.enable = false;
@@ -44,12 +50,10 @@
       user
     ];
     extra-substituters = [
-      "https://cache.lix.systems"
       "https://nix-community.cachix.org"
       "https://tomrfitz.cachix.org"
     ];
     extra-trusted-public-keys = [
-      "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o="
       "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
       "tomrfitz.cachix.org-1:LwNFrIvyn1kTHi9VH6w9gVz5VE5qhZpqIe7JMYAlDZI="
     ];
