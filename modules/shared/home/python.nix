@@ -11,6 +11,17 @@ _: {
   # no print, TODO format, import style, size budgets — is the template's.
   programs.ty.enable = true;
 
+  # uv itself comes from devShells and the uvx wrappers (zotero.nix); this
+  # only writes uv.toml, which every copy reads. Its default webpki root list
+  # is compiled in, so it lags distrusts (uv 0.13.1 still trusted eMudhra's
+  # compromised intermediates); the platform store follows nix's bundle on
+  # Linux and Apple's revocations on macOS.
+  programs.uv = {
+    enable = true;
+    package = null;
+    settings.system-certs = true;
+  };
+
   programs.ruff = {
     enable = true;
     settings = {

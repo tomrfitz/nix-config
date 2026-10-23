@@ -48,8 +48,15 @@ in
   # Dock or Finder take their environment from launchd. Claude Code's XDG
   # config directory (claude-code.nix) has to reach the desktop app's Code tab
   # and the editors' ACP agents too, or they fall back to ~/.claude.
-  launchd.user.envVariables.CLAUDE_CONFIG_DIR =
-    config.home-manager.users.${user}.programs.claude-code.configDir;
+  # Without NIX_SSL_CERT_FILE, nix-built OpenSSL in a GUI app or agent falls
+  # back to the default profile's bundle, the installer's stale cacert.
+  # REVISIT(upstream): drop NIX_SSL_CERT_FILE once nixpkgs' OpenSSL prefers
+  # /etc/ssl/certs/ca-certificates.crt on darwin.
+  # ref: https://github.com/NixOS/nixpkgs/pull/570263; checked: 2026-10-22
+  launchd.user.envVariables = {
+    CLAUDE_CONFIG_DIR = config.home-manager.users.${user}.programs.claude-code.configDir;
+    inherit (config.environment.variables) NIX_SSL_CERT_FILE;
+  };
 
   system.defaults = {
     # ── Global (NSGlobalDomain) ──────────────────────────────────────────
