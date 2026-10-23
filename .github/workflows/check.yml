@@ -1,9 +1,26 @@
 name: Check
 
+# check: evaluate every host and check formatting.
+# darwin: once check passes, build trfmbp's expensive, free derivations that
+#   cache.nixos.org lacks and push them to tomrfitz.cachix.org, so the Mac's
+#   switches download them instead of compiling (scripts/build-uncached.sh has
+#   the why of the allowlist). cachix-action's default daemon mode pushes only
+#   what the job builds, never what it substitutes. A run where nothing
+#   allowlisted changed finds it all cached and stops after evaluation; the
+#   first cold run (2026-10-23) built 606 derivations in 19 min and grew /nix to
+#   6.9 GiB of the runner's 96 GiB free.
+# automerge: on the Update flake.lock PR only, merge the commit both jobs
+#   tested.
 on:
     push:
         branches: [main]
     pull_request:
+    workflow_dispatch:
+
+# A newer push to the same branch supersedes a running check and build.
+concurrency:
+    group: check-${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
     check:
@@ -11,7 +28,7 @@ jobs:
         steps:
             - uses: actions/checkout@v6
 
-            - uses: samueldr/lix-gha-installer-action@v2026-02-22
+            - uses: samueldr/lix-gha-installer-action@v2026-06-15
 
             - name: Assert Lix runtime
               run: |
@@ -28,3 +45,52 @@ jobs:
 
             - name: Check formatting
               run: nix build .#checks.x86_64-linux.formatting --no-link
+
+    darwin:
+        needs: check
+        runs-on: macos-latest
+        timeout-minutes: 240
+        steps:
+            - uses: actions/checkout@v6
+
+            - uses: samueldr/lix-gha-installer-action@v2026-06-15
+
+            - uses: cachix/cachix-action@v17
+              with:
+                  name: tomrfitz
+                  extraPullNames: nix-community
+                  authToken: ${{ secrets.CACHIX }}
+
+            - name: Disk before
+              run: df -h / /nix
+
+            # What the Mac compiles today, all free software; keep it to names
+            # whose licence is known, since anything matched goes public.
+            - name: Build uncached allowlisted derivations
+              run: ./scripts/build-uncached.sh .#darwinConfigurations.trfmbp.system 'paneru|sgram-tui|emacs-|package-build-|tesseract-|aspell-'
+
+            - name: Disk after
+              if: always()
+              run: |
+                  df -h / /nix
+                  du -sh /nix/store
+
+    automerge:
+        needs: [check, darwin]
+        if: >-
+            github.event_name == 'pull_request'
+            && github.head_ref == 'update_flake_lock_action'
+            && github.event.pull_request.user.login == 'github-actions[bot]'
+        runs-on: ubuntu-latest
+        permissions:
+            contents: write
+            pull-requests: write
+        steps:
+            # --match-head-commit: merge only the commit check and darwin
+            # tested. Rebase keeps the bot's "Update flake.lock" commit as is.
+            - name: Merge the tested lock bump
+              run: gh pr merge "$PR" --repo "$GITHUB_REPOSITORY" --rebase --delete-branch --match-head-commit "$SHA"
+              env:
+                  GH_TOKEN: ${{ github.token }}
+                  PR: ${{ github.event.pull_request.number }}
+                  SHA: ${{ github.event.pull_request.head.sha }}

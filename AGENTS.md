@@ -228,23 +228,22 @@ Decided 2026-09-26: an i5-12400 box with direct-attached mergerfs + SnapRAID sto
 Lock bumps come from GitHub: a scheduled workflow opens a PR, CI checks it, and a merge lands it on main. Every host then follows main on its own schedule.
 
 ```text
-Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR, whose pull_request
-              runs of Check and Darwin cache test it
-PRs + main CI: Darwin cache builds trfmbp's allowlisted uncached derivations on
-              macos-latest and pushes them to tomrfitz.cachix.org, so the Mac's
-              06:30 switch downloads them once the merged commit has run
+Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR; Check runs on it:
+              check (eval + format) → darwin (build trfmbp's allowlisted
+              uncached derivations on macos-latest, push to tomrfitz.cachix.org)
+              → automerge (rebase-merge the tested commit onto main)
 04:45  trfwsl: build trfwsl from main → push to Attic → switch trfwsl
 06:30  trfnix: nixos-rebuild switch from remote main (when powered on; no
                Attic hits while the pipeline skips its build)
 06:30  trfmbp: nh darwin switch --refresh from remote main (local darwin build)
-on-push CI:    eval all 3 hosts + formatting check (safety net)
+PRs + main CI: the same check → darwin (no automerge)
 daily CI:      fail if flake.lock hasn't changed on main for 10 days (watchdog)
 ```
 
 **Key files:**
 
 - `.github/workflows/update-flake-lock.yml` — the bump PR (DeterminateSystems' action). Creating it needs Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests". The repo requires approval of runs from first-time contributors, so the first bump PR's runs waited for "Approve and run" until a github-actions[bot] commit was merged
-- `.github/workflows/darwin-cache.yml` + `scripts/build-uncached.sh` — the Cachix build (secret `CACHIX`, the cache's auth token; a cold run takes ~20 min). Only allowlisted, free derivations: the closure doesn't fit a runner's disk, and unfree vendor repackages must stay out of a public cache
+- `.github/workflows/check.yml` + `scripts/build-uncached.sh` — the checks, the Cachix build (secret `CACHIX`, the cache's auth token; a cold run takes ~20 min) and the bump PR's merge. Only allowlisted, free derivations get built: unfree vendor repackages must stay out of a public cache, and caching a download saves the Mac nothing. A merge made with `GITHUB_TOKEN` starts no push run on main, which the PR's run already covered
 - `scripts/auto-update.sh` — trfwsl's pipeline (phases 0–4; it no longer bumps or pushes, so its deploy key needs only read access)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
 - `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp (unattended; user sudo is Touch ID-only). Log: `/var/log/auto-rebuild.log`. It fires at 06:30 Mac-local time, or on the next wake if the Mac slept through it (a run lost to a shutdown is not retried; a run on an unchanged `main` makes no new generation). It has no Full Disk Access, so only interactive switches write the sandboxed apps' preferences (Safari, Mail; `settings.nix`), and the daemon logs a warning instead

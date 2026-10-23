@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # Build the derivations of an installable that no configured cache has, keeping
 # only those whose name matches an allowlist, without realising the installable
-# itself. CI runs this for trfmbp (.github/workflows/darwin-cache.yml) so the
-# expensive, free builds land in Cachix:
-#   - The whole closure doesn't fit: a fresh runner would fetch ~19 GiB
-#     unpacked against a 14 GB disk. Each allowlisted build pulls in only its
-#     own inputs.
+# itself. CI runs this for trfmbp (.github/workflows/check.yml, the darwin
+# job) so the expensive, free builds land in Cachix:
+#   - Not the whole system: realising trfmbp on a fresh runner fetches
+#     ~19.5 GiB unpacked just to assemble it, while each allowlisted build
+#     pulls in only its own inputs.
 #   - An allowlist rather than everything uncached: unfree apps repackaged from
 #     vendor downloads (Hydra builds no unfree packages) are uncached too, and
 #     a public cache must not redistribute them. They are also just downloads,
