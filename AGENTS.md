@@ -142,7 +142,7 @@ modules/
 
 - **Don't switch the system yourself** — no `nh … switch`, `darwin-/nixos-rebuild switch` or `nr*` aliases; activating mutates the live system (`.claude/hooks/block-rebuild.sh` enforces this for Claude Code)
 - **Commit only when asked** — until then leave the working tree dirty; the user shapes commits in magit. When asked, run `/land`: topic commits built from hunks on `main` (no landing branch; amending unpushed commits is fine), each gated on its own staged tree, pushed once the tip is green and only if asked
-- **Don't touch `flake.lock` unless asked** — trfwsl's pipeline bumps it daily; a requested bump is `nix flake update`, committed on its own
+- **Don't touch `flake.lock` unless asked** — the Update flake.lock workflow opens a bump PR twice a week; a requested bump is `nix flake update`, committed on its own
 - **Inputs float** — every input tracks its upstream default branch and a bump moves all of them; adapt the config to upstream changes rather than pinning. A pin is a last resort and carries a `REVISIT(upstream)`. Wire each input the way its upstream documents, and drop it once nixpkgs or home-manager carries the same thing
 - **Don't add packages to platform modules** without first checking if they work in `modules/shared/`
 - **Don't create new top-level modules** without discussing placement — the structure is intentional
@@ -225,22 +225,26 @@ Decided 2026-09-26: an i5-12400 box with direct-attached mergerfs + SnapRAID sto
 
 ### Auto-update pipeline
 
-`trfwsl` runs a daily pipeline that updates flake.lock, evaluates the other hosts, builds and switches itself, caches to Attic, and pushes to main. Other hosts rebuild on schedule.
+Lock bumps come from GitHub: a scheduled workflow opens a PR, CI checks it, and a merge lands it on main. Every host then follows main on its own schedule.
 
 ```text
-04:45  trfwsl: update flake.lock → eval trfmbp + trfnix → build trfwsl
-               → push to Attic → switch trfwsl → commit + push flake.lock to main
+Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR, dispatches Check on it
+on demand CI: Darwin cache builds trfmbp's allowlisted uncached derivations on
+              macos-latest and pushes them to tomrfitz.cachix.org (dispatch-only
+              until one run is measured; then on the bump PRs and on main)
+04:45  trfwsl: build trfwsl from main → push to Attic → switch trfwsl
 06:30  trfnix: nixos-rebuild switch from remote main (when powered on; no
                Attic hits while the pipeline skips its build)
 06:30  trfmbp: nh darwin switch --refresh from remote main (local darwin build)
 on-push CI:    eval all 3 hosts + formatting check (safety net)
-daily CI:      fail if trfwsl hasn't pushed flake.lock for 48 h (watchdog)
+daily CI:      fail if flake.lock hasn't changed on main for 10 days (watchdog)
 ```
 
 **Key files:**
 
+- `.github/workflows/update-flake-lock.yml` — the bump PR (DeterminateSystems' action). A PR opened with `GITHUB_TOKEN` starts no workflows, so the job dispatches Check on the PR branch itself; creating the PR needs Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"
 - `.github/workflows/darwin-cache.yml` + `scripts/build-uncached.sh` — the Cachix build (secret `CACHIX`, the cache's auth token). Only allowlisted, free derivations: the closure doesn't fit a runner's disk, and unfree vendor repackages must stay out of a public cache
-- `scripts/auto-update.sh` — pipeline logic (phases 0–7)
+- `scripts/auto-update.sh` — trfwsl's pipeline (phases 0–4; it no longer bumps or pushes, so its deploy key needs only read access)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
 - `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp (unattended; user sudo is Touch ID-only). Log: `/var/log/auto-rebuild.log`. It fires at 06:30 Mac-local time, or on the next wake if the Mac slept through it (a run lost to a shutdown is not retried; a run on an unchanged `main` makes no new generation). It has no Full Disk Access, so only interactive switches write the sandboxed apps' preferences (Safari, Mail; `settings.nix`), and the daemon logs a warning instead
 
@@ -250,7 +254,7 @@ daily CI:      fail if trfwsl hasn't pushed flake.lock for 48 h (watchdog)
 
 **Diagnose a build failure from the Mac:** `nix eval --raw --no-write-lock-file --override-input nixpkgs github:NixOS/nixpkgs/<rev> .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath`, then `nix-store -q --requisites <drv> | rg <name>`; `nix path-info --store <cache-url> <outpath>` tells whether a cache has it.
 
-**Failure notification:** email to `tomrfitz@gmail.com` via msmtp/Gmail relay (sops secret `mail/app-pass`). It needs trfwsl's network, which most failed runs lacked, so `.github/workflows/auto-update-watchdog.yml` checks from GitHub's side: it fails, and GitHub mails whoever last edited its cron line, once the pipeline has gone 48 h without pushing `flake.lock`; the SessionStart hook reports the same gap. While the pipeline is off on purpose, `gh workflow disable auto-update-watchdog.yml` (re-enabling routes its mail to whoever re-enables it).
+**Failure notification:** email to `tomrfitz@gmail.com` via msmtp/Gmail relay (sops secret `mail/app-pass`). It needs trfwsl's network, which most failed runs lacked. The lock itself is watched from GitHub's side: `.github/workflows/auto-update-watchdog.yml` fails, and GitHub mails whoever last edited its cron line, once `flake.lock` has gone 10 days without changing on main (the bump workflow failing, or its PRs left unmerged); the SessionStart hook reports the same gap. While the pipeline is off on purpose, `gh workflow disable auto-update-watchdog.yml` (re-enabling routes its mail to whoever re-enables it).
 
 ### Naming convention
 

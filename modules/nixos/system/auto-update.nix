@@ -21,7 +21,7 @@ let
 in
 {
   config = lib.mkMerge [
-    # ── trfwsl: update pipeline + email notification ──────────────────
+    # ── trfwsl: follow main (build, cache, switch) + failure mail ─────
     (lib.mkIf (hostName == "trfwsl") {
       sops.secrets."mail/app-pass" = {
         sopsFile = ../../../secrets/trfwsl.yaml;
@@ -56,7 +56,7 @@ in
       };
 
       systemd.services.auto-update = {
-        description = "Nix flake auto-update pipeline";
+        description = "Build, cache and switch trfwsl from main";
         restartIfChanged = false;
         after = [
           "network-online.target"
@@ -121,7 +121,7 @@ in
       };
 
       systemd.timers.auto-update = {
-        description = "Daily flake auto-update";
+        description = "Daily switch from main";
         wantedBy = [ "timers.target" ];
         timerConfig = {
           OnCalendar = "*-*-* 04:45:00";

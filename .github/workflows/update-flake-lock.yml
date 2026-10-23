@@ -1,0 +1,38 @@
+name: Update flake.lock
+
+# Opens (or refreshes) a PR that bumps every input, then dispatches Check on its
+# branch: a PR opened with GITHUB_TOKEN starts no workflows by itself, but a
+# workflow_dispatch does, and its checks attach to the PR's head commit. This
+# replaces trfwsl's daily push to main, so a bump reaches main only through a
+# merge.
+on:
+    schedule:
+        # Mondays and Thursdays, UTC; off the hour, when GitHub delays
+        # scheduled runs most.
+        - cron: "17 9 * * 1,4"
+    workflow_dispatch:
+
+permissions:
+    contents: write
+    pull-requests: write
+    actions: write
+
+jobs:
+    lockfile:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v6
+
+            - uses: samueldr/lix-gha-installer-action@v2026-06-15
+
+            - id: update
+              uses: DeterminateSystems/update-flake-lock@v29
+              with:
+                  commit-msg: Update flake.lock
+                  pr-title: Update flake.lock
+
+            - name: Run Check on the PR branch
+              if: steps.update.outputs.pull-request-operation == 'created' || steps.update.outputs.pull-request-operation == 'updated'
+              run: gh workflow run check.yml --ref update_flake_lock_action
+              env:
+                  GH_TOKEN: ${{ github.token }}
