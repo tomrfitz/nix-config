@@ -20,7 +20,6 @@ in
   config = lib.mkIf (cfg.enable && spcfg.enable) {
     services.postgresql = {
       enable = true;
-      enableTCPIP = true;
       ensureDatabases = [ dbName ];
       ensureUsers = [
         {

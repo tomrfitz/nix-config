@@ -7,21 +7,22 @@
   ...
 }:
 {
-  users.users.${user} = {
-    shell = pkgs.zsh;
-  }
-  // lib.optionalAttrs isDarwin {
-    name = user;
-    home = "/Users/${user}";
-  }
-  // lib.optionalAttrs (!isDarwin) {
-    isNormalUser = true;
-    extraGroups = [
-      "wheel"
-      "networkmanager"
-    ];
-    openssh.authorizedKeys.keys = [ sshPublicKey ];
-  };
+  # nix-darwin sets a user's shell only for users.knownUsers, which would hand
+  # it the whole account, so on darwin the login shell stays Apple's /bin/zsh.
+  users.users.${user} =
+    lib.optionalAttrs isDarwin {
+      name = user;
+      home = "/Users/${user}";
+    }
+    // lib.optionalAttrs (!isDarwin) {
+      shell = pkgs.zsh;
+      isNormalUser = true;
+      extraGroups = [
+        "wheel"
+        "networkmanager"
+      ];
+      openssh.authorizedKeys.keys = [ sshPublicKey ];
+    };
 
 }
 // lib.optionalAttrs isDarwin {
