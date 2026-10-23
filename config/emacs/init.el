@@ -604,15 +604,25 @@
 ;; Spelling stays with jinx; ToDoHyphen would flag every TODO keyword.
 ;; eglot-ensure connects only when a buffer is visited, so agenda files opened
 ;; in the background stay idle.
+;; Markdown also gets rumdl's lints (the rules treefmt enforces, from the
+;; project's .rumdl.toml or ~/.config/rumdl/rumdl.toml); Eglot runs one
+;; server per buffer, so rass runs both.
 (defvar tf/harper-program (executable-find "harper-ls")
     "Absolute path to harper-ls, resolved at startup.")
+(defvar tf/rumdl-program (executable-find "rumdl")
+    "Absolute path to rumdl, resolved at startup.")
 (when tf/harper-program
     (with-eval-after-load 'eglot
         (add-to-list 'eglot-server-programs
-            `(((org-mode :language-id "org")
-                  (markdown-mode :language-id "markdown")
+            `((org-mode :language-id "org") . (,tf/harper-program "--stdio")))
+        (add-to-list 'eglot-server-programs
+            `(((markdown-mode :language-id "markdown")
                   (gfm-mode :language-id "markdown"))
-                 . (,tf/harper-program "--stdio")))
+                 . ,(if (and tf/rass-program tf/rumdl-program)
+                        (list tf/rass-program
+                            "--" tf/harper-program "--stdio"
+                            "--" tf/rumdl-program "server")
+                        (list tf/harper-program "--stdio"))))
         (setq-default eglot-workspace-configuration
             '(:harper-ls (:dialect "American"
                              :linters (:SpellCheck :json-false

@@ -1,0 +1,2 @@
+# This repo's tier over the global floor (config/rumdl-floor.toml).
+extends = "config/rumdl-floor.toml"

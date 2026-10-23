@@ -74,7 +74,8 @@
       "java"
       "latex"
       "make"
-      "markdownlint"
+      # Runs the rumdl on PATH (packages.nix) before downloading its own.
+      "rumdl"
       "material-icon-theme"
       "nix"
       "opencode"

@@ -1,0 +1,24 @@
+# rumdl global floor: rules acceptable in any checkout without its own config,
+# deployed as the user-level config (default.nix). This repo layers its own
+# tier on top in .rumdl.toml. Not named rumdl.toml, which rumdl would find as
+# the project config for everything under config/. Converted with `rumdl import` from the former
+# .markdownlint-cli2.jsonc, whose rules came from vault_template's Obsidian
+# Linter config.
+
+[global]
+disable = ["MD013", "MD025", "MD033"]
+
+[MD024]
+siblings-only = true
+
+[MD026]
+punctuation = ".,;:!"
+
+[MD029]
+style = "ordered"
+
+[MD049]
+style = "consistent"
+
+[MD050]
+style = "consistent"

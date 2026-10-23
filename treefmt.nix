@@ -58,10 +58,10 @@
       typescript.quoteStyle = "preferDouble";
     };
   };
-  # markdownlint-cli2 stays as an advisory linter (no --fix) for rules dprint
-  # doesn't enforce: MD026 (heading trailing punctuation) and MD034 (bare URLs).
-  settings.formatter.markdownlint = {
-    command = "${pkgs.markdownlint-cli2}/bin/markdownlint-cli2";
-    includes = [ "*.md" ];
-  };
+  # rumdl lints markdown for rules dprint doesn't enforce (MD026 heading
+  # punctuation, MD034 bare URLs, MD057 broken relative links, …): `check
+  # --fix` fixes what it can and fails fmt-check on the rest. Rules come from
+  # .rumdl.toml. dprint keeps the line breaks rumdl writes (textWrap
+  # "maintain"), so the two can run on the same file in either order.
+  programs.rumdl-check.enable = true;
 }

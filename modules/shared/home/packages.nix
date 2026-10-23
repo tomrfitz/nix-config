@@ -17,7 +17,7 @@
       # code formatters (available globally so editors find them)
       shellcheck
       shfmt
-      markdownlint-cli2
+      rumdl
       sql-formatter
       dprint
 

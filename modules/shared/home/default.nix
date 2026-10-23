@@ -175,8 +175,10 @@
   home.file.".editorconfig".source = ../../../config/editorconfig;
   home.file.".hushlogin".text = "";
 
-  # markdownlint-cli2 config (shared by Zed ext, obsidian-markdownlint, CLI):
-  # the repo-root file is the single source; treefmt reads it in place.
-  home.file.".markdownlint-cli2.jsonc".source = ../../../.markdownlint-cli2.jsonc;
+  # rumdl's global floor, for any checkout without its own config (CLI, Zed,
+  # Emacs). This repo's .rumdl.toml extends the same file, and the Obsidian
+  # vault's extends this deployed copy (desktop only; mobile uses the plugin's
+  # own settings), so keep project-specific settings in those files.
+  xdg.configFile."rumdl/rumdl.toml".source = ../../../config/rumdl-floor.toml;
 
 }

@@ -17,7 +17,7 @@ _Italic text_ should be italic, no color change.
 > Blockquote text should be dimmed italic
 
 [Link text](https://example.com) — link URL should be cyan.
-![Image alt](image.png)
+![Image alt](../wallpaper.jpg)
 
 ---
 
