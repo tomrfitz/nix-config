@@ -15,7 +15,6 @@
 
   # ── macOS-specific packages ────────────────────────────────────────────
   home.packages = with pkgs; [
-    mas
     container
     iina
   ];

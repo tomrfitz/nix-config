@@ -44,7 +44,7 @@ Personal `nr*` aliases (declared in `modules/shared/home/shell.nix`). Commands t
 - `nrsl` — switch from the local working tree (`~/nix-config`); use for dirty/iterative work. It lasts only until the next switch from remote `main` (`nrs`, or the 06:30 daemon), which puts `main`'s build back: push to keep it. Going back can downgrade stateful tools (atuin 18.19 refuses a database 18.21 migrated)
 - `nrb` — build only (no activation)
 
-On macOS a switch installs and removes Homebrew casks to match the Brewfile but upgrades nothing, so the unattended 06:30 switch can finish (some cask upgrades need sudo). `nrs`, `nrsr` and `nrsl` then upgrade: `brew bundle` against `/etc/homebrew/Brewfile` (greedy, so self-updating casks too, except Microsoft's two) and `mas upgrade` (`modules/darwin/system/homebrew.nix`). A cask upgrade can quit its running app, and `.pkg` casks ask for Touch ID.
+On macOS a switch installs and removes Homebrew casks to match the Brewfile but upgrades nothing, so the unattended 06:30 switch can finish (some cask upgrades need sudo). `nrs`, `nrsr` and `nrsl` then upgrade: `brew bundle` against `/etc/homebrew/Brewfile` (greedy, so self-updating casks too, except Microsoft's two) (`modules/darwin/system/homebrew.nix`). App Store apps install and upgrade at every activation through nix-darwin's `programs.mas` (`mas.nix`). A cask upgrade can quit its running app, and `.pkg` casks ask for Touch ID.
 
 The `justfile` is the agents' command surface for checks; it has no switch, rollback or lock-bump recipes. `check` builds the local tree and passes `-H` (see the hostname note above):
 
@@ -101,7 +101,7 @@ modules/
 ### Common edit locations
 
 - Add/remove nix packages: `modules/shared/home/packages.nix`
-- Add/remove macOS casks: `modules/darwin/system/homebrew.nix`
+- Add/remove macOS casks: `modules/darwin/system/homebrew.nix`; App Store apps: `modules/darwin/system/mas.nix`
 - Change macOS system settings: `modules/darwin/system/settings.nix`
 - Shell aliases/functions (cross-platform): `modules/shared/home/shell.nix`
 - Shell aliases/functions (macOS-only): `modules/darwin/home/zsh.nix`

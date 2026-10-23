@@ -25,7 +25,7 @@
         # upgrade afterwards, where Touch ID can answer brew's sudo prompts.
         # brew bundle keeps each cask's greedy flag, unlike brew upgrade
         # --greedy, and reads the Brewfile the switch just activated.
-        upgradeApps = lib.optionalString pkgs.stdenv.hostPlatform.isDarwin " && brew bundle --file=/etc/homebrew/Brewfile --verbose && mas upgrade";
+        upgradeApps = lib.optionalString pkgs.stdenv.hostPlatform.isDarwin " && brew bundle --file=/etc/homebrew/Brewfile --verbose";
       in
       {
         ls = "eza --group-directories-first --icons --hyperlink";

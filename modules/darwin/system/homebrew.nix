@@ -127,19 +127,7 @@
       "font-sf-pro"
     ];
 
-    masApps = {
-      "1Password for Safari" = 1569813296;
-      "Dark Reader for Safari" = 1438243180;
-      "Flighty" = 1358823008;
-      "Hand Mirror" = 1502839586;
-      "Headjust" = 6759303637;
-      "KakaoTalk" = 869223134;
-      "RapidClick" = 419891002;
-      "Steam Link" = 1246969117;
-      "Userscripts" = 1463298887;
-      "Velja" = 1607635845;
-      # "iA Writer" = 775737590; # requires purchase
-    };
+    # App Store apps: programs.mas (mas.nix).
   };
 
   # The active generation's Brewfile at a stable path, for the aliases'
