@@ -228,8 +228,8 @@ Decided 2026-09-26: an i5-12400 box with direct-attached mergerfs + SnapRAID sto
 Lock bumps come from GitHub: a scheduled workflow opens a PR, CI checks it, and a merge lands it on main. Every host then follows main on its own schedule.
 
 ```text
-Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR, dispatches Check and
-              Darwin cache on it
+Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR, whose pull_request
+              runs of Check and Darwin cache test it
 PRs + main CI: Darwin cache builds trfmbp's allowlisted uncached derivations on
               macos-latest and pushes them to tomrfitz.cachix.org, so the Mac's
               06:30 switch downloads them once the merged commit has run
@@ -243,7 +243,7 @@ daily CI:      fail if flake.lock hasn't changed on main for 10 days (watchdog)
 
 **Key files:**
 
-- `.github/workflows/update-flake-lock.yml` — the bump PR (DeterminateSystems' action). A PR opened with `GITHUB_TOKEN` starts no workflows, so the job dispatches Check on the PR branch itself; creating the PR needs Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"
+- `.github/workflows/update-flake-lock.yml` — the bump PR (DeterminateSystems' action). Creating it needs Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests". The repo requires approval of runs from first-time contributors, so the first bump PR's runs waited for "Approve and run" until a github-actions[bot] commit was merged
 - `.github/workflows/darwin-cache.yml` + `scripts/build-uncached.sh` — the Cachix build (secret `CACHIX`, the cache's auth token; a cold run takes ~20 min). Only allowlisted, free derivations: the closure doesn't fit a runner's disk, and unfree vendor repackages must stay out of a public cache
 - `scripts/auto-update.sh` — trfwsl's pipeline (phases 0–4; it no longer bumps or pushes, so its deploy key needs only read access)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp

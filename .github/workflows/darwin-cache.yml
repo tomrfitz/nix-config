@@ -15,8 +15,6 @@ on:
         paths-ignore: ["**.md"]
     pull_request:
         paths-ignore: ["**.md"]
-    # update-flake-lock.yml dispatches this on its PR branch, since a PR
-    # opened with GITHUB_TOKEN triggers no pull_request run.
     workflow_dispatch:
 
 # A newer push to the same branch supersedes a running build.
