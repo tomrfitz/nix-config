@@ -5,16 +5,21 @@ description: Close out a working thread so a fresh session can pick it up. Write
 
 # Handoff
 
-Leave the thread so that a fresh session, possibly in another harness or on another machine, can continue without this conversation.
+Leave the thread so that a fresh session,
+possibly in another harness or on another machine,
+can continue without this conversation.
 
 ## 1. Gather state
 
-- In a repo: `git status --short`, `git log --oneline '@{upstream}..HEAD'` (unpushed), `git stash list`.
-- From the conversation: what was decided, what changed, what was verified and how, what's next, what's blocked and on whom.
+- In a repo: `git status --short`, `git log --oneline '@{upstream}..HEAD'`
+  (unpushed), `git stash list`.
+- From the conversation: what was decided, what changed,
+  what was verified and how, what's next, what's blocked and on whom.
 
 ## 2. Write it down
 
-In a repo with a `TODO.md`, add one section near the top, or replace the previous handoff for the same topic rather than stacking another:
+In a repo with a `TODO.md`, add one section near the top,
+or replace the previous handoff for the same topic rather than stacking another:
 
 ```markdown
 ## Handoff: <topic> (<YYYY-MM-DD>)
@@ -25,14 +30,22 @@ In a repo with a `TODO.md`, add one section near the top, or replace the previou
 - **Blocked on:** decisions or actions only the user can take.
 ```
 
-Outside a repo, append the same content as an org heading (`* Handoff: <topic>` with an inactive timestamp) to `$NOTES/inbox.org` (`~/Documents/notes/inbox.org`). Append; never overwrite it.
+Outside a repo, append the same content as an org heading
+(`* Handoff: <topic>` with an inactive timestamp)
+to `$NOTES/inbox.org` (`~/Documents/notes/inbox.org`).
+Append; never overwrite it.
 
-Write for a reader with no access to this conversation: name files, hosts and commands, not "the thing we tried earlier".
+Write for a reader with no access to this conversation: name files,
+hosts and commands, not "the thing we tried earlier".
 
 ## 3. Prune memory
 
-If this harness keeps memory, correct the entries this thread made stale and delete the ones it resolved. Add a memory only for something a future session would get wrong without it. The handoff itself belongs in the file above, not in memory.
+If this harness keeps memory,
+correct the entries this thread made stale and delete the ones it resolved.
+Add a memory only for something a future session would get wrong without it.
+The handoff itself belongs in the file above, not in memory.
 
 ## 4. Close
 
-Say in one line where the handoff went, then suggest starting a fresh session (`/clear` in Claude Code) whose first step is reading it.
+Say in one line where the handoff went, then suggest starting a fresh session
+(`/clear` in Claude Code) whose first step is reading it.

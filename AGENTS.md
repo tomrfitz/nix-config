@@ -1,10 +1,13 @@
 # AGENTS.md
 
-Repo-specific guidance for AI agents working on this nix-config. See also `~/.config/AGENTS.md` for global, project-agnostic conventions.
+Repo-specific guidance for AI agents working on this nix-config.
+See also `~/.config/AGENTS.md` for global, project-agnostic conventions.
 
 ## What This Is
 
-A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tracks on nixpkgs-unstable. Uses Lix as the nix runtime across all hosts.
+A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager.
+Tracks on nixpkgs-unstable.
+Uses Lix as the nix runtime across all hosts.
 
 ### Machines
 
@@ -16,37 +19,84 @@ A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager. Tra
 | `trflab` | x86_64-linux | Dedicated homelab server | Future |
 | `trfvm` | TBD | Scratch/sandbox VM | Future |
 
-The primary config target is `trfmbp`. `trfnix` is a real NixOS install useful for prototyping NixOS service configs (and the only host that exercises the Linux desktop modules); it has been powered off since ~2026-03, so the daily pipeline only evaluates it. `trfwsl` runs NixOS-WSL with Tailscale, ollama, Attic and the auto-update pipeline; its homelab is off until trflab (see Roadmap).
+The primary config target is `trfmbp`.
+`trfnix` is a real NixOS install useful for prototyping NixOS service configs
+(and the only host that exercises the Linux desktop modules);
+it has been powered off since ~2026-03, so the daily pipeline only evaluates it.
+`trfwsl` runs NixOS-WSL with Tailscale, ollama,
+Attic and the auto-update pipeline; its homelab is off until trflab
+(see Roadmap).
 
 ## Commands
 
 ### Rebuild workflow
 
-`NH_FLAKE` defaults to `github:tomrfitz/nix-config/main` — rebuilds fetch from the remote, so every build corresponds to a pushed commit. This enforces clean git discipline and triggers CI before any local build.
+`NH_FLAKE` defaults to `github:tomrfitz/nix-config/main` —
+rebuilds fetch from the remote, so every build corresponds to a pushed commit.
+This enforces clean git discipline and triggers CI before any local build.
 
-Each generation records the commit it was built from (`system.configurationRevision`, set in `mkHost`): `darwin-version --configuration-revision` (NixOS: `nixos-version`) prints it, with `-dirty` marking a local `nrsl` build. The SessionStart hook `.claude/hooks/session-state.sh` gives every agent session that, plus the branch and its uncommitted and unpushed state.
+Each generation records the commit it was built from
+(`system.configurationRevision`, set in `mkHost`):
+`darwin-version --configuration-revision`
+(NixOS: `nixos-version`) prints it, with `-dirty` marking a local `nrsl` build.
+The SessionStart hook `.claude/hooks/session-state.sh` gives every agent session
+that, plus the branch and its uncommitted and unpushed state.
 
-nh derives the target host from macOS's `LocalHostName`, which the OS silently renames on a network clash (seen: `trfmbp-2` → `nh` fails with "Did you mean trfmbp?"). The justfile passes `-H` explicitly; the permanent fix is `sudo scutil --set LocalHostName trfmbp` (nix-darwin reasserts it on activation).
+nh derives the target host from macOS's `LocalHostName`,
+which the OS silently renames on a network clash
+(seen: `trfmbp-2` → `nh` fails with "Did you mean trfmbp?").
+The justfile passes `-H` explicitly;
+the permanent fix is `sudo scutil --set LocalHostName trfmbp`
+(nix-darwin reasserts it on activation).
 
-A switch that changes paneru or uninstalls many apps can wedge paneru's event tap (every click freezes input until a forced restart — seen 2026-09-03): quit paneru before switching and run `paneru restart` after. Its logs are in `~/Library/Logs/paneru.err.log`.
+A switch that changes paneru
+or uninstalls many apps can wedge paneru's event tap
+(every click freezes input until a forced restart — seen 2026-09-03):
+quit paneru before switching and run `paneru restart` after.
+Its logs are in `~/Library/Logs/paneru.err.log`.
 
-Project templates: `nixify [default|python-uv|cpp]` runs `nix flake init -t ~/nix-config#<name>` and then the tail nix cannot do (git init, intent-to-add of the written files, `.envrc` fallback, `direnv allow`). Templates carry the strict lint tier over the global floor. See `templates/`.
+Project templates: `nixify [default|python-uv|cpp]` runs
+`nix flake init -t ~/nix-config#<name>` and then the tail nix cannot do (git
+init, intent-to-add of the written files, `.envrc` fallback, `direnv allow`).
+Templates carry the strict lint tier over the global floor.
+See `templates/`.
 
-- `nh darwin switch` — rebuild from remote (uses cached tarball; add `--refresh` to force re-fetch after a push)
-- `nh darwin switch .` — local iteration escape hatch (dirty/uncommitted changes; flakeref is positional in nh 4.x)
-- `nh darwin switch --refresh` — force re-fetch from remote (what `nrsr` runs); does **not** bump `flake.lock`
+- `nh darwin switch` — rebuild from remote
+  (uses cached tarball; add `--refresh` to force re-fetch after a push)
+- `nh darwin switch .` — local iteration escape hatch
+  (dirty/uncommitted changes; flakeref is positional in nh 4.x)
+- `nh darwin switch --refresh` — force re-fetch from remote
+  (what `nrsr` runs); does **not** bump `flake.lock`
 - `nh darwin switch --refresh --update` — force re-fetch + bump inputs
 
-Personal `nr*` aliases (declared in `modules/shared/home/shell.nix`). Commands the user runs from any directory are zsh aliases there; `just` recipes are for repo-local work.
+Personal `nr*` aliases (declared in `modules/shared/home/shell.nix`).
+Commands the user runs from any directory are zsh aliases there;
+`just` recipes are for repo-local work.
 
 - `nrs` — switch from remote `NH_FLAKE` (daily-driver path)
 - `nrsr` — switch with `--refresh` (force re-fetch the remote flake tarball)
-- `nrsl` — switch from the local working tree (`~/nix-config`); use for dirty/iterative work. It lasts only until the next switch from remote `main` (`nrs`, or the 06:30 daemon), which puts `main`'s build back: push to keep it. Going back can downgrade stateful tools (atuin 18.19 refuses a database 18.21 migrated)
+- `nrsl` — switch from the local working tree (`~/nix-config`);
+  use for dirty/iterative work.
+  It lasts only until the next switch from remote `main`
+  (`nrs`, or the 06:30 daemon), which puts `main`'s build back: push to keep it.
+  Going back can downgrade stateful tools
+  (atuin 18.19 refuses a database 18.21 migrated)
 - `nrb` — build only (no activation)
 
-On macOS a switch installs and removes Homebrew casks to match the Brewfile but upgrades nothing, so the unattended 06:30 switch can finish (some cask upgrades need sudo). `nrs`, `nrsr` and `nrsl` then upgrade: `brew bundle` against `/etc/homebrew/Brewfile` (greedy, so self-updating casks too, except Microsoft's two) (`modules/darwin/system/homebrew.nix`). App Store apps install and upgrade at every activation through nix-darwin's `programs.mas` (`mas.nix`). A cask upgrade can quit its running app, and `.pkg` casks ask for Touch ID.
+On macOS a switch installs and removes Homebrew casks to match the Brewfile
+but upgrades nothing, so the unattended 06:30 switch can finish
+(some cask upgrades need sudo).
+`nrs`, `nrsr` and `nrsl` then upgrade:
+`brew bundle` against `/etc/homebrew/Brewfile`
+(greedy, so self-updating casks too, except Microsoft's two)
+(`modules/darwin/system/homebrew.nix`).
+App Store apps install and upgrade at every activation through nix-darwin's
+`programs.mas` (`mas.nix`).
+A cask upgrade can quit its running app, and `.pkg` casks ask for Touch ID.
 
-The `justfile` is the agents' command surface for checks; it has no switch, rollback or lock-bump recipes. `check` builds the local tree and passes `-H` (see the hostname note above):
+The `justfile` is the agents' command surface for checks; it has no switch,
+rollback or lock-bump recipes.
+`check` builds the local tree and passes `-H` (see the hostname note above):
 
 ```bash
 just check         # nh darwin build . (local tree; build closure without activating, with diff)
@@ -58,28 +108,48 @@ just diff          # dix diff between previous and current system profile
 just snapshot NAME # take macOS defaults snapshot; snapshot-diff BEFORE AFTER compares two
 ```
 
-**Validation:** There are no tests. Correctness = `just check` (build without activating) or `just eval` succeeding. Use `just eval-all` to gate cross-platform changes.
+**Validation:** There are no tests.
+Correctness = `just check` (build without activating) or `just eval` succeeding.
+Use `just eval-all` to gate cross-platform changes.
 
-**Important:** Nix flakes only see files tracked by git. When adding new files referenced by the flake (e.g., config files used in `home.file` or `source`), you must `git add` them before `just eval` or `just check` will work.
+**Important:** Nix flakes only see files tracked by git.
+When adding new files referenced by the flake
+(e.g., config files used in `home.file` or `source`),
+you must `git add` them before `just eval` or `just check` will work.
 
 ## Architecture
 
 ### Flake structure
 
-`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, nix-homebrew (Homebrew itself, pinned), emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks, nix-index-database, mattpocock-skills (pi skills). pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules; Claude Code is configured by home-manager everywhere, but on macOS its binary comes from Anthropic's native installer (nixpkgs on Linux) — see `modules/shared/home/claude-code.nix`.
+`flake.nix` defines a single host registry
+(`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper.
+Inputs: nixpkgs (unstable), nix-darwin, home-manager, nix-homebrew
+(Homebrew itself, pinned),
+emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks,
+nix-index-database, mattpocock-skills
+(pi skills).
+pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules;
+Claude Code is configured by home-manager everywhere,
+but on macOS its binary comes from Anthropic's native installer
+(nixpkgs on Linux) — see `modules/shared/home/claude-code.nix`.
 
 ### Hosts are thin wiring
 
-`hosts/<machine>/default.nix` files only set machine facts (hardware imports, hostname, boot/networking quirks) and import system modules. All user/profile logic lives in `modules/`.
+`hosts/<machine>/default.nix` files only set machine facts
+(hardware imports, hostname, boot/networking quirks) and import system modules.
+All user/profile logic lives in `modules/`.
 
 ### Host contract
 
 Keep host files concise, idiomatic, portable, and composable:
 
 - **Hosts (`hosts/<name>/default.nix`)** define only machine facts.
-- **OS system modules (`modules/{darwin,nixos}/system`)** define user/account shape and OS-wide services.
-- **Home-manager modules (`modules/{shared,darwin,nixos}/home`)** define user environment and app/tooling behavior.
-- **Use `hostName`, `isDarwin`, and `isWSL` from `specialArgs`** for conditional behavior instead of duplicating host-specific modules.
+- **OS system modules (`modules/{darwin,nixos}/system`)** define user/account
+  shape and OS-wide services.
+- **Home-manager modules (`modules/{shared,darwin,nixos}/home`)** define user
+  environment and app/tooling behavior.
+- **Use `hostName`, `isDarwin`, and `isWSL` from `specialArgs`**
+  for conditional behavior instead of duplicating host-specific modules.
 
 ### Module organization
 
@@ -101,25 +171,56 @@ modules/
 ### Common edit locations
 
 - Add/remove nix packages: `modules/shared/home/packages.nix`
-- Add/remove macOS casks: `modules/darwin/system/homebrew.nix`; App Store apps: `modules/darwin/system/mas.nix`
+- Add/remove macOS casks: `modules/darwin/system/homebrew.nix`; App Store apps:
+  `modules/darwin/system/mas.nix`
 - Change macOS system settings: `modules/darwin/system/settings.nix`
 - Shell aliases/functions (cross-platform): `modules/shared/home/shell.nix`
 - Shell aliases/functions (macOS-only): `modules/darwin/home/zsh.nix`
 - Linux system services: `modules/nixos/system/default.nix`
 - Homelab shared config: `modules/nixos/system/homelab/default.nix`
 - Homelab per-service conventions: `modules/nixos/system/homelab/<service>.nix`
-- Enable homelab services: the homelab host's file, via `trf.homelab` and `services.<name>.enable` (no host runs it since 2026-10-01; trfwsl's last declaration is `git show 76e9d16:hosts/trfwsl/default.nix`)
+- Enable homelab services: the homelab host's file,
+  via `trf.homelab` and `services.<name>.enable`
+  (no host runs it since 2026-10-01;
+  trfwsl's last declaration is `git show 76e9d16:hosts/trfwsl/default.nix`)
 - WSL GPU / container runtime: `modules/nixos/system/wsl-gpu.nix`
 - Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
-- Configure editors: Zed in `modules/shared/home/desktop.nix`, Helix in `modules/shared/home/editors.nix`, Emacs in `modules/shared/home/emacs.nix`
-- Claude Code: settings in `config/claude-settings.json`, status line in `config/claude-statusline.sh`, wiring in `modules/shared/home/claude-code.nix`
-- Other agent harnesses: pi in `modules/shared/home/pi.nix` (with `pi-resources/`), omp in `omp.nix`; the Anthropic API key pi and omp read (Max's monthly API credits; 1Password, never exported) in `anthropic-api-key.nix`
-- Agent skills: for every project in `config/skills/` (linked into `~/.config/claude/skills/` by `claude-code.nix`, and as `~/.agents/skills`, which omp and pi read, by `default.nix`); for this repo only in `.claude/skills/`. omp's global instructions come from the same `config/agents.md` (`omp.nix`); its memory settings (Mnemopi, auto-retain off) live in its own `~/.omp/agent/config.yml`
-- MCP servers: `programs.mcp` (Claude Code picks them up via `enableMcpIntegration`); the Zotero server, its CLI (both uvx-wrapped) and the Linux app in `modules/shared/home/zotero.nix`, which also merges the server into the Claude desktop app's config on darwin
-- Python global tooling (ruff floor, ty): `modules/shared/home/python.nix`; project tier: `templates/python-uv/pyproject.toml`
-- C/C++ floor: `config/clang-format`, `config/clang-tidy`, `config/clangd.yaml`; project tier: `templates/cpp/`
-- Universal formatter front (dprint, exec-wrapped CLIs, fence tag map): `modules/shared/home/dprint.nix`
-- Browsers: Zen is primary (`modules/shared/home/zen.nix`); extension/policy manifest in `browser-policies.nix` (live on both platforms: on darwin home-manager writes the policies to macOS defaults, which the brew cask reads); Helium via cask; Orion via cask (the one extra, as a paying Kagi member); Safari native; Linux base Firefox in `modules/nixos/home/desktop.nix`.
+- Configure editors: Zed in `modules/shared/home/desktop.nix`,
+  Helix in `modules/shared/home/editors.nix`,
+  Emacs in `modules/shared/home/emacs.nix`
+- Claude Code: settings in `config/claude-settings.json`,
+  status line in `config/claude-statusline.sh`,
+  wiring in `modules/shared/home/claude-code.nix`
+- Other agent harnesses: pi in `modules/shared/home/pi.nix`
+  (with `pi-resources/`),
+  omp in `omp.nix`; the Anthropic API key pi and omp read
+  (Max's monthly API credits; 1Password, never exported)
+  in `anthropic-api-key.nix`
+- Agent skills: for every project in `config/skills/`
+  (linked into `~/.config/claude/skills/` by `claude-code.nix`,
+  and as `~/.agents/skills`, which omp and pi read, by `default.nix`);
+  for this repo only in `.claude/skills/`. omp's global instructions come from
+  the same `config/agents.md` (`omp.nix`); its memory settings (Mnemopi,
+  auto-retain off) live in its own `~/.omp/agent/config.yml`
+- MCP servers: `programs.mcp`
+  (Claude Code picks them up via `enableMcpIntegration`);
+  the Zotero server, its CLI
+  (both uvx-wrapped)
+  and the Linux app in `modules/shared/home/zotero.nix`,
+  which also merges the server into the Claude desktop app's config on darwin
+- Python global tooling (ruff floor, ty): `modules/shared/home/python.nix`;
+  project tier: `templates/python-uv/pyproject.toml`
+- C/C++ floor: `config/clang-format`, `config/clang-tidy`, `config/clangd.yaml`;
+  project tier: `templates/cpp/`
+- Universal formatter front
+  (dprint, exec-wrapped CLIs, fence tag map): `modules/shared/home/dprint.nix`
+- Browsers: Zen is primary (`modules/shared/home/zen.nix`);
+  extension/policy manifest in `browser-policies.nix`
+  (live on both platforms:
+  on darwin home-manager writes the policies to macOS defaults,
+  which the brew cask reads); Helium via cask; Orion via cask
+  (the one extra, as a paying Kagi member);
+  Safari native; Linux base Firefox in `modules/nixos/home/desktop.nix`.
 - Git settings (shared): `modules/shared/home/git.nix`
 - Git settings (1Password signing): `modules/darwin/home/git.nix`
 - Fontconfig defaults: `modules/shared/home/fonts.nix`
@@ -127,38 +228,97 @@ modules/
 
 ### Key design rules
 
-- **Maximize `modules/shared/`** — platform-specific modules only for genuine differences (e.g., 1Password SSH agent path, homebrew, macOS system.defaults)
-- **Prefer native home-manager modules** (`programs.*`) over `home.file` when available
-- **Package source priority:** nixpkgs shared → nixpkgs platform-specific → homebrew casks → Mac App Store (mas)
-- **Brew-preferred exceptions:** 1Password, Ghostty (macOS app integration). **Vendor-installer exception:** the Claude Code CLI on macOS (Anthropic's native installer keeps it current alongside the desktop app's bundled copy, which shares the config directory); home-manager still owns its config via `package = null`, in `~/.config/claude` (`CLAUDE_CONFIG_DIR`, which launchd also hands to GUI apps). Emacs is nix-owned (emacs-overlay, nixpkgs emacs 31 on both platforms) — see `modules/shared/home/emacs.nix`
-- **Language tooling belongs in project devShells**, not in the system config — only editor-universal tools (`nixd`, `nixfmt`, `shfmt`, `shellcheck`) stay global
-- **Global floor vs project tier**: global lint configs (`programs.ruff`, `~/.clang-tidy`, the clangd user config) hold only rules you would accept in someone else's checkout; `templates/*` carry the strict tier and layer it with ruff `extend`, clang-tidy `InheritParentConfig`, and clangd's project-over-user merge. Formatters (`~/.clang-format`, `ruff format`) can be opinionated globally since they only run on files you format. ruff and ty are nix-owned globally (`modules/shared/home/python.nix`) so loose scripts get editor diagnostics; project devShells pin their own copies, which win on PATH
-- **Zed uses `load_direnv = "shell_hook"`** to discover project-provided LSPs/formatters automatically
-- **Zed settings go through home-manager** (`programs.zed-editor.userSettings` in `modules/shared/home/desktop.nix`), never the live `settings.json`: each switch merges the declared keys over it
-- **Files an app rewrites stay out of home-manager's links**: once an app replaces a link with a file, every activation moves that file to `.hm-backup`, and a non-forced path fails activation when its content differs and an old backup exists. Disable the link (`home.file.<path>.enable = false`) and install a writable copy from activation when the content changes, as `zen.nix` does for `profiles.ini`
-- **A few rarely-changing files from a larger upstream repo**: a pinned sparse `fetchFromGitHub` (`sparseCheckout`) or a pinned `fetchurl` (the Emacs icon), not a vendored copy or a whole-repo flake input. Bump by setting `hash = lib.fakeHash` and copying the hash nix reports
+- **Maximize `modules/shared/`** —
+  platform-specific modules only for genuine differences
+  (e.g., 1Password SSH agent path, homebrew, macOS system.defaults)
+- **Prefer native home-manager modules** (`programs.*`) over `home.file`
+  when available
+- **Package source priority:** nixpkgs shared → nixpkgs platform-specific →
+  homebrew casks → Mac App Store (mas)
+- **Brew-preferred exceptions:** 1Password, Ghostty (macOS app integration).
+  **Vendor-installer exception:** the Claude Code CLI on macOS
+  (Anthropic's native installer keeps it current alongside the desktop app's
+  bundled copy, which shares the config directory); home-manager still owns its
+  config via `package = null`, in `~/.config/claude` (`CLAUDE_CONFIG_DIR`, which
+  launchd also hands to GUI apps).
+  Emacs is nix-owned (emacs-overlay, nixpkgs emacs 31 on both platforms) —
+  see `modules/shared/home/emacs.nix`
+- **Language tooling belongs in project devShells**, not in the system config —
+  only editor-universal tools
+  (`nixd`, `nixfmt`, `shfmt`, `shellcheck`) stay global
+- **Global floor vs project tier**: global lint configs
+  (`programs.ruff`, `~/.clang-tidy`, the clangd user config)
+  hold only rules you would accept in someone else's checkout;
+  `templates/*` carry the strict tier and layer it with ruff `extend`,
+  clang-tidy `InheritParentConfig`, and clangd's project-over-user merge.
+  Formatters (`~/.clang-format`, `ruff format`) can be opinionated globally
+  since they only run on files you format. ruff
+  and ty are nix-owned globally (`modules/shared/home/python.nix`)
+  so loose scripts get editor diagnostics;
+  project devShells pin their own copies, which win on PATH
+- **Zed uses `load_direnv = "shell_hook"`** to discover project-provided
+  LSPs/formatters automatically
+- **Zed settings go through home-manager**
+  (`programs.zed-editor.userSettings` in `modules/shared/home/desktop.nix`),
+  never the live `settings.json`: each switch merges the declared keys over it
+- **Files an app rewrites stay out of home-manager's links**:
+  once an app replaces a link with a file,
+  every activation moves that file to `.hm-backup`,
+  and a non-forced path fails activation when its content differs
+  and an old backup exists.
+  Disable the link (`home.file.<path>.enable = false`)
+  and install a writable copy from activation when the content changes,
+  as `zen.nix` does for `profiles.ini`
+- **A few rarely-changing files from a larger upstream repo**:
+  a pinned sparse `fetchFromGitHub` (`sparseCheckout`) or a pinned `fetchurl`
+  (the Emacs icon), not a vendored copy or a whole-repo flake input.
+  Bump by setting `hash = lib.fakeHash` and copying the hash nix reports
 
 ### Guardrails
 
-- **Don't switch the system yourself** — no `nh … switch`, `darwin-/nixos-rebuild switch` or `nr*` aliases; activating mutates the live system (`.claude/hooks/block-rebuild.sh` enforces this for Claude Code)
-- **Commit only when asked** — until then leave the working tree dirty; the user shapes commits in magit. When asked, run `/land`: topic commits built from hunks on `main` (no landing branch; amending unpushed commits is fine), each gated on its own staged tree, pushed once the tip is green and only if asked
-- **Don't touch `flake.lock` unless asked** — the Update flake.lock workflow opens a bump PR twice a week; a requested bump is `nix flake update`, committed on its own
-- **Inputs float** — every input tracks its upstream default branch and a bump moves all of them; adapt the config to upstream changes rather than pinning. A pin is a last resort and carries a `REVISIT(upstream)`. Wire each input the way its upstream documents, and drop it once nixpkgs or home-manager carries the same thing
-- **Don't add packages to platform modules** without first checking if they work in `modules/shared/`
-- **Don't create new top-level modules** without discussing placement — the structure is intentional
-- **This repo is public** — keep personal details out of it: location, IP addresses, key fingerprints, school emails, health. They belong in the user's private notes (`~/Documents/notes/agent-context.org`)
+- **Don't switch the system yourself** — no `nh … switch`,
+  `darwin-/nixos-rebuild switch` or `nr*` aliases;
+  activating mutates the live system
+  (`.claude/hooks/block-rebuild.sh` enforces this for Claude Code)
+- **Commit only when asked** — until then leave the working tree dirty;
+  the user shapes commits in magit.
+  When asked, run `/land`: topic commits built from hunks on `main`
+  (no landing branch; amending unpushed commits is fine),
+  each gated on its own staged tree,
+  pushed once the tip is green and only if asked
+- **Don't touch `flake.lock` unless asked** —
+  the Update flake.lock workflow opens a bump PR twice a week;
+  a requested bump is `nix flake update`, committed on its own
+- **Inputs float** — every input tracks its upstream default branch
+  and a bump moves all of them;
+  adapt the config to upstream changes rather than pinning.
+  A pin is a last resort and carries a `REVISIT(upstream)`.
+  Wire each input the way its upstream documents,
+  and drop it once nixpkgs or home-manager carries the same thing
+- **Don't add packages to platform modules** without first checking
+  if they work in `modules/shared/`
+- **Don't create new top-level modules** without discussing placement —
+  the structure is intentional
+- **This repo is public** — keep personal details out of it: location,
+  IP addresses, key fingerprints, school emails, health.
+  They belong in the user's private notes
+  (`~/Documents/notes/agent-context.org`)
 
 ### Upstream Revisit Notation
 
-For temporary workarounds blocked on upstream changes, use this marker in comments and TODOs:
+For temporary workarounds blocked on upstream changes,
+use this marker in comments and TODOs:
 
 - `REVISIT(upstream): <action when unblocked>; ref: <url-or-issue>; checked: <YYYY-MM-DD>`
 - Keep one central checklist in `TODO.md` under an "Upstream Watchlist" section.
-- When updating `flake.lock`, re-check all `REVISIT(upstream)` items before removing overrides/workarounds.
+- When updating `flake.lock`,
+  re-check all `REVISIT(upstream)` items before removing overrides/workarounds.
 
 ### Platform-conditional pattern
 
-When a package needs different sources per platform, use `pkgs.stdenv.hostPlatform.isDarwin` in a shared module rather than duplicating across platform modules:
+When a package needs different sources per platform,
+use `pkgs.stdenv.hostPlatform.isDarwin` in a shared module rather than
+duplicating across platform modules:
 
 ```nix
 # package = null means "installed outside nix" (e.g., via brew cask on macOS)
@@ -175,23 +335,55 @@ home.packages = [ ... ] ++ lib.optionals (!pkgs.stdenv.hostPlatform.isDarwin) [ 
 
 Two mechanisms, split by trust model:
 
-- **1Password** — user-space secrets where a human is present to unlock (SSH agent, vault-backed credentials, `op://` references). Used on all platforms.
-- **sops-nix** — service-level secrets that must be available without user interaction (homelab API keys, tunnel tokens, VPN credentials). Age-encrypted in `secrets/`, decrypted to `/run/secrets/` at activation. Each host's age key is derived from its SSH host key; the admin key is a standalone age key (`~/.config/sops/age/keys.txt` on trfmbp). Edit with `sops secrets/<host>.yaml`: sops-nix reads `/` in a key name as YAML nesting, so write nested maps, and quote every value (a number-like one, such as a Mullvad account number, otherwise parses as an integer).
+- **1Password** — user-space secrets where a human is present to unlock
+  (SSH agent, vault-backed credentials, `op://` references).
+  Used on all platforms.
+- **sops-nix** — service-level secrets
+  that must be available without user interaction
+  (homelab API keys, tunnel tokens, VPN credentials).
+  Age-encrypted in `secrets/`, decrypted to `/run/secrets/` at activation.
+  Each host's age key is derived from its SSH host key;
+  the admin key is a standalone age key
+  (`~/.config/sops/age/keys.txt` on trfmbp).
+  Edit with `sops secrets/<host>.yaml`:
+  sops-nix reads `/` in a key name as YAML nesting, so write nested maps,
+  and quote every value (a number-like one, such as a Mullvad account number,
+  otherwise parses as an integer).
 
 ### Config files
 
-`config/` holds files that modules deploy or import as-is: the Emacs config, Helix themes (`lib.importTOML`), editorconfig, clang-format, clang-tidy, clangd.yaml (deployed to `~/Library/Preferences/clangd/` on macOS, since clangd ignores XDG there), karabiner.json, the Zen userChrome/userContent CSS, the dprint plugin selector, the wallpaper. `config/agents.md` is the global agent instructions file deployed to the agents' home paths; `config/claude-settings.json` is Claude Code's settings, `config/claude-statusline.sh` its status line, and `config/skills/` the skills every project gets.
+`config/` holds files that modules deploy or import as-is: the Emacs config,
+Helix themes (`lib.importTOML`), editorconfig, clang-format, clang-tidy,
+clangd.yaml (deployed to `~/Library/Preferences/clangd/` on macOS,
+since clangd ignores XDG there), karabiner.json,
+the Zen userChrome/userContent CSS, the dprint plugin selector, the wallpaper.
+`config/agents.md` is the global agent instructions file deployed to the agents'
+home paths; `config/claude-settings.json` is Claude Code's settings,
+`config/claude-statusline.sh` its status line, and `config/skills/` the skills
+every project gets.
 
 ## Theming
 
-- **Linux theming engine:** Noctalia — wallpaper-derived Material You colors, template-based app theming (GTK, Qt, foot, Ghostty, Emacs, Vesktop), auto dark/light scheduling, night light, app launcher
-- **macOS theming:** native system appearance (Ghostty and Zed respond to system dark/light preference); Flexoki theme for Zed/Emacs
-- **Fonts:** Sarasa Gothic SC orthography everywhere (since 2026-10-13): `Sarasa Fixed SC` (monospace; Iosevka Latin, no ligatures, CJK at exactly two cells) and `Sarasa UI SC` (sans; Inter Latin). One family covers Latin, Greek, Cyrillic, Hangul, kana and Han, so no CJK fallback fonts or fontsets. Fontconfig defaults in `modules/shared/home/fonts.nix`
+- **Linux theming engine:** Noctalia — wallpaper-derived Material You colors,
+  template-based app theming
+  (GTK, Qt, foot, Ghostty, Emacs, Vesktop),
+  auto dark/light scheduling, night light, app launcher
+- **macOS theming:** native system appearance
+  (Ghostty and Zed respond to system dark/light preference);
+  Flexoki theme for Zed/Emacs
+- **Fonts:** Sarasa Gothic SC orthography everywhere
+  (since 2026-10-13):
+  `Sarasa Fixed SC` (monospace; Iosevka Latin, no ligatures,
+  CJK at exactly two cells) and `Sarasa UI SC` (sans; Inter Latin).
+  One family covers Latin, Greek, Cyrillic, Hangul, kana and Han,
+  so no CJK fallback fonts or fontsets.
+  Fontconfig defaults in `modules/shared/home/fonts.nix`
 - **Emacs:** Noctalia-generated theme on Linux, Flexoki fallback on macOS
 
 ## Custom packages
 
-- **`pkgs/sgram-tui/`** — the only custom package (pinned to upstream's latest tag; not in nixpkgs).
+- **`pkgs/sgram-tui/`** — the only custom package
+  (pinned to upstream's latest tag; not in nixpkgs).
 
 ## Bootstrap
 
@@ -201,31 +393,65 @@ Fresh machine setup (darwin or NixOS):
 bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/main/scripts/bootstrap.sh)
 ```
 
-The script handles: Xcode CLT (darwin), Lix installation, repo clone, first `darwin-rebuild`/`nixos-rebuild` (which installs Homebrew through nix-homebrew on darwin), and Claude Code's native installer (darwin). The manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
+The script handles: Xcode CLT (darwin), Lix installation, repo clone,
+first `darwin-rebuild`/`nixos-rebuild`
+(which installs Homebrew through nix-homebrew on darwin),
+and Claude Code's native installer (darwin).
+The manual post-bootstrap steps are signing into 1Password and
+(on darwin) Apple ID.
 
 ## Roadmap
 
 ### Phase 1 — NixOS-WSL on gaming PC (`trfwsl`)
 
-Interim homelab running NixOS-WSL on the existing Windows desktop. The config ran Plex, full *arr stack, sabnzbd, tautulli, recyclarr, minecraft, bookshelf, with Mullvad VPN + Tailscale coexistence, Cloudflare tunnel, sops-nix secrets, and ollama, but those services never held data: the live homelab is still Windows-native Plex and \*arr on the PC's DrivePool (`K:\data\media`).
+Interim homelab running NixOS-WSL on the existing Windows desktop.
+The config ran Plex, full *arr stack, sabnzbd, tautulli, recyclarr, minecraft,
+bookshelf, with Mullvad VPN + Tailscale coexistence, Cloudflare tunnel,
+sops-nix secrets, and ollama, but those services never held data:
+the live homelab is still Windows-native Plex
+and \*arr on the PC's DrivePool (`K:\data\media`).
 
-**The homelab is off on trfwsl since 2026-10-01**: WSL 3.0's kernel can't host Mullvad's split tunneling (the why is in `modules/nixos/system/homelab/vpn.nix`). The modules stay ready for trflab; trfwsl's last declaration is `git show 76e9d16:hosts/trfwsl/default.nix`. trfwsl runs without the NixOS firewall: NixOS-WSL masks `firewall.service`, and Windows' firewall fronts the WSL NAT.
+**The homelab is off on trfwsl since 2026-10-01**:
+WSL 3.0's kernel can't host Mullvad's split tunneling
+(the why is in `modules/nixos/system/homelab/vpn.nix`).
+The modules stay ready for trflab;
+trfwsl's last declaration is `git show 76e9d16:hosts/trfwsl/default.nix`. trfwsl
+runs without the NixOS firewall: NixOS-WSL masks `firewall.service`, and
+Windows' firewall fronts the WSL NAT.
 
-**Done:** nixos-wsl input, host config, WSL module, homelab service modules, media path config (NTFS mounts), Tailscale (on eduroam it falls back to DERP relays over 443, which works), Mullvad VPN with nftables split-tunnel, Cloudflare tunnel, sops-nix secrets, the Windows `Start-NixOS-WSL` scheduled task (boot trigger, runs whether or not anyone is logged on), and an out-of-band path to trfwsl through the Windows host (details in the user's private notes).
+**Done:** nixos-wsl input, host config, WSL module, homelab service modules,
+media path config (NTFS mounts), Tailscale
+(on eduroam it falls back to DERP relays over 443, which works),
+Mullvad VPN with nftables split-tunnel, Cloudflare tunnel, sops-nix secrets,
+the Windows `Start-NixOS-WSL` scheduled task
+(boot trigger, runs whether or not anyone is logged on),
+and an out-of-band path to trfwsl through the Windows host
+(details in the user's private notes).
 
 Open items: TODO.md § Homelab.
 
-**Constraints:** WSL starts only through the Windows scheduled task, networking is NAT'd by default (use mirrored mode or Tailscale), no direct disk/hardware access, Windows updates can kill WSL. Acceptable for an interim setup.
+**Constraints:** WSL starts only through the Windows scheduled task,
+networking is NAT'd by default
+(use mirrored mode or Tailscale),
+no direct disk/hardware access, Windows updates can kill WSL.
+Acceptable for an interim setup.
 
 ### Phase 2 — Dedicated NixOS server (`trflab`)
 
-Decided 2026-09-26: an i5-12400 box with direct-attached mergerfs + SnapRAID storage, reusing the GTX 1070 for light ollama. Parts, storage layout and steps: TODO.md § Phase 2; the plan of record (prices, migration runbook) is a Claude Doc linked from the user's private notes. Tailscale carries over unchanged.
+Decided 2026-09-26: an i5-12400 box with direct-attached mergerfs + SnapRAID
+storage, reusing the GTX 1070 for light ollama.
+Parts, storage layout and steps: TODO.md § Phase 2; the plan of record
+(prices, migration runbook)
+is a Claude Doc linked from the user's private notes.
+Tailscale carries over unchanged.
 
 ## Automation
 
 ### Auto-update pipeline
 
-Lock bumps come from GitHub: a scheduled workflow opens a PR, CI checks it, and a merge lands it on main. Every host then follows main on its own schedule.
+Lock bumps come from GitHub: a scheduled workflow opens a PR, CI checks it,
+and a merge lands it on main.
+Every host then follows main on its own schedule.
 
 ```text
 Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR; Check runs on it:
@@ -242,26 +468,74 @@ daily CI:      fail if flake.lock hasn't changed on main for 10 days (watchdog)
 
 **Key files:**
 
-- `.github/workflows/update-flake-lock.yml` — the bump PR (DeterminateSystems' action). Creating it needs Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests". The repo requires approval of runs from first-time contributors, so the first bump PR's runs waited for "Approve and run" until a github-actions[bot] commit was merged
-- `.github/workflows/check.yml` + `scripts/build-uncached.sh` — the checks, the Cachix build (secret `CACHIX`, the cache's auth token; a cold run takes ~20 min) and the bump PR's merge. Only allowlisted, free derivations get built: unfree vendor repackages must stay out of a public cache, and caching a download saves the Mac nothing. A merge made with `GITHUB_TOKEN` starts no push run on main, which the PR's run already covered
-- `scripts/auto-update.sh` — trfwsl's pipeline (phases 0–4; it no longer bumps or pushes, so its deploy key needs only read access)
+- `.github/workflows/update-flake-lock.yml` — the bump PR
+  (DeterminateSystems' action).
+  Creating it needs Settings → Actions → General → "Allow GitHub Actions to
+  create and approve pull requests".
+  The repo requires approval of runs from first-time contributors,
+  so the first bump PR's runs waited for "Approve and run"
+  until a github-actions[bot] commit was merged
+- `.github/workflows/check.yml` + `scripts/build-uncached.sh` — the checks,
+  the Cachix build (secret `CACHIX`, the cache's auth token;
+  a cold run takes ~20 min) and the bump PR's merge.
+  Only allowlisted, free derivations get built:
+  unfree vendor repackages must stay out of a public cache,
+  and caching a download saves the Mac nothing.
+  A merge made with `GITHUB_TOKEN` starts no push run on main,
+  which the PR's run already covered
+- `scripts/auto-update.sh` — trfwsl's pipeline
+  (phases 0–4; it no longer bumps or pushes,
+  so its deploy key needs only read access)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
-- `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp (unattended; user sudo is Touch ID-only). Log: `/var/log/auto-rebuild.log`. It fires at 06:30 Mac-local time, or on the next wake if the Mac slept through it (a run lost to a shutdown is not retried; a run on an unchanged `main` makes no new generation). It has no Full Disk Access, so only interactive switches write the sandboxed apps' preferences (Safari, Mail; `settings.nix`), and the daemon logs a warning instead
+- `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp
+  (unattended; user sudo is Touch ID-only).
+  Log: `/var/log/auto-rebuild.log`.
+  It fires at 06:30 Mac-local time,
+  or on the next wake if the Mac slept through it
+  (a run lost to a shutdown is not retried;
+  a run on an unchanged `main` makes no new generation).
+  It has no Full Disk Access,
+  so only interactive switches write the sandboxed apps' preferences
+  (Safari, Mail; `settings.nix`), and the daemon logs a warning instead
 
 **Manual trigger:** `sudo systemctl start auto-update` on trfwsl
 
-**Check status:** `systemctl status auto-update.timer` / `journalctl -u auto-update`; `journalctl -u auto-update -o short-iso | grep '==>'` shows how far each run got. On the Mac, `/var/log/auto-rebuild.log` has ANSI codes (`sed 's/\x1b\[[0-9;]*m//g'`), and `launchctl print system/org.nixos.auto-rebuild` counts runs since boot only.
+**Check status:** `systemctl status auto-update.timer` /
+`journalctl -u auto-update`;
+`journalctl -u auto-update -o short-iso | grep '==>'` shows how far each run
+got.
+On the Mac, `/var/log/auto-rebuild.log` has ANSI codes
+(`sed 's/\x1b\[[0-9;]*m//g'`),
+and `launchctl print system/org.nixos.auto-rebuild` counts runs since boot only.
 
-**Diagnose a build failure from the Mac:** `nix eval --raw --no-write-lock-file --override-input nixpkgs github:NixOS/nixpkgs/<rev> .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath`, then `nix-store -q --requisites <drv> | rg <name>`; `nix path-info --store <cache-url> <outpath>` tells whether a cache has it.
+**Diagnose a build failure from the Mac:**
+`nix eval --raw --no-write-lock-file --override-input nixpkgs github:NixOS/nixpkgs/<rev> .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath`,
+then `nix-store -q --requisites <drv> | rg <name>`;
+`nix path-info --store <cache-url> <outpath>` tells whether a cache has it.
 
-**Failure notification:** email to `tomrfitz@gmail.com` via msmtp/Gmail relay (sops secret `mail/app-pass`). It needs trfwsl's network, which most failed runs lacked. The lock itself is watched from GitHub's side: `.github/workflows/auto-update-watchdog.yml` fails, and GitHub mails whoever last edited its cron line, once `flake.lock` has gone 10 days without changing on main (the bump workflow failing, or its PRs left unmerged); the SessionStart hook reports the same gap. While the pipeline is off on purpose, `gh workflow disable auto-update-watchdog.yml` (re-enabling routes its mail to whoever re-enables it).
+**Failure notification:** email to `tomrfitz@gmail.com` via msmtp/Gmail relay
+(sops secret `mail/app-pass`).
+It needs trfwsl's network, which most failed runs lacked.
+The lock itself is watched from GitHub's side:
+`.github/workflows/auto-update-watchdog.yml` fails,
+and GitHub mails whoever last edited its cron line,
+once `flake.lock` has gone 10 days without changing on main
+(the bump workflow failing, or its PRs left unmerged);
+the SessionStart hook reports the same gap.
+While the pipeline is off on purpose,
+`gh workflow disable auto-update-watchdog.yml`
+(re-enabling routes its mail to whoever re-enables it).
 
 ### Naming convention
 
-Hostnames follow `trf<identifier>` — initials prefix for network disambiguation (eduroam has many colliding default Apple/Windows names), short suffix for the device/role. Under 7 chars, unique prefixes for tab completion.
+Hostnames follow `trf<identifier>` — initials prefix for network disambiguation
+(eduroam has many colliding default Apple/Windows names),
+short suffix for the device/role.
+Under 7 chars, unique prefixes for tab completion.
 
 ### Future machines
 
 - **`trflab`** — dedicated homelab server (phase 2)
-- **`trfvm`** — scratch/sandbox NixOS VM (host TBD — could be local on Mac via UTM, or on the gaming PC via Hyper-V)
+- **`trfvm`** — scratch/sandbox NixOS VM
+  (host TBD — could be local on Mac via UTM, or on the gaming PC via Hyper-V)
 - **`trfnix`** may be retired when the Samsung laptop is repurposed or replaced

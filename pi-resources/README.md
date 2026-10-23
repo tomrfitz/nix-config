@@ -1,8 +1,16 @@
 # pi-resources
 
-Author-owned [pi](https://github.com/earendil-works/pi) skills and prompt templates managed declaratively in this repo. Wired into `~/.pi/agent/{skills,prompts}/` via out-of-store symlinks declared in `modules/shared/home/pi.nix`.
+Author-owned [pi](https://github.com/earendil-works/pi) skills
+and prompt templates managed declaratively in this repo.
+Wired into `~/.pi/agent/{skills,prompts}/` via out-of-store symlinks declared in
+`modules/shared/home/pi.nix`.
 
-Pi reads through the symlinks live — edits here take effect on the next pi restart with no rebuild needed. Reverts are `git checkout pi-resources/...`. A rebuild is only required when the wiring itself changes (e.g. adding a new top-level skill folder requires a new `home.file` entry in `pi.nix`).
+Pi reads through the symlinks live —
+edits here take effect on the next pi restart with no rebuild needed.
+Reverts are `git checkout pi-resources/...`.
+A rebuild is only required when the wiring itself changes
+(e.g. adding a new top-level skill folder requires a new `home.file` entry in
+`pi.nix`).
 
 ## Layout
 
@@ -14,15 +22,33 @@ pi-resources/
         simplify.md       # author-owned
 ```
 
-Skill discovery follows pi's auto-discovery rule for `~/.pi/agent/skills/`: every `SKILL.md` file (recursively) registers its containing directory as a skill. Sibling `.md` files in a skill directory are supporting docs, not separate skills. Don't put top-level `.md` files directly under `skills/` — pi would load them as standalone skills.
+Skill discovery follows pi's auto-discovery rule for `~/.pi/agent/skills/`:
+every `SKILL.md` file (recursively) registers its containing directory
+as a skill.
+Sibling `.md` files in a skill directory are supporting docs,
+not separate skills.
+Don't put top-level `.md` files directly under `skills/` —
+pi would load them as standalone skills.
 
 ## Author-owned content
 
-- `skills/org-notes/` — agent guidance for reading and writing the org notes at `$NOTES`, including the `#+author:` convention for agent-written notes. The Obsidian vault at `$OBSD` is a read-only archive.
-- `prompts/simplify.md` — `/simplify` slash command. Three-angle review of the current diff (reuse, quality, efficiency) by one `reviewer` subagent.
+- `skills/org-notes/` — agent guidance for reading
+  and writing the org notes at `$NOTES`,
+  including the `#+author:` convention for agent-written notes.
+  The Obsidian vault at `$OBSD` is a read-only archive.
+- `prompts/simplify.md` — `/simplify` slash command.
+  Three-angle review of the current diff
+  (reuse, quality, efficiency) by one `reviewer` subagent.
 
 ## Third-party skills (not vendored)
 
-`mattpocock/skills` is consumed via the `mattpocock-skills` flake input declared in `flake.nix`, **not** vendored into this repo. `modules/shared/home/pi.nix` symlinks only the skills upstream promotes in its plugin manifest (`.claude-plugin/plugin.json`) to `~/.pi/agent/skills/mattpocock/<name>/`; its draft, deprecated and misc directories stay out, as upstream intends, and renames track automatically.
+`mattpocock/skills` is consumed via the `mattpocock-skills` flake input declared
+in `flake.nix`, **not** vendored into this repo.
+`modules/shared/home/pi.nix` symlinks only the skills upstream promotes in its
+plugin manifest (`.claude-plugin/plugin.json`) to
+`~/.pi/agent/skills/mattpocock/<name>/`; its draft, deprecated and misc
+directories stay out, as upstream intends, and renames track automatically.
 
-Updates land via `nix flake update`; `flake.lock` pins the commit. License (MIT) is upstream at <https://github.com/mattpocock/skills/blob/main/LICENSE>.
+Updates land via `nix flake update`; `flake.lock` pins the commit.
+License (MIT) is upstream at
+<https://github.com/mattpocock/skills/blob/main/LICENSE>.

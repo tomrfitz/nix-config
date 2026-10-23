@@ -2,69 +2,319 @@
 
 ## Handoff: agent setup (2026-10-03)
 
-- **State:** landed on `main` on 2026-10-03, each commit gated on all three hosts' eval and the formatting check. Before landing, the public history was rewritten to remove personal details and force-pushed (re-signed; every commit from 2026-02-17 on has a new ID, and the IDs cited in this repo were remapped); the working tree sits on the new `main`. Details are in the user's private notes.
-  - Status line: `config/claude-statusline.sh`, plus `statusLine` and `cleanupPeriodDays: 365` in `config/claude-settings.json`.
-  - Skills: `/handoff`, `/recall` and `zotero` in `config/skills/` (linked by `claude-code.nix`); `/land` replaces `nix-check` and `nix-search` in `.claude/skills/`.
-  - Instructions in `config/agents.md`: commit only when asked, finish approved plans, flag deviations, verified vs the user's view, tangent capture, the persistence bar, handoff around 300k tokens, and an import of the private `~/Documents/notes/agent-context.org`. AGENTS.md has the single commit rule and a "this repo is public" guardrail.
-  - Notes moved from `$OBSD` to org (`$NOTES`); the pi skill `obsidian-vault` became `org-notes`.
+- **State:** landed on `main` on 2026-10-03,
+  each commit gated on all three hosts' eval and the formatting check.
+  Before landing, the public history was rewritten to remove personal details
+  and force-pushed (re-signed; every commit from 2026-02-17 on has a new ID,
+  and the IDs cited in this repo were remapped);
+  the working tree sits on the new `main`.
+  Details are in the user's private notes.
+  - Status line: `config/claude-statusline.sh`,
+    plus `statusLine` and `cleanupPeriodDays: 365` in
+    `config/claude-settings.json`.
+  - Skills: `/handoff`, `/recall` and `zotero` in `config/skills/`
+    (linked by `claude-code.nix`);
+    `/land` replaces `nix-check` and `nix-search` in `.claude/skills/`.
+  - Instructions in `config/agents.md`: commit only when asked,
+    finish approved plans, flag deviations, verified vs the user's view,
+    tangent capture, the persistence bar, handoff around 300k tokens,
+    and an import of the private `~/Documents/notes/agent-context.org`.
+    AGENTS.md has the single commit rule and a "this repo is public" guardrail.
+  - Notes moved from `$OBSD` to org (`$NOTES`);
+    the pi skill `obsidian-vault` became `org-notes`.
   - SSH entries `tomrfitz-pc` and `trfwsl-oob`.
   - `CLAUDE.md` symlink deleted: Claude Code ≥ 2.1.277 reads AGENTS.md itself.
-  - Both `settings.local.json` files and five promoted feedback memories removed; backups in `~/.config/claude/backups/2026-10-03-cleanup/` (`~/.claude` until the 2026-10-21 XDG move).
-  - `system.configurationRevision` in `mkHost`, plus the SessionStart hook `.claude/hooks/session-state.sh` that reports it with the branch and uncommitted/unpushed state.
-  - Memory restructured: the 49 memory files went to AGENTS.md (rules; the 2026-09-26 trflab decisions), code comments, the `zotero` skill, this file, and seven org notes in `$NOTES`: private `agent-context.org`, `windows-pc.org`, `nix-config-history-scrub.org` and `zotero-library.org`; research `agent-harnesses.org`, `emacs-startup.org` and `nix-config-research.org`. MEMORY.md is a 17-line index of pointers; the old files are in `~/.config/claude/backups/2026-10-03-cleanup/memory-restructure/`. AGENTS.md lost its incident narrative and the Phase 1 list this file duplicates.
-  - `just` keeps only repo-local recipes: `rebuild`, `update`, `rollback`, `clean` and `sops-edit` are gone, and `fmt-check` runs CI's sandboxed `checks.<system>.formatting` (the old `nix fmt -- --ci` formatted in place). `block-rebuild.sh` and AGENTS.md match.
+  - Both `settings.local.json` files
+    and five promoted feedback memories removed;
+    backups in `~/.config/claude/backups/2026-10-03-cleanup/`
+    (`~/.claude` until the 2026-10-21 XDG move).
+  - `system.configurationRevision` in `mkHost`,
+    plus the SessionStart hook `.claude/hooks/session-state.sh`
+    that reports it with the branch and uncommitted/unpushed state.
+  - Memory restructured: the 49 memory files went to AGENTS.md
+    (rules; the 2026-09-26 trflab decisions),
+    code comments, the `zotero` skill, this file,
+    and seven org notes in `$NOTES`: private `agent-context.org`,
+    `windows-pc.org`, `nix-config-history-scrub.org` and `zotero-library.org`;
+    research `agent-harnesses.org`,
+    `emacs-startup.org` and `nix-config-research.org`.
+    MEMORY.md is a 17-line index of pointers; the old files are in
+    `~/.config/claude/backups/2026-10-03-cleanup/memory-restructure/`.
+    AGENTS.md lost its incident narrative
+    and the Phase 1 list this file duplicates.
+  - `just` keeps only repo-local recipes: `rebuild`, `update`, `rollback`,
+    `clean` and `sops-edit` are gone,
+    and `fmt-check` runs CI's sandboxed `checks.<system>.formatting`
+    (the old `nix fmt -- --ci` formatted in place).
+    `block-rebuild.sh` and AGENTS.md match.
 - **Next:**
-  1. The bare MagicDNS name `tomrfitz-pc` doesn't resolve on trfmbp (2026-10-03): not in Zen's Lab pins, not for `ssh tomrfitz-pc`, so it isn't Zen's DNS-over-HTTPS. `tailscale dns status` reports Tailscale DNS on, with the tailnet as search domain, yet `scutil --dns` shows neither that search domain nor a 100.100.100.100 resolver: macOS isn't applying Tailscale's DNS config. Test the full name next; if it fails too, fix the client (Tailscale's DNS setting, the network extension) rather than the names. The tailnet's full name must stay out of this repo either way. On 2026-10-13, with Mullvad disconnected, the bare name resolved (`dscacheutil -q host -a name tomrfitz-pc`) and `scutil --dns` listed both the resolver and the search domain. Suspect Mullvad's DNS takeover while connected: retest with Mullvad on before touching Tailscale.
-  2. The PC's OpenSSH `DefaultShell` change and the tests of the SSH entries: in the user's private notes.
-  3. The status line as a mod, so it also shows in the desktop app (the `plugin-authoring` skill; <https://claude.com/blog/claude-code-mods>).
-  4. A project agent kit in `templates/`: an AGENTS.md skeleton, plus `.claude/settings.json` with a SessionStart hook writing `direnv export bash` to `$CLAUDE_ENV_FILE` (desktop sessions don't get direnv) and a formatter hook. Later, link `config/skills/` into pi too.
+  1. The bare MagicDNS name `tomrfitz-pc` doesn't resolve on trfmbp
+     (2026-10-03): not in Zen's Lab pins, not for `ssh tomrfitz-pc`, so it isn't
+     Zen's DNS-over-HTTPS.
+     `tailscale dns status` reports Tailscale DNS on,
+     with the tailnet as search domain,
+     yet `scutil --dns` shows neither that search domain
+     nor a 100.100.100.100 resolver:
+     macOS isn't applying Tailscale's DNS config.
+     Test the full name next; if it fails too, fix the client
+     (Tailscale's DNS setting, the network extension) rather than the names.
+     The tailnet's full name must stay out of this repo either way.
+     On 2026-10-13, with Mullvad disconnected, the bare name resolved
+     (`dscacheutil -q host -a name tomrfitz-pc`)
+     and `scutil --dns` listed both the resolver and the search domain.
+     Suspect Mullvad's DNS takeover while connected:
+     retest with Mullvad on before touching Tailscale.
+  2. The PC's OpenSSH `DefaultShell` change and the tests of the SSH entries:
+     in the user's private notes.
+  3. The status line as a mod, so it also shows in the desktop app
+     (the `plugin-authoring` skill; <https://claude.com/blog/claude-code-mods>).
+  4. A project agent kit in `templates/`: an AGENTS.md skeleton,
+     plus `.claude/settings.json` with a SessionStart hook writing
+     `direnv export bash` to `$CLAUDE_ENV_FILE` (desktop sessions don't get
+     direnv) and a formatter hook.
+     Later, link `config/skills/` into pi too.
 - **Unverified:**
-  - `wsl.exe -e` one-shots under PowerShell quoting, and the `trfwsl-oob` RemoteCommand.
-  - Whether the desktop Code tab shows the shell status line: its docs don't mention one.
-- **Verified after the `nrsl` switch (2026-10-03):** a fresh session's context carried `agent-context.org` through the deployed `~/.claude/CLAUDE.md` import.
-- **Decided (2026-10-03):** the PC's access details and the Windows homelab inventory live in the user's private notes, not here; the SSH entries stay, with bare MagicDNS names.
+  - `wsl.exe -e` one-shots under PowerShell quoting,
+    and the `trfwsl-oob` RemoteCommand.
+  - Whether the desktop Code tab shows the shell status line:
+    its docs don't mention one.
+- **Verified after the `nrsl` switch (2026-10-03):** a fresh session's context
+  carried `agent-context.org` through the deployed `~/.claude/CLAUDE.md` import.
+- **Decided (2026-10-03):** the PC's access details
+  and the Windows homelab inventory live in the user's private notes, not here;
+  the SSH entries stay, with bare MagicDNS names.
 
 ## Landing — start here (2026-09-01)
 
-**Where we are (2026-09-23).** Everything is on `main` through the September batch: the language-tooling floor and project templates (`nixify`), the Claude Code CLI from Anthropic's installer on macOS, greedy brew upgrades on every switch, the daemon's log in `/var/log` and warn-only sandboxed-app defaults, Zen's writable `profiles.ini`, the Ghostty and Zed cleanups, and the lock bump to nixpkgs 2026-09-21 with MELPA's `pilish` rename. Next: switch from a terminal (`nrsr`), then read the next `/var/log/auto-rebuild.log` (see Deferred).
+**Where we are (2026-09-23).**
+Everything is on `main` through the September batch:
+the language-tooling floor and project templates (`nixify`),
+the Claude Code CLI from Anthropic's installer on macOS,
+greedy brew upgrades on every switch,
+the daemon's log in `/var/log` and warn-only sandboxed-app defaults,
+Zen's writable `profiles.ini`, the Ghostty and Zed cleanups,
+and the lock bump to nixpkgs 2026-09-21 with MELPA's `pilish` rename.
+Next: switch from a terminal (`nrsr`),
+then read the next `/var/log/auto-rebuild.log` (see Deferred).
 
-**The lifeline.** The tree is proven, so stop shaping it. Commit in a handful of coarse thematic commits on `main`, each prep-checklist item landing in the commit that owns its files; push, get CI green, switch once, then bump the lock in a separate commit. Only the tip has to evaluate; bisectability is not worth another quarter. Everything else is deferred with a trigger, below. Everything landed and was pushed on 2026-09-03, the inputs audit below that week, and the September batch on 2026-09-23 (topic commits on `main`, each one evaluated).
+**The lifeline.**
+The tree is proven, so stop shaping it.
+Commit in a handful of coarse thematic commits on `main`,
+each prep-checklist item landing in the commit that owns its files; push,
+get CI green, switch once, then bump the lock in a separate commit.
+Only the tip has to evaluate; bisectability is not worth another quarter.
+Everything else is deferred with a trigger, below.
+Everything landed and was pushed on 2026-09-03,
+the inputs audit below that week, and the September batch on 2026-09-23
+(topic commits on `main`, each one evaluated).
 
 ### Prep checklist (each item lands in the commit that owns its files; gate the tip with `just fmt-check && just eval-all && just check`)
 
-- **Firefox/Natsumi stream — reverted in commit 2 (2026-09-03).** Zen stays primary, Helium for Chromium, Safari native; Linux gets plain Firefox. Both firefox modules, their imports, the `natsumi-browser`/`fx-autoconfig` inputs and the `firefox` cask are gone (nix pruned the two lock nodes on the next lock write, as expected). Base Firefox on the Linux desktop (`programs.firefox` + `sharedPolicies`, which now sets `DisableAppUpdate = true` for nix-wrapped builds) landed in commit 5.
-- **Casks — cut in commit 4 (2026-09-03).** 32 casks and 3 MAS apps gone (arc … league-of-legends; Dropover, Infuse, TestFlight), plus `--force-cleanup` and its REVISIT (nix-darwin at the locked rev passes it natively). They uninstalled at the first switch; eight came back the same day because the user still uses them: orion, signal, wechat, plex-htpc, onyx (the @beta cask needs macOS 27), oversight, calibre, handy.
-- **packages.nix — cut in commit 6 (2026-09-03).** 25 unused packages and the `gossip` comment gone (streamlink stays: Chatterino launches it, so shell history never saw it; aria2 and termdown returned after the first switch — xcodes uses aria2) (`rg -w` found no code references; statix was the explicit exception — treefmt-nix supplies its own; `dust`/`duf` also left the agents.md tool list), `programs.nushell` dropped. Kept: sql-formatter, shfmt, shellcheck, markdownlint-cli2, dprint, rassumfrassum — tools call them.
-- **mdbase-tasknotes — deleted in commit 6 (2026-09-03)** (zero invocations ever; tasks live in org now).
-- **Dead stubs — deleted in commit 4 (2026-09-03):** `aerospace.nix`, `sketchybar.nix`, their imports, and the `paneru-restart` alias (restart is built into paneru now).
-- **flake.nix — done in commit 7 (2026-09-03).** `llm-agents.overlays.shared-nixpkgs` (both names exist at the locked rev; `default` is gone upstream); the fetchurl-UA and streamlink overlays and `dixSkipChecks` deleted (streamlink 8.4.0 gates the test itself; nixpkgs' dix 2.0.1 arrives from cache.nixos.org with checks on); the paneru build override deleted in the follow-up (upstream's package builds now); `homebrew-emacs-plus` replaced by a pinned fetchurl of the icon; `follows` for paneru's nix-darwin and nixos-wsl's flake-compat; the legacy `system` argument replaced by `nixpkgs.hostPlatform`. Orphan lock nodes pruned themselves at the next lock write.
-- **Docs — done:** the unblocked watchlist entries died with their code (commits 4 and 7); `AGENTS.md` is kept in sync per commit.
+- **Firefox/Natsumi stream — reverted in commit 2 (2026-09-03).**
+  Zen stays primary, Helium for Chromium, Safari native;
+  Linux gets plain Firefox.
+  Both firefox modules, their imports,
+  the `natsumi-browser`/`fx-autoconfig` inputs and the `firefox` cask are gone
+  (nix pruned the two lock nodes on the next lock write, as expected).
+  Base Firefox on the Linux desktop
+  (`programs.firefox` + `sharedPolicies`,
+  which now sets `DisableAppUpdate = true`
+  for nix-wrapped builds) landed in commit 5.
+- **Casks — cut in commit 4 (2026-09-03).**
+  32 casks and 3 MAS apps gone
+  (arc … league-of-legends; Dropover, Infuse, TestFlight),
+  plus `--force-cleanup` and its REVISIT
+  (nix-darwin at the locked rev passes it natively).
+  They uninstalled at the first switch;
+  eight came back the same day because the user still uses them: orion, signal,
+  wechat, plex-htpc, onyx
+  (the @beta cask needs macOS 27), oversight, calibre, handy.
+- **packages.nix — cut in commit 6 (2026-09-03).**
+  25 unused packages and the `gossip` comment gone
+  (streamlink stays: Chatterino launches it, so shell history never saw it;
+  aria2 and termdown returned after the first switch — xcodes uses aria2)
+  (`rg -w` found no code references; statix was the explicit exception —
+  treefmt-nix supplies its own; `dust`/`duf` also left the agents.md tool list),
+  `programs.nushell` dropped.
+  Kept: sql-formatter, shfmt, shellcheck, markdownlint-cli2, dprint,
+  rassumfrassum — tools call them.
+- **mdbase-tasknotes — deleted in commit 6 (2026-09-03)**
+  (zero invocations ever; tasks live in org now).
+- **Dead stubs — deleted in commit 4 (2026-09-03):** `aerospace.nix`,
+  `sketchybar.nix`, their imports, and the `paneru-restart` alias
+  (restart is built into paneru now).
+- **flake.nix — done in commit 7 (2026-09-03).**
+  `llm-agents.overlays.shared-nixpkgs`
+  (both names exist at the locked rev; `default` is gone upstream);
+  the fetchurl-UA and streamlink overlays and `dixSkipChecks` deleted
+  (streamlink 8.4.0 gates the test itself;
+  nixpkgs' dix 2.0.1 arrives from cache.nixos.org with checks on);
+  the paneru build override deleted in the follow-up
+  (upstream's package builds now);
+  `homebrew-emacs-plus` replaced by a pinned fetchurl of the icon;
+  `follows` for paneru's nix-darwin and nixos-wsl's flake-compat;
+  the legacy `system` argument replaced by `nixpkgs.hostPlatform`.
+  Orphan lock nodes pruned themselves at the next lock write.
+- **Docs — done:** the unblocked watchlist entries died with their code
+  (commits 4 and 7); `AGENTS.md` is kept in sync per commit.
 
 ### Commit map (coarse, thematic; staged by topic — whole files where a file is one topic, single hunks where it spans two)
 
-1. `emacs: nix-owned build, trimmed config, flexoki palette fix` — `config/emacs/**`, `modules/shared/home/emacs.nix`, `modules/shared/home/shell.nix`, `config/editorconfig`, plus the `packages.nix` hunk that drops the Linux `emacs` entry.
-2. `browsers: drop Firefox/Natsumi stream; Zen + Helium` (the Linux base-Firefox line rides commit 5) — delete `modules/shared/home/firefox.nix`; `modules/shared/home/{zen,browser-policies,desktop}.nix`; the `homebrew.nix` hunk dropping the firefox cask. Also fixes the two c2 review findings (zen activation gated to darwin + `run`; Sidebery dropped, `DisableAppUpdate = true`).
-3. `agents, formatting, xdg: pi, drop kagi MCP, dprint stack, xdg sweep` — `modules/shared/home/{pi,dprint,xdg-compliance,xdg-dirs,1password-ssh,default}.nix`, `modules/shared/system/nix.nix`, `pi-resources/**`, `config/agents.md`, `config/claude-settings.json`, `config/editorconfig`, new `config/dprint-plugins.nix`, `treefmt.nix`, `.github/workflows/check.yml`, `config/vscode/test-theme.md`, plus the formatter hunks of `desktop.nix`. Also fixes the c3 review findings: `accept-flake-config` dropped and the lix override marked REVISIT; one dprint plugin selector for treefmt and the global fallback; shfmt reads editorconfig everywhere (`simplify = true` there) and shellcheck gates fmt-check; sql-formatter config path from `xdg.configHome`; markdownlint rules sourced from the repo-root file; pi activation via `run`; agents.md/README drift. `git.nix`'s Emacs-ignore hunk belonged with commit 1 and went out on its own as 2ab8c23 (2026-09-03). The `programs.nushell` hunk of `default.nix` waits for commit 6.
-4. `darwin: paneru system module, root auto-rebuild daemon, homebrew cuts` — `modules/darwin/system/{default,homebrew,auto-rebuild,paneru}.nix` (paneru is a rename from `darwin/home`), `modules/darwin/home/{default,zsh}.nix`, delete `modules/darwin/home/{auto-rebuild,aerospace,sketchybar}.nix`. Also: paneru settings moved off the deprecated flat `[options]` keys onto `swipe.gesture` (vertical workspace swipe off — it fired on ordinary drags; re-check key names at the `v0.4.4` pin), karabiner activation `cmp`-guarded and via `run`, `paneru-restart` alias dropped.
-5. `nixos: noctalia v5, homelab fixes, base firefox` — `modules/nixos/home/desktop.nix`, `modules/nixos/system/auto-update.nix`, `modules/nixos/system/homelab/{sabnzbd,vpn,default}.nix`, `hosts/trfwsl/default.nix`, new `modules/nixos/system/homelab/cloudflared.nix` (the tunnel unit moved out of the host file behind `trf.homelab.cloudflared.enable`, now `DynamicUser` + `LoadCredential` — untested at runtime until trfwsl is back on). `xwayland-satellite` is no longer spawned at startup (niri does it on demand).
-6. `packages: drop unused CLI tools and mdbase-tasknotes` — `modules/shared/home/packages.nix`, delete `pkgs/mdbase-tasknotes/`, plus the `programs.nushell` hunk of `default.nix` and the `dust`/`duf` mention in `config/agents.md`.
-7. `flake: templates.python-uv, llm-agents overlay rename, drop dead overlays` — `flake.nix`, `templates/python-uv/**`, plus the `emacs.nix` hunk that swaps the `homebrew-emacs-plus` input for a pinned fetchurl of the icon. Also fixes the two c7 findings (`nixpkgs.hostPlatform` instead of the legacy `system` arg; `follows` for paneru's nix-darwin and nixos-wsl's flake-compat).
-8. `tooling, docs: justfile -H, harness hooks, AGENTS/TODO` — `justfile`, `.claude/**`, `AGENTS.md`, `TODO.md`. Also fixes the c8 finding (AGENTS.md drift: module tree, inputs list, the `config/` description, the justfile block).
-9. `flake.lock: sync to the running system` — `flake.lock` alone. This is the tree's lock (nixpkgs 2026-06-16, emacs-overlay added, dead nodes pruned), not a bump: the tip only evaluates with it, so it must land before the push. The `just update` bump is a separate, later commit (Steps 4).
+1. `emacs: nix-owned build, trimmed config, flexoki palette fix` —
+   `config/emacs/**`, `modules/shared/home/emacs.nix`,
+   `modules/shared/home/shell.nix`, `config/editorconfig`,
+   plus the `packages.nix` hunk that drops the Linux `emacs` entry.
+2. `browsers: drop Firefox/Natsumi stream; Zen + Helium`
+   (the Linux base-Firefox line rides commit 5)
+   — delete `modules/shared/home/firefox.nix`;
+   `modules/shared/home/{zen,browser-policies,desktop}.nix`;
+   the `homebrew.nix` hunk dropping the firefox cask.
+   Also fixes the two c2 review findings
+   (zen activation gated to darwin + `run`; Sidebery dropped,
+   `DisableAppUpdate = true`).
+3. `agents, formatting, xdg: pi, drop kagi MCP, dprint stack, xdg sweep` —
+   `modules/shared/home/{pi,dprint,xdg-compliance,xdg-dirs,1password-ssh,default}.nix`,
+   `modules/shared/system/nix.nix`, `pi-resources/**`, `config/agents.md`,
+   `config/claude-settings.json`, `config/editorconfig`, new
+   `config/dprint-plugins.nix`, `treefmt.nix`, `.github/workflows/check.yml`,
+   `config/vscode/test-theme.md`, plus the formatter hunks of `desktop.nix`.
+   Also fixes the c3 review findings:
+   `accept-flake-config` dropped and the lix override marked REVISIT;
+   one dprint plugin selector for treefmt and the global fallback;
+   shfmt reads editorconfig everywhere
+   (`simplify = true` there)
+   and shellcheck gates fmt-check;
+   sql-formatter config path from `xdg.configHome`;
+   markdownlint rules sourced from the repo-root file; pi activation via `run`;
+   agents.md/README drift.
+   `git.nix`'s Emacs-ignore hunk belonged with commit 1 and went out on its own
+   as 2ab8c23 (2026-09-03).
+   The `programs.nushell` hunk of `default.nix` waits for commit 6.
+4. `darwin: paneru system module, root auto-rebuild daemon, homebrew cuts` —
+   `modules/darwin/system/{default,homebrew,auto-rebuild,paneru}.nix`
+   (paneru is a rename from `darwin/home`),
+   `modules/darwin/home/{default,zsh}.nix`,
+   delete `modules/darwin/home/{auto-rebuild,aerospace,sketchybar}.nix`.
+   Also: paneru settings moved off the deprecated flat `[options]` keys onto
+   `swipe.gesture` (vertical workspace swipe off — it fired on ordinary drags;
+   re-check key names at the `v0.4.4` pin), karabiner activation `cmp`-guarded
+   and via `run`, `paneru-restart` alias dropped.
+5. `nixos: noctalia v5, homelab fixes, base firefox` —
+   `modules/nixos/home/desktop.nix`, `modules/nixos/system/auto-update.nix`,
+   `modules/nixos/system/homelab/{sabnzbd,vpn,default}.nix`,
+   `hosts/trfwsl/default.nix`,
+   new `modules/nixos/system/homelab/cloudflared.nix`
+   (the tunnel unit moved out of the host file behind
+   `trf.homelab.cloudflared.enable`, now `DynamicUser` + `LoadCredential` —
+   untested at runtime until trfwsl is back on).
+   `xwayland-satellite` is no longer spawned at startup
+   (niri does it on demand).
+6. `packages: drop unused CLI tools and mdbase-tasknotes` —
+   `modules/shared/home/packages.nix`, delete `pkgs/mdbase-tasknotes/`,
+   plus the `programs.nushell` hunk of `default.nix`
+   and the `dust`/`duf` mention in `config/agents.md`.
+7. `flake: templates.python-uv, llm-agents overlay rename, drop dead overlays` —
+   `flake.nix`, `templates/python-uv/**`,
+   plus the `emacs.nix` hunk that swaps the `homebrew-emacs-plus` input
+   for a pinned fetchurl of the icon.
+   Also fixes the two c7 findings
+   (`nixpkgs.hostPlatform` instead of the legacy `system` arg;
+   `follows` for paneru's nix-darwin and nixos-wsl's flake-compat).
+8. `tooling, docs: justfile -H, harness hooks, AGENTS/TODO` — `justfile`,
+   `.claude/**`, `AGENTS.md`, `TODO.md`.
+   Also fixes the c8 finding
+   (AGENTS.md drift: module tree, inputs list, the `config/` description,
+   the justfile block).
+9. `flake.lock: sync to the running system` — `flake.lock` alone.
+   This is the tree's lock
+   (nixpkgs 2026-06-16, emacs-overlay added, dead nodes pruned),
+   not a bump: the tip only evaluates with it, so it must land before the push.
+   The `just update` bump is a separate, later commit (Steps 4).
 
-The audit docs (June review, August currency review, cruft cut, landing plan) were folded into the Evidence section at the end of this file on 2026-09-01 and deleted; only `emacs-overhaul-1f5cf88.patch` (raw code for the salvage list) stays untracked. Do not add new planning docs; this file is the plan.
+The audit docs (June review, August currency review, cruft cut, landing plan)
+were folded into the Evidence section at the end of this file on 2026-09-01 and
+deleted; only `emacs-overhaul-1f5cf88.patch` (raw code for the salvage list)
+stays untracked.
+Do not add new planning docs; this file is the plan.
 
 ### Steps
 
-1. On `main`, no branch (nothing is pushed until the tip is green; the reflog is the rollback; CI only runs on `main` pushes and PRs). Commits 1–9 above, each carrying its prep-checklist items. Gate at the tip: `just fmt-check`, `just eval-all`, `just check`. Two traps met on the way: the repo's pre-commit hook stashes unstaged changes and its restore breaks if an intent-to-add file pairs with an unstaged deletion as a rename (keep such files untracked until their commit), never edit dirty tracked files while a commit's hook is running, and a home-manager path that turns from a symlink into a directory of links fails activation (`ln: Permission denied` into the store) until the old link is removed by hand — keep such paths a single link, as pi.nix now does with a link farm.
-2. `git rebase origin/main` — the only conflict is `flake.lock`; keep ours (newer). Push; CI evaluates all three hosts + formatting.
-3. **First switch done 2026-09-03** (generation 317, from the local tree). It froze the Mac: every mouse-down stalled all input until a forced restart; fine after the reboot. paneru is the suspect: the binary is identical in both generations, but the old home-manager agent and the new nix-darwin agent share the launchd label `com.github.karinushka.paneru`, and the switch booted one out while bootstrapping the other in the middle of brew uninstalling 32 apps — a stalled event-tap owner that keeps re-enabling its tap freezes input exactly like that. Unproven: paneru logged to `/tmp`, which macOS emptied at reboot (now fixed: `~/Library/Logs/paneru.err.log`). Next time a switch changes paneru or removes many apps: quit paneru first (`ctrl+alt-q`), switch, then `paneru restart`. If input freezes on clicks, `launchctl bootout gui/$UID/com.github.karinushka.paneru` from a terminal beats a forced restart. The orphaned `~/Library/Application Support/Firefox` profile (and `Firefox.bak`) went to the Trash 2026-09-22.
-4. **Source moves landed 2026-09-03** (policy, from the user: every input floats on its upstream default branch; a bump moves all of them and the config adapts — never pin for back-compat): paneru follows `main` and uses upstream's own package (crane, luajit; nixpkgs' apple-sdk supplies `DEVELOPER_DIR`), so the local build override in flake.nix is gone; noctalia input on the renamed `noctalia-dev/noctalia` repo (HEAD ≥ beta.10); `programs.niri.package = pkgs.niri` (niri-flake is frozen, nixpkgs' niri is current — an interim step: the input itself went the same day and the option is back to its default, see Decisions of record). Caveat: trfnix's niri config validation and noctalia's config rendering happen at build time on x86_64-linux, which the Mac cannot build — they evaluated, but the first trfnix rebuild is the real test. Then the lock bump, alone: `nix flake update` → `just eval-all` → `just check` → fix what surfaces and re-check the watchlist (lix milestone is 2.97, the workaround stays; the home-manager plugin rename `mcp__plugin_hm_*` arrives with this bump) → commit the lock → switch (quit paneru first) → push. Done 2026-09-03 (7c97cce): one break, `emacs30` retired for `emacs`; the warnings (`stdenv.hostPlatform`, fzf/atuin Ctrl-R, pointerCursor) fixed in e04f61f.
-5. Automation: the darwin daemon runs (it passes `--bypass-root-check` and `--hostname`; log in `/var/log/auto-rebuild.log`), but until 2026-09-23 its activation died partway, see Deferred; power the gaming PC on so the trfwsl lock-bump pipeline resumes (`journalctl -u auto-update`), and on that first switch confirm `cloudflared-tunnel` comes up under DynamicUser (`journalctl -u cloudflared-tunnel`).
+1. On `main`, no branch (nothing is pushed until the tip is green;
+   the reflog is the rollback; CI only runs on `main` pushes and PRs).
+   Commits 1–9 above, each carrying its prep-checklist items.
+   Gate at the tip: `just fmt-check`, `just eval-all`, `just check`.
+   Two traps met on the way:
+   the repo's pre-commit hook stashes unstaged changes and its restore breaks
+   if an intent-to-add file pairs with an unstaged deletion as a rename
+   (keep such files untracked until their commit),
+   never edit dirty tracked files while a commit's hook is running,
+   and a home-manager path
+   that turns from a symlink into a directory of links fails activation
+   (`ln: Permission denied` into the store)
+   until the old link is removed by hand — keep such paths a single link,
+   as pi.nix now does with a link farm.
+2. `git rebase origin/main` — the only conflict is `flake.lock`; keep ours
+   (newer).
+   Push; CI evaluates all three hosts + formatting.
+3. **First switch done 2026-09-03** (generation 317, from the local tree).
+   It froze the Mac: every mouse-down stalled all input until a forced restart;
+   fine after the reboot. paneru is the suspect:
+   the binary is identical in both generations,
+   but the old home-manager agent
+   and the new nix-darwin agent share the launchd label
+   `com.github.karinushka.paneru`, and the switch booted one out while
+   bootstrapping the other in the middle of brew uninstalling 32 apps — a
+   stalled event-tap owner that keeps re-enabling its tap freezes input exactly
+   like that.
+   Unproven: paneru logged to `/tmp`, which macOS emptied at reboot
+   (now fixed: `~/Library/Logs/paneru.err.log`).
+   Next time a switch changes paneru
+   or removes many apps: quit paneru first (`ctrl+alt-q`), switch,
+   then `paneru restart`.
+   If input freezes on clicks,
+   `launchctl bootout gui/$UID/com.github.karinushka.paneru` from a terminal
+   beats a forced restart.
+   The orphaned `~/Library/Application Support/Firefox` profile
+   (and `Firefox.bak`) went to the Trash 2026-09-22.
+4. **Source moves landed 2026-09-03**
+   (policy, from the user: every input floats on its upstream default branch;
+   a bump moves all of them and the config adapts — never pin for back-compat):
+   paneru follows `main` and uses upstream's own package
+   (crane, luajit; nixpkgs' apple-sdk supplies `DEVELOPER_DIR`),
+   so the local build override in flake.nix is gone;
+   noctalia input on the renamed `noctalia-dev/noctalia` repo
+   (HEAD ≥ beta.10);
+   `programs.niri.package = pkgs.niri`
+   (niri-flake is frozen, nixpkgs' niri is current — an interim step:
+   the input itself went the same day and the option is back to its default,
+   see Decisions of record).
+   Caveat: trfnix's niri config validation
+   and noctalia's config rendering happen at build time on x86_64-linux,
+   which the Mac cannot build — they evaluated,
+   but the first trfnix rebuild is the real test.
+   Then the lock bump, alone:
+   `nix flake update` → `just eval-all` → `just check` → fix what surfaces
+   and re-check the watchlist
+   (lix milestone is 2.97, the workaround stays;
+   the home-manager plugin rename `mcp__plugin_hm_*` arrives with this bump) →
+   commit the lock → switch (quit paneru first) → push.
+   Done 2026-09-03 (7c97cce): one break, `emacs30` retired for `emacs`;
+   the warnings (`stdenv.hostPlatform`, fzf/atuin Ctrl-R, pointerCursor) fixed
+   in e04f61f.
+5. Automation: the darwin daemon runs
+   (it passes `--bypass-root-check` and `--hostname`;
+   log in `/var/log/auto-rebuild.log`),
+   but until 2026-09-23 its activation died partway, see Deferred;
+   power the gaming PC on so the trfwsl lock-bump pipeline resumes
+   (`journalctl -u auto-update`),
+   and on that first switch confirm `cloudflared-tunnel` comes up under
+   DynamicUser (`journalctl -u cloudflared-tunnel`).
 
 ### Flake inputs — audit 2026-09-03 (upstream's documented Nix path vs this config vs nixpkgs now; 7 researchers + synthesis)
 
-Policy: inputs float; follow each upstream's documented integration; drop an input once nixpkgs/home-manager carry the same thing. Verdicts:
+Policy: inputs float; follow each upstream's documented integration;
+drop an input once nixpkgs/home-manager carry the same thing.
+Verdicts:
 
 | Input | Verdict | Why / action |
 | --- | --- | --- |
@@ -80,7 +330,10 @@ Policy: inputs float; follow each upstream's documented integration; drop an inp
 | disko | dropped 2026-09-03 | trfnix's disko.nix is a placeholder (`enableConfig = false`), the justfile runs bare master, upstream docs say `/latest`. Drop and re-add from disko-templates when trflab's layout is real, or keep as pre-wiring. |
 | nix-topology | dropped 2026-09-03 | Two hand-written nodes, zero links, never rendered. Drop and re-add when trflab exists. |
 
-All decided 2026-09-03: disko and nix-topology dropped (re-add from their templates when trflab is real); pi configured everywhere; Zen stays a cask; the standalone home-manager CLI dropped; niri went home-manager native.
+All decided 2026-09-03: disko and nix-topology dropped
+(re-add from their templates when trflab is real);
+pi configured everywhere; Zen stays a cask;
+the standalone home-manager CLI dropped; niri went home-manager native.
 
 ## Upstream Watchlist
 
@@ -95,154 +348,781 @@ All decided 2026-09-03: disko and nix-topology dropped (re-add from their templa
 
 ## Deferred (trigger → action)
 
-- **Lock bumps** → when nixpkgs' `dprint-plugins.dprint-plugin-markdown` reaches 0.21.1, drop the 0.23.3 pin in `config/dprint-plugins.nix` (watchlist above). Otherwise nothing pending. (kagi.nix was deleted in commit 3 on 2026-09-03; it lives in git history, and `programs.mcp` would be the way back.)
-- **Winter break** → probable-tier cuts: (`ruff.nix` left this list 2026-09-07: it became `python.nix`, the nix-owned ruff/ty floor — see CLAUDE.md "Global floor vs project tier") helix (+ its theme TOMLs), `vesktop.nix` (+ audacity/pear-desktop; chatterino2 stays — used sometimes, per user 2026-09-03), dix + `just diff`, the font hoard (keep Sarasa + symbols/emoji), stale casks (daisydisk, pearcleaner, netnewswire, element, sf-symbols, zoom, one of xcodes-app/xcodes, KakaoTalk, RapidClick), rarely-used packages (yazi, mcrcon, nix-init, pandoc, tldr, witr, lazygit, htop). Then the no-rename structure wins: split the 200-line `shared/home/default.nix`, merge darwin git/zsh/topgrade into shared via `isDarwin`, colocate `config/` assets with their modules, devShell → `shell.nix`.
-- **When the agent harnesses are reviewed** → keep or cut pi, omp and opencode (Hermes was dropped on 2026-10-22, never used; its input and package are in `7ee3846` (`flake.nix`, `packages.nix`), the API-key wiring is in `~/Documents/notes/agent-harnesses.org`, and upstream now ships a home-manager module). Since 2026-10-07 Max includes $200 a month of Claude API credits in the linked Console org (the API and the Agent SDK only, not Claude Code sessions or extra usage), so third-party harnesses have a sanctioned Anthropic path: pi and omp run on them since 2026-10-09 (`anthropic-api-key.nix`), and pi's `claude-bridge/*` models still draw plan limits. opencode is not wired to the key. omp is on trial on the Mac since 2026-09-23 (`omp.nix`, ~1.1 GiB). Research: `~/Documents/notes/agent-harnesses.org`. Retiring them all means pi.nix, omp.nix, opencode.nix, `pi-resources/`, the mattpocock-skills input, pilish in Emacs, Zed's opencode/copilot agent servers (plus github-copilot-cli and amp-acp, added in Zed's UI and never declared; Zed's own agent defaults also point at zed.dev/copilot/google models), `~/.pi` (516 MB), `~/.omp`, and amp's unmanaged `~/.amp` and `~/.local/bin/amp`.
-- **Only if the itch survives the structure wins** → the full `features/` layout rename (the `feature-colocation` branch + `stash@{0}` are the blueprint: flat `features/<name>/{default,home,darwin,nixos}.nix` + explicit `profiles/`; re-derive with `git mv`, never merge the branch; delete both afterwards).
-- **When the next assignment write-up hurts** → the remaining Emacs salvage items from `emacs-overhaul-1f5cf88.patch` (org QoL block first; then LSP extras, cape/consult-dir, jinx — nix side is ready: enchant AppleSpell + aspell en/it).
-- **When a month passes with no daemon run** → the auto-rebuild wake gap (the Mac sleeps through 06:30; launchd runs a missed calendar job on the next wake, but not after a shutdown; StartInterval fallback or accept-and-document).
-- **Next daemon run** → read `/var/log/auto-rebuild.log`. Until 2026-09-23 every run died at `user defaults`: Safari's and Mail's preferences live in their sandbox containers, which need Full Disk Access, and a root launchd job has none. By then `/etc`, and with it the per-user packages, had already switched to `main`, while home-manager, the launchd agents and `/run/current-system` had not. Generation 332 did that on 2026-09-23, and 326 and 330 fit the same pattern; it is what put atuin 18.19 back over a database already migrated by 18.21. The two domains now warn instead (`settings.nix`). The 2026-09-24 run then got as far as `brew bundle`, where WeChat's greedy upgrade needed sudo (`chgrp` on its bundle), which nothing unattended can answer: brew reverted it, activation stopped before home-manager again, and the revert's leftover broke the next interactive switch until brew cleaned it up. Since then activation installs and removes casks without upgrading, and the `nr*` aliases upgrade (`homebrew.nix`). The next run should finish: afterwards `readlink /run/current-system` should match the profile.
-- **When a new Claude model lands** → re-run the prompt audit (`/claude-api prompt-audit`) over `config/agents.md`, AGENTS.md, `.claude/`, `config/skills/` and `pi-resources/`, diffing against the 2026-09-23 baseline (Opus 5.5, fixes 66f02b8..cd1df0f): no model-era idioms then, mostly factual drift. Kept on purpose: the no-`head`/`tail` truncation rule (often broken, still wanted), the guardrail prose (pi and opencode read AGENTS.md without the hook).
-- **When macOS announces the Rosetta cutoff** → cask arch audit (activitywatch is x86_64-only; native arm64 in its 0.14 betas).
-- **When convenient** → `atuin login` (doctor flags a legacy Hub token); open asks: karabiner-elements (check `~/.config/karabiner` for live remaps), folding-at-home, google-drive, Userscripts MAS, `nix-topology` + `defaults2nix` inputs (ever used?), IINA↔VLC (IINA is the real player, unmanaged), Steam-Link/minecraft, the bare `programs.kitty.enable` beside a themed alacritty and primary Ghostty (comment why or drop it), the unmanaged strays (AlDente, iA Writer, Overcast, GlobalProtect, TinkerTool, Horse, GhostMD, Subway Builder, ZenNotes).
-- **Audit follow-ups (2026-10-13)** → Maccy trial: its login item is gone and the cask stays; try Spotlight's clipboard history (⌘Space, then ⌘4) and drop the `maccy` cask if it holds up. Tot: its dots are exported to `~/Documents/notes/tot-export.org` except dot 4 (credentials and ID numbers), which goes into 1Password by hand; then quit Tot and trash it (its entry is already gone, and `programs.mas` runs with `cleanup` off, so nothing uninstalls App Store apps). One Thing: trash the app (root-owned; `sudo mas uninstall 1604176982`). Notes by Firefox: remove it in Zen's add-ons page (`normal_installed` policies don't uninstall when dropped). Still open from the audit: Alacritty and kitty on darwin, opencode (no runs in 120 days), Ollama.app, the Shottr and Headjust login items (launched at boot, not running), Mullvad's app vs Tailscale's Mullvad exit nodes, greedy cask upgrades vs apps' own updaters, `EDITOR` (Zed vs `emacsclient`).
-- **Opportunistic** → the open review findings listed under Evidence below; pick up any that touch a file you are already editing.
+- **Lock bumps** → when nixpkgs' `dprint-plugins.dprint-plugin-markdown` reaches
+  0.21.1, drop the 0.23.3 pin in `config/dprint-plugins.nix` (watchlist above).
+  Otherwise nothing pending.
+  (kagi.nix was deleted in commit 3 on 2026-09-03; it lives in git history,
+  and `programs.mcp` would be the way back.)
+- **Winter break** → probable-tier cuts:
+  (`ruff.nix` left this list 2026-09-07: it became `python.nix`,
+  the nix-owned ruff/ty floor — see CLAUDE.md "Global floor vs project tier")
+  helix (+ its theme TOMLs), `vesktop.nix` (+ audacity/pear-desktop; chatterino2
+  stays — used sometimes, per user 2026-09-03), dix + `just diff`, the font
+  hoard (keep Sarasa + symbols/emoji), stale casks (daisydisk, pearcleaner,
+  netnewswire, element, sf-symbols, zoom, one of xcodes-app/xcodes, KakaoTalk,
+  RapidClick), rarely-used packages (yazi, mcrcon, nix-init, pandoc, tldr, witr,
+  lazygit, htop).
+  Then the no-rename structure wins:
+  split the 200-line `shared/home/default.nix`,
+  merge darwin git/zsh/topgrade into shared via `isDarwin`,
+  colocate `config/` assets with their modules, devShell → `shell.nix`.
+- **When the agent harnesses are reviewed** → keep or cut pi, omp and opencode
+  (Hermes was dropped on 2026-10-22, never used;
+  its input and package are in `7ee3846`
+  (`flake.nix`, `packages.nix`),
+  the API-key wiring is in `~/Documents/notes/agent-harnesses.org`,
+  and upstream now ships a home-manager module).
+  Since 2026-10-07 Max includes $200 a month of Claude API credits in the linked
+  Console org (the API and the Agent SDK only, not Claude Code sessions or extra
+  usage), so third-party harnesses have a sanctioned Anthropic path: pi and omp
+  run on them since 2026-10-09 (`anthropic-api-key.nix`), and pi's
+  `claude-bridge/*` models still draw plan limits. opencode is not wired to the
+  key. omp is on trial on the Mac since 2026-09-23 (`omp.nix`, ~1.1 GiB).
+  Research: `~/Documents/notes/agent-harnesses.org`.
+  Retiring them all means pi.nix, omp.nix, opencode.nix, `pi-resources/`,
+  the mattpocock-skills input, pilish in Emacs,
+  Zed's opencode/copilot agent servers
+  (plus github-copilot-cli and amp-acp, added in Zed's UI and never declared;
+  Zed's own agent defaults also point at zed.dev/copilot/google models), `~/.pi`
+  (516 MB), `~/.omp`, and amp's unmanaged `~/.amp` and `~/.local/bin/amp`.
+- **Only if the itch survives the structure wins** → the full `features/` layout
+  rename (the `feature-colocation` branch + `stash@{0}` are the blueprint: flat
+  `features/<name>/{default,home,darwin,nixos}.nix` + explicit `profiles/`;
+  re-derive with `git mv`, never merge the branch; delete both afterwards).
+- **When the next assignment write-up hurts** → the remaining Emacs salvage
+  items from `emacs-overhaul-1f5cf88.patch` (org QoL block first; then LSP
+  extras, cape/consult-dir, jinx — nix side is ready: enchant AppleSpell +
+  aspell en/it).
+- **When a month passes with no daemon run** → the auto-rebuild wake gap
+  (the Mac sleeps through 06:30;
+  launchd runs a missed calendar job on the next wake, but not after a shutdown;
+  StartInterval fallback or accept-and-document).
+- **Next daemon run** → read `/var/log/auto-rebuild.log`.
+  Until 2026-09-23 every run died at `user defaults`:
+  Safari's and Mail's preferences live in their sandbox containers,
+  which need Full Disk Access, and a root launchd job has none.
+  By then `/etc`, and with it the per-user packages,
+  had already switched to `main`, while home-manager,
+  the launchd agents and `/run/current-system` had not.
+  Generation 332 did that on 2026-09-23, and 326 and 330 fit the same pattern;
+  it is what put atuin 18.19 back over a database already migrated by 18.21.
+  The two domains now warn instead (`settings.nix`).
+  The 2026-09-24 run then got as far as `brew bundle`,
+  where WeChat's greedy upgrade needed sudo
+  (`chgrp` on its bundle),
+  which nothing unattended can answer: brew reverted it,
+  activation stopped before home-manager again,
+  and the revert's leftover broke the next interactive switch
+  until brew cleaned it up.
+  Since then activation installs and removes casks without upgrading,
+  and the `nr*` aliases upgrade (`homebrew.nix`).
+  The next run should finish:
+  afterwards `readlink /run/current-system` should match the profile.
+- **When a new Claude model lands** → re-run the prompt audit
+  (`/claude-api prompt-audit`)
+  over `config/agents.md`, AGENTS.md, `.claude/`,
+  `config/skills/` and `pi-resources/`, diffing against the 2026-09-23 baseline
+  (Opus 5.5, fixes 66f02b8..cd1df0f):
+  no model-era idioms then, mostly factual drift.
+  Kept on purpose: the no-`head`/`tail` truncation rule
+  (often broken, still wanted),
+  the guardrail prose (pi and opencode read AGENTS.md without the hook).
+- **When macOS announces the Rosetta cutoff** → cask arch audit
+  (activitywatch is x86_64-only; native arm64 in its 0.14 betas).
+- **When convenient** → `atuin login`
+  (doctor flags a legacy Hub token);
+  open asks: karabiner-elements
+  (check `~/.config/karabiner` for live remaps),
+  folding-at-home, google-drive, Userscripts MAS,
+  `nix-topology` + `defaults2nix` inputs (ever used?), IINA↔VLC
+  (IINA is the real player, unmanaged),
+  Steam-Link/minecraft, the bare `programs.kitty.enable` beside a themed
+  alacritty and primary Ghostty (comment why or drop it), the unmanaged strays
+  (AlDente, iA Writer, Overcast, GlobalProtect, TinkerTool, Horse, GhostMD,
+  Subway Builder, ZenNotes).
+- **Audit follow-ups (2026-10-13)** → Maccy trial:
+  its login item is gone and the cask stays; try Spotlight's clipboard history
+  (⌘Space, then ⌘4) and drop the `maccy` cask if it holds up.
+  Tot: its dots are exported to `~/Documents/notes/tot-export.org` except dot 4
+  (credentials and ID numbers),
+  which goes into 1Password by hand; then quit Tot and trash it
+  (its entry is already gone, and `programs.mas` runs with `cleanup` off,
+  so nothing uninstalls App Store apps).
+  One Thing: trash the app (root-owned; `sudo mas uninstall 1604176982`).
+  Notes by Firefox: remove it in Zen's add-ons page
+  (`normal_installed` policies don't uninstall when dropped).
+  Still open from the audit: Alacritty and kitty on darwin, opencode
+  (no runs in 120 days),
+  Ollama.app, the Shottr and Headjust login items
+  (launched at boot, not running),
+  Mullvad's app vs Tailscale's Mullvad exit nodes,
+  greedy cask upgrades vs apps' own updaters, `EDITOR` (Zed vs `emacsclient`).
+- **Opportunistic** → the open review findings listed under Evidence below;
+  pick up any that touch a file you are already editing.
 
 ## Maintenance rhythm (~2 h/month)
 
-- Monthly: lock bump, glance at the watchlist, switch with an `nr*` alias. Since 2026-09-24 activation only installs and removes casks, and the aliases upgrade them (`brew bundle`, greedy; Microsoft's two are left to Microsoft AutoUpdate) and the App Store apps; a bare `nh darwin switch` upgrades nothing. Two things break silently: LocalHostName drift (`nh … Did you mean trfmbp?` → `sudo scutil --set LocalHostName trfmbp`) and upstream overlay/option renames (eval fails — read the error, it names the attribute).
-- Check `/var/log/auto-rebuild.log` has runs (it lived in `/tmp` until 2026-09-22, which macOS empties at boot) and that they finished: after a complete activation `readlink -f /nix/var/nix/profiles/system` equals `readlink /run/current-system`. If the trfwsl pipeline is quiet (the Auto-update watchdog workflow fails after 48 h without a `flake.lock` push), the PC is off or trfwsl's network is down (DNS failed on every run from 2026-09-16 to 09-25, and the failure mail can't send then either); `journalctl -u auto-update -o short-iso | grep '==>'` shows how far each run got.
-- A switch that changes paneru or uninstalls many apps: quit paneru first, `paneru restart` after (Steps 3 has the why).
-- Add nothing without a usage reason; the August audit showed 20%+ of the config was one-week experiments.
-- Read the `nh` diff before activating: a bump once added the 540 MiB nix 1Password GUI to the darwin closure through Zen's `nativeMessagingHosts` (home-manager started building them even with the cask); surprise ADDED lines are the tell.
-- Inputs float: no tag pins, no `follows` to old revs for back-compat. When a bump breaks something, adapt the config (or the package) to upstream; a pin is a last resort and carries a REVISIT.
+- Monthly: lock bump, glance at the watchlist, switch with an `nr*` alias.
+  Since 2026-09-24 activation only installs and removes casks,
+  and the aliases upgrade them
+  (`brew bundle`, greedy; Microsoft's two are left to Microsoft AutoUpdate)
+  and the App Store apps; a bare `nh darwin switch` upgrades nothing.
+  Two things break silently: LocalHostName drift
+  (`nh … Did you mean trfmbp?` → `sudo scutil --set LocalHostName trfmbp`)
+  and upstream overlay/option renames
+  (eval fails — read the error, it names the attribute).
+- Check `/var/log/auto-rebuild.log` has runs
+  (it lived in `/tmp` until 2026-09-22, which macOS empties at boot)
+  and that they finished:
+  after a complete activation `readlink -f /nix/var/nix/profiles/system` equals
+  `readlink /run/current-system`.
+  If the trfwsl pipeline is quiet
+  (the Auto-update watchdog workflow fails after 48 h without a `flake.lock`
+  push), the PC is off or trfwsl's network is down (DNS failed on every run from
+  2026-09-16 to 09-25, and the failure mail can't send then either);
+  `journalctl -u auto-update -o short-iso | grep '==>'` shows how far each run
+  got.
+- A switch that changes paneru or uninstalls many apps: quit paneru first,
+  `paneru restart` after (Steps 3 has the why).
+- Add nothing without a usage reason;
+  the August audit showed 20%+ of the config was one-week experiments.
+- Read the `nh` diff before activating:
+  a bump once added the 540 MiB nix 1Password GUI to the darwin closure through
+  Zen's `nativeMessagingHosts` (home-manager started building them even with the
+  cask); surprise ADDED lines are the tell.
+- Inputs float: no tag pins, no `follows` to old revs for back-compat.
+  When a bump breaks something, adapt the config
+  (or the package) to upstream; a pin is a last resort and carries a REVISIT.
 
 ## Homelab
 
 ### Phase 1 — NixOS-WSL (`trfwsl`) — remaining
 
-- [ ] Post-boot Tailscale race: tailscaled stayed dead after boot until `sudo tailscale down && sudo tailscale up` (a 28-day outage ended 2026-09-26). Mullvad was the likely cause, and the homelab (with Mullvad) is off on trfwsl since 2026-10-01: after the next reboot, confirm Tailscale comes up on its own. The cause is unproven (not `After=` ordering: systemd waits for `ExecStartPost` too); if it recurs, read `journalctl -b -u tailscaled -u mullvad-daemon` first. If it comes back on trflab with Mullvad, the cheap fixes sit in `vpn.nix`: a tailscaled `ExecStartPost` (or a oneshot like `tailscale-route-fix`) that waits for Mullvad's `Connected` and then cycles `tailscale down && tailscale up`
-- [ ] `.wslconfig` for mirrored networking (it only sets `vmIdleTimeout=-1`; optional while Tailscale covers access)
-- [x] Windows scheduled task to auto-start WSL: `Start-NixOS-WSL` (boot trigger, highest privileges)
-- [x] Tailscale on eduroam: no direct path, falls back to DERP over 443 (checked 2026-09-27)
+- [ ] Post-boot Tailscale race:
+      tailscaled stayed dead after boot
+      until `sudo tailscale down && sudo tailscale up`
+      (a 28-day outage ended 2026-09-26).
+      Mullvad was the likely cause, and the homelab
+      (with Mullvad)
+      is off on trfwsl since 2026-10-01: after the next reboot,
+      confirm Tailscale comes up on its own.
+      The cause is unproven (not `After=` ordering:
+      systemd waits for `ExecStartPost` too); if it recurs,
+      read `journalctl -b -u tailscaled -u mullvad-daemon` first.
+      If it comes back on trflab with Mullvad, the cheap fixes sit in `vpn.nix`:
+      a tailscaled `ExecStartPost`
+      (or a oneshot like `tailscale-route-fix`)
+      that waits for Mullvad's `Connected`
+      and then cycles `tailscale down && tailscale up`
+- [ ] `.wslconfig` for mirrored networking
+      (it only sets `vmIdleTimeout=-1`; optional while Tailscale covers access)
+- [x] Windows scheduled task to auto-start WSL: `Start-NixOS-WSL`
+      (boot trigger, highest privileges)
+- [x] Tailscale on eduroam: no direct path, falls back to DERP over 443
+      (checked 2026-09-27)
 - [x] Out-of-band path to trfwsl through the Windows host (2026-10-01)
 
 ### Homelab apps
 
-The live apps run on the Windows PC until trflab; its state and Windows-side work are in the user's private notes.
+The live apps run on the Windows PC until trflab;
+its state and Windows-side work are in the user's private notes.
 
-- [ ] Recyclarr for the richest selection (user's goal): `homelab/recyclarr.nix` still uses `include: template:`, and recyclarr is now v8.7.2; research v8's config and guide pinning, then convert. Run it against the Windows Sonarr/Radarr so the same config carries to trflab
-- [ ] Remote access, designed once for trflab: Tautulli outside the tailnet, Cloudflare tunnels for Spliit and others (the `cloudflared` homelab module exists)
+- [ ] Recyclarr for the richest selection
+      (user's goal):
+      `homelab/recyclarr.nix` still uses `include: template:`,
+      and recyclarr is now v8.7.2; research v8's config and guide pinning,
+      then convert.
+      Run it against the Windows Sonarr/Radarr
+      so the same config carries to trflab
+- [ ] Remote access, designed once for trflab: Tautulli outside the tailnet,
+      Cloudflare tunnels for Spliit and others
+      (the `cloudflared` homelab module exists)
 
 ### Phase 2 — Dedicated NixOS server (`trflab`)
 
-Decided 2026-09-26; the plan doc (prices, migration runbook) is linked from the user's private notes. Memtest the reused DDR4 overnight before committing.
+Decided 2026-09-26; the plan doc
+(prices, migration runbook) is linked from the user's private notes.
+Memtest the reused DDR4 overnight before committing.
 
-- **Hardware:** i5-12400 (Quick Sync handles Plex transcode) on an ASRock B760M Pro-A D4 in the Fractal Focus G Mini, with a 512 GB NVMe boot drive. Reuses the Noctua NH-U9S (LGA 1700 kit), the 2×8 GB DDR4, the EVGA 550 G2 and the GTX 1070 for light ollama, which needs the `legacy_580` driver (`config.boot.kernelPackages.nvidiaPackages.legacy_580`) with `hardware.nvidia.open = false` (CUDA 13 and PyTorch 2.15 drop Pascal).
-- **Storage:** direct-attached, no NAS. mergerfs + SnapRAID with one parity disk over ext4 data disks (`services.snapraid`); app state stays on the NVMe. The first purchase is 2 × 14 TB; a drive bigger than the parity becomes the new parity. Media moves off the DrivePool drives by rsync (file-level NTFS pooling, so each drive reads on its own). Growth is capped by cost, not need (media is kept as an archive), so layouts compare on cost per added TB.
-- [ ] Add `trflab` host to the flake (swap the WSL module for hardware config; reuse the homelab modules, starting from trfwsl's last declaration in `git show 76e9d16:hosts/trfwsl/default.nix`; swap NTFS mount paths for the mergerfs pool's paths in `configRoot`/`mediaRoot`)
-- [ ] Headless NVIDIA for the 1070 (`legacy_580`, `hardware.nvidia.open = false`); auto-rebuild via systemd timer
-- [ ] Storage: mergerfs + SnapRAID (`services.snapraid`) over ext4 data disks with one parity disk; mount the old DrivePool drives (file-level NTFS pooling, files under hidden `PoolPart.*`) individually and rsync media in; dedupe if duplication was on; verify checksums; then reuse the old drives as data disks or backup targets
-- [ ] Migrate services (trfwsl's copies never held data and are off since 2026-10-01; the data lives in the Windows-native apps): stateless (recyclarr, openbooks, VPN, tunnel, tailscale) just rebuild; SQLite services (*arr, sabnzbd, qbittorrent, plex, jellyfin, seerr, tautulli, calibre, bookshelf, minecraft) stop → rsync `/var/lib/homelab/<svc>` → start; Postgres (immich, spliit) pg_dump/restore — re-run Immich ML jobs rather than migrating pgvecto.rs embeddings; re-point the Cloudflare tunnel; Plex starts as a fresh server with "Sync My Watch State and Ratings" (decided 2026-09-26)
-- [ ] Consider a backup job now (restic/borgmatic) — doubles as a migration dry-run
+- **Hardware:** i5-12400 (Quick Sync handles Plex transcode) on an ASRock B760M
+  Pro-A D4 in the Fractal Focus G Mini, with a 512 GB NVMe boot drive.
+  Reuses the Noctua NH-U9S
+  (LGA 1700 kit),
+  the 2×8 GB DDR4, the EVGA 550 G2 and the GTX 1070 for light ollama,
+  which needs the `legacy_580` driver
+  (`config.boot.kernelPackages.nvidiaPackages.legacy_580`) with
+  `hardware.nvidia.open = false` (CUDA 13 and PyTorch 2.15 drop Pascal).
+- **Storage:** direct-attached,
+  no NAS. mergerfs + SnapRAID with one parity disk over ext4 data disks
+  (`services.snapraid`); app state stays on the NVMe.
+  The first purchase is 2 × 14 TB;
+  a drive bigger than the parity becomes the new parity.
+  Media moves off the DrivePool drives by rsync
+  (file-level NTFS pooling, so each drive reads on its own).
+  Growth is capped by cost, not need
+  (media is kept as an archive), so layouts compare on cost per added TB.
+- [ ] Add `trflab` host to the flake
+      (swap the WSL module for hardware config; reuse the homelab modules,
+      starting from trfwsl's last declaration in
+      `git show 76e9d16:hosts/trfwsl/default.nix`; swap NTFS mount paths for the
+      mergerfs pool's paths in `configRoot`/`mediaRoot`)
+- [ ] Headless NVIDIA for the 1070
+      (`legacy_580`, `hardware.nvidia.open = false`);
+      auto-rebuild via systemd timer
+- [ ] Storage: mergerfs + SnapRAID (`services.snapraid`) over ext4 data disks
+      with one parity disk; mount the old DrivePool drives (file-level NTFS
+      pooling, files under hidden `PoolPart.*`) individually and rsync media in;
+      dedupe if duplication was on; verify checksums; then reuse the old drives
+      as data disks or backup targets
+- [ ] Migrate services (trfwsl's copies never held data and are off since
+      2026-10-01; the data lives in the Windows-native apps): stateless
+      (recyclarr, openbooks, VPN, tunnel, tailscale) just rebuild; SQLite
+      services (*arr, sabnzbd, qbittorrent, plex, jellyfin, seerr, tautulli,
+      calibre, bookshelf, minecraft) stop → rsync `/var/lib/homelab/<svc>` →
+      start; Postgres (immich, spliit) pg_dump/restore — re-run Immich ML jobs
+      rather than migrating pgvecto.rs embeddings; re-point the Cloudflare
+      tunnel; Plex starts as a fresh server with "Sync My Watch State and
+      Ratings" (decided 2026-09-26)
+- [ ] Consider a backup job now (restic/borgmatic) —
+      doubles as a migration dry-run
 - [ ] Router recommendation (open in the plan doc)
 - [ ] Demote `trfwsl` to a dev environment
 
 ## Emacs & notes — what is still open
 
-Applied so far: nix-owned build (emacs-overlay, use-package as the package source), nixpkgs' Emacs 31 on both platforms since 2026-09-03, consensus cleanup 697→533 lines, org agenda in directory form with the week view as the startup surface, capture templates for the course, pdf-tools, avy, vundo, UI at the top of the frame (posframe + which-key) for laptop ergonomics. Since 2026-10-05: a launchd daemon on darwin too (the macport could not open GUI frames from launchd; the NS build can), so Emacs behaves like a menu-bar app — Hyper+E raises or opens a frame, Hyper+C opens a popup org-capture at the top of the screen (`config/karabiner.json`, a paneru float rule), Cmd-Q closes frames and leaves the daemon; olivetti centres every editing buffer with no soft wrap anywhere (`truncate-lines`, diff-hl moved to the fringe); spacious-padding back; org clock persistence and idle detection. Tested against a throwaway daemon from the built closure; not yet tested live. Quickstart: `~/Documents/notes/emacs-quickstart.org`.
+Applied so far: nix-owned build
+(emacs-overlay, use-package as the package source),
+nixpkgs' Emacs 31 on both platforms since 2026-09-03,
+consensus cleanup 697→533 lines,
+org agenda in directory form with the week view as the startup surface,
+capture templates for the course, pdf-tools, avy, vundo,
+UI at the top of the frame (posframe + which-key) for laptop ergonomics.
+Since 2026-10-05: a launchd daemon on darwin too
+(the macport could not open GUI frames from launchd; the NS build can),
+so Emacs behaves like a menu-bar app — Hyper+E raises or opens a frame,
+Hyper+C opens a popup org-capture at the top of the screen
+(`config/karabiner.json`, a paneru float rule),
+Cmd-Q closes frames and leaves the daemon;
+olivetti centres every editing buffer with no soft wrap anywhere
+(`truncate-lines`, diff-hl moved to the fringe);
+spacious-padding back; org clock persistence and idle detection.
+Tested against a throwaway daemon from the built closure; not yet tested live.
+Quickstart: `~/Documents/notes/emacs-quickstart.org`.
 
-- [ ] After the first switch with the daemon: Hyper+E/Hyper+C fire from Karabiner (its `shell_command` environment must reach the `$TMPDIR` socket), paneru floats the `org-capture` frame, and nothing tiles oddly. Quit Emacs.app before that switch, or the daemon cannot claim the server socket and launchd restarts it in a loop.
-- [ ] paneru tiles Ghostty's quick terminal (an `AXFloatingWindow` panel, which paneru counts as manageable) after a paneru restart, so it fights Ghostty's own placement; seen 2026-10-05 and 2026-10-06 on paneru b1b6abb. Not only at startup: on 10-06 the panel was absent from `paneru query state` after the restart and tiled once shown, because paneru now auto-manages any stray window of a known app (<https://github.com/karinushka/paneru/issues/359>). No rule can match it (title is the cwd; rules and Lua events see no subrole). Workaround: focus it, `window_manage` (Ctrl+Alt+Shift+F). Unblocked upstream: cbeff33 (2026-10-05, closing #409) adds `role`/`subrole` matchers to `[windows]` rules and to `paneru query state`; the 2026-10-12 lock bump brought it (a3cdcdc), and `paneru.nix` now floats `ghostty-quick-terminal` by subrole. After the next switch, confirm with `paneru query state` that only the panel reports `AXFloatingWindow`, then close this. Never pin paneru below cbeff33 with that rule in place: older paneru ignores unknown rule keys, so it would float every Ghostty window.
-- [ ] A Dock/Spotlight launch of Emacs.app while the daemon runs starts a second, separate Emacs. If that bites, a small client app (`emacsclient -n -c` behind an app bundle) can replace the Dock entry.
-- [ ] paneru moves focus to another app when an Emacs child frame hides (corfu popup, vertico-posframe): `window_destroyed_trigger` in `src/ecs/triggers.rs` calls `give_away_focus` for every tracked window that disappears, focused or not, and floating windows count. Caught 2026-10-12 on a3cdcdc: Emacs lost app focus to Zen 84 ms after corfu hid its frame, with no input in between. Prose no longer triggers it: init.el now turns off `text-mode-ispell-word-completion`, which made corfu pop up over nearly every word. Corfu in code buffers and the posframe minibuffer still can. Unfixed on upstream `main` as of 8a21331. Next: file upstream (suggested fix: give focus away only when the destroyed window held `FocusedMarker`, or never for floating windows); no rule can exclude a window from tracking.
-- [ ] Mobile capture (later): an iOS Shortcut "Append to Text File" onto `~/Documents/notes/inbox.org` (iCloud Drive's Documents, so no extra app) from the Lock Screen or Action button; turn on `global-auto-revert-mode` for the notes first. Browser org-protocol is optional since copy-URL + Hyper+C covers it; if wanted, macOS needs a URL handler app such as Scrim (<https://github.com/kickingvegas/scrim>, Mac App Store, Emacs 29.4+ with a TCP server socket).
-- [ ] `~/Documents/notes/emacs-migration.org` (2026-05-31) is mostly superseded by this section (daemon and macport decisions reversed, its Block C duplicated above): trim it to the reasoning found nowhere else, or delete it — the user's call.
-- [ ] Notes repo: `~/Documents/notes` is the canonical location on both platforms but its git dir (`~/.local/share/notes-git`) has **zero commits** — make the initial commit, then rename the GitHub `Obsidian` repo → `notes`, collapse `modules/shared/home/{obsidian,notes}.nix` into one `notes.nix` that clones it with platform-conditional `--separate-git-dir`, drop `$OBSD`, keep `$NOTES`, move the vault content in, repoint the Obsidian app
-- [ ] `tf/convert-note-to-org` (pandoc gfm→org on touch) for legacy markdown under `$NOTES`
-- Denote: trial lapsed; one org file per course this semester. Revisit at semester end (denote → org-roam later only if denote feels wrong).
-- Asks left in `init.el`: the T-SQL/sql-indent/sqlformat trio (work SQL files touched this summer — cut if that project is done) and haskell-mode (oreo).
+- [ ] After the first switch with the daemon:
+      Hyper+E/Hyper+C fire from Karabiner
+      (its `shell_command` environment must reach the `$TMPDIR` socket),
+      paneru floats the `org-capture` frame, and nothing tiles oddly.
+      Quit Emacs.app before that switch,
+      or the daemon cannot claim the server socket
+      and launchd restarts it in a loop.
+- [ ] paneru tiles Ghostty's quick terminal
+      (an `AXFloatingWindow` panel, which paneru counts as manageable)
+      after a paneru restart, so it fights Ghostty's own placement;
+      seen 2026-10-05 and 2026-10-06 on paneru b1b6abb.
+      Not only at startup: on 10-06 the panel was absent from
+      `paneru query state` after the restart and tiled once shown, because
+      paneru now auto-manages any stray window of a known app
+      (<https://github.com/karinushka/paneru/issues/359>).
+      No rule can match it (title is the cwd;
+      rules and Lua events see no subrole).
+      Workaround: focus it, `window_manage` (Ctrl+Alt+Shift+F).
+      Unblocked upstream: cbeff33
+      (2026-10-05, closing #409)
+      adds `role`/`subrole` matchers to `[windows]` rules
+      and to `paneru query state`;
+      the 2026-10-12 lock bump brought it (a3cdcdc),
+      and `paneru.nix` now floats `ghostty-quick-terminal` by subrole.
+      After the next switch,
+      confirm with `paneru query state`
+      that only the panel reports `AXFloatingWindow`, then close this.
+      Never pin paneru below cbeff33 with that rule in place:
+      older paneru ignores unknown rule keys,
+      so it would float every Ghostty window.
+- [ ] A Dock/Spotlight launch of Emacs.app
+      while the daemon runs starts a second, separate Emacs.
+      If that bites, a small client app
+      (`emacsclient -n -c` behind an app bundle) can replace the Dock entry.
+- [ ] paneru moves focus to another app when an Emacs child frame hides
+      (corfu popup, vertico-posframe):
+      `window_destroyed_trigger` in `src/ecs/triggers.rs` calls
+      `give_away_focus` for every tracked window that disappears, focused or
+      not, and floating windows count.
+      Caught 2026-10-12 on a3cdcdc:
+      Emacs lost app focus to Zen 84 ms after corfu hid its frame,
+      with no input in between.
+      Prose no longer triggers it:
+      init.el now turns off `text-mode-ispell-word-completion`,
+      which made corfu pop up over nearly every word.
+      Corfu in code buffers and the posframe minibuffer still can.
+      Unfixed on upstream `main` as of 8a21331.
+      Next: file upstream (suggested fix:
+      give focus away only when the destroyed window held `FocusedMarker`,
+      or never for floating windows);
+      no rule can exclude a window from tracking.
+- [ ] Mobile capture (later):
+      an iOS Shortcut "Append to Text File" onto `~/Documents/notes/inbox.org`
+      (iCloud Drive's Documents, so no extra app)
+      from the Lock Screen or Action button;
+      turn on `global-auto-revert-mode` for the notes first.
+      Browser org-protocol is optional since copy-URL + Hyper+C covers it;
+      if wanted, macOS needs a URL handler app such as Scrim
+      (<https://github.com/kickingvegas/scrim>, Mac App Store,
+      Emacs 29.4+ with a TCP server socket).
+- [ ] `~/Documents/notes/emacs-migration.org` (2026-05-31) is mostly superseded
+      by this section (daemon and macport decisions reversed, its Block C
+      duplicated above): trim it to the reasoning found nowhere else, or delete
+      it — the user's call.
+- [ ] Notes repo: `~/Documents/notes` is the canonical location on both
+      platforms but its git dir (`~/.local/share/notes-git`) has
+      **zero commits** — make the initial commit, then rename the GitHub
+      `Obsidian` repo → `notes`, collapse
+      `modules/shared/home/{obsidian,notes}.nix` into one `notes.nix` that
+      clones it with platform-conditional `--separate-git-dir`, drop `$OBSD`,
+      keep `$NOTES`, move the vault content in, repoint the Obsidian app
+- [ ] `tf/convert-note-to-org`
+      (pandoc gfm→org on touch) for legacy markdown under `$NOTES`
+- Denote: trial lapsed; one org file per course this semester.
+  Revisit at semester end (denote → org-roam later only if denote feels wrong).
+- Asks left in `init.el`: the T-SQL/sql-indent/sqlformat trio
+  (work SQL files touched this summer — cut if that project is done)
+  and haskell-mode (oreo).
 
 ## Unmanaged (macOS)
 
-Installed outside nix and used (inventory 2026-10-02): Overcast (an iPad app from the App Store; `mas` can't see iOS apps, so `programs.mas` can't declare it), GlobalProtect (Georgia Tech VPN), TinkerTool + BresinkSoftwareUpdater (no cask; kept for spotting new macOS settings), Subway Builder (paid, no cask), Tern (Stencil's terminal, closed beta), Xcode (via `xcodes`). IINA and Pear Desktop are nix-installed (`modules/darwin/home/default.nix`; `pear-desktop` in `shared/home/desktop.nix` still builds as `YouTube Music.app`). Login items are set in System Settings, not nix (System Events' list, 2026-10-13): Ghostty, BatFi, Stats, Mullvad, Google Drive, ActivityWatch, LookAway, Shottr, Pika, KeyClu, Macs Fan Control, LinearMouse, Hand Mirror, Handy, and Tot until it goes. Post-bootstrap manual steps: `xcodes install --latest`, Apple ID, 1Password, iCloud.
+Installed outside nix and used (inventory 2026-10-02): Overcast
+(an iPad app from the App Store; `mas` can't see iOS apps,
+so `programs.mas` can't declare it), GlobalProtect
+(Georgia Tech VPN),
+TinkerTool + BresinkSoftwareUpdater
+(no cask; kept for spotting new macOS settings),
+Subway Builder (paid, no cask), Tern (Stencil's terminal, closed beta), Xcode
+(via `xcodes`).
+IINA and Pear Desktop are nix-installed
+(`modules/darwin/home/default.nix`;
+`pear-desktop` in `shared/home/desktop.nix` still builds
+as `YouTube Music.app`).
+Login items are set in System Settings, not nix
+(System Events' list, 2026-10-13):
+Ghostty, BatFi, Stats, Mullvad, Google Drive, ActivityWatch, LookAway, Shottr,
+Pika, KeyClu, Macs Fan Control, LinearMouse, Hand Mirror, Handy,
+and Tot until it goes.
+Post-bootstrap manual steps: `xcodes install --latest`, Apple ID, 1Password,
+iCloud.
 
 ## Evidence and decisions of record (folded from the audit docs, 2026-09-01)
 
-Everything below is decision support, not a plan: the numbers behind the cuts, the upstream facts the deferred items rest on, and the decisions already taken. Dates are when each was verified.
+Everything below is decision support, not a plan: the numbers behind the cuts,
+the upstream facts the deferred items rest on, and the decisions already taken.
+Dates are when each was verified.
 
 ### Open review findings (June 2026, re-checked 2026-09-01)
 
-Source: the June 2026 wide review (2026-06-10; 103 findings, 101 confirmed; the standalone doc was folded here and deleted). Listed: only unchecked findings whose defect still exists in the working tree on 2026-09-01 (verified by grep, not the June line numbers). Everything touching the Firefox/Natsumi stream, the dead overlays and inputs, kagi.nix, and the aerospace/sketchybar stubs dies with the prep checklist and is not repeated. `cN` = commit N in the commit map.
+Source: the June 2026 wide review
+(2026-06-10; 103 findings, 101 confirmed;
+the standalone doc was folded here and deleted).
+Listed: only unchecked findings whose defect still exists in the working tree on
+2026-09-01 (verified by grep, not the June line numbers).
+Everything touching the Firefox/Natsumi stream, the dead overlays and inputs,
+kagi.nix, and the aerospace/sketchybar stubs dies with the prep checklist
+and is not repeated.
+`cN` = commit N in the commit map.
 
 #### Later — no commit-map file, or waits on a Deferred trigger
 
-- `modules/nixos/system/desktop.nix:117-120` — the four per-service `howdy.enable = true` are no-ops: `services.howdy.enable` already injects howdy (control=sufficient) into every PAM service → delete them, or `security.pam.howdy.enable = false` + keep the four if scoping was the intent.
-- `modules/shared/home/obsidian.nix:28` + `notes.nix:18` — activation mutations unguarded on dry-run (a real network clone; `mkdir` + `git init`), `export GIT_SSH_COMMAND` leaks into later blocks, trfnix retries a doomed key-less clone on every 06:30 autoUpgrade → `run` + `ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new`, local var; `desktop.nix:19` bare `pkgs.obsidian` → `programs.obsidian.enable` + `cli.enable = true` (skip vaults/defaultSettings). Do it inside the notes.nix collapse. `$OBSD` still lives in: config/agents.md:68, pi-resources/README.md:21, pi-resources/skills/obsidian-vault/SKILL.md, obsidian.nix:20.
-- Homelab `prowlarr.nix`, `qbittorrent.nix`, `openbooks.nix` are wired but enabled on no host (prowlarr looks like an omission given "full *arr stack") → per service: enable on trfwsl, delete, or keep as trflab pre-wiring; if qbittorrent ever joins sabnzbd, move its webui off 8080.
-- `programs.claude-code` `settings = lib.importJSON ../../../config/claude-settings.json; context = ../../../config/agents.md;` replaces `default.nix:127-128` — rides with the Deferred `programs.claude-code` adoption, not before.
-- 2 low-severity one-liners survive: `settings.nix:152` the digital-clock keys are no-ops under `IsAnalog = true` and `ShowAMPM` contradicts 24-hour; `homelab/bookshelf.nix:17` `port` only opens the firewall (the container always listens on 8787). Fixed 2026-10-22: Starship `orange`, Ghostty `bold-color`, the darwin `shell` no-op, native zsh autosuggestion/fast-syntax-highlighting, `programs.npm`, the Linux-only 1Password browser list on darwin, spliit `enableTCPIP`, the two `config/` orphans; `oprunenv` stands (op 2.41 has `--environment`). Casks with an aarch64-darwin nixpkgs build at or near the cask version (2026-10-22): maccy, linearmouse, daisydisk, syntax-highlight, xcodes-app, ghostty-bin, zoom-us (equal); zotero, stats, element, signal, zed, ollama (trailing a patch or minor).
+- `modules/nixos/system/desktop.nix:117-120` —
+  the four per-service `howdy.enable = true` are no-ops:
+  `services.howdy.enable` already injects howdy (control=sufficient) into every
+  PAM service → delete them, or `security.pam.howdy.enable = false` + keep the
+  four if scoping was the intent.
+- `modules/shared/home/obsidian.nix:28` + `notes.nix:18` —
+  activation mutations unguarded on dry-run
+  (a real network clone; `mkdir` + `git init`),
+  `export GIT_SSH_COMMAND` leaks into later blocks,
+  trfnix retries a doomed key-less clone on every 06:30 autoUpgrade → `run` +
+  `ssh -o BatchMode=yes -o StrictHostKeyChecking=accept-new`, local var;
+  `desktop.nix:19` bare `pkgs.obsidian` → `programs.obsidian.enable` +
+  `cli.enable = true` (skip vaults/defaultSettings).
+  Do it inside the notes.nix collapse.
+  `$OBSD` still lives in: config/agents.md:68, pi-resources/README.md:21,
+  pi-resources/skills/obsidian-vault/SKILL.md, obsidian.nix:20.
+- Homelab `prowlarr.nix`, `qbittorrent.nix`,
+  `openbooks.nix` are wired but enabled on no host
+  (prowlarr looks like an omission given "full *arr stack")
+  → per service: enable on trfwsl, delete, or keep as trflab pre-wiring;
+  if qbittorrent ever joins sabnzbd, move its webui off 8080.
+- `programs.claude-code`
+  `settings = lib.importJSON ../../../config/claude-settings.json; context = ../../../config/agents.md;`
+  replaces `default.nix:127-128` — rides with the Deferred
+  `programs.claude-code` adoption, not before.
+- 2 low-severity one-liners survive:
+  `settings.nix:152` the digital-clock keys are no-ops under `IsAnalog = true`
+  and `ShowAMPM` contradicts 24-hour;
+  `homelab/bookshelf.nix:17` `port` only opens the firewall
+  (the container always listens on 8787).
+  Fixed 2026-10-22: Starship `orange`, Ghostty `bold-color`,
+  the darwin `shell` no-op, native zsh autosuggestion/fast-syntax-highlighting,
+  `programs.npm`, the Linux-only 1Password browser list on darwin,
+  spliit `enableTCPIP`, the two `config/` orphans; `oprunenv` stands
+  (op 2.41 has `--environment`).
+  Casks with an aarch64-darwin nixpkgs build at
+  or near the cask version (2026-10-22): maccy, linearmouse, daisydisk,
+  syntax-highlight, xcodes-app, ghostty-bin, zoom-us (equal); zotero, stats,
+  element, signal, zed, ollama (trailing a patch or minor).
 
 ### Evidence behind the cuts (2026-08-26)
 
-Sources (mined read-only 2026-08-26): 11.5 months of ActivityWatch foreground time (AFK-filtered, ~1,699 h across 236 apps); full atuin history (6,885 commands, Dec 2025 → Aug 2026); Spotlight `mdls` last-used for every configured app. From an agent shell (the atuin and aw CLIs aren't on its PATH): copy `~/.local/share/atuin/history.db` **and** `history.db-wal` (recent history sits in the WAL until a checkpoint) and query with sqlite3 (`timestamp` is ns: `date(timestamp/1e9,'unixepoch')`); the live ActivityWatch store is `~/Library/Application Support/activitywatch/aw-server-rust/sqlite.db` (tables `buckets`/`events`, ns times, `json_extract(data,'$.app')`).
+Sources (mined read-only 2026-08-26):
+11.5 months of ActivityWatch foreground time
+(AFK-filtered, ~1,699 h across 236 apps);
+full atuin history (6,885 commands, Dec 2025 → Aug 2026);
+Spotlight `mdls` last-used for every configured app.
+From an agent shell (the atuin and aw CLIs aren't on its PATH):
+copy `~/.local/share/atuin/history.db` **and** `history.db-wal`
+(recent history sits in the WAL until a checkpoint)
+and query with sqlite3 (`timestamp` is ns: `date(timestamp/1e9,'unixepoch')`);
+the live ActivityWatch store is
+`~/Library/Application Support/activitywatch/aw-server-rust/sqlite.db` (tables
+`buckets`/`events`, ns times, `json_extract(data,'$.app')`).
 
-Blind spots: atuin cannot see agent-run shells (Claude Code / pi Bash calls) — so rg/fd/bat/jq stay despite low interactive counts (global AGENTS.md promises them to agents) — nor GUI-launched tools: streamlink showed zero but Chatterino runs it (`~/Library/Application Support/streamlink/config`, player = IINA), caught 2026-09-03 before the cut landed. Check for a config dir before cutting a CLI. `mdls` null is unreliable for pkg-installed/background apps — every "never" cut was corroborated by ActivityWatch. The AW window watcher was down June and desynced July 2026 — last-90-day figures are understated; August was fully captured and confirms the patterns. The AW "firefox" web-watcher bucket is hosted in Zen. Several menubar utilities share a 2026-08-16 login-item mass-relaunch timestamp — "active" there means "auto-starts" (fair game for a later pass).
+Blind spots: atuin cannot see agent-run shells
+(Claude Code / pi Bash calls)
+— so rg/fd/bat/jq stay despite low interactive counts
+(global AGENTS.md promises them to agents)
+— nor GUI-launched tools: streamlink showed zero but Chatterino runs it
+(`~/Library/Application Support/streamlink/config`, player = IINA),
+caught 2026-09-03 before the cut landed.
+Check for a config dir before cutting a CLI.
+`mdls` null is unreliable for pkg-installed/background apps —
+every "never" cut was corroborated by ActivityWatch.
+The AW window watcher was down June and desynced July 2026 —
+last-90-day figures are understated;
+August was fully captured and confirms the patterns.
+The AW "firefox" web-watcher bucket is hosted in Zen.
+Several menubar utilities share a 2026-08-16 login-item mass-relaunch timestamp
+— "active" there means "auto-starts" (fair game for a later pass).
 
-- Zen Twilight 1,119 h = 66% of all screen time. Every other browser combined < 22 h (Orion 3.4 h, dead since Oct 2025; Dia 0.4; Vivaldi 0.2; Arc 0.1; Firefox 0.1; Canary 0.03; STP 0.01). Helium 3.4 h but 165 recent opens (thin, but the named Chromium fallback). Safari 10.3 h, rising (4.8 h last 90 d).
-- Apps: Ghostty 156 h · VS Code 50.8 h (ended ~Feb, no cask) · Zed 48.4 h, 1,068 opens, active · Obsidian 39.5 h · Claude 13.6 h · Emacs 8.4 h · vesktop 8.2 h (0.1 h/90 d) · League 11.7 h, all pre-May · IINA 6.2 h (unmanaged) vs managed VLC 0 h.
-- CLI: zoxide 718 · nh 434 (incl. `nr*`) · topgrade 362 (hard stop 2026-05-15) · claude 295 · eza 126 · paneru 104 · opencode 55 (historic) · helix 24 (last March) · nushell 3 (all Feb) · mdbase-tasknotes 0 in 6,885 commands. ~19 nix packages + 4 HM programs are hard zeros (the packages.nix list in the prep checklist).
-- Interactive shell use collapsed ~90% after the March job start (2,119 commands/month → 43 in Aug): work moved into agent harnesses — keeps the agent stack, weakens anything that exists only for interactive use. "Stale since March" ≠ "unneeded forever": every cut is a one-line re-add (anki, pandoc may revive for OMSCS).
-- Size: modules/{shared,darwin} 4,222 → ~3,300 lines (−22%) across both tiers; certain tier alone ≈ 3,070 lines (≈ 640 hand-written once the vendored lockfile is discounted), 2 flake inputs (natsumi, fx-autoconfig), ~35 homebrew lines, one custom package with its hash-bump ritual.
+- Zen Twilight 1,119 h = 66% of all screen time.
+  Every other browser combined < 22 h
+  (Orion 3.4 h, dead since Oct 2025; Dia 0.4; Vivaldi 0.2; Arc 0.1; Firefox 0.1;
+  Canary 0.03; STP 0.01).
+  Helium 3.4 h but 165 recent opens (thin, but the named Chromium fallback).
+  Safari 10.3 h, rising (4.8 h last 90 d).
+- Apps: Ghostty 156 h · VS Code 50.8 h
+  (ended ~Feb, no cask)
+  · Zed 48.4 h, 1,068 opens,
+  active · Obsidian 39.5 h · Claude 13.6 h · Emacs 8.4 h · vesktop 8.2 h
+  (0.1 h/90 d)
+  · League 11.7 h, all pre-May · IINA 6.2 h (unmanaged) vs managed VLC 0 h.
+- CLI: zoxide 718 · nh 434 (incl.
+  `nr*`) · topgrade 362 (hard stop 2026-05-15) · claude 295 · eza 126 · paneru
+  104 · opencode 55 (historic) · helix 24 (last March) · nushell 3 (all Feb) ·
+  mdbase-tasknotes 0 in 6,885 commands.
+  ~19 nix packages + 4 HM programs are hard zeros
+  (the packages.nix list in the prep checklist).
+- Interactive shell use collapsed ~90% after the March job start
+  (2,119 commands/month → 43 in Aug):
+  work moved into agent harnesses — keeps the agent stack,
+  weakens anything that exists only for interactive use.
+  "Stale since March" ≠ "unneeded forever": every cut is a one-line re-add
+  (anki, pandoc may revive for OMSCS).
+- Size: modules/{shared,darwin} 4,222 → ~3,300 lines (−22%) across both tiers;
+  certain tier alone ≈ 3,070 lines
+  (≈ 640 hand-written once the vendored lockfile is discounted),
+  2 flake inputs (natsumi, fx-autoconfig), ~35 homebrew lines,
+  one custom package with its hash-bump ritual.
 
-Keep-core (data-supported): Zen (+zen.nix, browser-policies) · Helium · base OS browser · Ghostty · 1Password (cask+CLI+SSH+signing) · Zed · Emacs (OMSCS driver) · agent stack (claude, pi, kagi/dprint/xdg modules, mattpocock-skills, gh) · paneru + darwin system base · shell core (zsh/starship/atuin/zoxide/eza/fzf/direnv/nix-index) · git/jj/delta/mergiraf · rg/fd/bat/jq · nh/just/nixd/nixfmt/shellcheck/shfmt/markdownlint-cli2 · tmux · btop/fastfetch · fonts.nix + Atkinson · Obsidian + Tot/One Thing/Velja (827 opens) · mullvad/tailscale/rustdesk/sops/homelab · active menubar utilities (lookaway 310 opens, shottr, maccy, stats, batfi, betterdisplay, thaw, keepingyouawake, keyclu, linearmouse, macs-fan-control) · plex/steam/zotero/picard/flighty/hand-mirror/pika/tabtab · Office+MAU (0.9 h/90 d, real work use). Safari's 1Password + Dark Reader MAS extensions stay (extension hosts legitimately show mdls-null).
+Keep-core (data-supported): Zen
+(+zen.nix, browser-policies)
+· Helium · base OS browser · Ghostty · 1Password (cask+CLI+SSH+signing) · Zed ·
+Emacs (OMSCS driver) · agent stack (claude, pi, kagi/dprint/xdg modules,
+mattpocock-skills, gh) · paneru + darwin system base · shell core
+(zsh/starship/atuin/zoxide/eza/fzf/direnv/nix-index) · git/jj/delta/mergiraf ·
+rg/fd/bat/jq · nh/just/nixd/nixfmt/shellcheck/shfmt/markdownlint-cli2 · tmux ·
+btop/fastfetch · fonts.nix + Atkinson · Obsidian + Tot/One Thing/Velja (827
+opens) · mullvad/tailscale/rustdesk/sops/homelab · active menubar utilities
+(lookaway 310 opens, shottr, maccy, stats, batfi, betterdisplay, thaw,
+keepingyouawake, keyclu, linearmouse, macs-fan-control) ·
+plex/steam/zotero/picard/flighty/hand-mirror/pika/tabtab · Office+MAU (0.9 h/90
+d, real work use).
+Safari's 1Password + Dark Reader MAS extensions stay
+(extension hosts legitimately show mdls-null).
 
-Unmanaged-but-used inversions: IINA is the real video player while the managed VLC cask sat unused (VLC cut; IINA↔VLC swap is the open ask). Steam-Link MAS never opened, yet steamstreamingclient logged 3.5 h (in-home streaming from the gaming PC?). VS Code 50.8 h with no cask. The remaining used strays are the Unmanaged list.
+Unmanaged-but-used inversions:
+IINA is the real video player while the managed VLC cask sat unused
+(VLC cut; IINA↔VLC swap is the open ask).
+Steam-Link MAS never opened, yet steamstreamingclient logged 3.5 h
+(in-home streaming from the gaming PC?).
+VS Code 50.8 h with no cask.
+The remaining used strays are the Unmanaged list.
 
 ### Upstream state (verified 2026-08-26)
 
-- **paneru** — healthy: v0.4.4 (2026-07-26), Tahoe fixed, 10+ contributors, only contender with a first-party nix-darwin module; +192 stars in 18 d vs Rift +38. Watch acsandmann/rift (same niche; no flake/module; nixpkgs `rift-wm` stale at 0.4.3). The Lua/mlua rework on `main`/`testing` (breaking `bind` API, lua feature default-on 2026-08-25, needs pkgconf+luajit — issue #361) breaks the local buildRustPackage override → pin the input to the `v0.4.4` tag until the next tag, or add pkg-config+luajit to the override. Locked rev is post-v0.4.3.
-- **nixpi** (mateusdcc/nixpi, created 2026-08-17) — complement, not substitute for llm-agents.nix: unlicensed, no releases, unbuildable by others (lock pins a local path), wraps nixpkgs `pi-coding-agent`, packages neither pi nor the npm extensions pi.nix manages. Revisit as adopt-alongside (`programs.pi.package = pkgs.llm-agents.pi`) only if it gains a license/releases/external users.
-- **llm-agents.nix** — keep: same-day pi/claude-code builds, no official Anthropic flake. `overlays.default` deleted upstream 2026-07-12 (→ `overlays.shared-nixpkgs`). The overlay only ever added the `llm-agents` scope, so bare `pkgs.claude-code` has always been nixpkgs-sourced (2.1.177 locked vs npm 2.1.246). Superseded 2026-09-03: input dropped, nixpkgs + home-manager modules (see the inputs audit).
-- **natsumi-browser** — sole maintainer absent ~21 months from 2026-08 (issue #343); v6.12.1 pre-baked through FF 156 (runway ≈ Nov 2026). Moot after the revert.
-- **noctalia** — v5 stable unshipped (beta.9, 2026-08-20; cadence slowing); repo → `noctalia-dev/noctalia`. Of the four documented v4→v5 regressions: tailscale plugin fixed (community-plugins 2026-08-09, second tailnet plugin 08-16), vesktop covered by the community discord template, mono font + per-urgency durations still open. beta.9 drops plugins whose manifests lack a semver `version`.
-- **niri-flake** — dropped 2026-09-03 (was frozen: bot-only commits since ~Feb 2026, its own lock-bump PR unmerged since 2026-08-06, build-fix PR #1853 open; pinned niri-stable v25.08 vs nixpkgs 26.04). Replaced by nixpkgs `programs.niri` + home-manager `wayland.windowManager.niri` (generic KDL settings) + our own `polkit-agent` user unit; niri.cachix.org substituter removed. niri repo → `niri-wm/niri`.
-- **Lix** — healthy (2.95.4; nixpkgs first-class, 2.96.0-pre packaged). #1101 (macOS shells failing non-deterministically) is still open on milestone 2.97, but nixpkgs runs the darwin install checks with `OBJC_DISABLE_INITIALIZE_FORK_SAFETY` and Hydra caches the result, so the old `doInstallCheck` override went on 2026-10-22: it only forced a local build. The `NIX_LDFLAGS` fix (nixpkgs#568529) reached the lock the same week. Query via `https://git.lix.systems/api/v1/` (bypasses the Anubis bot check).
-- **nh** — 4.4.2 (2026-07-28) is latest; `--bypass-root-check` correct since 4.3.0; the #739 root-cache fix is master-only (the daemon carries `XDG_CACHE_HOME=/var/root/.cache` as the stopgap). viperML left maintainers 2026-08-18; repo is `nix-community/nh` only.
-- **dprint** — steady (0.55.2, 2026-07-14); still the polyglot umbrella, composes with Biome via the official dprint-plugin-biome adapter — the module's bet is sound.
-- **statix** — nixpkgs switched to the maintained Molybdenum fork (PR #516044, 2026-05-06); zero action. `treefmt.nix` enables it regardless of the packages.nix entry.
-- **home-manager `programs.claude-code`** — generated plugin renamed `hm` (2026-08-09): managed MCP tools become `mcp__plugin_hm_<server>__*` after the next HM bump; `programs.mcp` untouched. The lock carries it now (checked 2026-09-25), so prefix-dependent permission rules are safe; the zotero ones in `config/claude-settings.json` use it.
-- **activitywatch** — stable dmg is x86_64-only (22 months since a stable release); native arm64 in v0.14.0b4 prereleases — stable 0.14 ends the Rosetta caveat. Arch-audit method for other casks: `brew info --json=v2` arch data or `lipo -archs` on the installed app.
-- **Homelab** — Plex 2026 monetization (lifetime pass $249 → $749 on 2026-07-01, remote-play paywalls) strengthens the Jellyfin direction; treat Plex-specific investment (tautulli tooling) as short-horizon. recyclarr "maintenance mode" rumor false — only v7 templates are frozen, v8.7.1 released 2026-08-07 (confirm the config uses v8-style templates).
-- **defaults2nix / nix-topology** — single-maintainer, dormant/bursty, zero runtime blast radius; drop-or-vendor if they break (feeds the "ever used?" ask). Superseded 2026-09-03: both inputs dropped.
-- **Repo renames** (redirects hold): noctalia-dev/noctalia-shell → noctalia-dev/noctalia · YaLTeR/niri → niri-wm/niri · sst/opencode → anomalyco/opencode · koekeishiya/yabai → asmvik/yabai.
+- **paneru** — healthy: v0.4.4 (2026-07-26), Tahoe fixed, 10+ contributors,
+  only contender with a first-party nix-darwin module;
+  +192 stars in 18 d vs Rift +38.
+  Watch acsandmann/rift (same niche; no flake/module;
+  nixpkgs `rift-wm` stale at 0.4.3).
+  The Lua/mlua rework on `main`/`testing`
+  (breaking `bind` API, lua feature default-on 2026-08-25,
+  needs pkgconf+luajit — issue #361) breaks the local buildRustPackage override
+  → pin the input to the `v0.4.4` tag until the next tag, or add
+  pkg-config+luajit to the override.
+  Locked rev is post-v0.4.3.
+- **nixpi** (mateusdcc/nixpi, created 2026-08-17) — complement,
+  not substitute for llm-agents.nix: unlicensed, no releases,
+  unbuildable by others (lock pins a local path),
+  wraps nixpkgs `pi-coding-agent`,
+  packages neither pi nor the npm extensions pi.nix manages.
+  Revisit as adopt-alongside
+  (`programs.pi.package = pkgs.llm-agents.pi`)
+  only if it gains a license/releases/external users.
+- **llm-agents.nix** — keep: same-day pi/claude-code builds,
+  no official Anthropic flake.
+  `overlays.default` deleted upstream 2026-07-12 (→ `overlays.shared-nixpkgs`).
+  The overlay only ever added the `llm-agents` scope,
+  so bare `pkgs.claude-code` has always been nixpkgs-sourced
+  (2.1.177 locked vs npm 2.1.246).
+  Superseded 2026-09-03: input dropped, nixpkgs + home-manager modules
+  (see the inputs audit).
+- **natsumi-browser** — sole maintainer absent ~21 months from 2026-08
+  (issue #343); v6.12.1 pre-baked through FF 156 (runway ≈ Nov 2026).
+  Moot after the revert.
+- **noctalia** — v5 stable unshipped
+  (beta.9, 2026-08-20; cadence slowing); repo → `noctalia-dev/noctalia`.
+  Of the four documented v4→v5 regressions: tailscale plugin fixed
+  (community-plugins 2026-08-09, second tailnet plugin 08-16),
+  vesktop covered by the community discord template,
+  mono font + per-urgency durations still open. beta.9 drops plugins whose
+  manifests lack a semver `version`.
+- **niri-flake** — dropped 2026-09-03
+  (was frozen: bot-only commits since ~Feb 2026,
+  its own lock-bump PR unmerged since 2026-08-06, build-fix PR #1853 open;
+  pinned niri-stable v25.08 vs nixpkgs 26.04).
+  Replaced by nixpkgs `programs.niri` + home-manager
+  `wayland.windowManager.niri` (generic KDL settings) + our own `polkit-agent`
+  user unit; niri.cachix.org substituter removed. niri repo → `niri-wm/niri`.
+- **Lix** — healthy (2.95.4; nixpkgs first-class, 2.96.0-pre packaged). #1101
+  (macOS shells failing non-deterministically)
+  is still open on milestone 2.97,
+  but nixpkgs runs the darwin install checks with
+  `OBJC_DISABLE_INITIALIZE_FORK_SAFETY` and Hydra caches the result, so the old
+  `doInstallCheck` override went on 2026-10-22: it only forced a local build.
+  The `NIX_LDFLAGS` fix (nixpkgs#568529) reached the lock the same week.
+  Query via `https://git.lix.systems/api/v1/` (bypasses the Anubis bot check).
+- **nh** — 4.4.2 (2026-07-28) is latest;
+  `--bypass-root-check` correct since 4.3.0;
+  the #739 root-cache fix is master-only
+  (the daemon carries `XDG_CACHE_HOME=/var/root/.cache` as the stopgap).
+  viperML left maintainers 2026-08-18; repo is `nix-community/nh` only.
+- **dprint** — steady (0.55.2, 2026-07-14); still the polyglot umbrella,
+  composes with Biome via the official dprint-plugin-biome adapter —
+  the module's bet is sound.
+- **statix** — nixpkgs switched to the maintained Molybdenum fork
+  (PR #516044, 2026-05-06); zero action.
+  `treefmt.nix` enables it regardless of the packages.nix entry.
+- **home-manager `programs.claude-code`** — generated plugin renamed `hm`
+  (2026-08-09): managed MCP tools become `mcp__plugin_hm_<server>__*` after the
+  next HM bump; `programs.mcp` untouched.
+  The lock carries it now
+  (checked 2026-09-25),
+  so prefix-dependent permission rules are safe;
+  the zotero ones in `config/claude-settings.json` use it.
+- **activitywatch** — stable dmg is x86_64-only
+  (22 months since a stable release);
+  native arm64 in v0.14.0b4 prereleases — stable 0.14 ends the Rosetta caveat.
+  Arch-audit method for other casks:
+  `brew info --json=v2` arch data or `lipo -archs` on the installed app.
+- **Homelab** — Plex 2026 monetization
+  (lifetime pass $249 → $749 on 2026-07-01, remote-play paywalls)
+  strengthens the Jellyfin direction; treat Plex-specific investment
+  (tautulli tooling)
+  as short-horizon. recyclarr "maintenance mode" rumor false —
+  only v7 templates are frozen, v8.7.1 released 2026-08-07
+  (confirm the config uses v8-style templates).
+- **defaults2nix / nix-topology** — single-maintainer, dormant/bursty,
+  zero runtime blast radius; drop-or-vendor if they break
+  (feeds the "ever used?" ask).
+  Superseded 2026-09-03: both inputs dropped.
+- **Repo renames** (redirects hold):
+  noctalia-dev/noctalia-shell → noctalia-dev/noctalia · YaLTeR/niri →
+  niri-wm/niri · sst/opencode → anomalyco/opencode · koekeishiya/yabai →
+  asmvik/yabai.
 
 ### Decisions of record
 
-- 2026-09-22 — **Claude Code CLI: Anthropic's native installer on macOS, nixpkgs on Linux; home-manager owns the config everywhere** (`package = null` on darwin). The nix CLI never actually ran: a native install recreated on 2026-05-23 sat in `~/.local/bin`, which precedes the nix profile on PATH, and it self-updated 2.1.150 → 2.1.280 on 2026-09-22. Most sessions run in the desktop app, which bundles its own self-updating copy and shares `~/.claude`, so a nix-pinned CLI would only trail it. nixpkgs' wrapper already sets `DISABLE_AUTOUPDATER` and `DISABLE_INSTALLATION_CHECKS`, so `claude-settings.json` no longer sets it (on macOS it would stall the native updater). `settings.json` stays read-only by design: `/model` and other runtime writes fail with EACCES, so defaults change in `config/claude-settings.json`.
-- 2026-08-26 — **Browsers:** Zen (primary) + Helium (Chromium fallback) + the base OS browser (Safari on macOS, plain `pkgs.firefox` on the Linux DE). The earlier "Edge" mention meant the work Windows laptop, not this config. `browser-policies.nix` stays as Zen's extension manifest (live on Linux, canonical doc on darwin).
-- 2026-09-03 — **niri-flake dropped** for what upstream documents: nixpkgs `programs.niri` (session, portals with niri's config, keyring, polkit, dconf, the graphical-desktop bits) + home-manager `wayland.windowManager.niri` (generic KDL attrset; HM `systemd.enable = false` because the NixOS module already installs niri's user units, `portalPackage = null` because portals are system-side). Lost with the flake and re-added by hand: the KDE polkit agent unit (`polkit-agent`). Lost and not missed: the typed settings DSL, the niri.cachix.org cache (nixpkgs niri comes from cache.nixos.org). The HM `xdg.portal` block went too — its generic `portals.conf` shadowed the system's `niri-portals.conf`, and its `NIX_XDG_DESKTOP_PORTAL_DIR` limited discovery to the gtk portal, so the gnome screencast and keyring Secret backends were never reachable. `programs.niri.useNautilus` stays at its default (true): the gnome portal's file chooser is Nautilus, as upstream documents; `useNautilus = false` is the one-liner if the gtk chooser and a smaller closure are preferred.
-- 2026-09-03 — **kagi MCP cut** (the August keep-core list predates this): 2 tool calls in 1 of 16 Claude Code transcripts, and the `op read`-per-launch wrapper meant a 1Password prompt per Claude process, multiplied by fan-out agents. Built-in web search covers the need; `claude mcp remove kagi -s user` was run the same day.
-- 2026-08-26 — **Editors:** Zed stays; VS Code stays as a managed backup — work needs the proprietary MSSQL extension (absent from VSCodium), so home muscle-memory has value. Currently unmanaged: the `visual-studio-code` cask is optional (add it if VS Code should be day-1 on a new machine); `config/vscode/` Flexoki themes stay either way.
-- 2026-08-26 — **Emacs kept** despite 8.4 h/yr (vs Zed 48 h): the Mac is now the OMSCS study machine (basic Emacs + org for notes/tasks, flakes for per-course dev envs — `templates.python-uv` is the first); the salvage list's org QoL items are the critical path.
-- 2026-08-26 — **Cuts confirmed by the user:** league-of-legends (TFT temporarily dead on Mac), mdbase-tasknotes (tasks migrate to org). speedtest-cli and aria2 are deleted, not swapped (zero invocations; curl/wget cover aria2).
-- 2026-03-07 — **The lean precedent:** `lean` branched from main's tip fdb8678, main stayed still, then a pure fast-forward to lean's tip plus consolidation commit 44d6a72 (NH_FLAKE back to main, CI branches, doc links). Annotated tag `pre-lean-main` was belt-and-suspenders (an ancestor of main; nothing orphaned).
-- 2026-08-08 — **`feature-colocation` is a design document, not a mergeable artifact** — re-derive with `git mv`, never merge: three layouts in two days, its final AGENTS.md describes an abandoned layout, its own stash reverts the headline mechanism; against the post-landing tree the merge is modify/delete surgery on the files the dirty work rewrote (shared/home/default.nix, darwin/home/zsh.nix), with paneru and auto-rebuild placements now contradictory. Target shape = `stash@{0}` v4: flat `features/<name>/{default,home,darwin,nixos}.nix` + explicit `profiles/hm/*.nix`, `profiles/system/*.nix`, `roles/homelab/`. Dead, don't re-litigate: auto-discovery (the branch's own stash replaced readDir scanning with explicit imports; the 2026 route would be import-tree/dendritic, which the repo's values argue against), flake-parts (bought only the perSystem tail), oxfmt (superseded by the dprint stack — but healthy, covers JSON/YAML/TOML/MD/JS/CSS at ~30× prettier speed: a possible future replacement for the dprint plugin set). Cask colocation undecided — only if every feature-owning cask migrates; decide at the rename, not before.
-- 2026-08-08 — **The March 2026 design transcripts are gone** (no CCD session 03-10 → 05-31, local transcripts rotated, pi sessions start 05-24). Intent survives in the branch commit bodies, `git show feature-colocation:AGENTS.md` (the "~10+ config lines earns a feature directory" rule), and `$OBSD/Notes/homelab-flake-comparison.md` (2026-03-03, the readDir auto-discovery precursor).
-- 2026-09-24 — **Emacs overhaul export retired:** `origin/claude/refine-local-plan-Rz5C0` still holds the raw 2026-04-14 commit (`1f5cf88`), but no PR ever existed and the local patch export has been removed. The May–September rework absorbed the file-name-handler optimization, measured 16 MB GC restore, 1 MB subprocess reads, selected Eglot lifecycle settings, Avy, and Vundo; the improvements still worth considering are retained below.
+- 2026-09-22 — **Claude Code CLI: Anthropic's native installer on macOS, nixpkgs
+  on Linux; home-manager owns the config everywhere** (`package = null` on
+  darwin).
+  The nix CLI never actually ran:
+  a native install recreated on 2026-05-23 sat in `~/.local/bin`,
+  which precedes the nix profile on PATH,
+  and it self-updated 2.1.150 → 2.1.280 on 2026-09-22.
+  Most sessions run in the desktop app,
+  which bundles its own self-updating copy and shares `~/.claude`,
+  so a nix-pinned CLI would only trail it. nixpkgs' wrapper already sets
+  `DISABLE_AUTOUPDATER` and `DISABLE_INSTALLATION_CHECKS`, so
+  `claude-settings.json` no longer sets it (on macOS it would stall the native
+  updater).
+  `settings.json` stays read-only by design:
+  `/model` and other runtime writes fail with EACCES,
+  so defaults change in `config/claude-settings.json`.
+- 2026-08-26 — **Browsers:** Zen (primary) + Helium
+  (Chromium fallback) + the base OS browser (Safari on macOS, plain `pkgs.firefox` on the Linux DE).
+  The earlier "Edge" mention meant the work Windows laptop, not this config.
+  `browser-policies.nix` stays as Zen's extension manifest
+  (live on Linux, canonical doc on darwin).
+- 2026-09-03 — **niri-flake dropped** for what upstream documents:
+  nixpkgs `programs.niri`
+  (session, portals with niri's config, keyring, polkit, dconf,
+  the graphical-desktop bits) + home-manager `wayland.windowManager.niri`
+  (generic KDL attrset; HM `systemd.enable = false` because the NixOS module
+  already installs niri's user units, `portalPackage = null` because portals are
+  system-side).
+  Lost with the flake and re-added by hand: the KDE polkit agent unit
+  (`polkit-agent`).
+  Lost and not missed: the typed settings DSL, the niri.cachix.org cache
+  (nixpkgs niri comes from cache.nixos.org).
+  The HM `xdg.portal` block went too —
+  its generic `portals.conf` shadowed the system's `niri-portals.conf`,
+  and its `NIX_XDG_DESKTOP_PORTAL_DIR` limited discovery to the gtk portal,
+  so the gnome screencast and keyring Secret backends were never reachable.
+  `programs.niri.useNautilus` stays at its default (true):
+  the gnome portal's file chooser is Nautilus, as upstream documents;
+  `useNautilus = false` is the one-liner if the gtk chooser
+  and a smaller closure are preferred.
+- 2026-09-03 — **kagi MCP cut**
+  (the August keep-core list predates this):
+  2 tool calls in 1 of 16 Claude Code transcripts,
+  and the `op read`-per-launch wrapper meant a 1Password prompt per Claude
+  process, multiplied by fan-out agents.
+  Built-in web search covers the need;
+  `claude mcp remove kagi -s user` was run the same day.
+- 2026-08-26 — **Editors:** Zed stays; VS Code stays as a managed backup —
+  work needs the proprietary MSSQL extension
+  (absent from VSCodium), so home muscle-memory has value.
+  Currently unmanaged: the `visual-studio-code` cask is optional
+  (add it if VS Code should be day-1 on a new machine);
+  `config/vscode/` Flexoki themes stay either way.
+- 2026-08-26 — **Emacs kept** despite 8.4 h/yr
+  (vs Zed 48 h):
+  the Mac is now the OMSCS study machine
+  (basic Emacs + org for notes/tasks, flakes for per-course dev envs —
+  `templates.python-uv` is the first);
+  the salvage list's org QoL items are the critical path.
+- 2026-08-26 — **Cuts confirmed by the user:** league-of-legends
+  (TFT temporarily dead on Mac),
+  mdbase-tasknotes (tasks migrate to org). speedtest-cli and aria2 are deleted,
+  not swapped (zero invocations; curl/wget cover aria2).
+- 2026-03-07 — **The lean precedent:** `lean` branched from main's tip fdb8678,
+  main stayed still, then a pure fast-forward to lean's tip plus consolidation
+  commit 44d6a72 (NH_FLAKE back to main, CI branches, doc links).
+  Annotated tag `pre-lean-main` was belt-and-suspenders
+  (an ancestor of main; nothing orphaned).
+- 2026-08-08 —
+  **`feature-colocation` is a design document, not a mergeable artifact** —
+  re-derive with `git mv`, never merge: three layouts in two days, its final
+  AGENTS.md describes an abandoned layout, its own stash reverts the headline
+  mechanism; against the post-landing tree the merge is modify/delete surgery on
+  the files the dirty work rewrote (shared/home/default.nix,
+  darwin/home/zsh.nix), with paneru and auto-rebuild placements now
+  contradictory.
+  Target shape = `stash@{0}` v4:
+  flat `features/<name>/{default,home,darwin,nixos}.nix` + explicit
+  `profiles/hm/*.nix`, `profiles/system/*.nix`, `roles/homelab/`.
+  Dead, don't re-litigate: auto-discovery
+  (the branch's own stash replaced readDir scanning with explicit imports;
+  the 2026 route would be import-tree/dendritic,
+  which the repo's values argue against), flake-parts
+  (bought only the perSystem tail),
+  oxfmt (superseded by the dprint stack — but healthy,
+  covers JSON/YAML/TOML/MD/JS/CSS at ~30× prettier speed:
+  a possible future replacement for the dprint plugin set).
+  Cask colocation undecided — only if every feature-owning cask migrates;
+  decide at the rename, not before.
+- 2026-08-08 — **The March 2026 design transcripts are gone**
+  (no CCD session 03-10 → 05-31, local transcripts rotated,
+  pi sessions start 05-24).
+  Intent survives in the branch commit bodies,
+  `git show feature-colocation:AGENTS.md`
+  (the "~10+ config lines earns a feature directory" rule),
+  and `$OBSD/Notes/homelab-flake-comparison.md`
+  (2026-03-03, the readDir auto-discovery precursor).
+- 2026-09-24 — **Emacs overhaul export retired:**
+  `origin/claude/refine-local-plan-Rz5C0` still holds the raw 2026-04-14 commit
+  (`1f5cf88`), but no PR ever existed and the local patch export has been
+  removed.
+  The May–September rework absorbed the file-name-handler optimization,
+  measured 16 MB GC restore, 1 MB subprocess reads,
+  selected Eglot lifecycle settings, Avy, and Vundo;
+  the improvements still worth considering are retained below.
 
 ### Emacs improvement backlog (reviewed from 1f5cf88)
 
-Porting rules: do not cherry-pick or restore the old runtime package bootstrap. Reimplement against Emacs 31 and the current Nix-owned model: packages belong in `:ensure t` `use-package` blocks that parse under `emacsWithPackagesFromUsePackage`; feature choices remain preference-driven; performance changes need a measured problem. Status as of 2026-09-24:
+Porting rules: do not cherry-pick or restore the old runtime package bootstrap.
+Reimplement against Emacs 31 and the current Nix-owned model:
+packages belong in `:ensure t` `use-package` blocks
+that parse under `emacsWithPackagesFromUsePackage`;
+feature choices remain preference-driven;
+performance changes need a measured problem.
+Status as of 2026-09-24:
 
-1. **Org QoL (first; OMSCS-critical):** speed commands; smart Org C-a/C-e; a visible ellipsis; refile caching plus an explicit missing-parent policy; headline-only M-RET splitting; sub/superscript braces; bullet-demotion cycling; progressively larger headings edited in `config/emacs/themes/flexoki.el`. Treat Org-appear as an alternative to the current visible-marker policy, not an addition to it; defer font-lock only if large Org files actually stall.
-2. **File and minibuffer flow:** Vertico directory RET/DEL/M-DEL bindings and the `rfn-eshadow-update-overlay` tidy hook; `file-name-shadow-mode`; recursive minibuffers; additional Avy word/line jumps on non-conflicting keys.
-3. **Completion:** Orderless category overrides for Eglot; Consult preview gating on expensive searches; Embark prefix help; a Consult directory picker. Cape's file/dabbrev/Elisp sources remain an experiment only after checking source ordering and a real completion-staleness problem; do not copy its Eglot cache-busting advice blindly.
-4. **LSP and xref:** Eglot autostart now excludes Emacs Lisp so built-in Eldoc remains the editor support; evaluate `eglot-extend-to-xref`; xref search through ripgrep and definition selection through the existing Vertico UI.
-5. **General defaults and UI:** expanded save history; recent-file exclusions; same-frame Ediff; a Unicode truncation ellipsis; automatic bookmark persistence; verbose TRAMP only while diagnosing remote issues; popup placement for Help/Warnings/Backtrace/Flymake. Any `display-buffer-alist` design must preserve existing entries and be rebuilt around the current top-positioned Which-Key/Vertico layout rather than copied wholesale.
-6. **Magit presentation:** timestamped log margin, whole-hunk diff refinement, and optionally hidden untracked sections.
-7. **Optional packages:** (Jinx landed 2026-10-09 with the Writing section of init.el.) string-inflection for identifier case cycling; Helpful for richer command documentation. Avy and Vundo are already present; Eat is redundant with vterm, and undo-fu-session should not be combined with Vundo without an explicit replacement decision.
-8. **Editing/navigation experiments:** smarter C-g; C-a indentation/BOL toggling; a narrow-or-widen command on a non-destructive binding; Vim-like open-line commands without replacing core M-o/M-O globally; a robust `file:line:column` opener instead of broad `find-file` advice; save-on-focus-loss limited to the previously focused modified file buffer; backend-specific remote-VC disabling only if the trfwsl hang is reproduced.
-9. **Startup/rendering:** evaluate the LTR/bidi and redisplay tuning block only with its tradeoffs understood (stale fontification, imprecise scrolling, extra font-cache memory, hidden cursors in unfocused windows). White-flash prevention needs a bounded frame-aware handoff that also works with the Linux daemon. `use-package-expand-minimally` is the only unconditional micro-improvement.
+1. **Org QoL (first; OMSCS-critical):** speed commands; smart Org C-a/C-e;
+   a visible ellipsis; refile caching plus an explicit missing-parent policy;
+   headline-only M-RET splitting; sub/superscript braces;
+   bullet-demotion cycling;
+   progressively larger headings edited in `config/emacs/themes/flexoki.el`.
+   Treat Org-appear as an alternative to the current visible-marker policy,
+   not an addition to it; defer font-lock only
+   if large Org files actually stall.
+2. **File and minibuffer flow:** Vertico directory RET/DEL/M-DEL bindings
+   and the `rfn-eshadow-update-overlay` tidy hook; `file-name-shadow-mode`;
+   recursive minibuffers; additional Avy word/line jumps on non-conflicting
+   keys.
+3. **Completion:** Orderless category overrides for Eglot;
+   Consult preview gating on expensive searches; Embark prefix help;
+   a Consult directory picker.
+   Cape's file/dabbrev/Elisp sources remain an experiment only
+   after checking source ordering and a real completion-staleness problem;
+   do not copy its Eglot cache-busting advice blindly.
+4. **LSP and xref:** Eglot autostart now excludes Emacs Lisp
+   so built-in Eldoc remains the editor support;
+   evaluate `eglot-extend-to-xref`;
+   xref search through ripgrep
+   and definition selection through the existing Vertico UI.
+5. **General defaults and UI:** expanded save history; recent-file exclusions;
+   same-frame Ediff; a Unicode truncation ellipsis;
+   automatic bookmark persistence;
+   verbose TRAMP only while diagnosing remote issues;
+   popup placement for Help/Warnings/Backtrace/Flymake.
+   Any `display-buffer-alist` design must preserve existing entries
+   and be rebuilt around the current top-positioned Which-Key/Vertico layout
+   rather than copied wholesale.
+6. **Magit presentation:** timestamped log margin, whole-hunk diff refinement,
+   and optionally hidden untracked sections.
+7. **Optional packages:** (Jinx landed 2026-10-09 with the Writing section of
+   init.el.) string-inflection for identifier case cycling; Helpful for richer
+   command documentation.
+   Avy and Vundo are already present; Eat is redundant with vterm,
+   and undo-fu-session should not be combined with Vundo without an explicit
+   replacement decision.
+8. **Editing/navigation experiments:** smarter C-g;
+   C-a indentation/BOL toggling;
+   a narrow-or-widen command on a non-destructive binding;
+   Vim-like open-line commands without replacing core M-o/M-O globally;
+   a robust `file:line:column` opener instead of broad `find-file` advice;
+   save-on-focus-loss limited to the previously focused modified file buffer;
+   backend-specific remote-VC disabling only if the trfwsl hang is reproduced.
+9. **Startup/rendering:** evaluate the LTR/bidi
+   and redisplay tuning block only with its tradeoffs understood
+   (stale fontification, imprecise scrolling, extra font-cache memory,
+   hidden cursors in unfocused windows).
+   White-flash prevention needs a bounded frame-aware handoff
+   that also works with the Linux daemon.
+   `use-package-expand-minimally` is the only unconditional micro-improvement.
 
-Do not restore the patch's runtime package list, gcmh, `load-prefer-newer`, 4 MB process cap, bare Enchant package line, Corfu RET remap, global completion-preview workaround, xref marker advice, raw `find-file` regex advice, broad focus-loss saving, global C-x n/M-o replacement, or `custom-set-faces` outline overrides.
+Do not restore the patch's runtime package list, gcmh, `load-prefer-newer`,
+4 MB process cap, bare Enchant package line, Corfu RET remap,
+global completion-preview workaround, xref marker advice,
+raw `find-file` regex advice, broad focus-loss saving,
+global C-x n/M-o replacement, or `custom-set-faces` outline overrides.

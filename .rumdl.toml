@@ -1,2 +1,16 @@
-# This repo's tier over the global floor (config/rumdl-floor.toml).
+# This repo's tier over the global floor (config/rumdl-floor.toml): prose in
+# semantic line breaks (https://sembr.org) at 80 columns. treefmt runs
+# `rumdl check --fix`, which reflows and fails on what it cannot fix.
 extends = "config/rumdl-floor.toml"
+
+[global]
+# Replaces the floor's list, minus MD013.
+disable = ["MD025", "MD033"]
+
+[MD013]
+line-length = 80
+reflow = true
+reflow-mode = "semantic-line-breaks"
+# Fences keep their own formatter's width; a code span cannot wrap.
+code-blocks = false
+code-spans = false
