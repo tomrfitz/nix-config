@@ -29,6 +29,8 @@
       url = "github:Mic92/sops-nix";
       inputs.nixpkgs.follows = "nixpkgs";
     };
+    # Installs and pins Homebrew itself (nix-darwin's homebrew.* only drives it).
+    nix-homebrew.url = "github:zhaofengli/nix-homebrew";
     paneru = {
       url = "github:karinushka/paneru";
       inputs.nixpkgs.follows = "nixpkgs";
@@ -72,6 +74,7 @@
       nixos-wsl,
       zen-browser,
       sops-nix,
+      nix-homebrew,
       paneru,
       git-hooks,
       nix-index-database,
@@ -179,6 +182,9 @@
               inherit hmModules;
               specialArgs = commonSpecialArgs;
             })
+          ]
+          ++ lib.optionals isDarwin [
+            nix-homebrew.darwinModules.nix-homebrew
           ]
           ++ lib.optionals (!isDarwin) [
             sops-nix.nixosModules.sops

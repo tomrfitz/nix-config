@@ -1,5 +1,20 @@
-{ config, ... }:
+{ config, user, ... }:
 {
+  # Homebrew itself, pinned by flake.lock: a fresh Mac gets it at the first
+  # switch, and autoMigrate takes over an existing /opt/homebrew (it deletes
+  # Homebrew's own git checkout and keeps what is installed). No taps are
+  # declared, so casks still come from Homebrew's API, refreshed by
+  # onActivation.autoUpdate below. Pinning homebrew/homebrew-core and
+  # homebrew/homebrew-cask as inputs would pin casks to the lock too, at the
+  # cost of fetching both large repos on every bump.
+  nix-homebrew = {
+    enable = true;
+    inherit user;
+    autoMigrate = true;
+    # No imperative `brew tap`; a tap goes into nix-homebrew.taps.
+    mutableTaps = false;
+  };
+
   homebrew = {
     enable = true;
     # A switch installs and removes what the Brewfile lists but upgrades

@@ -66,7 +66,7 @@ just snapshot NAME # take macOS defaults snapshot; snapshot-diff BEFORE AFTER co
 
 ### Flake structure
 
-`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks, nix-index-database, mattpocock-skills (pi skills), hermes-agent (on trial on the Mac, with its own nixpkgs). pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules; Claude Code is configured by home-manager everywhere, but on macOS its binary comes from Anthropic's native installer (nixpkgs on Linux) — see `modules/shared/home/claude-code.nix`.
+`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, nix-homebrew (Homebrew itself, pinned), emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks, nix-index-database, mattpocock-skills (pi skills), hermes-agent (on trial on the Mac, with its own nixpkgs). pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules; Claude Code is configured by home-manager everywhere, but on macOS its binary comes from Anthropic's native installer (nixpkgs on Linux) — see `modules/shared/home/claude-code.nix`.
 
 ### Hosts are thin wiring
 
@@ -201,7 +201,7 @@ Fresh machine setup (darwin or NixOS):
 bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/main/scripts/bootstrap.sh)
 ```
 
-The script handles: Xcode CLT (darwin), Lix installation, repo clone, first `darwin-rebuild`/`nixos-rebuild`, and Claude Code's native installer (darwin). The manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
+The script handles: Xcode CLT (darwin), Lix installation, repo clone, first `darwin-rebuild`/`nixos-rebuild` (which installs Homebrew through nix-homebrew on darwin), and Claude Code's native installer (darwin). The manual post-bootstrap steps are signing into 1Password and (on darwin) Apple ID.
 
 ## Roadmap
 
