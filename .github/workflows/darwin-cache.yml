@@ -1,0 +1,42 @@
+name: Darwin cache
+
+# Builds trfmbp's expensive, free derivations that cache.nixos.org lacks and
+# pushes them to tomrfitz.cachix.org, so the Mac's switches download them
+# instead of compiling (scripts/build-uncached.sh has the why of the
+# allowlist). cachix-action's default daemon mode pushes only what this job
+# builds, never what it substitutes.
+#
+# workflow_dispatch only until one run's time and disk use are measured; then
+# add `pull_request` (the lock-bump PRs, dispatched by update-flake-lock.yml)
+# and `push: branches: [main]`.
+on:
+    workflow_dispatch:
+
+jobs:
+    build:
+        runs-on: macos-latest
+        timeout-minutes: 240
+        steps:
+            - uses: actions/checkout@v6
+
+            - uses: samueldr/lix-gha-installer-action@v2026-06-15
+
+            - uses: cachix/cachix-action@v17
+              with:
+                  name: tomrfitz
+                  extraPullNames: nix-community
+                  authToken: ${{ secrets.CACHIX }}
+
+            - name: Disk before
+              run: df -h / /nix
+
+            # What the Mac compiles today, all free software; keep it to names
+            # whose licence is known, since anything matched goes public.
+            - name: Build uncached allowlisted derivations
+              run: ./scripts/build-uncached.sh .#darwinConfigurations.trfmbp.system 'paneru|sgram-tui|emacs-|package-build-|tesseract-|aspell-'
+
+            - name: Disk after
+              if: always()
+              run: |
+                  df -h / /nix
+                  du -sh /nix/store

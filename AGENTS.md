@@ -239,6 +239,7 @@ daily CI:      fail if trfwsl hasn't pushed flake.lock for 48 h (watchdog)
 
 **Key files:**
 
+- `.github/workflows/darwin-cache.yml` + `scripts/build-uncached.sh` — the Cachix build (secret `CACHIX`, the cache's auth token). Only allowlisted, free derivations: the closure doesn't fit a runner's disk, and unfree vendor repackages must stay out of a public cache
 - `scripts/auto-update.sh` — pipeline logic (phases 0–7)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
 - `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp (unattended; user sudo is Touch ID-only). Log: `/var/log/auto-rebuild.log`. It fires at 06:30 Mac-local time, or on the next wake if the Mac slept through it (a run lost to a shutdown is not retried; a run on an unchanged `main` makes no new generation). It has no Full Disk Access, so only interactive switches write the sandboxed apps' preferences (Safari, Mail; `settings.nix`), and the daemon logs a warning instead
