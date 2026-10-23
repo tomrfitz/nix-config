@@ -6,11 +6,23 @@ name: Darwin cache
 # allowlist). cachix-action's default daemon mode pushes only what this job
 # builds, never what it substitutes.
 #
-# workflow_dispatch only until one run's time and disk use are measured; then
-# add `pull_request` (the lock-bump PRs, dispatched by update-flake-lock.yml)
-# and `push: branches: [main]`.
+# A run where nothing allowlisted changed finds it all cached and stops after
+# evaluation. The first cold run (2026-10-23) built 606 derivations in 19 min
+# and grew /nix to 6.9 GiB of the runner's 96 GiB free.
 on:
+    push:
+        branches: [main]
+        paths-ignore: ["**.md"]
+    pull_request:
+        paths-ignore: ["**.md"]
+    # update-flake-lock.yml dispatches this on its PR branch, since a PR
+    # opened with GITHUB_TOKEN triggers no pull_request run.
     workflow_dispatch:
+
+# A newer push to the same branch supersedes a running build.
+concurrency:
+    group: darwin-cache-${{ github.ref }}
+    cancel-in-progress: true
 
 jobs:
     build:

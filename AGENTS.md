@@ -228,10 +228,11 @@ Decided 2026-09-26: an i5-12400 box with direct-attached mergerfs + SnapRAID sto
 Lock bumps come from GitHub: a scheduled workflow opens a PR, CI checks it, and a merge lands it on main. Every host then follows main on its own schedule.
 
 ```text
-Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR, dispatches Check on it
-on demand CI: Darwin cache builds trfmbp's allowlisted uncached derivations on
-              macos-latest and pushes them to tomrfitz.cachix.org (dispatch-only
-              until one run is measured; then on the bump PRs and on main)
+Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR, dispatches Check and
+              Darwin cache on it
+PRs + main CI: Darwin cache builds trfmbp's allowlisted uncached derivations on
+              macos-latest and pushes them to tomrfitz.cachix.org, so the Mac's
+              06:30 switch downloads them once the merged commit has run
 04:45  trfwsl: build trfwsl from main → push to Attic → switch trfwsl
 06:30  trfnix: nixos-rebuild switch from remote main (when powered on; no
                Attic hits while the pipeline skips its build)
@@ -243,7 +244,7 @@ daily CI:      fail if flake.lock hasn't changed on main for 10 days (watchdog)
 **Key files:**
 
 - `.github/workflows/update-flake-lock.yml` — the bump PR (DeterminateSystems' action). A PR opened with `GITHUB_TOKEN` starts no workflows, so the job dispatches Check on the PR branch itself; creating the PR needs Settings → Actions → General → "Allow GitHub Actions to create and approve pull requests"
-- `.github/workflows/darwin-cache.yml` + `scripts/build-uncached.sh` — the Cachix build (secret `CACHIX`, the cache's auth token). Only allowlisted, free derivations: the closure doesn't fit a runner's disk, and unfree vendor repackages must stay out of a public cache
+- `.github/workflows/darwin-cache.yml` + `scripts/build-uncached.sh` — the Cachix build (secret `CACHIX`, the cache's auth token; a cold run takes ~20 min). Only allowlisted, free derivations: the closure doesn't fit a runner's disk, and unfree vendor repackages must stay out of a public cache
 - `scripts/auto-update.sh` — trfwsl's pipeline (phases 0–4; it no longer bumps or pushes, so its deploy key needs only read access)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
 - `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp (unattended; user sudo is Touch ID-only). Log: `/var/log/auto-rebuild.log`. It fires at 06:30 Mac-local time, or on the next wake if the Mac slept through it (a run lost to a shutdown is not retried; a run on an unchanged `main` makes no new generation). It has no Full Disk Access, so only interactive switches write the sandboxed apps' preferences (Safari, Mail; `settings.nix`), and the daemon logs a warning instead
