@@ -122,6 +122,8 @@
 ;; ── Indentation ───────────────────────────────────────────────────────
 (setq-default indent-tabs-mode nil
     tab-width 4
+    ;; 80 columns, like dprint, rumdl, ruff and clang-format.
+    fill-column 80
     ;; No soft wrapping anywhere: it breaks org and markdown tables, and
     ;; olivetti (below) keeps text centred instead. Long lines scroll
     ;; horizontally.
@@ -417,6 +419,10 @@
 (use-package markdown-mode
     :ensure t
     :mode ("\\.md\\'" . markdown-mode)
+    ;; Semantic line breaks, the style rumdl enforces on nix-config's markdown
+    ;; (.rumdl.toml): one sentence per line, wrapped at fill-column. rumdl
+    ;; also breaks long sentences at clauses; this only wraps them.
+    :bind (:map markdown-mode-map ("M-q" . fill-paragraph-semlf))
     :custom
     ;; Highlight fenced code blocks in their native major mode's font-lock.
     ;; Lighter than polymode/LSP — purely visual, no completion/indent.
@@ -506,7 +512,10 @@
               ("C-c a" . org-agenda)
               ("C-c l" . org-store-link)
               ;; org takes C-' for org-cycle-agenda-files; keep it for avy.
-              (:map org-mode-map ("C-'" . nil)))
+              (:map org-mode-map ("C-'" . nil)
+                  ;; Semantic line breaks (https://sembr.org): one sentence
+                  ;; per line, wrapped at fill-column; see markdown-mode.
+                  ("M-q" . fill-paragraph-semlf)))
     :custom
     (org-directory "~/Documents/notes")
     ;; Directory form (Prot; Doom's default): every top-level .org file in
