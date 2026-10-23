@@ -66,7 +66,7 @@ just snapshot NAME # take macOS defaults snapshot; snapshot-diff BEFORE AFTER co
 
 ### Flake structure
 
-`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, nix-homebrew (Homebrew itself, pinned), emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks, nix-index-database, mattpocock-skills (pi skills), hermes-agent (on trial on the Mac, with its own nixpkgs). pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules; Claude Code is configured by home-manager everywhere, but on macOS its binary comes from Anthropic's native installer (nixpkgs on Linux) — see `modules/shared/home/claude-code.nix`.
+`flake.nix` defines a single host registry (`hosts = { ... };`) plus a shared `mkHost` builder and `mkHM` helper. Inputs: nixpkgs (unstable), nix-darwin, home-manager, nix-homebrew (Homebrew itself, pinned), emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks, nix-index-database, mattpocock-skills (pi skills). pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules; Claude Code is configured by home-manager everywhere, but on macOS its binary comes from Anthropic's native installer (nixpkgs on Linux) — see `modules/shared/home/claude-code.nix`.
 
 ### Hosts are thin wiring
 
@@ -113,7 +113,7 @@ modules/
 - Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
 - Configure editors: Zed in `modules/shared/home/desktop.nix`, Helix in `modules/shared/home/editors.nix`, Emacs in `modules/shared/home/emacs.nix`
 - Claude Code: settings in `config/claude-settings.json`, status line in `config/claude-statusline.sh`, wiring in `modules/shared/home/claude-code.nix`
-- Other agent harnesses: pi in `modules/shared/home/pi.nix` (with `pi-resources/`), omp in `omp.nix`, Hermes in `packages.nix`; the Anthropic API key pi and omp read (Max's monthly API credits; 1Password, never exported) in `anthropic-api-key.nix`
+- Other agent harnesses: pi in `modules/shared/home/pi.nix` (with `pi-resources/`), omp in `omp.nix`; the Anthropic API key pi and omp read (Max's monthly API credits; 1Password, never exported) in `anthropic-api-key.nix`
 - Agent skills: for every project in `config/skills/` (linked into `~/.config/claude/skills/` by `claude-code.nix`, and as `~/.agents/skills`, which omp and pi read, by `default.nix`); for this repo only in `.claude/skills/`. omp's global instructions come from the same `config/agents.md` (`omp.nix`); its memory settings (Mnemopi, auto-retain off) live in its own `~/.omp/agent/config.yml`
 - MCP servers: `programs.mcp` (Claude Code picks them up via `enableMcpIntegration`); the Zotero server, its CLI (both uvx-wrapped) and the Linux app in `modules/shared/home/zotero.nix`, which also merges the server into the Claude desktop app's config on darwin
 - Python global tooling (ruff floor, ty): `modules/shared/home/python.nix`; project tier: `templates/python-uv/pyproject.toml`
