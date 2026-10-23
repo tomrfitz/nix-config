@@ -492,7 +492,7 @@ in
   # a content change with that backup present failed the activation. The
   # nix-wrapped Zen on Linux reads the link fine.
   # REVISIT(upstream): link it on darwin too once the module writes profiles.ini
-  #   writable itself. ref: https://github.com/0xc000022070/zen-browser-flake/issues/285; checked: 2026-09-22
+  #   writable itself. ref: https://github.com/0xc000022070/zen-browser-flake/issues/285; checked: 2026-10-22
   home.file.${profilesIni}.enable = !pkgs.stdenv.hostPlatform.isDarwin;
   home.activation.zenProfilesIni = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
     lib.hm.dag.entryAfter [ "linkGeneration" ] ''

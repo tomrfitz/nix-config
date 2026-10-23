@@ -109,7 +109,7 @@
   # same ESR.
   # REVISIT(upstream): drop this once nixpkgs' zotero leaves
   # firefox-esr-140-bin (Zotero 11, on ESR 153).
-  # ref: https://github.com/NixOS/nixpkgs/pull/572466; checked: 2026-10-21
+  # ref: https://github.com/NixOS/nixpkgs/pull/572466; checked: 2026-10-22
   nixpkgs.config.permittedInsecurePackages = [ "firefox-esr-140-bin-unwrapped-140.17.0esr" ];
 
   # ── Face authentication (howdy) ───────────────────────────────────────
@@ -140,7 +140,7 @@
   # nixpkgs#486044 (merged 2026-04-02) only covers FIDO/hidraw, not video4linux —
   # video4linux needs its own upstream fix.
   # REVISIT(upstream): no upstream tracking yet — file an issue or wait;
-  # related: https://github.com/NixOS/nixpkgs/pull/486044; checked: 2026-05-12
+  # related: https://github.com/NixOS/nixpkgs/pull/486044; checked: 2026-10-22
   systemd.services."polkit-agent-helper@".serviceConfig = {
     DeviceAllow = "char-video4linux rw";
     PrivateDevices = "no";

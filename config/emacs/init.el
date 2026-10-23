@@ -630,7 +630,7 @@
 ;; REVISIT(upstream): drop this once Harper's org parser lints table cells the
 ;; way its Markdown parser does (no issue filed yet); ref:
 ;; https://github.com/Automattic/harper/blob/master/harper-core/src/parsers/org_mode.rs;
-;; checked: 2026-10-17
+;; checked: 2026-10-22
 (defun tf/harper-org-table-misfire-p (diag)
     "Non-nil if DIAG is a Harper lint set off by Org table syntax."
     (let ((lsp (alist-get 'eglot-lsp-diag (flymake-diagnostic-data diag))))

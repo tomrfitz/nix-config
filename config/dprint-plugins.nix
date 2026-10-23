@@ -13,7 +13,7 @@ rec {
   #   `tags` map (fence tag → extension), which is what lets exec-wrapped
   #   formatters reach ```cpp / ```nix / ```sql / ```sh fences.
   #   ref: https://github.com/dprint/dprint-plugin-markdown/pull/153;
-  #   checked: 2026-09-07 (nixpkgs: 0.20.0, upstream: 0.23.3)
+  #   checked: 2026-10-22 (nixpkgs: 0.20.0, upstream: 0.28.0)
   markdown = mkDprintPlugin {
     pname = "dprint-plugin-markdown";
     version = "0.23.3";

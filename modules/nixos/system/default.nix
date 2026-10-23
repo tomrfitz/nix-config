@@ -35,7 +35,7 @@
         # services.resolved) crashes resolvconf.service with exit 127. The
         # correct binary is bin/resolvconf.
         # ref: https://github.com/NixOS/nixpkgs/blob/master/nixos/modules/config/resolvconf.nix
-        # checked: 2026-04-29
+        # checked: 2026-10-22
         systemd.services.resolvconf.script = lib.mkIf config.networking.resolvconf.enable (
           lib.mkForce ''
             ${lib.getExe' config.networking.resolvconf.package "resolvconf"} -u
