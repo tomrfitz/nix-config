@@ -55,11 +55,6 @@
 
   programs.nh.enable = true;
 
-  # ── Boot ─────────────────────────────────────────────────────────────
-  # Systemd stage 1: faster, more reliable than scripted initrd.
-  # WSL has no real boot process.
-  boot.initrd.systemd.enable = lib.mkIf (!isWSL) true;
-
   # ── Nix daemon scheduling ────────────────────────────────────────────
   # Deprioritize builds so media services (Plex, *arr) aren't starved.
   nix.daemonCPUSchedPolicy = "batch";
