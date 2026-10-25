@@ -80,7 +80,7 @@ jobs:
         if: >-
             github.event_name == 'pull_request'
             && github.head_ref == 'update_flake_lock_action'
-            && github.event.pull_request.user.login == 'github-actions[bot]'
+            && github.event.pull_request.user.login == 'tomrfitz-lock-bump[bot]'
         runs-on: ubuntu-latest
         permissions:
             contents: write

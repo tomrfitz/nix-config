@@ -2,9 +2,14 @@ name: Update flake.lock
 
 # Opens (or refreshes) a PR that bumps every input; Check's pull_request run
 # tests it, builds it into Cachix and merges it. This replaces trfwsl's daily
-# push to main, so a bump reaches main only through a tested merge. GitHub held the first
-# bump PR's runs for approval, since the repo requires it for first-time
-# contributors and github-actions[bot] had no merged commit yet.
+# push to main, so a bump reaches main only through a tested merge.
+#
+# The PR is opened as the tomrfitz-lock-bump GitHub App, not with GITHUB_TOKEN:
+# GitHub holds the runs of every PR github-actions[bot] opens until someone with
+# write access approves them, which stalled each bump until a click.
+# https://github.blog/changelog/2026-06-11-bot-created-pull-requests-can-run-workflows-if-approved/
+# The app's client ID is the LOCK_BUMP_CLIENT_ID variable and its private key
+# the LOCK_BUMP_PRIVATE_KEY secret.
 on:
     schedule:
         # Mondays and Thursdays, UTC; off the hour, when GitHub delays
@@ -13,18 +18,26 @@ on:
     workflow_dispatch:
 
 permissions:
-    contents: write
-    pull-requests: write
+    contents: read
 
 jobs:
     lockfile:
         runs-on: ubuntu-latest
         steps:
+            - uses: actions/create-github-app-token@v3
+              id: app-token
+              with:
+                  client-id: ${{ vars.LOCK_BUMP_CLIENT_ID }}
+                  private-key: ${{ secrets.LOCK_BUMP_PRIVATE_KEY }}
+                  permission-contents: write
+                  permission-pull-requests: write
+
             - uses: actions/checkout@v6
 
             - uses: samueldr/lix-gha-installer-action@v2026-06-15
 
             - uses: DeterminateSystems/update-flake-lock@v29
               with:
+                  token: ${{ steps.app-token.outputs.token }}
                   commit-msg: Update flake.lock
                   pr-title: Update flake.lock

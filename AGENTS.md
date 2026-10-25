@@ -469,12 +469,14 @@ daily CI:      fail if flake.lock hasn't changed on main for 10 days (watchdog)
 **Key files:**
 
 - `.github/workflows/update-flake-lock.yml` — the bump PR
-  (DeterminateSystems' action).
-  Creating it needs Settings → Actions → General → "Allow GitHub Actions to
-  create and approve pull requests".
-  The repo requires approval of runs from first-time contributors,
-  so the first bump PR's runs waited for "Approve and run"
-  until a github-actions[bot] commit was merged
+  (DeterminateSystems' action),
+  opened as the `tomrfitz-lock-bump` GitHub App
+  (variable `LOCK_BUMP_CLIENT_ID`, secret `LOCK_BUMP_PRIVATE_KEY`;
+  contents and pull requests read/write, installed on this repo only).
+  A PR opened with `GITHUB_TOKEN` would hold its runs
+  until someone with write access clicked "Approve and run"
+  (GitHub's rule for github-actions[bot] since 2026-06;
+  the repo's first-time-contributor setting covers only forks)
 - `.github/workflows/check.yml` + `scripts/build-uncached.sh` — the checks,
   the Cachix build (secret `CACHIX`, the cache's auth token;
   a cold run takes ~20 min) and the bump PR's merge.
