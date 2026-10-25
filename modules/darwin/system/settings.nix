@@ -53,9 +53,14 @@ in
   # REVISIT(upstream): drop NIX_SSL_CERT_FILE once nixpkgs' OpenSSL prefers
   # /etc/ssl/certs/ca-certificates.crt on darwin.
   # ref: https://github.com/NixOS/nixpkgs/pull/570263; checked: 2026-10-22
+  # PATH gives GUI apps that shell out to nix-installed tools the shells'
+  # profiles instead of launchd's /usr/bin:/bin:/usr/sbin:/sbin. setenv
+  # passes the value single-quoted, so systemPath's $HOME and $USER are
+  # expanded here.
   launchd.user.envVariables = {
     CLAUDE_CONFIG_DIR = config.home-manager.users.${user}.programs.claude-code.configDir;
     inherit (config.environment.variables) NIX_SSL_CERT_FILE;
+    PATH = lib.replaceStrings [ "$HOME" "$USER" ] [ homeDirectory user ] config.environment.systemPath;
   };
 
   system.defaults = {
