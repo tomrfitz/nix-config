@@ -1,6 +1,9 @@
 { pkgs, lib, ... }:
 {
   projectRootFile = "flake.nix";
+  # `rex skill setup` writes this stub and reports it outdated, then rewrites
+  # it, once its text differs from what Rex installed.
+  settings.global.excludes = [ "config/skills/rex/SKILL.md" ];
 
   programs.nixfmt.enable = true;
   # shfmt reads indent/simplify from config/editorconfig (root symlink), the

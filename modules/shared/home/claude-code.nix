@@ -42,6 +42,8 @@ in
     # skill needs no intent-to-add to be visible to the flake.
     "${cfg.configDir}/skills/handoff".source = link "config/skills/handoff";
     "${cfg.configDir}/skills/recall".source = link "config/skills/recall";
+    # A stub `rex skill setup` writes; it reads its guide from the installed rex.
+    "${cfg.configDir}/skills/rex".source = link "config/skills/rex";
     "${cfg.configDir}/skills/zotero".source = link "config/skills/zotero";
   };
 }

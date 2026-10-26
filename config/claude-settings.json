@@ -60,5 +60,18 @@
       "**Org-specific CLIs**: None configured — repo-local tooling observed in usage: nix, nixfmt, hm (home-manager), nd, emacsclient, tailscale, op (1Password CLI)",
       "routine under tomrfitz/ prefix: git and nix operations within ~/nix-config (and its declared remote) are routine for this user"
     ]
+  },
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh -c 'rex __internal session-start --agent claude 2>/dev/null || true'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
   }
 }
