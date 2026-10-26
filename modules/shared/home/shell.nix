@@ -240,6 +240,14 @@
         }
         starship_precmd_user_func="set_win_title"
       ''
+
+      # Rex puts its bundled CLI first on PATH and exports REX_BIN_DIR, but
+      # nix-darwin's and NixOS's set-environment rebuild PATH from a fixed
+      # list, so put it back. Not home.sessionPath: outside Rex the variable
+      # is empty. https://www.superlogical.com/rex/docs/automate/cli#nix
+      (lib.mkAfter ''
+        [[ -n "$REX_BIN_DIR" ]] && path=("$REX_BIN_DIR" $path)
+      '')
     ];
 
     # Native options load autosuggestions early and fast-syntax-highlighting
