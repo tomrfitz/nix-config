@@ -111,6 +111,14 @@
           bundle_id = "com.apple.finder";
           floating = true;
         };
+        # The call window is the one that must float, but no matcher tells it
+        # from the main window: both are titled "FaceTime", role AXWindow,
+        # subrole AXStandardWindow (seen 2026-10-26). So the whole app floats.
+        facetime = {
+          title = ".*";
+          bundle_id = "com.apple.FaceTime";
+          floating = true;
+        };
         # Emacs child frames, which paneru otherwise tiles as columns beside
         # the main frame: posframe titles its frames "posframe" (the
         # vertico-posframe minibuffer) and corfu names its "EmacsCorfuGUI"
