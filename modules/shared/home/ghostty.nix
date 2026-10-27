@@ -25,7 +25,9 @@
       font-thicken = true;
       font-family = "Sarasa Fixed SC";
       quick-terminal-position = "center";
-      # Keep remote SSH sessions usable when hosts don't yet have Ghostty terminfo.
+      # Wrap ssh in `ghostty +ssh`: forward the environment, and install
+      # Ghostty's xterm-ghostty entry on a host's first connect (cached; see
+      # `ghostty +ssh-cache`), falling back to xterm-256color if that fails.
       shell-integration-features = "ssh-env,ssh-terminfo";
       keybind = [
         "global:shift+ctrl+backquote=new_window"
@@ -35,9 +37,8 @@
         "super+t=new_window"
       ];
       focus-follows-mouse = true;
-      # REVISIT(upstream): restore `macos-titlebar-style = "tabs"` once a stable
-      #   Ghostty ships the macOS 27 tab-titlebar fix (merged on tip in #13069;
-      #   1.3.1 squishes the tab strip). ref: https://github.com/ghostty-org/ghostty/issues/13070; checked: 2026-10-22
+      # Needs Ghostty ≥ 1.4.0 on macOS 27: 1.3.1 squishes the tab strip.
+      macos-titlebar-style = "tabs";
       macos-option-as-alt = true;
       auto-update = "off";
     };
