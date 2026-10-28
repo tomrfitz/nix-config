@@ -20,6 +20,19 @@
     "defaultMode": "auto"
   },
   "model": "opus[1m]",
+  "hooks": {
+    "SessionStart": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "/bin/sh -c 'rex __internal session-start --agent claude 2>/dev/null || true'",
+            "timeout": 5
+          }
+        ]
+      }
+    ]
+  },
   "statusLine": {
     "type": "command",
     "command": "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/statusline.sh"
@@ -61,17 +74,5 @@
       "routine under tomrfitz/ prefix: git and nix operations within ~/nix-config (and its declared remote) are routine for this user"
     ]
   },
-  "hooks": {
-    "SessionStart": [
-      {
-        "hooks": [
-          {
-            "type": "command",
-            "command": "/bin/sh -c 'rex __internal session-start --agent claude 2>/dev/null || true'",
-            "timeout": 5
-          }
-        ]
-      }
-    ]
-  }
+  "tui": "fullscreen"
 }
