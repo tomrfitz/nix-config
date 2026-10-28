@@ -580,6 +580,43 @@
 (setq initial-buffer-choice
     (lambda () (org-agenda nil "w") (get-buffer "*Org Agenda*")))
 
+;; Kill buffers unseen for 30 min (buffer-terminator's defaults; it never
+;; kills unsaved, visible or process buffers, and save-place restores point).
+;; Without it the daemon keeps every agenda file open for good, and with them
+;; their Eglot server: eglot-autoshutdown waits for its last buffer. Midnight's
+;; clean-buffer-list can't do this: it reads a buffer never displayed, as
+;; agenda files are, as just displayed.
+(defun tf/buffer-terminator-keep-org-p ()
+    "Return :keep for an Org buffer that live Org state points into.
+That is the buffer with the running clock, and agenda files while an
+agenda buffer, whose entries are markers into them, is live."
+    (and buffer-file-name
+         (derived-mode-p 'org-mode)
+         (or (and (bound-and-true-p org-clock-marker)
+                  (eq (marker-buffer org-clock-marker) (current-buffer)))
+             (and (seq-some (lambda (buf)
+                                (eq (buffer-local-value 'major-mode buf)
+                                    'org-agenda-mode))
+                            (buffer-list))
+                  (org-agenda-file-p)))
+         :keep))
+
+(use-package buffer-terminator
+    :ensure t
+    :config
+    ;; First match wins. An agenda left hidden past the timeout goes first
+    ;; (C-c a or a new frame rebuilds it), which frees its files on the next
+    ;; sweep. The special rule stays, as upstream insists.
+    (setq buffer-terminator-rules-alist
+          '((keep-buffer-property . process)
+            (keep-buffer-property . visible)
+            (keep-buffer-property . active)
+            (kill-buffer-major-modes . org-agenda-mode)
+            (call-function . tf/buffer-terminator-keep-org-p)
+            (keep-buffer-property . special)
+            (kill-buffer-property . inactive)))
+    (buffer-terminator-mode))
+
 (use-package org-cliplink
     :ensure t
     :bind ("C-c n l" . org-cliplink))
@@ -611,8 +648,9 @@
 ;; Harper over Eglot, configured as in Harper's Emacs guide. Its absolute path
 ;; is resolved at startup like rass's, so a devShell's PATH can't hide it.
 ;; Spelling stays with jinx; ToDoHyphen would flag every TODO keyword.
-;; eglot-ensure connects only when a buffer is visited, so agenda files opened
-;; in the background stay idle.
+;; eglot-ensure connects only when a buffer is visited, but once Harper runs,
+;; Eglot attaches every open notes buffer to it, agenda files included;
+;; buffer-terminator (above) closes them, and Harper with its last one.
 ;; Markdown also gets rumdl's lints (the rules treefmt enforces, from the
 ;; project's .rumdl.toml or ~/.config/rumdl/rumdl.toml); Eglot runs one
 ;; server per buffer, so rass runs both.
