@@ -106,7 +106,8 @@ in
         { app = "/System/Applications/Mail.app"; }
         # { app = "${homeManagerAppsDirectory}/Zen Browser (Twilight).app"; }
         { app = "/Applications/Twilight.app"; }
-        { app = "/Applications/Ghostty.app"; }
+        # Installed by hand from Rex's private beta; no cask or nix package yet.
+        { app = "/Applications/Rex Beta.app"; }
         { app = "/Applications/Zed.app"; }
         { app = "${homeManagerAppsDirectory}/Emacs.app"; }
       ];
