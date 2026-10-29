@@ -44,6 +44,10 @@
 
     casks = [
       # browsers
+      # Only for Honorlock exams and Claude in Chrome, each in its own profile.
+      # Cask, not nixpkgs: Chrome must update itself to stay within Honorlock's
+      # minimum version.
+      "google-chrome"
       "helium-browser"
       "orion" # Kagi's browser — paying member, keeping an eye on it
       "zen@twilight"
