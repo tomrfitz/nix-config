@@ -526,13 +526,23 @@ the standalone home-manager CLI dropped; niri went home-manager native.
 The live apps run on the Windows PC until trflab;
 its state and Windows-side work are in the user's private notes.
 
-- [ ] Recyclarr for the richest selection
-      (user's goal):
-      `homelab/recyclarr.nix` still uses `include: template:`,
-      and recyclarr is now v8.7.2; research v8's config and guide pinning,
-      then convert.
-      Run it against the Windows Sonarr/Radarr
-      so the same config carries to trflab
+- [ ] Port the Windows recyclarr v8 config to `homelab/recyclarr.nix`
+      (Windows side done 2026-10-27; config and decisions in the private notes),
+      with the Sonarr/Radarr URLs as options for trflab.
+      The current module still uses v7 `include: template:` and never synced.
+      Decisions to carry over: TRaSH templates as shipped
+      (Sonarr WEB-1080p, WEB-2160p, anime; Radarr HD Bluray + WEB,
+      Remux + WEB 1080p, UHD Bluray + WEB, Remux + WEB 2160p),
+      DV Boost on 2160p, and `DV (w/o HDR fallback)` at -10000 in every profile
+      (Plex can't play or transcode DV Profile 5;
+      the guide's group covers 2160p only).
+      The anime profile keeps the name `Remux-1080p - Anime`
+      so recyclarr adopts it instead of creating `[Anime] Remux-1080p`
+- [ ] Jellyfin beside Plex, explored on trflab:
+      a Windows test (2026-10-27) showed NVENC + `tonemap_cuda` plays DV Profile
+      5 correctly in any client, which Plex can't.
+      Keep "Allow encoding in AV1" off on GPUs without AV1 encode
+      (3060 Ti, i5-12400), or AV1-capable browsers fail
 - [ ] Remote access, designed once for trflab: Tautulli outside the tailnet,
       Cloudflare tunnels for Spliit and others
       (the `cloudflared` homelab module exists)
