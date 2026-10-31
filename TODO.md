@@ -813,10 +813,10 @@ Several menubar utilities share a 2026-08-16 login-item mass-relaunch timestamp
   active · Obsidian 39.5 h · Claude 13.6 h · Emacs 8.4 h · vesktop 8.2 h
   (0.1 h/90 d)
   · League 11.7 h, all pre-May · IINA 6.2 h (unmanaged) vs managed VLC 0 h.
-- CLI: zoxide 718 · nh 434 (incl.
-  `nr*`) · topgrade 362 (hard stop 2026-05-15) · claude 295 · eza 126 · paneru
-  104 · opencode 55 (historic) · helix 24 (last March) · nushell 3 (all Feb) ·
-  mdbase-tasknotes 0 in 6,885 commands.
+- CLI: zoxide 718 · nh 434 (incl. `nr*`) · topgrade 362
+  (hard stop 2026-05-15)
+  · claude 295 · eza 126 · paneru 104 · opencode 55 (historic) · helix 24
+  (last March) · nushell 3 (all Feb) · mdbase-tasknotes 0 in 6,885 commands.
   ~19 nix packages + 4 HM programs are hard zeros
   (the packages.nix list in the prep checklist).
 - Interactive shell use collapsed ~90% after the March job start
