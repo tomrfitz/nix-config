@@ -13,10 +13,13 @@ let
   gitDir = if isDarwin then "${config.xdg.dataHome}/notes-git" else null;
 
   # Auto-commit, as obsidian-git did for the vault: commit whatever changed,
-  # then push. It never fetches (the Mac is the only writer) and pushes only
-  # after a fresh commit, so 1Password's Touch ID prompt for the SSH key comes
-  # only within one interval of editing; commits a declined push left behind
-  # go out with the next one. Unsigned, or each commit would prompt too.
+  # rebase onto what other writers (cloud agents) pushed, then push. It
+  # touches the network only after a fresh commit, so 1Password's Touch ID
+  # prompt for the SSH key comes only within one interval of editing; commits
+  # a declined push left behind go out with the next one. A conflicting
+  # rebase is aborted and left for a manual pull, so a later run never
+  # commits into a half-finished rebase. Unsigned, or each commit would
+  # prompt too.
   # Not services.git-sync: it fetches on every run, so it would prompt every
   # interval even when nothing changed.
   notes-sync = pkgs.writeShellApplication {
@@ -31,6 +34,10 @@ let
       git add --all
       git -c commit.gpgsign=false commit --quiet \
         --message "Auto-commit from ${hostName} at $(date '+%Y-%m-%dT%H:%M')"
+      if ! git pull --quiet --rebase origin HEAD; then
+        git rebase --abort 2>/dev/null || true
+        exit 1
+      fi
       git push --quiet origin HEAD
     '';
   };
