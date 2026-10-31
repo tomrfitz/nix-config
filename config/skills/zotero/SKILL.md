@@ -42,6 +42,19 @@ so each record describes the exact file attached to it:
   `needs published PDF`, for a batch Find Full Text from a network with access.
 - File size never matters (storage is unlimited).
   Accuracy, complete metadata and filing in the right collection do.
+- Fill every field a source supports, not just the import's defaults: abstract,
+  ISSN, publisher, article number as pages, `PMID:`/`PMCID:` lines in Extra,
+  full author names over initials.
+  A preprint's abstract comes from its own PDF,
+  since manuscript wording often differs from the published text.
+- Two records of the same version are a true duplicate:
+  `zotero-cli duplicates merge --keeper-key <K> --duplicate-keys <D>`
+  (`--dry-run` first),
+  keeping the record with more state
+  (notes, annotations, a clean DOI, the unsuffixed citation key)
+  after copying any metadata only the other one has.
+  Zotero's duplicate pane also flags every preprint/published pair by title;
+  those stay separate.
 
 ## Bulk work
 
@@ -65,7 +78,17 @@ Import gotchas:
   It also drops `bookauthor`; set the creators with `edit --creators`.
 - CrossRef imports Wiley chapter DOIs as `document`,
   and its bookSections arrive without bookTitle or editors.
-- A type change keeps DOI, ISSN and `Issue:` lines in Extra.
+- A type change keeps DOI, ISSN and `Issue:` lines in Extra,
+  and moves fields the new type lacks there too
+  (`Journal Abbreviation: …`): check Extra after one.
+- `add url` with an arXiv link leaves repository,
+  archive ID and the `10.48550/arXiv.<id>` DOI empty,
+  and Extra without the category; set them from the arXiv API
+  (`export.arxiv.org/api/query?id_list=`, which answers 429 under bursts:
+  retry after ~20 s).
+- Unpaywall's PDF for a published record can be the arXiv version;
+  moving it to a preprint record keeps the DOI-based filename,
+  so rename it from the parent's metadata.
 
 ## Metadata and OCR
 
