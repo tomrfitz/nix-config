@@ -533,7 +533,7 @@ While the pipeline is off on purpose,
 Hostnames follow `trf<identifier>` — initials prefix for network disambiguation
 (eduroam has many colliding default Apple/Windows names),
 short suffix for the device/role.
-Under 7 chars, unique prefixes for tab completion.
+Under 7 characters.
 
 ### Future machines
 
