@@ -268,12 +268,10 @@ Do not add new planning docs; this file is the plan.
    like that.
    Unproven: paneru logged to `/tmp`, which macOS emptied at reboot
    (now fixed: `~/Library/Logs/paneru.err.log`).
-   Next time a switch changes paneru
-   or removes many apps: quit paneru first (`ctrl+alt-q`), switch,
-   then `paneru restart`.
-   If input freezes on clicks,
-   `launchctl bootout gui/$UID/com.github.karinushka.paneru` from a terminal
-   beats a forced restart.
+   The quit-before-switch routine this prompted was retired 2026-11-02:
+   paneru changed in 9 later generations (344–382) without a freeze,
+   and it now re-enables a disabled tap itself.
+   The recovery step is in AGENTS.md.
    The orphaned `~/Library/Application Support/Firefox` profile
    (and `Firefox.bak`) went to the Trash 2026-09-22.
 4. **Source moves landed 2026-09-03**
@@ -494,8 +492,6 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   2026-09-16 to 09-25, and the failure mail can't send then either);
   `journalctl -u auto-update -o short-iso | grep '==>'` shows how far each run
   got.
-- A switch that changes paneru or uninstalls many apps: quit paneru first,
-  `paneru restart` after (Steps 3 has the why).
 - Add nothing without a usage reason;
   the August audit showed 20%+ of the config was one-week experiments.
 - Read the `nh` diff before activating:

@@ -49,10 +49,14 @@ The justfile passes `-H` explicitly;
 the permanent fix is `sudo scutil --set LocalHostName trfmbp`
 (nix-darwin reasserts it on activation).
 
-A switch that changes paneru
-or uninstalls many apps can wedge paneru's event tap
-(every click freezes input until a forced restart — seen 2026-09-03):
-quit paneru before switching and run `paneru restart` after.
+Switches need no paneru routine.
+If clicks ever freeze all input after one
+(a wedged event tap, seen once, 2026-09-03,
+when paneru's agent moved from home-manager to nix-darwin),
+run `launchctl bootout gui/$UID/com.github.karinushka.paneru` from a terminal,
+which beats a forced restart,
+then `paneru restart`. paneru now re-enables a disabled tap itself,
+and the many unattended switches that changed it since haven't frozen.
 Its logs are in `~/Library/Logs/paneru.err.log`.
 
 Project templates: `nixify [default|python-uv|cpp]` runs
