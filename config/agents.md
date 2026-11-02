@@ -48,6 +48,9 @@ be understandable and contributable by others.
 ## Tools
 
 - Installed on every host: `rg`, `fd`, `bat`, `jq`, `nixfmt`, `nixd`, `dix`
+- The userland on `PATH` is GNU on every host, macOS included
+  (`sed`, `grep`, `find`, `awk`, `tar`, coreutils):
+  write `sed -i`, never BSD's `sed -i ''`
 - Trust tool output (LSPs, linters, formatters) over your own reasoning
   for syntax, style, and correctness —
   they encode more collective experience than any one agent has.
