@@ -32,7 +32,7 @@
                         ]
                     },
                     {
-                        "description": "Left Control → Hyper (Ctrl+Shift+Alt+Cmd)",
+                        "description": "Left Control → Hyper (Ctrl+Alt+Cmd; Shift adds a second tier)",
                         "manipulators": [
                             {
                                 "type": "basic",
@@ -42,11 +42,10 @@
                                 },
                                 "to": [
                                     {
-                                        "key_code": "left_shift",
+                                        "key_code": "left_command",
                                         "modifiers": [
                                             "left_control",
-                                            "left_option",
-                                            "left_command"
+                                            "left_option"
                                         ]
                                     }
                                 ]
@@ -64,8 +63,7 @@
                                         "mandatory": [
                                             "command",
                                             "control",
-                                            "option",
-                                            "shift"
+                                            "option"
                                         ]
                                     }
                                 },
@@ -83,8 +81,7 @@
                                         "mandatory": [
                                             "command",
                                             "control",
-                                            "option",
-                                            "shift"
+                                            "option"
                                         ]
                                     }
                                 },

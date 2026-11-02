@@ -4,6 +4,10 @@
   user,
   ...
 }:
+let
+  hyper = key: "ctrl + alt + cmd - ${key}";
+  hyperShift = key: "ctrl + alt + cmd + shift - ${key}";
+in
 {
   # paneru's module logs to /tmp, which macOS empties at boot — so the one
   # time the log mattered (the 2026-09-03 input freeze that ended in a forced
@@ -28,6 +32,10 @@
         ];
         animation_speed = 4000;
         auto_center = false;
+        # Workspaces come and go as in niri: moving south past the last one
+        # opens a new one, and an emptied one closes
+        create_virtual_workspace_automatically = true;
+        reap_empty_workspaces = true;
       };
 
       # Trackpad: a four-finger horizontal swipe scrolls the column strip. The
@@ -39,50 +47,79 @@
         vertical = false;
       };
 
+      # Hyper (Left Control, config/karabiner.json) acts and Hyper+Shift moves,
+      # the way Super and Super+Shift do in niri on trfnix
+      # (modules/nixos/home/desktop.nix); keys follow niri's wherever paneru
+      # has the same command. Emacs binds nothing on C-M-s-, so none of this
+      # shadows it. C and E stay Karabiner's Emacs keys, so centring is on X.
       bindings = {
-        # Focus (vim hjkl)
-        window_focus_west = "ctrl + alt - h";
-        window_focus_east = "ctrl + alt - l";
-        window_focus_north = "ctrl + alt - k";
-        window_focus_south = "ctrl + alt - j";
+        window_focus_west = hyper "h";
+        window_focus_south = hyper "j";
+        window_focus_north = hyper "k";
+        window_focus_east = hyper "l";
+        window_swap_west = hyperShift "h";
+        window_swap_south = hyperShift "j";
+        window_swap_north = hyperShift "k";
+        window_swap_east = hyperShift "l";
 
-        # Swap
-        window_swap_west = "ctrl + alt + shift - h";
-        window_swap_east = "ctrl + alt + shift - l";
-        window_swap_north = "ctrl + alt + shift - k";
-        window_swap_south = "ctrl + alt + shift - j";
+        # niri's Home/End; the laptop has them only behind fn, so the arrows too
+        window_focus_first = map hyper [
+          "home"
+          "leftarrow"
+        ];
+        window_focus_last = map hyper [
+          "end"
+          "rightarrow"
+        ];
+        window_swap_first = map hyperShift [
+          "home"
+          "leftarrow"
+        ];
+        window_swap_last = map hyperShift [
+          "end"
+          "rightarrow"
+        ];
 
-        # Jump to first/last
-        window_focus_first = "ctrl + alt + cmd - h";
-        window_focus_last = "ctrl + alt + cmd - l";
-        window_swap_first = "ctrl + alt + cmd + shift - h";
-        window_swap_last = "ctrl + alt + cmd + shift - l";
+        # Together these give niri's Super+V, which toggles floating/tiling focus
+        window_focus_unmanaged = hyper "v";
+        window_focus_managed = hyper "tab";
 
-        # Layout
-        window_center = "ctrl + alt - c";
-        window_resize = "ctrl + alt - r";
-        window_shrink = "ctrl + alt + shift - r";
-        window_fullwidth = "ctrl + alt - f";
-        window_manage = "ctrl + alt + shift - f";
-        window_equalize = "ctrl + alt - e";
+        # Widths cycle through preset_column_widths; heights apply in a stack
+        window_resize = map hyper [
+          "r"
+          "equal"
+        ];
+        window_shrink = hyper "minus";
+        window_vertical_resize = hyperShift "equal";
+        window_vertical_shrink = hyperShift "minus";
+        window_equalize = hyperShift "r";
+        window_balance = hyper "b";
+        window_fullwidth = hyper "w";
+        window_manage = hyperShift "f";
+        window_center = hyper "x";
+        window_snap = hyper "s";
+        window_tabbeddisplay = hyper "t";
+        window_stack = hyper "leftbracket";
+        window_unstack = hyper "rightbracket";
 
-        # Stacking (consume/expel)
-        window_stack = "ctrl + alt - ]";
-        window_unstack = "ctrl + alt + shift - ]";
-
-        # Multi-monitor
-        window_nextdisplay = "ctrl + alt + shift - n"; # move and follow
-        window_nextdisplaysend = "ctrl + alt + cmd - n"; # move but stay
+        window_nextdisplay = hyper "n";
+        window_nextdisplaysend = hyperShift "n";
 
         # Virtual workspaces (experimental — virtualmove_north is a no-op at
         # the topmost strip; focus restore on return isn't deterministic)
-        window_virtual_north = "ctrl + alt + cmd - k";
-        window_virtual_south = "ctrl + alt + cmd - j";
-        window_virtualmove_north = "ctrl + alt + cmd + shift - k";
-        window_virtualmove_south = "ctrl + alt + cmd + shift - j";
+        window_virtual_north = hyper "u";
+        window_virtual_south = hyper "i";
+        window_virtualmove_north = hyperShift "u";
+        window_virtualmove_south = hyperShift "i";
 
-        quit = "ctrl + alt - q";
-      };
+        quit = hyperShift "e";
+      }
+      // lib.mergeAttrsList (
+        map (n: {
+          "window_virtualnum_${n}" = hyper n;
+          "window_virtualmovenum_${n}" = hyperShift n;
+        }) (map toString (lib.range 1 9))
+      );
 
       # ── Window rules ────────────────────────────────────────────────────
       windows = {
