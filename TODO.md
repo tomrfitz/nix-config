@@ -352,6 +352,19 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   Otherwise nothing pending.
   (kagi.nix was deleted in commit 3 on 2026-09-03; it lives in git history,
   and `programs.mcp` would be the way back.)
+- **The M5 Pro arrives** → rename the hosts
+  (decision and draft names in `~/Documents/notes/host-names.org`).
+  The M5 bootstraps as `fortis` and the M1 switches to `lenis`;
+  `trfnix` and `trfwsl` can follow or wait.
+  Repo: the host registry in `flake.nix` and `hosts/`,
+  the `justfile`'s `host == "trfmbp"` darwin check
+  (derive it from the registry),
+  the `smbp` and host aliases in `shell.nix`,
+  the ActivityWatch bucket URL in `zen.nix`, CI's trfmbp references
+  (`check.yml`, `build-uncached.sh`),
+  the `/land` skill's eval gate, and AGENTS.md's host table and naming section.
+  Outside: rename the Tailscale nodes and clear the old SSH host keys
+  (`ssh-keygen -R`).
 - **Winter break** → probable-tier cuts:
   (`ruff.nix` left this list 2026-09-07: it became `python.nix`,
   the nix-owned ruff/ty floor — see CLAUDE.md "Global floor vs project tier")
