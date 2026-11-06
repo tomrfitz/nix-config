@@ -25,6 +25,34 @@ let
       (_: {
         metaData.hidden = true;
       });
+  # Sarasa for every language group, in that script's orthography, so a
+  # lang-tagged CJK page gets its own Han forms. Serif is Iosevka Etoile where
+  # it has the script; it has no CJK. fontconfig never reaches Zen on darwin,
+  # so these prefs are the only route there.
+  etoileGroups = [
+    "x-western"
+    "x-cyrillic"
+    "el"
+  ];
+  fontPrefs =
+    lib.concatMapAttrs
+      (group: orthography: {
+        "font.default.${group}" = "sans-serif";
+        "font.name.sans-serif.${group}" = "Sarasa UI ${orthography}";
+        "font.name.monospace.${group}" = "Sarasa Fixed ${orthography}";
+        "font.name.serif.${group}" =
+          if lib.elem group etoileGroups then "Iosevka Etoile" else "Sarasa UI ${orthography}";
+      })
+      {
+        x-western = "SC";
+        x-cyrillic = "SC";
+        el = "SC";
+        zh-CN = "SC";
+        zh-TW = "TC";
+        zh-HK = "HC";
+        ja = "J";
+        ko = "K";
+      };
 in
 {
   programs.zen-browser = {
@@ -76,7 +104,8 @@ in
         # navigation
         "browser.ctrlTab.sortByRecentlyUsed" = true;
         "browser.download.dir" = "${config.home.homeDirectory}/Downloads";
-      };
+      }
+      // fontPrefs;
 
       userChrome = builtins.readFile ../../../config/zen-userchrome.css;
       userContent = builtins.readFile ../../../config/zen-usercontent.css;
