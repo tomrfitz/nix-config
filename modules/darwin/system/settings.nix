@@ -187,6 +187,11 @@ in
     CustomUserPreferences = {
       # Extra NSGlobalDomain keys without typed nix-darwin options
       NSGlobalDomain = {
+        # The user font every Cocoa app inherits unless it sets its own
+        # (TextEdit, Emacs's frame default, Mail before its own keys land).
+        # Left unmanaged, it stayed Atkinson after the 2026-10 Sarasa switch.
+        NSFont = "Sarasa-UI-SC-Regular";
+        NSFixedPitchFont = "Sarasa-Fixed-SC-Regular";
         AppleLanguages = [
           "en-US"
           "it-US"
