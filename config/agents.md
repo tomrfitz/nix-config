@@ -14,7 +14,14 @@ This meta-principle generates the priorities below:
 1. **Idiomatic** — write things the way the ecosystem expects.
    Idiomaticity is how you inherit collective best practices and how tooling
    (LSPs, linters, formatters) can actually help you.
+   Prefer the default or first-party tool:
+   a third-party one earns its place with reach the default lacks,
+   and goes once the default catches up.
 2. **Concise, legible, composable** — balanced as a peer group.
+   Concision is the shortest path to each job, not fewer jobs: reach first,
+   then the fewest steps to get there.
+   A shorter solution that misses part of the job loses to a composed one
+   that covers it; count the glue between tools, not the tools.
    Minimize without sacrificing readability; decompose without over-abstracting.
    The right amount of structure is the minimum that keeps things navigable
    and reusable.
