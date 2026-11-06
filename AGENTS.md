@@ -7,7 +7,7 @@ See also `~/.config/AGENTS.md` for global, project-agnostic conventions.
 
 A Nix flake managing macOS (nix-darwin) and NixOS systems with home-manager.
 Tracks on nixpkgs-unstable.
-Uses Lix as the nix runtime across all hosts.
+Uses nixpkgs' default Nix (CppNix) on every host.
 
 ### Machines
 
@@ -397,8 +397,9 @@ Fresh machine setup (darwin or NixOS):
 bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/main/scripts/bootstrap.sh)
 ```
 
-The script handles: Xcode CLT (darwin), Lix installation, repo clone,
-first `darwin-rebuild`/`nixos-rebuild`
+The script handles: Xcode CLT (darwin), Nix installation
+(nixos.org's script),
+repo clone, first `darwin-rebuild`/`nixos-rebuild`
 (which installs Homebrew through nix-homebrew on darwin),
 and Claude Code's native installer (darwin).
 The manual post-bootstrap steps are signing into 1Password and

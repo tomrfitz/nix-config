@@ -3,7 +3,7 @@ set -euo pipefail
 
 REPO_URL="${REPO_URL:-https://github.com/tomrfitz/nix-config.git}"
 REPO_DIR="${REPO_DIR:-$HOME/nix-config}"
-NIX_INSTALL_URL="${NIX_INSTALL_URL:-https://install.lix.systems/lix}"
+NIX_INSTALL_URL="${NIX_INSTALL_URL:-https://nixos.org/nix/install}"
 
 platform="$(uname -s)"
 
@@ -27,7 +27,7 @@ Optional args:
 Environment overrides:
   REPO_URL          Git URL to clone/pull (default: $REPO_URL)
   REPO_DIR          Local checkout path (default: $REPO_DIR)
-  NIX_INSTALL_URL   Lix installer URL (default: $NIX_INSTALL_URL)
+  NIX_INSTALL_URL   Nix installer URL (default: $NIX_INSTALL_URL)
 EOF
 }
 
@@ -111,11 +111,11 @@ ensure_nix() {
     fi
 
     have_cmd curl || die "curl is required to install Nix."
-    info "Installing Lix..."
-    curl -sSfL "$NIX_INSTALL_URL" | sh -s -- install
+    info "Installing Nix..."
+    curl -sSfL "$NIX_INSTALL_URL" | sh -s -- --daemon
 
     source_nix_profile || true
-    have_cmd nix || die "Lix installed but is not in PATH yet. Start a new shell and rerun."
+    have_cmd nix || die "Nix installed but is not in PATH yet. Start a new shell and rerun."
 }
 
 sync_repo() {

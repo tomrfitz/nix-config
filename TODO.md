@@ -920,14 +920,6 @@ The remaining used strays are the Unmanaged list.
   Replaced by nixpkgs `programs.niri` + home-manager
   `wayland.windowManager.niri` (generic KDL settings) + our own `polkit-agent`
   user unit; niri.cachix.org substituter removed. niri repo → `niri-wm/niri`.
-- **Lix** — healthy (2.95.4; nixpkgs first-class, 2.96.0-pre packaged). #1101
-  (macOS shells failing non-deterministically)
-  is still open on milestone 2.97,
-  but nixpkgs runs the darwin install checks with
-  `OBJC_DISABLE_INITIALIZE_FORK_SAFETY` and Hydra caches the result, so the old
-  `doInstallCheck` override went on 2026-10-22: it only forced a local build.
-  The `NIX_LDFLAGS` fix (nixpkgs#568529) reached the lock the same week.
-  Query via `https://git.lix.systems/api/v1/` (bypasses the Anubis bot check).
 - **nh** — 4.4.2 (2026-07-28) is latest;
   `--bypass-root-check` correct since 4.3.0;
   the #739 root-cache fix is master-only

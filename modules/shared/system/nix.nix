@@ -1,28 +1,6 @@
-{
-  pkgs,
-  user,
-  ...
-}:
+{ user, ... }:
 {
   nixpkgs.config.allowUnfree = true;
-  # Unmodified, so it comes from cache.nixos.org: any override (as the old
-  # darwin doInstallCheck one) makes every Lix bump a local build.
-  nix.package = pkgs.lixPackageSets.stable.lix;
-  # The tools that wrap a nix of their own, built against Lix instead of
-  # CppNix (https://lix.systems/add-to-config/). Spelled as the overrides
-  # lixPackageSets itself applies: inheriting its attributes recurses, since
-  # the set builds them from the final package set. Same derivations, so all
-  # cached. comma stays on CppNix: its Lix build isn't cached.
-  nixpkgs.overlays = [
-    (final: prev: {
-      nix-direnv = prev.nix-direnv.override { nix = final.lixPackageSets.stable.lix; };
-      nurl = prev.nurl.override { nix = final.lixPackageSets.stable.lix; };
-      nix-init = prev.nix-init.override {
-        nix = final.lixPackageSets.stable.lix;
-        inherit (final) nurl;
-      };
-    })
-  ];
   # Flakes only: no channels, so no dead channels entry on the Nix search path
   # (impure evaluations warned that root's channels profile does not exist).
   nix.channel.enable = false;
