@@ -78,7 +78,6 @@
       "rumdl"
       "material-icon-theme"
       "nix"
-      "opencode"
       "tombi"
       "toml"
       "typst"
@@ -97,7 +96,6 @@
             effort = "high";
           };
         };
-        opencode.type = "registry";
         github-copilot.type = "registry";
       };
       load_direnv = "shell_hook";

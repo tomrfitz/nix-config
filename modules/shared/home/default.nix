@@ -18,7 +18,6 @@
     ./dprint.nix
     ./claude-code.nix
     ./anthropic-api-key.nix
-    ./opencode.nix
     ./pi.nix
     ./omp.nix
     ./xdg-dirs.nix
@@ -140,7 +139,6 @@
 
   # ── Agent instructions (each tool looks for instructions at a different path) ──
   xdg.configFile."AGENTS.md".source = ../../../config/agents.md; # generic / Gemini
-  xdg.configFile."opencode/AGENTS.md".source = ../../../config/agents.md; # OpenCode
   # Claude Code, pi and omp get theirs through their own modules (claude-code.nix,
   # pi.nix, omp.nix). Codex CLI too: with preferXdgDirectories its home
   # is ~/.config/codex (CODEX_HOME), and with no settings declared it keeps its

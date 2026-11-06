@@ -383,9 +383,9 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   split the 200-line `shared/home/default.nix`,
   merge darwin git/zsh/topgrade into shared via `isDarwin`,
   colocate `config/` assets with their modules, devShell → `shell.nix`.
-- **When the agent harnesses are reviewed** → keep or cut pi, omp and opencode
-  (Hermes was dropped on 2026-10-22, never used;
-  its input and package are in `7ee3846`
+- **When the agent harnesses are reviewed** → keep or cut pi and omp
+  (opencode was dropped on 2026-11-06, unused for months; Hermes on 2026-10-22,
+  never used; its input and package are in `7ee3846`
   (`flake.nix`, `packages.nix`),
   the API-key wiring is in `~/Documents/notes/agent-harnesses.org`,
   and upstream now ships a home-manager module).
@@ -393,12 +393,11 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   Console org (the API and the Agent SDK only, not Claude Code sessions or extra
   usage), so third-party harnesses have a sanctioned Anthropic path: pi and omp
   run on them since 2026-10-09 (`anthropic-api-key.nix`), and pi's
-  `claude-bridge/*` models still draw plan limits. opencode is not wired to the
-  key. omp is on trial on the Mac since 2026-09-23 (`omp.nix`, ~1.1 GiB).
+  `claude-bridge/*` models still draw plan limits. omp is on trial on the Mac
+  since 2026-09-23 (`omp.nix`, ~1.1 GiB).
   Research: `~/Documents/notes/agent-harnesses.org`.
-  Retiring them all means pi.nix, omp.nix, opencode.nix, `pi-resources/`,
-  the mattpocock-skills input, pilish in Emacs,
-  Zed's opencode/copilot agent servers
+  Retiring them all means pi.nix, omp.nix, `pi-resources/`,
+  the mattpocock-skills input, pilish in Emacs, Zed's copilot agent server
   (plus github-copilot-cli and amp-acp, added in Zed's UI and never declared;
   Zed's own agent defaults also point at zed.dev/copilot/google models), `~/.pi`
   (516 MB), `~/.omp`, and amp's unmanaged `~/.amp` and `~/.local/bin/amp`.
@@ -443,7 +442,7 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   no model-era idioms then, mostly factual drift.
   Kept on purpose: the no-`head`/`tail` truncation rule
   (often broken, still wanted),
-  the guardrail prose (pi and opencode read AGENTS.md without the hook).
+  the guardrail prose (pi reads AGENTS.md without the hook).
 - **When macOS announces the Rosetta cutoff** → cask arch audit
   (activitywatch is x86_64-only; native arm64 in its 0.14 betas).
 - **When convenient** → `atuin login`
@@ -468,9 +467,8 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   One Thing: trash the app (root-owned; `sudo mas uninstall 1604176982`).
   Notes by Firefox: remove it in Zen's add-ons page
   (`normal_installed` policies don't uninstall when dropped).
-  Still open from the audit: Alacritty and kitty on darwin, opencode
-  (no runs in 120 days),
-  Ollama.app, the Shottr and Headjust login items
+  Still open from the audit: Alacritty and kitty on darwin, Ollama.app,
+  the Shottr and Headjust login items
   (launched at boot, not running),
   Mullvad's app vs Tailscale's Mullvad exit nodes,
   greedy cask upgrades vs apps' own updaters, `EDITOR` (Zed vs `emacsclient`).

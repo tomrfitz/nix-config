@@ -2,7 +2,7 @@
 
 Project-agnostic guidance for AI coding agents.
 Deployed to `~/.config/AGENTS.md`, `~/.config/claude/CLAUDE.md`,
-`~/.omp/agent/AGENTS.md`, `~/.config/opencode/AGENTS.md`,
+`~/.omp/agent/AGENTS.md`,
 `~/.pi/agent/AGENTS.md` and Codex's home by home-manager.
 
 ## Principles
