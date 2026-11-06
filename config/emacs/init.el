@@ -142,6 +142,22 @@
     :family "Sarasa UI SC"
     :height 140)
 
+;; Sarasa UI has 24 of 47 common IPA marks (no dental bridge, syllabic mark,
+;; ring below...); Fixed has all 47. Unrouted, a mark falls to the first
+;; installed font that has it (Aporetic Sans, Helvetica). Only a frame's own
+;; fontset is consulted for these, not the default one, so this runs per frame
+;; (the daemon has none at init), and `prepend', since `append' loses to that
+;; search.
+(defun tf/ipa-fontsets (&rest _)
+    (dolist (fontset (fontset-list))
+        (dolist (range '((#x0300 . #x036F)   ; combining diacritics
+                         (#x1AB0 . #x1AFF)   ; ...extended
+                         (#x1D00 . #x1DFF)   ; phonetic extensions, diacritics supplement
+                         (#xA700 . #xA71F))) ; modifier tone letters
+            (set-fontset-font fontset range "Sarasa Fixed SC" nil 'prepend))))
+(tf/ipa-fontsets)
+(add-hook 'server-after-make-frame-hook #'tf/ipa-fontsets)
+
 ;; ── Theme ─────────────────────────────────────────────────────────────
 ;; Local Flexoki theme (spec-corrected); platform-aware dark/light switching.
 (let ((themes-dir (expand-file-name "themes/" user-emacs-directory)))
