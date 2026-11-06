@@ -350,6 +350,13 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   Otherwise nothing pending.
   (kagi.nix was deleted in commit 3 on 2026-09-03; it lives in git history,
   and `programs.mcp` would be the way back.)
+- **trflab comes online** → replace the hand-rolled update pipeline
+  (bump PR → CI build → cache → `auto-update.sh` / `auto-rebuild.nix`)
+  with the fewest tools that cover every stage, least glue between them:
+  hosts pull only CI-built commits, trflab builds and caches Linux,
+  and the darwin leg stays on GitHub's macOS runners or the Mac
+  (no Linux host builds darwin).
+  Candidates are catalogued in `~/Documents/notes/nix-config-research.org`.
 - **The M5 Pro arrives** → rename the hosts
   (decision and draft names in `~/Documents/notes/host-names.org`).
   The M5 bootstraps as `fortis` and the M1 switches to `lenis`;
@@ -522,6 +529,22 @@ the standalone home-manager CLI dropped; niri went home-manager native.
       (or a oneshot like `tailscale-route-fix`)
       that waits for Mullvad's `Connected`
       and then cycles `tailscale down && tailscale up`
+- [ ] Homelab back on trfwsl as trflab's rehearsal,
+      serving the existing DrivePool (`/mnt/k`, 98% full on 2026-11-05).
+      First the VPN: replace Mullvad's daemon in `vpn.nix` with wg-quick policy
+      routing (`Table = off`, an `ip rule` from the tunnel address, SABnzbd
+      bound to it; MrSom3body's `modules/arr/proton-vpn`).
+      Tested 2026-11-05 on WSL kernel 6.18.54.1: `modprobe wireguard`,
+      a kernel tunnel between two network namespaces
+      (handshake, pings),
+      and the `ip rule` split (bound traffic via `wg0`, the rest via main).
+      Untested: a live Mullvad tunnel through WSL's NAT,
+      which needs a Mullvad device slot.
+      Then the apps from `git show 76e9d16:hosts/trfwsl/default.nix`,
+      migrated once from the Windows apps
+      (root folders remapped from `K:\data\media` paths);
+      the Windows apps stay authoritative until cutover.
+      Watch drvfs (9P) scan speed and inotify for Windows-side writes.
 - [ ] `.wslconfig` for mirrored networking
       (it only sets `vmIdleTimeout=-1`; optional while Tailscale covers access)
 - [x] Windows scheduled task to auto-start WSL: `Start-NixOS-WSL`
@@ -1040,11 +1063,17 @@ The remaining used strays are the Unmanaged list.
   Target shape = `stash@{0}` v4:
   flat `features/<name>/{default,home,darwin,nixos}.nix` + explicit
   `profiles/hm/*.nix`, `profiles/system/*.nix`, `roles/homelab/`.
-  Dead, don't re-litigate: auto-discovery
-  (the branch's own stash replaced readDir scanning with explicit imports;
-  the 2026 route would be import-tree/dendritic,
-  which the repo's values argue against), flake-parts
-  (bought only the perSystem tail),
+  Superseded 2026-11-05: dendritic
+  (flake-parts + import-tree) is the target layout.
+  The August deferral was about that session's scope, not the pattern;
+  the drvPath-gated migration order is in
+  `~/Documents/notes/nix-config-research.org` § Peer survey.
+  On flake-parts itself, not den
+  (`denful/den`, rejected 2026-11-05):
+  an 18k-line v0.x framework whose gains start past one user and three hosts;
+  why in the same note, § Not to copy.
+  Dead, don't re-litigate: readDir auto-discovery
+  (the branch's own stash replaced it with explicit imports),
   oxfmt (superseded by the dprint stack — but healthy,
   covers JSON/YAML/TOML/MD/JS/CSS at ~30× prettier speed:
   a possible future replacement for the dprint plugin set).
