@@ -41,7 +41,7 @@ The working tree still holds later commits' changes, so gate the index,
 not the worktree:
 
 ```bash
-gate=$(mktemp -d)
+gate=$(realpath "$(mktemp -d)")
 git checkout-index -a --prefix="$gate/"
 for h in fortis lenis; do nix eval --raw "path:$gate#darwinConfigurations.$h.system" >/dev/null; done
 for h in trfnix trfwsl; do nix eval --raw "path:$gate#nixosConfigurations.$h.config.system.build.toplevel" >/dev/null; done
