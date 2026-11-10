@@ -19,7 +19,7 @@
     ],
     "defaultMode": "auto"
   },
-  "model": "opus[1m]",
+  "model": "fable",
   "hooks": {
     "SessionStart": [
       {
@@ -41,9 +41,13 @@
   "modelSettings": {
     "claude-opus-5-5": {
       "effortLevel": "high"
+    },
+    "claude-fable-5-2": {
+      "effortLevel": "high"
     }
   },
   "tui": "fullscreen",
+  "skipWorkflowUsageWarning": true,
   "theme": "auto",
   "agentPushNotifEnabled": false,
   "autoMode": {
@@ -74,6 +78,5 @@
       "**Org-specific CLIs**: None configured — repo-local tooling observed in usage: nix, nixfmt, hm (home-manager), nd, emacsclient, tailscale, op (1Password CLI)",
       "routine under tomrfitz/ prefix: git and nix operations within ~/nix-config (and its declared remote) are routine for this user"
     ]
-  },
-  "skipWorkflowUsageWarning": true
+  }
 }
