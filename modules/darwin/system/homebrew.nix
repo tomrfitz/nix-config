@@ -13,6 +13,7 @@ let
     "1password"
     "activitywatch"
     "claude"
+    "batfi"
     "google-chrome" # Honorlock exams
     "karabiner-elements" # Emacs's Hyper+E and Hyper+C
     "lookaway"
