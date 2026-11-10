@@ -25,7 +25,9 @@
     ./1password-ssh.nix
   ];
 
-  home.stateVersion = "24.11";
+  # The home-manager release a machine's home was first installed under; a
+  # host installed later sets its own beside system.stateVersion.
+  home.stateVersion = lib.mkDefault "24.11";
 
   xdg.enable = true;
   # Ask HM modules to prefer XDG paths over $HOME for their own state/config.
