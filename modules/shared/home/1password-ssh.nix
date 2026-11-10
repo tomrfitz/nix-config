@@ -2,7 +2,6 @@
   config,
   pkgs,
   lib,
-  sshPublicKey,
   isDarwin,
   isWSL,
   ...
@@ -32,14 +31,6 @@ in
   # this preserves forwarded agents from SSH sessions while defaulting to
   # 1Password locally (via zsh envExtra).
   programs.ssh.settings."*".IdentityAgent = lib.mkIf (isDarwin || isWSL) identityAgent;
-
-  # macOS doesn't have a declarative system-level authorized_keys module,
-  # so keep it in HM.
-  home.file.".ssh/authorized_keys" = lib.mkIf isDarwin {
-    text = ''
-      ${sshPublicKey}
-    '';
-  };
 
   # ── WSL bridge ─────────────────────────────────────────────────────────
   # Bridge the 1Password Windows SSH agent to a Unix socket via
