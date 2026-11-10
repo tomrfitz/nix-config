@@ -214,9 +214,11 @@ be understandable and contributable by others.
   Record only what would change a future decision; when an entry goes stale,
   correct or delete it rather than appending history, which git already keeps.
 - Put knowledge where every reader that needs it will look:
-  repo rules in AGENTS.md,
-  the reason for a piece of code in a comment beside it, procedures in skills,
-  open work in TODO.md, research in notes.
+  repo rules in AGENTS.md, procedures in skills, open work in TODO.md,
+  research in notes.
+  Keep code comments to a line that points there:
+  decisions and things to revisit go in repo docs or notes,
+  which keeps the code easy to grep.
   Agent memory is the narrowest channel
   (one harness, one project), so it holds the least.
 - That rule binds every harness memory tool:
