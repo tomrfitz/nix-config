@@ -17,7 +17,6 @@ let
     "google-chrome" # Honorlock exams
     "karabiner-elements" # Emacs's Hyper+E and Hyper+C
     "lookaway"
-    "mullvad-vpn"
     "tailscale-app"
     "zen@twilight"
     "zotero"
