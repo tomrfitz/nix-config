@@ -20,8 +20,13 @@ Uses nixpkgs' default Nix (CppNix) on every host.
 | `trflab` | x86_64-linux | Dedicated homelab server | Future |
 | `trfvm` | TBD | Scratch/sandbox VM | Future |
 
-The primary config target is `fortis`; `lenis` shares its profile
-(both are `mac` in `flake.nix`, with a thin host file each).
+The primary config target is `fortis`.
+Both Macs take the `mac` profile in `flake.nix`,
+but `fortis` starts from a short list and takes things back as they are missed:
+its casks and App Store apps are the `onFortis` lists in `homebrew.nix`
+and `mas.nix`, its `system.defaults` are `fortisDefaults` in `settings.nix`,
+and it runs without paneru (`lenis` lists that in `flake.nix`).
+`lenis` keeps everything.
 `trfnix` is a real NixOS install useful for prototyping NixOS service configs
 (and the only host that exercises the Linux desktop modules);
 it has been powered off since ~2026-03, so the daily pipeline only evaluates it.
@@ -466,7 +471,7 @@ Every host then follows main on its own schedule.
 
 ```text
 Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR; Check runs on it:
-              check (eval + format) → darwin (build fortis's allowlisted
+              check (eval + format) → darwin (build lenis's allowlisted
               uncached derivations on macos-latest, push to tomrfitz.cachix.org)
               → automerge (rebase-merge the tested commit onto main)
 04:45  trfwsl: build trfwsl from main → push to Attic → switch trfwsl

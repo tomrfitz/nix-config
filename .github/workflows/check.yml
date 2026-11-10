@@ -1,7 +1,7 @@
 name: Check
 
 # check: evaluate every host and check formatting.
-# darwin: once check passes, build fortis's expensive, free derivations that
+# darwin: once check passes, build lenis's expensive, free derivations that
 #   cache.nixos.org lacks and push them to tomrfitz.cachix.org, so the Macs'
 #   switches download them instead of compiling (scripts/build-uncached.sh has
 #   the why of the allowlist). cachix-action's default daemon mode pushes only
@@ -64,7 +64,7 @@ jobs:
             # What the Macs compile today, all free software; keep it to names
             # whose licence is known, since anything matched goes public.
             - name: Build uncached allowlisted derivations
-              run: ./scripts/build-uncached.sh .#darwinConfigurations.fortis.system 'paneru|sgram-tui|emacs-|package-build-|tesseract-|aspell-'
+              run: ./scripts/build-uncached.sh .#darwinConfigurations.lenis.system 'paneru|sgram-tui|emacs-|package-build-|tesseract-|aspell-'
 
             - name: Disk after
               if: always()

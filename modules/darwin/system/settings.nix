@@ -1,5 +1,6 @@
 {
   config,
+  hostName,
   lib,
   user,
   ...
@@ -42,6 +43,43 @@ let
     ''launchctl asuser "$(id -u -- ${lib.escapeShellArg user})" sudo --user=${lib.escapeShellArg user} -- defaults write ${lib.escapeShellArg domain} ${lib.escapeShellArg key} ${
       lib.escapeShellArg (lib.generators.toPlist { escape = true; } value)
     }'';
+  # fortis starts from stock macOS and takes a setting back when it is missed
+  # (move the key here from the block below). These are the ones that don't
+  # wait: press-free clicking and dragging, and one date and unit format.
+  fortisDefaults = {
+    NSGlobalDomain = {
+      AppleICUForce24HourTime = true;
+      AppleMeasurementUnits = "Centimeters";
+      AppleMetricUnits = 1;
+      AppleTemperatureUnit = "Celsius";
+    };
+    trackpad = {
+      Clicking = true;
+      TrackpadThreeFingerDrag = true;
+      TrackpadThreeFingerHorizSwipeGesture = 0;
+      TrackpadThreeFingerVertSwipeGesture = 0;
+    };
+    CustomUserPreferences.NSGlobalDomain = {
+      AppleLanguages = [
+        "en-US"
+        "it-US"
+        "ko-US"
+        "fr-US"
+        "es-US"
+        "zh-Hans-US"
+      ];
+      AppleLocale = "en_US@calendar=iso8601";
+      AppleFirstWeekday = {
+        gregorian = 2;
+      }; # Monday
+      AppleICUDateFormatStrings = {
+        "1" = "yyyy-MM-dd";
+        "2" = "yyyy-MM-dd";
+        "3" = "yyyy-MM-dd";
+        "4" = "yyyy-MM-dd, EEEE";
+      };
+    };
+  };
 in
 {
   # home-manager's session variables reach shells only; apps launched from the
@@ -86,182 +124,188 @@ in
     RunAtLoad = true;
   };
 
-  system.defaults = {
-    # ── Global (NSGlobalDomain) ──────────────────────────────────────────
-    NSGlobalDomain = {
-      AppleInterfaceStyleSwitchesAutomatically = true;
-      AppleICUForce24HourTime = true;
-      AppleMeasurementUnits = "Centimeters";
-      AppleMetricUnits = 1;
-      AppleTemperatureUnit = "Celsius";
-      AppleWindowTabbingMode = "always";
-      NSAutomaticCapitalizationEnabled = true;
-      NSAutomaticPeriodSubstitutionEnabled = true;
-      NSTableViewDefaultSizeMode = 2;
-      "com.apple.sound.beep.feedback" = 1;
-      "com.apple.springing.delay" = 0.5;
-      "com.apple.springing.enabled" = true;
-      "com.apple.trackpad.forceClick" = true;
-    };
+  system.defaults =
+    if hostName == "fortis" then
+      fortisDefaults
+    else
+      {
+        # ── Global (NSGlobalDomain) ──────────────────────────────────────────
+        NSGlobalDomain = {
+          AppleInterfaceStyleSwitchesAutomatically = true;
+          AppleICUForce24HourTime = true;
+          AppleMeasurementUnits = "Centimeters";
+          AppleMetricUnits = 1;
+          AppleTemperatureUnit = "Celsius";
+          AppleWindowTabbingMode = "always";
+          NSAutomaticCapitalizationEnabled = true;
+          NSAutomaticPeriodSubstitutionEnabled = true;
+          NSTableViewDefaultSizeMode = 2;
+          "com.apple.sound.beep.feedback" = 1;
+          "com.apple.springing.delay" = 0.5;
+          "com.apple.springing.enabled" = true;
+          "com.apple.trackpad.forceClick" = true;
+        };
 
-    # ── Dock ─────────────────────────────────────────────────────────────
-    dock = {
-      autohide = true;
-      autohide-time-modifier = 0.15;
-      expose-group-apps = true;
-      magnification = true;
-      largesize = 90;
-      tilesize = 50;
-      mru-spaces = false;
-      orientation = "bottom";
-      show-recents = true;
-      showAppExposeGestureEnabled = true;
-      showhidden = true;
+        # ── Dock ─────────────────────────────────────────────────────────────
+        dock = {
+          autohide = true;
+          autohide-time-modifier = 0.15;
+          expose-group-apps = true;
+          magnification = true;
+          largesize = 90;
+          tilesize = 50;
+          mru-spaces = false;
+          orientation = "bottom";
+          show-recents = true;
+          showAppExposeGestureEnabled = true;
+          showhidden = true;
 
-      persistent-apps = [
-        { app = "/System/Applications/Apps.app"; }
-        { app = "/System/Applications/System Settings.app"; }
-        { app = "/Applications/Zotero.app"; }
-        { app = "${homeManagerAppsDirectory}/Obsidian.app"; }
-        { app = "${homeManagerAppsDirectory}/YouTube Music.app"; }
-        { app = "${homeManagerAppsDirectory}/Vesktop.app"; }
-        { app = "/System/Applications/Messages.app"; }
-        { app = "/System/Applications/Mail.app"; }
-        # { app = "${homeManagerAppsDirectory}/Zen Browser (Twilight).app"; }
-        { app = "/Applications/Twilight.app"; }
-        # Installed by hand from Rex's private beta; no cask or nix package yet.
-        { app = "/Applications/Rex Beta.app"; }
-        { app = "/Applications/Zed.app"; }
-        { app = "${homeManagerAppsDirectory}/Emacs.app"; }
-      ];
+          persistent-apps = [
+            { app = "/System/Applications/Apps.app"; }
+            { app = "/System/Applications/System Settings.app"; }
+            { app = "/Applications/Zotero.app"; }
+            { app = "${homeManagerAppsDirectory}/Obsidian.app"; }
+            { app = "${homeManagerAppsDirectory}/YouTube Music.app"; }
+            { app = "${homeManagerAppsDirectory}/Vesktop.app"; }
+            { app = "/System/Applications/Messages.app"; }
+            { app = "/System/Applications/Mail.app"; }
+            # { app = "${homeManagerAppsDirectory}/Zen Browser (Twilight).app"; }
+            { app = "/Applications/Twilight.app"; }
+            # Installed by hand from Rex's private beta; no cask or nix package yet.
+            { app = "/Applications/Rex Beta.app"; }
+            { app = "/Applications/Zed.app"; }
+            { app = "${homeManagerAppsDirectory}/Emacs.app"; }
+          ];
 
-      # Hot corners
-      # 5 = Start Screen Saver, 12 = Notification Center, 14 = Quick Note
-      wvous-bl-corner = 5;
-      wvous-br-corner = 14;
-      wvous-tr-corner = 12;
-    };
+          # Hot corners
+          # 5 = Start Screen Saver, 12 = Notification Center, 14 = Quick Note
+          wvous-bl-corner = 5;
+          wvous-br-corner = 14;
+          wvous-tr-corner = 12;
+        };
 
-    # ── Finder ───────────────────────────────────────────────────────────
-    finder = {
-      _FXShowPosixPathInTitle = true;
-      FXPreferredViewStyle = "clmv";
-      FXRemoveOldTrashItems = true;
-      ShowExternalHardDrivesOnDesktop = false;
-      ShowHardDrivesOnDesktop = false;
-      ShowMountedServersOnDesktop = false;
-      ShowRemovableMediaOnDesktop = false;
-      NewWindowTarget = "Home";
-      CreateDesktop = false; # Disable Finder's desktop icon layer (breaks Paneru tiling)
-      ShowPathbar = true;
-      ShowStatusBar = true;
-    };
+        # ── Finder ───────────────────────────────────────────────────────────
+        finder = {
+          _FXShowPosixPathInTitle = true;
+          FXPreferredViewStyle = "clmv";
+          FXRemoveOldTrashItems = true;
+          ShowExternalHardDrivesOnDesktop = false;
+          ShowHardDrivesOnDesktop = false;
+          ShowMountedServersOnDesktop = false;
+          ShowRemovableMediaOnDesktop = false;
+          NewWindowTarget = "Home";
+          CreateDesktop = false; # Disable Finder's desktop icon layer (breaks Paneru tiling)
+          ShowPathbar = true;
+          ShowStatusBar = true;
+        };
 
-    # ── Trackpad ─────────────────────────────────────────────────────────
-    trackpad = {
-      Clicking = true;
-      TrackpadThreeFingerDrag = true;
-      TrackpadRightClick = true;
-      ActuateDetents = true;
-      FirstClickThreshold = 1;
-      SecondClickThreshold = 1;
-      TrackpadFourFingerHorizSwipeGesture = 2;
-      TrackpadFourFingerPinchGesture = 2;
-      TrackpadFourFingerVertSwipeGesture = 2;
-      TrackpadMomentumScroll = true;
-      TrackpadPinch = true;
-      TrackpadRotate = true;
-      TrackpadTwoFingerDoubleTapGesture = true;
-      TrackpadTwoFingerFromRightEdgeSwipeGesture = 3;
-      TrackpadThreeFingerHorizSwipeGesture = 0;
-      TrackpadThreeFingerVertSwipeGesture = 0;
-    };
+        # ── Trackpad ─────────────────────────────────────────────────────────
+        trackpad = {
+          Clicking = true;
+          TrackpadThreeFingerDrag = true;
+          TrackpadRightClick = true;
+          ActuateDetents = true;
+          FirstClickThreshold = 1;
+          SecondClickThreshold = 1;
+          TrackpadFourFingerHorizSwipeGesture = 2;
+          TrackpadFourFingerPinchGesture = 2;
+          TrackpadFourFingerVertSwipeGesture = 2;
+          TrackpadMomentumScroll = true;
+          TrackpadPinch = true;
+          TrackpadRotate = true;
+          TrackpadTwoFingerDoubleTapGesture = true;
+          TrackpadTwoFingerFromRightEdgeSwipeGesture = 3;
+          TrackpadThreeFingerHorizSwipeGesture = 0;
+          TrackpadThreeFingerVertSwipeGesture = 0;
+        };
 
-    # ── Screenshot ───────────────────────────────────────────────────────
-    screencapture = {
-      location = "${homeDirectory}/Documents/Screenshots/";
-      target = "file";
-      show-thumbnail = false;
-    };
+        # ── Screenshot ───────────────────────────────────────────────────────
+        screencapture = {
+          location = "${homeDirectory}/Documents/Screenshots/";
+          target = "file";
+          show-thumbnail = false;
+        };
 
-    # ── Menu bar clock ───────────────────────────────────────────────────
-    menuExtraClock = {
-      FlashDateSeparators = true;
-      IsAnalog = true;
-      ShowAMPM = true;
-      ShowDate = 0;
-      ShowDayOfWeek = true;
-      ShowSeconds = true;
-    };
+        # ── Menu bar clock ───────────────────────────────────────────────────
+        menuExtraClock = {
+          FlashDateSeparators = true;
+          IsAnalog = true;
+          ShowAMPM = true;
+          ShowDate = 0;
+          ShowDayOfWeek = true;
+          ShowSeconds = true;
+        };
 
-    # ── Universal access ──────────────────────────────────────────────────
-    universalaccess = {
-      closeViewScrollWheelToggle = true; # Ctrl+scroll to zoom
-    };
+        # ── Universal access ──────────────────────────────────────────────────
+        universalaccess = {
+          closeViewScrollWheelToggle = true; # Ctrl+scroll to zoom
+        };
 
-    # ── Window manager ───────────────────────────────────────────────────
-    WindowManager = {
-      AppWindowGroupingBehavior = true;
-      EnableTiledWindowMargins = false; # No gaps between tiled windows
-      HideDesktop = true; # Hide desktop when clicking wallpaper
-    };
+        # ── Window manager ───────────────────────────────────────────────────
+        WindowManager = {
+          AppWindowGroupingBehavior = true;
+          EnableTiledWindowMargins = false; # No gaps between tiled windows
+          HideDesktop = true; # Hide desktop when clicking wallpaper
+        };
 
-    # ── Custom preferences (no typed nix-darwin options) ─────────────────
-    CustomUserPreferences = {
-      # Extra NSGlobalDomain keys without typed nix-darwin options
-      NSGlobalDomain = {
-        # The user font every Cocoa app inherits unless it sets its own
-        # (TextEdit, Emacs's frame default, Mail before its own keys land).
-        # Left unmanaged, it stayed Atkinson after the 2026-10 Sarasa switch.
-        NSFont = "Sarasa-UI-SC-Regular";
-        NSFixedPitchFont = "Sarasa-Fixed-SC-Regular";
-        AppleLanguages = [
-          "en-US"
-          "it-US"
-          "ko-US"
-          "fr-US"
-          "es-US"
-          "zh-Hans-US"
-        ];
-        AppleLocale = "en_US@calendar=iso8601";
-        AppleFirstWeekday = {
-          gregorian = 2;
-        }; # Monday
-        AppleICUDateFormatStrings = {
-          "1" = "yyyy-MM-dd";
-          "2" = "yyyy-MM-dd";
-          "3" = "yyyy-MM-dd";
-          "4" = "yyyy-MM-dd, EEEE";
+        # ── Custom preferences (no typed nix-darwin options) ─────────────────
+        CustomUserPreferences = {
+          # Extra NSGlobalDomain keys without typed nix-darwin options
+          NSGlobalDomain = {
+            # The user font every Cocoa app inherits unless it sets its own
+            # (TextEdit, Emacs's frame default, Mail before its own keys land).
+            # Left unmanaged, it stayed Atkinson after the 2026-10 Sarasa switch.
+            NSFont = "Sarasa-UI-SC-Regular";
+            NSFixedPitchFont = "Sarasa-Fixed-SC-Regular";
+            AppleLanguages = [
+              "en-US"
+              "it-US"
+              "ko-US"
+              "fr-US"
+              "es-US"
+              "zh-Hans-US"
+            ];
+            AppleLocale = "en_US@calendar=iso8601";
+            AppleFirstWeekday = {
+              gregorian = 2;
+            }; # Monday
+            AppleICUDateFormatStrings = {
+              "1" = "yyyy-MM-dd";
+              "2" = "yyyy-MM-dd";
+              "3" = "yyyy-MM-dd";
+              "4" = "yyyy-MM-dd, EEEE";
+            };
+          };
+          "com.apple.dock" = {
+            "recent-count" = 5;
+          };
+          "com.apple.desktopservices" = {
+            DSDontWriteNetworkStores = true;
+            DSDontWriteUSBStores = true;
+          };
+          "com.apple.controlcenter" = {
+            # 1 = In Full Screen Only
+            AutoHideMenuBarOption = 1;
+          };
+          "com.apple.finder" = {
+            ShowSidebar = true;
+          };
+          "com.apple.spaces" = {
+            "spans-displays" = false; # Independent spaces per display
+          };
         };
       };
-      "com.apple.dock" = {
-        "recent-count" = 5;
-      };
-      "com.apple.desktopservices" = {
-        DSDontWriteNetworkStores = true;
-        DSDontWriteUSBStores = true;
-      };
-      "com.apple.controlcenter" = {
-        # 1 = In Full Screen Only
-        AutoHideMenuBarOption = 1;
-      };
-      "com.apple.finder" = {
-        ShowSidebar = true;
-      };
-      "com.apple.spaces" = {
-        "spans-displays" = false; # Independent spaces per display
-      };
-    };
-  };
 
   # Sandboxed apps (see sandboxedAppPreferences): inside the `if` condition a
   # failed write doesn't trip the activation's `set -e`; the first denial skips
   # the rest of that domain, which would be denied the same way.
-  system.activationScripts.postActivation.text = lib.concatStrings (
-    lib.mapAttrsToList (domain: prefs: ''
-      if ! { ${lib.concatStringsSep " && " (lib.mapAttrsToList (writeUserDefault domain) prefs)}; }; then
-        echo >&2 "warning: ${domain} preferences not written (no Full Disk Access; expected when unattended)"
-      fi
-    '') sandboxedAppPreferences
+  system.activationScripts.postActivation.text = lib.optionalString (hostName != "fortis") (
+    lib.concatStrings (
+      lib.mapAttrsToList (domain: prefs: ''
+        if ! { ${lib.concatStringsSep " && " (lib.mapAttrsToList (writeUserDefault domain) prefs)}; }; then
+          echo >&2 "warning: ${domain} preferences not written (no Full Disk Access; expected when unattended)"
+        fi
+      '') sandboxedAppPreferences
+    )
   );
 }

@@ -1,4 +1,29 @@
-{ config, user, ... }:
+{
+  config,
+  hostName,
+  lib,
+  user,
+  ...
+}:
+let
+  # fortis starts from a short list and takes an app back when it is missed:
+  # add its name here. Every other Mac installs the whole list below. Rex,
+  # GlobalProtect and Honorlock have no cask and are installed by hand.
+  onFortis = [
+    "1password"
+    "activitywatch"
+    "claude"
+    "google-chrome" # Honorlock exams
+    "karabiner-elements" # Emacs's Hyper+E and Hyper+C
+    "lookaway"
+    "mullvad-vpn"
+    "tailscale-app"
+    "zen@twilight"
+    "zotero"
+  ];
+  wanted =
+    cask: hostName != "fortis" || lib.elem (if lib.isString cask then cask else cask.name) onFortis;
+in
 {
   # Homebrew itself, pinned by flake.lock: a fresh Mac gets it at the first
   # switch, and autoMigrate takes over an existing /opt/homebrew (it deletes
@@ -38,11 +63,11 @@
     # trusted = true; }: since Homebrew 6.0, brew bundle refuses casks from an
     # untrusted tap, and only at activation (eval and build still pass).
 
-    brews = [
+    brews = lib.filter wanted [
       "mole"
     ];
 
-    casks = [
+    casks = lib.filter wanted [
       # browsers
       # Only for Honorlock exams and Claude in Chrome, each in its own profile.
       # Cask, not nixpkgs: Chrome must update itself to stay within Honorlock's

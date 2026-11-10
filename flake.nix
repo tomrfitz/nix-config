@@ -189,7 +189,6 @@
       mac = {
         system = "aarch64-darwin";
         platform = "darwin";
-        extraModules = [ paneru.darwinModules.paneru ];
         hmModules = [
           ./modules/shared/home
           ./modules/shared/home/desktop.nix
@@ -203,6 +202,10 @@
         };
         lenis = mac // {
           hostModule = ./hosts/lenis;
+          extraModules = [
+            paneru.darwinModules.paneru
+            ./modules/darwin/system/paneru.nix
+          ];
         };
         trfnix = {
           system = "x86_64-linux";

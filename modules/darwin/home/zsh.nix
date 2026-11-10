@@ -1,10 +1,14 @@
 {
+  hostName,
   lib,
   ...
 }:
 {
   # Override EDITOR — brew cask installs a `zed` CLI shim at /usr/local/bin/zed
-  home.sessionVariables.EDITOR = lib.mkForce "zed --wait";
+  # fortis has no Zed: a frame on the Emacs daemon, which waits for C-x #.
+  home.sessionVariables.EDITOR = lib.mkForce (
+    if hostName == "fortis" then "emacsclient -c" else "zed --wait"
+  );
 
   programs.zsh = {
 
