@@ -52,15 +52,38 @@ in
   # back to the default profile's bundle, the installer's stale cacert.
   # REVISIT(upstream): drop NIX_SSL_CERT_FILE once nixpkgs' OpenSSL prefers
   # /etc/ssl/certs/ca-certificates.crt on darwin.
-  # ref: https://github.com/NixOS/nixpkgs/pull/570263; checked: 2026-10-22
+  # Merged to staging 2026-10-27, on master since; not yet on nixpkgs-unstable.
+  # ref: https://github.com/NixOS/nixpkgs/pull/570263; checked: 2026-11-10
   # PATH gives GUI apps that shell out to nix-installed tools the shells'
-  # profiles instead of launchd's /usr/bin:/bin:/usr/sbin:/sbin. setenv
-  # passes the value single-quoted, so systemPath's $HOME and $USER are
-  # expanded here.
-  launchd.user.envVariables = {
-    CLAUDE_CONFIG_DIR = config.home-manager.users.${user}.programs.claude-code.configDir;
-    inherit (config.environment.variables) NIX_SSL_CERT_FILE;
-    PATH = lib.replaceStrings [ "$HOME" "$USER" ] [ homeDirectory user ] config.environment.systemPath;
+  # profiles instead of launchd's /usr/bin:/bin:/usr/sbin:/sbin. No shell
+  # runs the agent's arguments, so systemPath's $HOME and $USER are expanded
+  # here.
+  # An agent instead of launchd.user.envVariables: nix-darwin runs that
+  # option's setenv as `sudo --user=` without `launchctl asuser`, which
+  # from the auto-rebuild daemon targets the system domain, so SIP fails
+  # activation there (exit 150). nix-darwin loads agents through asuser, and
+  # the agent also sets the variables again at each login.
+  # REVISIT(upstream): go back to launchd.user.envVariables once nix-darwin
+  # prefixes its setenv with `launchctl asuser`. No issue filed.
+  # ref: https://github.com/nix-darwin/nix-darwin/blob/master/modules/system/launchd.nix; checked: 2026-11-10
+  launchd.user.agents.user-env.serviceConfig = {
+    ProgramArguments = [
+      "/bin/launchctl"
+      "setenv"
+    ]
+    ++ lib.concatLists (
+      lib.mapAttrsToList
+        (name: value: [
+          name
+          value
+        ])
+        {
+          CLAUDE_CONFIG_DIR = config.home-manager.users.${user}.programs.claude-code.configDir;
+          inherit (config.environment.variables) NIX_SSL_CERT_FILE;
+          PATH = lib.replaceStrings [ "$HOME" "$USER" ] [ homeDirectory user ] config.environment.systemPath;
+        }
+    );
+    RunAtLoad = true;
   };
 
   system.defaults = {
