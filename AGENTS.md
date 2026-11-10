@@ -126,8 +126,15 @@ Never start both.
 - A brew upgrade leaves the old daemon running until a restart
   or `sudo launchctl kickstart -k system/org.nixos.batt`.
 - On a first switch launchd loads the daemon before brew installs batt;
-  the start script waits for the binary.
+  the start script polls for the binary
+  (`wait4path` rechecks only when the mount table changes,
+  so it never saw the install and the daemon hung on lenis, 2026-11-10).
 - batt's docs say to turn off Optimized Battery Charging in System Settings.
+- macOS 27 needs batt 0.9 or later,
+  which sets the limit through macOS's own charge limit (upper limit only).
+  0.8.0 starts, reports `Control mode: unsupported` and limits nothing.
+  After a daemon start macOS takes about a minute to apply the target; above it,
+  the Mac drains the battery to the target while plugged in.
 
 The `justfile` is the agents' command surface for checks; it has no switch,
 rollback or lock-bump recipes.

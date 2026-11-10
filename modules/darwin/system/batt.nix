@@ -10,7 +10,7 @@ in
   # Replaces `sudo brew services start batt`; see AGENTS.md § Charge limiters
   launchd.daemons.batt = {
     script = ''
-      /bin/wait4path ${bin}
+      until [ -x ${bin} ]; do /bin/sleep 5; done
       /usr/bin/install -m 644 ${pkgs.writeText "batt.json" (builtins.toJSON settings)} /etc/batt.json
       exec ${bin} daemon --always-allow-non-root-access
     '';
