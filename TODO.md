@@ -1,5 +1,46 @@
 # Nix Config — TODO
 
+## lenis headless, driven from fortis (2026-11-10)
+
+Decided: FileVault off with auto-login, lid open with the display asleep,
+approvals on fortis through a forwarded 1Password agent
+(if it works), batt holding the charge at 40%.
+Why approvals move: while lenis's screen is locked,
+1Password's agent refuses to sign
+(no commit, no fetch over the SSH remote)
+and Touch ID sudo hangs (`nrs` run from fortis sat at `sudo` until someone
+unlocked lenis).
+
+- [ ] Prototype the forwarded agent by hand before declaring it:
+      fortis's agent socket forwarded to a fixed path on lenis,
+      ssh and git signing on lenis pointed at it,
+      a signed commit made with lenis's screen locked.
+      `1password-ssh.nix` pins `IdentityAgent` on macOS,
+      which overrides a forwarded agent, so lenis has to stop pinning it.
+- [ ] By hand on lenis: FileVault off, auto-login, Screen Sharing on,
+      Optimized Battery Charging off, Rex as a login item.
+- [ ] A lenis-only module: never sleep on AC, sshd key-only
+      (both Macs),
+      a sudoers rule to kick the rebuild daemon, the agent forward,
+      then tailscaled as a daemon in place of the app (expect a re-login).
+- [ ] Tests: Screen Sharing over the tailnet from fortis
+      (RustDesk only if that falls short);
+      pull the power and confirm lenis boots,
+      logs in and answers over Tailscale and Rex.
+- [ ] Confirm batt holds 40% once the battery has drained to it.
+- [ ] Make lenis the Rex home
+      (`rex home set` on fortis)
+      so hosts and shortcuts live in one place;
+      each Mac lists the other as a host today.
+- [ ] fortis: switch (`nrsl`) to pick up the system-level authorized key,
+      set Rex's terminal font
+      (lenis uses `Sarasa Term SC`, set by hand),
+      install Mullvad from a network that resolves `cdn.mullvad.net`
+      (eduroam's resolvers time out on it) and put it back in `onFortis`.
+- [ ] Open: one cask that fails to download stops the activation script
+      before home-manager's step, on any Mac.
+      Decide whether a switch should survive that.
+
 ## Handoff: agent setup (2026-10-03)
 
 - **State:** landed on `main` on 2026-10-03,
