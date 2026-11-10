@@ -109,7 +109,7 @@
   # same ESR.
   # REVISIT(upstream): drop this once nixpkgs' zotero leaves
   # firefox-esr-140-bin (Zotero 11, on ESR 153).
-  # ref: https://github.com/NixOS/nixpkgs/pull/572466; checked: 2026-10-22
+  # ref: https://github.com/NixOS/nixpkgs/pull/572466; checked: 2026-11-10
   nixpkgs.config.permittedInsecurePackages = [ "firefox-esr-140-bin-unwrapped-140.17.0esr" ];
 
   # ── Face authentication (howdy) ───────────────────────────────────────
