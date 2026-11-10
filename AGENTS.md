@@ -27,6 +27,7 @@ its casks and App Store apps are the `onFortis` lists in `homebrew.nix`
 and `mas.nix`, its `system.defaults` are `fortisDefaults` in `settings.nix`,
 and it runs without paneru (`lenis` lists that in `flake.nix`).
 `lenis` keeps everything.
+Each Mac has one charge limiter (see Charge limiters).
 `trfnix` is a real NixOS install useful for prototyping NixOS service configs
 (and the only host that exercises the Linux desktop modules);
 it has been powered off since ~2026-03, so the daily pipeline only evaluates it.
@@ -105,6 +106,29 @@ App Store apps install and upgrade at every activation through nix-darwin's
 `programs.mas` (`mas.nix`).
 A cask upgrade can quit its running app, and `.pkg` casks ask for Touch ID.
 
+### Charge limiters
+
+`fortis` uses BatFi (cask), which needs a GUI session.
+A Mac that lists `modules/darwin/system/batt.nix` in `flake.nix`
+(`lenis`, headless)
+runs [batt](https://github.com/charlie0129/batt) instead,
+and `homebrew.nix` drops BatFi there. batt is a Homebrew formula
+(not in nixpkgs, checked 2026-11-10);
+nix-darwin runs its daemon
+(`org.nixos.batt`, log `/var/log/batt.log`)
+in place of the formula's `sudo brew services start batt`.
+Never start both.
+
+- The limit is `settings.limit` in `batt.nix`.
+  Every daemon start writes it over `/etc/batt.json`,
+  so `batt limit N` and `batt disable --for=1d` last
+  until the next start. batt's own default is 80%.
+- A brew upgrade leaves the old daemon running until a restart
+  or `sudo launchctl kickstart -k system/org.nixos.batt`.
+- On a first switch launchd loads the daemon before brew installs batt;
+  the start script waits for the binary.
+- batt's docs say to turn off Optimized Battery Charging in System Settings.
+
 The `justfile` is the agents' command surface for checks; it has no switch,
 rollback or lock-bump recipes.
 `check` builds the local tree and passes `-H` (see the hostname note above):
@@ -170,7 +194,7 @@ modules/
     system/        # nix.nix, user.nix
     home/          # packages, shell, git, editors, emacs, ghostty, zen, browser-policies, obsidian, notes, desktop, claude-code, pi, dprint, xdg-*, etc.
   darwin/          # macOS-only
-    system/        # homebrew.nix, settings.nix (system.defaults), security.nix, paneru.nix, auto-rebuild.nix
+    system/        # homebrew.nix, settings.nix (system.defaults), security.nix, paneru.nix, batt.nix, auto-rebuild.nix
     home/          # zsh.nix, git.nix (1Password signing)
   nixos/           # Linux-only
     system/        # desktop.nix, hardening.nix, homelab/, auto-update.nix, remote-build-cache.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh

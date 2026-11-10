@@ -205,6 +205,7 @@
           extraModules = [
             paneru.darwinModules.paneru
             ./modules/darwin/system/paneru.nix
+            ./modules/darwin/system/batt.nix
           ];
         };
         trfnix = {

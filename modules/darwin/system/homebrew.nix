@@ -22,7 +22,13 @@ let
     "zotero"
   ];
   wanted =
-    cask: hostName != "fortis" || lib.elem (if lib.isString cask then cask else cask.name) onFortis;
+    cask:
+    let
+      name = if lib.isString cask then cask else cask.name;
+    in
+    (hostName != "fortis" || lib.elem name onFortis)
+    # batt.nix replaces BatFi
+    && !(name == "batfi" && config.launchd.daemons ? batt);
 in
 {
   # Homebrew itself, pinned by flake.lock: a fresh Mac gets it at the first
