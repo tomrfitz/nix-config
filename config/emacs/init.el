@@ -808,13 +808,19 @@ agenda buffer, whose entries are markers into them, is live."
 (add-hook 'dired-mode-hook #'dired-hide-details-mode)
 
 ;; ── Terminal ──────────────────────────────────────────────────────────
-;; vterm only — Nix compiles the libvterm module at build time. Built-in
+;; vterm and ghostel side by side while ghostel (libghostty-vt) proves
+;; itself; drop vterm once it has. Nix compiles both native modules at
+;; build time, so ghostel never needs its prebuilt-module download. Built-in
 ;; eshell stays available with its defaults for quick Lisp-aware work.
 (use-package vterm
     :ensure t
     :commands vterm
     :config
     (setq vterm-max-scrollback 10000))
+
+(use-package ghostel
+    :ensure t
+    :commands ghostel)
 
 ;; ── Misc ──────────────────────────────────────────────────────────────
 (add-to-list 'vc-directory-exclusion-list ".jj")
