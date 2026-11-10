@@ -59,7 +59,10 @@ in
         "$NOTES"
       verboseEcho "notes-repo: initialized new repo at $NOTES"
     fi
-    if ! ${pkgs.git}/bin/git -C "$NOTES" remote get-url origin >/dev/null 2>&1; then
+    # Only in a working repo: on a second Mac iCloud delivers the folder with
+    # a .git file that names the first Mac's git dir, and git fails there.
+    if ${pkgs.git}/bin/git -C "$NOTES" rev-parse --git-dir >/dev/null 2>&1 \
+      && ! ${pkgs.git}/bin/git -C "$NOTES" remote get-url origin >/dev/null 2>&1; then
       ${pkgs.git}/bin/git -C "$NOTES" remote add origin "${notesRepo}"
     fi
   '';
