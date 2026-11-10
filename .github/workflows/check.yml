@@ -1,8 +1,8 @@
 name: Check
 
 # check: evaluate every host and check formatting.
-# darwin: once check passes, build trfmbp's expensive, free derivations that
-#   cache.nixos.org lacks and push them to tomrfitz.cachix.org, so the Mac's
+# darwin: once check passes, build fortis's expensive, free derivations that
+#   cache.nixos.org lacks and push them to tomrfitz.cachix.org, so the Macs'
 #   switches download them instead of compiling (scripts/build-uncached.sh has
 #   the why of the allowlist). cachix-action's default daemon mode pushes only
 #   what the job builds, never what it substitutes. A run where nothing
@@ -30,8 +30,10 @@ jobs:
 
             - uses: cachix/install-nix-action@v31
 
-            - name: Evaluate darwin configuration
-              run: nix eval .#darwinConfigurations.trfmbp.system --raw
+            - name: Evaluate darwin configurations
+              run: |
+                  nix eval .#darwinConfigurations.fortis.system --raw
+                  nix eval .#darwinConfigurations.lenis.system --raw
 
             - name: Evaluate nixos configurations
               run: |
@@ -59,10 +61,10 @@ jobs:
             - name: Disk before
               run: df -h / /nix
 
-            # What the Mac compiles today, all free software; keep it to names
+            # What the Macs compile today, all free software; keep it to names
             # whose licence is known, since anything matched goes public.
             - name: Build uncached allowlisted derivations
-              run: ./scripts/build-uncached.sh .#darwinConfigurations.trfmbp.system 'paneru|sgram-tui|emacs-|package-build-|tesseract-|aspell-'
+              run: ./scripts/build-uncached.sh .#darwinConfigurations.fortis.system 'paneru|sgram-tui|emacs-|package-build-|tesseract-|aspell-'
 
             - name: Disk after
               if: always()

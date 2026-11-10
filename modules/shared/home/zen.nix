@@ -1,5 +1,6 @@
 {
   config,
+  hostName,
   lib,
   pkgs,
   ...
@@ -282,7 +283,7 @@ in
           };
           ActivityWatch = {
             id = "{4693bca9-de9c-4307-a6ba-e92ddc1b319b}";
-            url = "http://localhost:5600/#/activity/trfmbp/view/";
+            url = "http://localhost:5600/#/activity/${hostName}/view/";
             workspace = s.Home.id;
             container = profile.containers.Personal.id;
             position = 2;

@@ -3,11 +3,11 @@
 # modules/shared/home/shell.nix).
 
 host := `hostname`
-nh_cmd := if host == "trfmbp" { "darwin" } else { "os" }
-system := if host == "trfmbp" { "aarch64-darwin" } else { "x86_64-linux" }
+nh_cmd := if os() == "macos" { "darwin" } else { "os" }
+system := if os() == "macos" { "aarch64-darwin" } else { "x86_64-linux" }
 
 # nh derives the target from macOS's LocalHostName, which the OS silently
-# renames on a network clash (seen: trfmbp-2) — pass the flake host explicitly.
+# renames on a network clash (seen: trfmbp-2, the M1's old name) — pass the flake host explicitly.
 nh_host := "-H " + host
 
 # Build the system closure without activating (local working tree, keep-going)
@@ -27,7 +27,7 @@ fmt-check:
 # Evaluate config (catches syntax/eval errors without building)
 [macos]
 eval:
-    nix eval .#darwinConfigurations.trfmbp.system --raw
+    nix eval .#darwinConfigurations.{{ host }}.system --raw
 
 [linux]
 eval:
@@ -35,7 +35,8 @@ eval:
 
 # Evaluate all flake hosts (darwin + nixos + nixos-wsl)
 eval-all:
-    nix eval .#darwinConfigurations.trfmbp.system --raw
+    nix eval .#darwinConfigurations.fortis.system --raw
+    nix eval .#darwinConfigurations.lenis.system --raw
     nix eval .#nixosConfigurations.trfnix.config.system.build.toplevel.drvPath --raw
     nix eval .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath --raw
 

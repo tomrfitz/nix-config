@@ -8,7 +8,7 @@
   # Daily rebuild from remote main as a root daemon (a user agent cannot run
   # unattended — sudo here is Touch ID-only). nh refuses `nh darwin` as root
   # unless told otherwise, and derives the target from macOS's LocalHostName,
-  # which the OS silently renames on a network clash (seen: trfmbp-2) — so
+  # which the OS silently renames on a network clash (seen: trfmbp-2, the M1's old name) — so
   # pass both explicitly. Verified against nh 4.3.2 (locked) and master.
   launchd.daemons.auto-rebuild = {
     serviceConfig = {

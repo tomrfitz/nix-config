@@ -43,7 +43,7 @@ not the worktree:
 ```bash
 gate=$(mktemp -d)
 git checkout-index -a --prefix="$gate/"
-for h in trfmbp; do nix eval --raw "path:$gate#darwinConfigurations.$h.system" >/dev/null; done
+for h in fortis lenis; do nix eval --raw "path:$gate#darwinConfigurations.$h.system" >/dev/null; done
 for h in trfnix trfwsl; do nix eval --raw "path:$gate#nixosConfigurations.$h.config.system.build.toplevel" >/dev/null; done
 nix build --no-link "path:$gate#checks.aarch64-darwin.formatting"
 ```

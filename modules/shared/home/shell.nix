@@ -46,7 +46,8 @@
         zln = "zmv -L";
 
         # SSH + tmux (attach or create named session)
-        smbp = "ssh trfmbp -t 'tmux new -As main'";
+        sfortis = "ssh fortis -t 'tmux new -As main'";
+        slenis = "ssh lenis -t 'tmux new -As main'";
         snix = "ssh trfnix -t 'tmux new -As main'";
         swsl = "ssh trfwsl -t 'tmux new -As main'";
         slab = "ssh trflab -t 'tmux new -As main'";
@@ -55,7 +56,7 @@
 
     envExtra = lib.optionalString (!pkgs.stdenv.hostPlatform.isDarwin && !isWSL) ''
       # On NixOS, default to the local 1Password agent but preserve a forwarded
-      # agent from SSH (e.g., when SSHing in from trfmbp).
+      # agent from SSH (e.g., when SSHing in from a Mac).
       if [[ -z "$SSH_AUTH_SOCK" ]]; then
         export SSH_AUTH_SOCK="${config.home.homeDirectory}/.1password/agent.sock"
       fi
@@ -338,7 +339,6 @@
         format = "[$hostname]($style) ";
         style = "dimmed cyan";
         aliases = {
-          trfmbp = "mbp";
           trfnix = "nix";
           trfwsl = "wsl";
           trflab = "lab";

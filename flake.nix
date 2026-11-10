@@ -184,17 +184,25 @@
           ++ extraModules;
         };
 
+      # fortis is the M5 and lenis the M1, for the life of each machine; the
+      # names don't move when a new Mac arrives.
+      mac = {
+        system = "aarch64-darwin";
+        platform = "darwin";
+        extraModules = [ paneru.darwinModules.paneru ];
+        hmModules = [
+          ./modules/shared/home
+          ./modules/shared/home/desktop.nix
+          ./modules/darwin/home
+        ];
+      };
+
       hosts = {
-        trfmbp = {
-          system = "aarch64-darwin";
-          platform = "darwin";
-          hostModule = ./hosts/trfmbp;
-          extraModules = [ paneru.darwinModules.paneru ];
-          hmModules = [
-            ./modules/shared/home
-            ./modules/shared/home/desktop.nix
-            ./modules/darwin/home
-          ];
+        fortis = mac // {
+          hostModule = ./hosts/fortis;
+        };
+        lenis = mac // {
+          hostModule = ./hosts/lenis;
         };
         trfnix = {
           system = "x86_64-linux";

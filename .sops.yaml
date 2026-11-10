@@ -1,5 +1,5 @@
 keys:
-  - &admin age1ttfh2w9nga89rdxt4pt6f6pr7j7lkwft496j3ej0pf28w237xemqvd8e27 # trfmbp (age-keygen)
+  - &admin age1ttfh2w9nga89rdxt4pt6f6pr7j7lkwft496j3ej0pf28w237xemqvd8e27 # admin (age-keygen; lives on the Macs)
   - &trfwsl age1k7npyywhsqhm3gdq8ymthkjry6ea56lmjpz7w8y57704j3lh8ypsj0d8hk # trfwsl host key
 
 creation_rules:

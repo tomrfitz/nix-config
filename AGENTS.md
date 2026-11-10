@@ -13,13 +13,15 @@ Uses nixpkgs' default Nix (CppNix) on every host.
 
 | Hostname | Platform | Role | Status |
 | -------- | ---------------- | ---------------------------------------- | ------ |
-| `trfmbp` | aarch64-darwin | Daily driver (M1 Pro MacBook Pro) | Active |
+| `fortis` | aarch64-darwin | Primary Mac (M5 Pro MacBook Pro) | Active |
+| `lenis` | aarch64-darwin | Secondary Mac (M1 Pro MacBook Pro) | Active |
 | `trfnix` | x86_64-linux | NixOS testbed (Samsung laptop) | Dormant |
 | `trfwsl` | x86_64-linux WSL | Interim homelab on gaming PC, later dev | Active |
 | `trflab` | x86_64-linux | Dedicated homelab server | Future |
 | `trfvm` | TBD | Scratch/sandbox VM | Future |
 
-The primary config target is `trfmbp`.
+The primary config target is `fortis`; `lenis` shares its profile
+(both are `mac` in `flake.nix`, with a thin host file each).
 `trfnix` is a real NixOS install useful for prototyping NixOS service configs
 (and the only host that exercises the Linux desktop modules);
 it has been powered off since ~2026-03, so the daily pipeline only evaluates it.
@@ -46,7 +48,7 @@ nh derives the target host from macOS's `LocalHostName`,
 which the OS silently renames on a network clash
 (seen: `trfmbp-2` → `nh` fails with "Did you mean trfmbp?").
 The justfile passes `-H` explicitly;
-the permanent fix is `sudo scutil --set LocalHostName trfmbp`
+the permanent fix is `sudo scutil --set LocalHostName <host>`
 (nix-darwin reasserts it on activation).
 
 Switches need no paneru routine.
@@ -105,7 +107,7 @@ rollback or lock-bump recipes.
 ```bash
 just check         # nh darwin build . (local tree; build closure without activating, with diff)
 just eval          # eval current host's system (catches eval errors without building)
-just eval-all      # eval all configured hosts (trfmbp + trfnix + trfwsl)
+just eval-all      # eval all configured hosts (fortis + lenis + trfnix + trfwsl)
 just fmt           # nix fmt: format the tree in place (treefmt)
 just fmt-check     # CI's sandboxed formatting check: read-only, sees tracked files only
 just diff          # dix diff between previous and current system profile
@@ -348,7 +350,7 @@ Two mechanisms, split by trust model:
   Age-encrypted in `secrets/`, decrypted to `/run/secrets/` at activation.
   Each host's age key is derived from its SSH host key;
   the admin key is a standalone age key
-  (`~/.config/sops/age/keys.txt` on trfmbp).
+  (`~/.config/sops/age/keys.txt` on the Macs).
   Edit with `sops secrets/<host>.yaml`:
   sops-nix reads `/` in a key name as YAML nesting, so write nested maps,
   and quote every value (a number-like one, such as a Mullvad account number,
@@ -394,8 +396,12 @@ every project gets.
 Fresh machine setup (darwin or NixOS):
 
 ```bash
-bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/main/scripts/bootstrap.sh)
+bash <(curl -L https://raw.githubusercontent.com/tomrfitz/nix-config/main/scripts/bootstrap.sh) <host>
 ```
+
+Pass the flake host (`fortis` for a new Mac):
+without it the script uses the machine's current name,
+which on a fresh Mac is a default like `Toms-MacBook-Pro`.
 
 The script handles: Xcode CLT (darwin), Nix installation
 (nixos.org's script),
@@ -460,13 +466,13 @@ Every host then follows main on its own schedule.
 
 ```text
 Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR; Check runs on it:
-              check (eval + format) → darwin (build trfmbp's allowlisted
+              check (eval + format) → darwin (build fortis's allowlisted
               uncached derivations on macos-latest, push to tomrfitz.cachix.org)
               → automerge (rebase-merge the tested commit onto main)
 04:45  trfwsl: build trfwsl from main → push to Attic → switch trfwsl
 06:30  trfnix: nixos-rebuild switch from remote main (when powered on; no
                Attic hits while the pipeline skips its build)
-06:30  trfmbp: nh darwin switch --refresh from remote main (local darwin build)
+06:30  Macs:   nh darwin switch --refresh from remote main (local darwin build)
 PRs + main CI: the same check → darwin (no automerge)
 daily CI:      fail if flake.lock hasn't changed on main for 10 days (watchdog)
 ```
@@ -494,7 +500,7 @@ daily CI:      fail if flake.lock hasn't changed on main for 10 days (watchdog)
   (phases 0–4; it no longer bumps or pushes,
   so its deploy key needs only read access)
 - `modules/nixos/system/auto-update.nix` — systemd services/timers + msmtp
-- `modules/darwin/system/auto-rebuild.nix` — root launchd daemon for trfmbp
+- `modules/darwin/system/auto-rebuild.nix` — root launchd daemon on each Mac
   (unattended; user sudo is Touch ID-only).
   Log: `/var/log/auto-rebuild.log`.
   It fires at 06:30 Mac-local time,
@@ -535,10 +541,13 @@ While the pipeline is off on purpose,
 
 ### Naming convention
 
-Hostnames follow `trf<identifier>` — initials prefix for network disambiguation
-(eduroam has many colliding default Apple/Windows names),
-short suffix for the device/role.
-Under 7 characters.
+New hosts take phonetic-feature adjectives, without the old `trf` prefix:
+an uncommon word already avoids eduroam's colliding default names.
+Every machine keeps its name for life: `fortis` is the M5 and `lenis` the M1,
+and a later Mac gets a new name under whatever scheme is chosen then.
+The other machines take trait names
+(draft assignments and the unused pool are in the user's private notes);
+`trfnix` and `trfwsl` keep their names until they're renamed.
 
 ### Future machines
 

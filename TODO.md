@@ -357,19 +357,15 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   and the darwin leg stays on GitHub's macOS runners or the Mac
   (no Linux host builds darwin).
   Candidates are catalogued in `~/Documents/notes/nix-config-research.org`.
-- **The M5 Pro arrives** → rename the hosts
-  (decision and draft names in `~/Documents/notes/host-names.org`).
-  The M5 bootstraps as `fortis` and the M1 switches to `lenis`;
-  `trfnix` and `trfwsl` can follow or wait.
-  Repo: the host registry in `flake.nix` and `hosts/`,
-  the `justfile`'s `host == "trfmbp"` darwin check
-  (derive it from the registry),
-  the `smbp` and host aliases in `shell.nix`,
-  the ActivityWatch bucket URL in `zen.nix`, CI's trfmbp references
-  (`check.yml`, `build-uncached.sh`),
-  the `/land` skill's eval gate, and AGENTS.md's host table and naming section.
-  Outside: rename the Tailscale nodes and clear the old SSH host keys
-  (`ssh-keygen -R`).
+- **Mac rename lands on main**
+  (repo side done 2026-11-10: `trfmbp` → `fortis` + `lenis`)
+  → switch the M1 once with `nh darwin switch --refresh -H lenis`
+  (its LocalHostName is still `trfmbp`, so a bare `nrsr` can't find it),
+  bootstrap the M5 as `fortis`, copy `~/.config/sops/age/keys.txt` over,
+  rename both Tailscale nodes, and `ssh-keygen -R trfmbp`.
+  ActivityWatch's history stays in its old `trfmbp` bucket.
+  `trfnix` and `trfwsl` can follow or wait
+  (names in `~/Documents/notes/host-names.org`).
 - **Winter break** → probable-tier cuts:
   (`ruff.nix` left this list 2026-09-07: it became `python.nix`,
   the nix-owned ruff/ty floor — see CLAUDE.md "Global floor vs project tier")
@@ -483,7 +479,7 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   (`brew bundle`, greedy; Microsoft's two are left to Microsoft AutoUpdate)
   and the App Store apps; a bare `nh darwin switch` upgrades nothing.
   Two things break silently: LocalHostName drift
-  (`nh … Did you mean trfmbp?` → `sudo scutil --set LocalHostName trfmbp`)
+  (`nh … Did you mean <host>?` → `sudo scutil --set LocalHostName <host>`)
   and upstream overlay/option renames
   (eval fails — read the error, it names the attribute).
 - Check `/var/log/auto-rebuild.log` has runs
