@@ -906,6 +906,13 @@ terminal frame fails on macOS."
         (org-capture)
         ((error quit) (delete-frame))))
 
+;; The template menu reads one character and drops every other event, but
+;; still echoes them: a trackpad's momentum over the new popup fills the echo
+;; area with <triple-wheel-down>. No key echo while the menu is up.
+(define-advice org-mks (:around (fn &rest args) tf/no-key-echo)
+    (let ((echo-keystrokes 0))
+        (apply fn args)))
+
 (defun tf/popup-frame-p ()
     "Non-nil when the selected frame is a capture popup."
     (frame-parameter nil 'tf-popup))
