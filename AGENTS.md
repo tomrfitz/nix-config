@@ -136,6 +136,30 @@ Never start both.
   After a daemon start macOS takes about a minute to apply the target; above it,
   the Mac drains the battery to the target while plugged in.
 
+### Headless Macs
+
+`lenis` is always on and driven from `fortis`
+(Rex, SSH, Screen Sharing), with its lid open and the display asleep.
+It lists `modules/darwin/system/headless.nix` in `flake.nix`:
+
+- It never sleeps and restarts after a freeze.
+  This MacBook has no restart-after-power-failure setting
+  (`pmset -g cap` lists no `autorestart`);
+  an Apple silicon laptop starts when power is connected.
+- Touch ID sudo hangs while nobody is at the Mac,
+  so two commands need no password:
+  `sudo launchctl kickstart system/org.nixos.auto-rebuild`
+  (a switch from remote `main`, as at 06:30)
+  and `sudo launchctl kickstart -k system/org.nixos.batt`.
+- Set by hand, since nix-darwin can't: auto-login, Screen Sharing,
+  Rex as a login item, Optimized Battery Charging off.
+
+sshd takes keys only on every Mac (`security.nix`);
+the key is the one in `flake.nix`, served from `/etc/ssh`.
+Between the Macs Tailscale relays through DERP on eduroam,
+which is too slow for Screen Sharing:
+use `vnc://lenis.local` on the same network.
+
 The `justfile` is the agents' command surface for checks; it has no switch,
 rollback or lock-bump recipes.
 `check` builds the local tree and passes `-H` (see the hostname note above):
@@ -201,7 +225,7 @@ modules/
     system/        # nix.nix, user.nix
     home/          # packages, shell, git, editors, emacs, ghostty, zen, browser-policies, obsidian, notes, desktop, claude-code, pi, dprint, xdg-*, etc.
   darwin/          # macOS-only
-    system/        # homebrew.nix, settings.nix (system.defaults), security.nix, paneru.nix, batt.nix, auto-rebuild.nix
+    system/        # homebrew.nix, settings.nix (system.defaults), security.nix, paneru.nix, batt.nix, headless.nix, auto-rebuild.nix
     home/          # zsh.nix, git.nix (1Password signing)
   nixos/           # Linux-only
     system/        # desktop.nix, hardening.nix, homelab/, auto-update.nix, remote-build-cache.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh
