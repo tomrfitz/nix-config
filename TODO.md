@@ -17,15 +17,24 @@ unlocked lenis).
       a signed commit made with lenis's screen locked.
       `1password-ssh.nix` pins `IdentityAgent` on macOS,
       which overrides a forwarded agent, so lenis has to stop pinning it.
-- [ ] By hand on lenis: FileVault off, auto-login, Screen Sharing on,
-      Optimized Battery Charging off, Rex as a login item.
-- [ ] A lenis-only module: never sleep on AC, sshd key-only
-      (both Macs),
-      a sudoers rule to kick the rebuild daemon, the agent forward,
+- [ ] By hand on lenis, done 2026-11-10: FileVault off, auto-login,
+      Screen Sharing on.
+      Not checkable without an admin prompt:
+      Optimized Battery Charging off and Rex as a login item
+      (the power-pull test shows the second).
+- [ ] `headless.nix` so far: never sleep, restart after a freeze,
+      passwordless kickstart of the rebuild and batt daemons;
+      sshd is key-only on every Mac.
+      After each switch, check
+      that `ssh -o PreferredAuthentications=password <host>` is refused.
+      Still to add: the agent forward,
       then tailscaled as a daemon in place of the app (expect a re-login).
-- [ ] Tests: Screen Sharing over the tailnet from fortis
-      (RustDesk only if that falls short);
-      pull the power and confirm lenis boots,
+- [ ] Screen Sharing over the tailnet is slow:
+      the Macs reach each other only through DERP on eduroam
+      (`tailscale ping` never goes direct).
+      `vnc://lenis.local` works on the same network; away from it,
+      a direct path needs something else (a peer relay, or RustDesk's own).
+- [ ] Pull the power and confirm lenis boots,
       logs in and answers over Tailscale and Rex.
 - [ ] Confirm batt holds 40% once the battery has drained to it.
 - [ ] Make lenis the Rex home
