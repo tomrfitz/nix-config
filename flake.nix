@@ -189,6 +189,10 @@
       mac = {
         system = "aarch64-darwin";
         platform = "darwin";
+        extraModules = [
+          paneru.darwinModules.paneru
+          ./modules/darwin/system/paneru.nix
+        ];
         hmModules = [
           ./modules/shared/home
           ./modules/shared/home/desktop.nix
@@ -200,13 +204,18 @@
         fortis = mac // {
           hostModule = ./hosts/fortis;
         };
+        # Headless (AGENTS.md § Headless Macs): no window manager and none of
+        # the desktop home modules, as on trfwsl.
         lenis = mac // {
           hostModule = ./hosts/lenis;
           extraModules = [
-            paneru.darwinModules.paneru
-            ./modules/darwin/system/paneru.nix
             ./modules/darwin/system/batt.nix
             ./modules/darwin/system/headless.nix
+          ];
+          hmModules = [
+            ./modules/shared/home
+            ./modules/darwin/home
+            ./modules/darwin/home/headless.nix
           ];
         };
         trfnix = {

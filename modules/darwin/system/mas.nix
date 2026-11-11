@@ -1,14 +1,4 @@
-{ hostName, lib, ... }:
-let
-  # fortis keeps only the Safari extensions; see onFortis in homebrew.nix.
-  onFortis = [
-    "1Password for Safari"
-    "Dark Reader for Safari"
-    "Userscripts"
-    "Velja"
-  ];
-in
-{
+_: {
   # App Store apps through nix-darwin's own module rather than homebrew.masApps:
   # a nix-built mas runs at activation as the primary user, independent of brew
   # bundle, and also upgrades them (`update` defaults on). Installs end in
@@ -17,7 +7,7 @@ in
   # and it can't see iOS apps (Overcast).
   programs.mas = {
     enable = true;
-    packages = lib.filterAttrs (name: _: hostName != "fortis" || lib.elem name onFortis) {
+    packages = {
       "1Password for Safari" = 1569813296;
       "Dark Reader for Safari" = 1438243180;
       "Flighty" = 1358823008;

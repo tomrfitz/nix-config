@@ -21,12 +21,12 @@ Uses nixpkgs' default Nix (CppNix) on every host.
 | `trfvm` | TBD | Scratch/sandbox VM | Future |
 
 The primary config target is `fortis`.
-Both Macs take the `mac` profile in `flake.nix`,
-but `fortis` starts from a short list and takes things back as they are missed:
-its casks and App Store apps are the `onFortis` lists in `homebrew.nix`
-and `mas.nix`, its `system.defaults` are `fortisDefaults` in `settings.nix`,
-and it runs without paneru (`lenis` lists that in `flake.nix`).
-`lenis` keeps everything.
+`fortis` takes the whole `mac` profile in `flake.nix`:
+every cask and App Store app, paneru and the desktop home modules.
+`lenis` is headless and holds as little as it can
+(see Headless Macs):
+in `flake.nix` it replaces the profile's modules with `batt.nix`,
+`headless.nix` and a home list without `desktop.nix`.
 Each Mac has one charge limiter (see Charge limiters).
 `trfnix` is a real NixOS install useful for prototyping NixOS service configs
 (and the only host that exercises the Linux desktop modules);
@@ -140,8 +140,17 @@ Never start both.
 
 `lenis` is always on and driven from `fortis`
 (Rex, SSH, Screen Sharing), with its lid open and the display asleep.
-It lists `modules/darwin/system/headless.nix` in `flake.nix`:
+It lists `modules/darwin/system/headless.nix`
+and `modules/darwin/home/headless.nix` in `flake.nix`:
 
+- It installs three casks
+  (1Password, ChatGPT and Claude; `homebrew.casks` in `headless.nix`),
+  no App Store apps, no window manager and none of `desktop.nix`
+  (Zed, Zen, Ghostty, Zotero and its MCP server, GUI apps, fonts).
+  FileVault is off and auto-login on,
+  so whatever lenis holds is open to whoever holds lenis:
+  an app comes back by being named there, when missed.
+  `EDITOR` is `emacsclient -t`.
 - It never sleeps and restarts after a freeze.
   This MacBook has no restart-after-power-failure setting
   (`pmset -g cap` lists no `autorestart`);
@@ -154,8 +163,13 @@ It lists `modules/darwin/system/headless.nix` in `flake.nix`:
   `sudo launchctl kickstart system/org.nixos.auto-rebuild`
   (a switch from remote `main`, as at 06:30)
   and `sudo launchctl kickstart -k system/org.nixos.batt`.
+- A launchd agent sleeps the display at login (`lock-at-login`),
+  which locks the screen:
+  auto-login would otherwise leave the desktop open
+  until the display slept by itself.
 - Set by hand, since nix-darwin can't: auto-login, Screen Sharing,
-  Rex as a login item, Optimized Battery Charging off.
+  Rex as a login item, Optimized Battery Charging off, the lock delay
+  ("immediately").
 
 sshd takes keys only on every Mac (`security.nix`);
 the key is the one in `flake.nix`, served from `/etc/ssh`.
@@ -229,7 +243,7 @@ modules/
     home/          # packages, shell, git, editors, emacs, ghostty, zen, browser-policies, obsidian, notes, desktop, claude-code, pi, dprint, xdg-*, etc.
   darwin/          # macOS-only
     system/        # homebrew.nix, settings.nix (system.defaults), security.nix, paneru.nix, batt.nix, headless.nix, auto-rebuild.nix
-    home/          # zsh.nix, git.nix (1Password signing)
+    home/          # zsh.nix, git.nix (1Password signing); per host in flake.nix: headless.nix
   nixos/           # Linux-only
     system/        # desktop.nix, hardening.nix, homelab/, auto-update.nix, remote-build-cache.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh
     home/          # desktop.nix (niri + noctalia theming)
@@ -241,7 +255,8 @@ modules/
 
 - Add/remove nix packages: `modules/shared/home/packages.nix`
 - Add/remove macOS casks: `modules/darwin/system/homebrew.nix`; App Store apps:
-  `modules/darwin/system/mas.nix`
+  `modules/darwin/system/mas.nix`; a headless Mac's own few casks:
+  `modules/darwin/system/headless.nix`
 - Change macOS system settings: `modules/darwin/system/settings.nix`
 - Shell aliases/functions (cross-platform): `modules/shared/home/shell.nix`
 - Shell aliases/functions (macOS-only): `modules/darwin/home/zsh.nix`
@@ -539,7 +554,7 @@ Every host then follows main on its own schedule.
 
 ```text
 Mon, Thu  CI: Update flake.lock opens/refreshes a bump PR; Check runs on it:
-              check (eval + format) → darwin (build lenis's allowlisted
+              check (eval + format) → darwin (build fortis's allowlisted
               uncached derivations on macos-latest, push to tomrfitz.cachix.org)
               → automerge (rebase-merge the tested commit onto main)
 04:45  trfwsl: build trfwsl from main → push to Attic → switch trfwsl

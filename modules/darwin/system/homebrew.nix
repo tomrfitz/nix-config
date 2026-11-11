@@ -1,34 +1,20 @@
 {
   config,
-  hostName,
   lib,
   user,
   ...
 }:
 let
-  # fortis starts from a short list and takes an app back when it is missed:
-  # add its name here. Every other Mac installs the whole list below. Rex,
-  # GlobalProtect and Honorlock have no cask and are installed by hand.
-  onFortis = [
-    "1password"
-    "activitywatch"
-    "claude"
-    "batfi"
-    "google-chrome" # Honorlock exams
-    "karabiner-elements" # Emacs's Hyper+E and Hyper+C
-    "lookaway"
-    "tailscale-app"
-    "zen@twilight"
-    "zotero"
-  ];
+  # Every Mac installs this list except a headless one, which names its own
+  # few casks (headless.nix). Rex, GlobalProtect and Honorlock have no cask
+  # and are installed by hand.
   wanted =
     cask:
     let
       name = if lib.isString cask then cask else cask.name;
     in
-    (hostName != "fortis" || lib.elem name onFortis)
     # batt.nix replaces BatFi
-    && !(name == "batfi" && config.launchd.daemons ? batt);
+    !(name == "batfi" && config.launchd.daemons ? batt);
 in
 {
   # Homebrew itself, pinned by flake.lock: a fresh Mac gets it at the first
@@ -121,7 +107,9 @@ in
       "maccy"
       "macs-fan-control"
       "macusb" # bootable USBs: Windows (splits install.wim), Linux, macOS
-      "mullvad-vpn"
+      # "mullvad-vpn" — back once fortis has installed it from a network that
+      # resolves cdn.mullvad.net (eduroam's resolvers time out, and a cask
+      # that fails to download stops activation); see TODO.md
       "tailscale-app"
       "netnewswire"
       "ollama-app"

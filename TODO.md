@@ -32,6 +32,14 @@ unlocked lenis).
 - [ ] Written 2026-11-10, not yet switched: sudo without Touch ID on lenis.
       After the switch, check that `sudo -v` from a Rex shell asks
       for the password.
+- [ ] fortis's Rex host `lenis` still points at `trfmbp-rex…`,
+      which no longer resolves; `lenis-rex.taila815b1.ts.net` works.
+- [ ] On battery lenis still sleeps after a minute
+      (`pmset -g custom`; nix-darwin's `systemsetup` sets AC only).
+      Draining to batt's limit counts as AC,
+      so this bites only when the power is really out.
+      The power-pull test decides: if lenis doesn't wake when power returns,
+      add `pmset -b sleep 0`.
 - [ ] Screen Sharing over the tailnet is slow:
       the Macs reach each other only through DERP on eduroam
       (`tailscale ping` never goes direct).
@@ -48,7 +56,29 @@ unlocked lenis).
       set Rex's terminal font
       (lenis uses `Sarasa Term SC`, set by hand),
       install Mullvad from a network that resolves `cdn.mullvad.net`
-      (eduroam's resolvers time out on it) and put it back in `onFortis`.
+      (eduroam's resolvers time out on it, still so on 2026-11-10)
+      and uncomment it in `homebrew.nix`.
+- [ ] Written 2026-11-10, not yet switched: fortis takes the whole profile again
+      (about 45 casks to download, ten App Store apps, paneru,
+      which asks for Accessibility on first run,
+      and the full `system.defaults`), and lenis shrinks to three casks.
+      Switch lenis by hand (`nrs` in a terminal, before 06:30):
+      brew removes about 45 casks there, several through sudo, Ollama,
+      Folding@home, Google Drive and Mullvad among them,
+      and their data stays in `~/Library`.
+      Afterwards check that a reboot of lenis ends at a locked screen
+      (`lock-at-login`) with Rex and Tailscale up.
+- [ ] lenis keeps the data of the 46 casks its switch removes,
+      for a move to fortis: no uninstall step
+      or package receipt touches a data directory
+      (checked 2026-11-10 against each cask's definition and with
+      `brew bundle cleanup`'s dry run).
+      Kept, among others: `~/.ollama`, `~/Zotero`,
+      `/Library/Application Support/FAHClient`,
+      `/etc/mullvad-vpn` and everything under `~/Library`
+      (Signal, Element, WeChat, Zen, Google Drive's cache, Steam).
+      Delete what isn't moved once fortis has what it needs;
+      until then it is still readable by whoever holds lenis.
 - [ ] Open: one cask that fails to download stops the activation script
       before home-manager's step, on any Mac.
       Decide whether a switch should survive that.

@@ -1,8 +1,7 @@
 { ... }:
 {
-  # paneru.nix is not here: lenis lists it in flake.nix, with the input's
-  # module it needs. fortis runs without a window manager for now. Nor is
-  # batt.nix.
+  # paneru.nix, batt.nix and headless.nix are not here: flake.nix lists them
+  # per host (paneru with the input's module it needs).
   imports = [
     ./homebrew.nix
     ./settings.nix
