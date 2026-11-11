@@ -273,7 +273,13 @@ modules/
   the Zotero server, its CLI
   (both uvx-wrapped)
   and the Linux app in `modules/shared/home/zotero.nix`,
-  which also merges the server into the Claude desktop app's config on darwin
+  which also merges the server into the Claude desktop app's config on darwin.
+  Nothing else is declared:
+  the `claude.ai <name>` servers are the account's connectors,
+  added and removed at claude.ai
+  (Customize → Connectors),
+  and `syncClaudeAiPlugins` in `config/claude-settings.json` keeps the account's
+  Cowork plugins and their MCP servers out of Claude Code
 - Python global tooling (ruff floor, ty): `modules/shared/home/python.nix`;
   project tier: `templates/python-uv/pyproject.toml`
 - C/C++ floor: `config/clang-format`, `config/clang-tidy`, `config/clangd.yaml`;

@@ -1,5 +1,6 @@
 {
   "cleanupPeriodDays": 365,
+  "syncClaudeAiPlugins": false,
   "permissions": {
     "allow": [
       "mcp__plugin_hm_zotero__zotero_get_*",
