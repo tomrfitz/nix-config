@@ -43,10 +43,47 @@ let
     ''launchctl asuser "$(id -u -- ${lib.escapeShellArg user})" sudo --user=${lib.escapeShellArg user} -- defaults write ${lib.escapeShellArg domain} ${lib.escapeShellArg key} ${
       lib.escapeShellArg (lib.generators.toPlist { escape = true; } value)
     }'';
+  # The same Dock on both Macs. Pinned: the apps ActivityWatch shows in use on
+  # most days; a running app shows without a pin (Emacs, from Hyper+E), and
+  # recents fill the rest.
+  dock = {
+    autohide = true;
+    autohide-time-modifier = 0.15;
+    expose-group-apps = true;
+    magnification = true;
+    largesize = 90;
+    tilesize = 50;
+    mru-spaces = false;
+    orientation = "bottom";
+    show-recents = true;
+    showAppExposeGestureEnabled = true;
+    showhidden = true;
+
+    persistent-apps = [
+      { app = "${homeManagerAppsDirectory}/Vesktop.app"; }
+      { app = "/System/Applications/Messages.app"; }
+      { app = "/System/Applications/Mail.app"; }
+      { app = "/Applications/Twilight.app"; }
+      # Installed by hand from Rex's private beta; no cask or nix package yet.
+      { app = "/Applications/Rex Beta.app"; }
+    ];
+
+    # Hot corners
+    # 4 = Desktop, 6 = Disable Screen Saver, 11 = Apps, 12 = Notification Center
+    wvous-tl-corner = 11;
+    wvous-tr-corner = 12;
+    wvous-bl-corner = 6;
+    wvous-br-corner = 4;
+  };
+  # No nix-darwin option; the Dock's own default is 3.
+  dockPreferences."show-recent-count" = 6;
+
   # fortis starts from stock macOS and takes a setting back when it is missed
   # (move the key here from the block below). These are the ones that don't
-  # wait: press-free clicking and dragging, and one date and unit format.
+  # wait: press-free clicking and dragging, one date and unit format, and the
+  # Dock.
   fortisDefaults = {
+    inherit dock;
     NSGlobalDomain = {
       AppleICUForce24HourTime = true;
       AppleMeasurementUnits = "Centimeters";
@@ -59,6 +96,7 @@ let
       TrackpadThreeFingerHorizSwipeGesture = 0;
       TrackpadThreeFingerVertSwipeGesture = 0;
     };
+    CustomUserPreferences."com.apple.dock" = dockPreferences;
     CustomUserPreferences.NSGlobalDomain = {
       AppleLanguages = [
         "en-US"
@@ -146,43 +184,7 @@ in
           "com.apple.trackpad.forceClick" = true;
         };
 
-        # ── Dock ─────────────────────────────────────────────────────────────
-        dock = {
-          autohide = true;
-          autohide-time-modifier = 0.15;
-          expose-group-apps = true;
-          magnification = true;
-          largesize = 90;
-          tilesize = 50;
-          mru-spaces = false;
-          orientation = "bottom";
-          show-recents = true;
-          showAppExposeGestureEnabled = true;
-          showhidden = true;
-
-          persistent-apps = [
-            { app = "/System/Applications/Apps.app"; }
-            { app = "/System/Applications/System Settings.app"; }
-            { app = "/Applications/Zotero.app"; }
-            { app = "${homeManagerAppsDirectory}/Obsidian.app"; }
-            { app = "${homeManagerAppsDirectory}/YouTube Music.app"; }
-            { app = "${homeManagerAppsDirectory}/Vesktop.app"; }
-            { app = "/System/Applications/Messages.app"; }
-            { app = "/System/Applications/Mail.app"; }
-            # { app = "${homeManagerAppsDirectory}/Zen Browser (Twilight).app"; }
-            { app = "/Applications/Twilight.app"; }
-            # Installed by hand from Rex's private beta; no cask or nix package yet.
-            { app = "/Applications/Rex Beta.app"; }
-            { app = "/Applications/Zed.app"; }
-            { app = "${homeManagerAppsDirectory}/Emacs.app"; }
-          ];
-
-          # Hot corners
-          # 5 = Start Screen Saver, 12 = Notification Center, 14 = Quick Note
-          wvous-bl-corner = 5;
-          wvous-br-corner = 14;
-          wvous-tr-corner = 12;
-        };
+        inherit dock;
 
         # ── Finder ───────────────────────────────────────────────────────────
         finder = {
@@ -276,9 +278,7 @@ in
               "4" = "yyyy-MM-dd, EEEE";
             };
           };
-          "com.apple.dock" = {
-            "recent-count" = 5;
-          };
+          "com.apple.dock" = dockPreferences;
           "com.apple.desktopservices" = {
             DSDontWriteNetworkStores = true;
             DSDontWriteUSBStores = true;
