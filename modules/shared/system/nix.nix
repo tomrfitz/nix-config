@@ -1,4 +1,9 @@
-{ user, ... }:
+{
+  isDarwin,
+  lib,
+  user,
+  ...
+}:
 {
   nixpkgs.config.allowUnfree = true;
   # Flakes only: no channels, so no dead channels entry on the Nix search path
@@ -22,10 +27,11 @@
     # download-attempts 10.
     connect-timeout = 5;
     log-lines = 25;
-    trusted-users = [
-      "root"
-      user
-    ];
+    # Trust is as good as root on the daemon (nix.conf(5)), and nothing the
+    # Macs run needs it (audited 2026-11-10). Without it the daemon ignores,
+    # with a warning, most `--option` flags a user passes, `--builders` and
+    # any substituter not listed here; `connect-timeout` still applies.
+    trusted-users = lib.optionals (!isDarwin) [ user ];
     extra-substituters = [
       "https://nix-community.cachix.org"
       "https://tomrfitz.cachix.org"
