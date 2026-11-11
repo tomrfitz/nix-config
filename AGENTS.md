@@ -163,6 +163,12 @@ and `modules/darwin/home/headless.nix` in `flake.nix`:
   `sudo launchctl kickstart system/org.nixos.auto-rebuild`
   (a switch from remote `main`, as at 06:30)
   and `sudo launchctl kickstart -k system/org.nixos.batt`.
+- Tailscale is nixpkgs' `tailscaled` as a root daemon (`services.tailscale`),
+  not the app, which
+  [runs only after a login](https://tailscale.com/kb/1065/macos-variants).
+  It can't use exit nodes and has no GUI;
+  nix-darwin points `ts.net` lookups at MagicDNS (`/etc/resolver/ts.net`).
+  Rex keeps its own tailnet node (`<host>-rex`), separate from both.
 - GitHub and commit signing use lenis's own key, `~/.ssh/id_ed25519_lenis`
   (`modules/darwin/home/headless.nix`, listed in `flake.nix`):
   behind a locked screen 1Password's agent refuses to sign.
@@ -182,6 +188,11 @@ and `modules/darwin/home/headless.nix` in `flake.nix`:
 - Set by hand, since nix-darwin can't: auto-login, Screen Sharing,
   Rex as a login item, Optimized Battery Charging off, the lock delay
   ("immediately").
+  In Tailscale's policy file `lenis`
+  and Rex's node `lenis-rex` carry `tag:server`,
+  and the only grant's source is `autogroup:member`:
+  the user's devices reach them, and they can start nothing on the tailnet
+  (checked 2026-11-10; `tailscale ping` still answers, real connections don't).
 
 sshd takes keys only on every Mac (`security.nix`);
 the key is the one in `flake.nix`, served from `/etc/ssh`.

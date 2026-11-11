@@ -38,6 +38,14 @@ unlocked lenis).
 - [ ] Written 2026-11-10, not yet switched: sudo without Touch ID on lenis.
       After the switch, check that `sudo -v` from a Rex shell asks
       for the password.
+- [ ] Written 2026-11-10, not yet switched:
+      tailscaled as a daemon in place of the app on lenis.
+      Switch by hand, never at 06:30: the cask's uninstall needs sudo
+      (`pkgutil`, `/usr/local/bin/tailscale`).
+      Then reboot (Tailscale's docs, to clear the app's system extension),
+      `sudo tailscale up` over `lenis.local` or Rex,
+      and remove the old `lenis` node in the admin console
+      if the new one comes up as `lenis-1`.
 - [ ] fortis's Rex host `lenis` still points at `trfmbp-rex…`,
       which no longer resolves; `lenis-rex.taila815b1.ts.net` works.
 - [ ] On battery lenis still sleeps after a minute

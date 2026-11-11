@@ -20,6 +20,10 @@
   ];
   programs.mas.enable = lib.mkForce false;
 
+  # tailscaled as a root daemon, up before anyone logs in, instead of the
+  # app, which runs only inside a GUI session.
+  services.tailscale.enable = true;
+
   # Nobody is there to touch the sensor, and a shell inside the GUI session
   # (Rex) waits on the locked screen's Touch ID prompt for good. Without
   # pam_tid sudo asks for the password in the terminal.
