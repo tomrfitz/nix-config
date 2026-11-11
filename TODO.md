@@ -395,6 +395,7 @@ the standalone home-manager CLI dropped; niri went home-manager native.
       asuser` (modules/system/launchd.nix still uses plain `sudo
       --user=`; from the root auto-rebuild daemon that targets the system domain and SIP fails activation with exit 150). No issue filed. ref: https://github.com/nix-darwin/nix-darwin/blob/master/modules/system/launchd.nix; checked: 2026-11-10`
 - [ ] `REVISIT(upstream): drop the firefox-esr-140-bin-unwrapped permittedInsecurePackages entry in modules/nixos/system/desktop.nix once nixpkgs' zotero no longer uses firefox-esr-140-bin. Zotero 10.x stays on ESR 140 (EOL 2026-10-13; nixpkgs marked it insecure on 2026-10-15, so every trfnix eval failed from the 2026-10-18 pipeline run on); Zotero's main branch is on ESR 153.3.0 for the unreleased Zotero 11. Open nixpkgs PR #574462 (10.0.6) keeps ESR 140. ref: https://github.com/NixOS/nixpkgs/pull/572466; checked: 2026-11-10`
+- [ ] `REVISIT(upstream): on fortis, tick Tailscale's "Launch Tailscale at Login" and delete the hand-added Tailscale entry under System Settings → General → Login Items once a stable Tailscale registers its login helper on macOS 27. 1.104.5 reads the never-registered helper's SMAppService status as notFound, treats that as fatal and never calls register, so the checkbox can't be ticked (relaunching and setting TailscaleStartOnLogin by hand don't help); the hand-added entry is the workaround. Commenters report the unstable track fixes it. ref: https://github.com/tailscale/tailscale/issues/18042; checked: 2026-11-10`
 
 ## Deferred (trigger → action)
 
@@ -419,6 +420,15 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   ActivityWatch's history stays in its old `trfmbp` bucket.
   `trfnix` and `trfwsl` can follow or wait
   (names in `~/Documents/notes/host-names.org`).
+- **fortis's next login** → check that macOS lists the home-manager fonts
+  (Font Book, or Emacs coming up in Sarasa).
+  On 2026-11-10 it listed none of `~/Library/Fonts/HomeManager`:
+  the first switch created `~/Library/Fonts` mid-session,
+  and neither a `fontd` restart nor a new file in the folder got it scanned.
+  They were registered by hand for that login session only
+  (`CTFontManagerRegisterFontsForURL`, session scope).
+  If they are missing again after a login, the fix belongs in activation; lenis,
+  with the same layout, lists them.
 - **Winter break** → probable-tier cuts:
   (`ruff.nix` left this list 2026-09-07: it became `python.nix`,
   the nix-owned ruff/ty floor — see CLAUDE.md "Global floor vs project tier")
@@ -704,6 +714,17 @@ Quickstart: `~/Documents/notes/emacs-quickstart.org`.
       Quit Emacs.app before that switch,
       or the daemon cannot claim the server socket
       and launchd restarts it in a loop.
+      On fortis (2026-11-10, no paneru) Hyper+E and Hyper+C both work.
+- [ ] The daemon exits (255) at startup, and launchd loops it,
+      while `~/Documents/notes` holds iCloud placeholders:
+      reading one fails with `EDEADLK` ("Resource deadlock avoided").
+      Seen 2026-11-10 on fortis, 529 runs, until every file was fetched
+      (`brctl download <file>`, one per file;
+      a directory argument fetches nothing).
+      Optimise Mac Storage is on there, so macOS may evict them again:
+      Finder's Keep Downloaded on the folder should prevent it (untested).
+      The agent has no `StandardErrorPath`,
+      so the cause took a hand-run `Emacs --fg-daemon=<name>` to see.
 - [ ] paneru tiles Ghostty's quick terminal
       (an `AXFloatingWindow` panel, which paneru counts as manageable)
       after a paneru restart, so it fights Ghostty's own placement;

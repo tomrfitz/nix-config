@@ -475,7 +475,11 @@ repo clone, first `darwin-rebuild`/`nixos-rebuild`
 (which installs Homebrew through nix-homebrew on darwin),
 and Claude Code's native installer (darwin).
 The manual post-bootstrap steps are signing into 1Password and
-(on darwin) Apple ID.
+(on darwin)
+Apple ID, and opening Karabiner-Elements once:
+the cask registers nothing until then,
+and its settings window lists the approvals to grant
+(background services, Accessibility, the driver extension).
 
 ## Roadmap
 
