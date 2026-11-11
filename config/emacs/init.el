@@ -163,6 +163,12 @@
 (let ((themes-dir (expand-file-name "themes/" user-emacs-directory)))
     (add-to-list 'custom-theme-load-path themes-dir)
     (add-to-list 'load-path themes-dir))
+;; Every theme here is this repo's or a nix-built package's, so none needs
+;; the "can run Lisp code" prompt. The daemon has no terminal to answer it,
+;; so without a custom.el that remembers the answer the prompt fails in
+;; `auto-dark-themes'' setter and comes back in the first frame, and again
+;; whenever a theme file changes.
+(setq custom-safe-themes t)
 
 ;; macOS: follow the system appearance. Upstream GNU Emacs has no change
 ;; notification for it — `ns-system-appearance-change-functions' is an
@@ -835,7 +841,9 @@ agenda buffer, whose entries are markers into them, is live."
          (consult-ripgrep "Ripgrep" "r")))
 (add-hook 'emacs-startup-hook
     (lambda ()
-        (project-remember-projects-under "~/Projects/")
+        ;; Guarded: an error here ends the hook before the trees below register.
+        (when (file-directory-p "~/Projects/")
+            (project-remember-projects-under "~/Projects/"))
         (dolist (dir '("~/nix-config/"
                           "~/Documents/notes/"
                           "~/Library/Mobile Documents/iCloud~md~obsidian/Documents/Obsidian/"))
