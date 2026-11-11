@@ -29,6 +29,9 @@ unlocked lenis).
       that `ssh -o PreferredAuthentications=password <host>` is refused.
       Still to add: the agent forward,
       then tailscaled as a daemon in place of the app (expect a re-login).
+- [ ] Written 2026-11-10, not yet switched: sudo without Touch ID on lenis.
+      After the switch, check that `sudo -v` from a Rex shell asks
+      for the password.
 - [ ] Screen Sharing over the tailnet is slow:
       the Macs reach each other only through DERP on eduroam
       (`tailscale ping` never goes direct).

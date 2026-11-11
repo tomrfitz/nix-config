@@ -146,8 +146,11 @@ It lists `modules/darwin/system/headless.nix` in `flake.nix`:
   This MacBook has no restart-after-power-failure setting
   (`pmset -g cap` lists no `autorestart`);
   an Apple silicon laptop starts when power is connected.
-- Touch ID sudo hangs while nobody is at the Mac,
-  so two commands need no password:
+- sudo asks for the password in the terminal, with no Touch ID:
+  from a shell inside the GUI session (Rex) the prompt waits on the locked
+  screen for good and ignores SIGTERM (measured 2026-11-10; over plain SSH sudo
+  fell back to the password by itself).
+  Two commands need no password:
   `sudo launchctl kickstart system/org.nixos.auto-rebuild`
   (a switch from remote `main`, as at 06:30)
   and `sudo launchctl kickstart -k system/org.nixos.batt`.
