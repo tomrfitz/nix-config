@@ -163,6 +163,18 @@ and `modules/darwin/home/headless.nix` in `flake.nix`:
   `sudo launchctl kickstart system/org.nixos.auto-rebuild`
   (a switch from remote `main`, as at 06:30)
   and `sudo launchctl kickstart -k system/org.nixos.batt`.
+- GitHub and commit signing use lenis's own key, `~/.ssh/id_ed25519_lenis`
+  (`modules/darwin/home/headless.nix`, listed in `flake.nix`):
+  behind a locked screen 1Password's agent refuses to sign.
+  Activation makes the key if it is missing, with no passphrase;
+  it opens nothing until its public half is registered at GitHub,
+  as an authentication key, a signing key or both,
+  and deleting it there revokes it.
+  No host accepts it, and every other ssh destination still goes through
+  1Password, so it works only while lenis is unlocked.
+  A standing forward of fortis's agent was built and dropped (2026-11-10):
+  once approved, anything running
+  as the user on lenis could have used fortis's main key until 1Password locked.
 - A launchd agent sleeps the display at login (`lock-at-login`),
   which locks the screen:
   auto-login would otherwise leave the desktop open

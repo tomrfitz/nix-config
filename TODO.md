@@ -3,20 +3,28 @@
 ## lenis headless, driven from fortis (2026-11-10)
 
 Decided: FileVault off with auto-login, lid open with the display asleep,
-approvals on fortis through a forwarded 1Password agent
-(if it works), batt holding the charge at 40%.
-Why approvals move: while lenis's screen is locked,
-1Password's agent refuses to sign
+its own key for GitHub and commit signing
+(not a forwarded 1Password agent; the why is in AGENTS.md § Headless Macs),
+batt holding the charge at 40%.
+Why: while lenis's screen is locked, 1Password's agent refuses to sign
 (no commit, no fetch over the SSH remote)
 and Touch ID sudo hangs (`nrs` run from fortis sat at `sudo` until someone
 unlocked lenis).
 
-- [ ] Prototype the forwarded agent by hand before declaring it:
-      fortis's agent socket forwarded to a fixed path on lenis,
-      ssh and git signing on lenis pointed at it,
-      a signed commit made with lenis's screen locked.
-      `1password-ssh.nix` pins `IdentityAgent` on macOS,
-      which overrides a forwarded agent, so lenis has to stop pinning it.
+- [ ] lenis's own key: written 2026-11-10, not
+      yet switched (`darwin/home/headless.nix`).
+      Signing with an on-disk key
+      and these settings was tested on locked lenis with a throwaway key
+      (`git verify-commit` passed).
+      After lenis switches: register `~/.ssh/id_ed25519_lenis.pub` at GitHub
+      (`gh ssh-key add --type signing`,
+      and `--type authentication` if lenis should push over ssh),
+      then check `ssh -T git@github.com` and a pushed commit showing Verified.
+      An authentication key reaches every repo of the account,
+      nix-config's `main` included, which every host switches to as root;
+      the narrower setup is signing only,
+      with pushes over HTTPS on a fine-grained token limited to chosen repos.
+      lenis's `gh` token is invalid as of 2026-11-10.
 - [ ] By hand on lenis, done 2026-11-10: FileVault off, auto-login,
       Screen Sharing on.
       Not checkable without an admin prompt:
@@ -27,8 +35,6 @@ unlocked lenis).
       sshd is key-only on every Mac.
       After each switch, check
       that `ssh -o PreferredAuthentications=password <host>` is refused.
-      Still to add: the agent forward,
-      then tailscaled as a daemon in place of the app (expect a re-login).
 - [ ] Written 2026-11-10, not yet switched: sudo without Touch ID on lenis.
       After the switch, check that `sudo -v` from a Rex shell asks
       for the password.
