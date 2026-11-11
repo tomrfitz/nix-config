@@ -107,7 +107,7 @@ in
       "maccy"
       "macs-fan-control"
       "macusb" # bootable USBs: Windows (splits install.wim), Linux, macOS
-      # "mullvad-vpn" — back once fortis has installed it from a network that
+      "mullvad-vpn"
       # resolves cdn.mullvad.net (eduroam's resolvers time out, and a cask
       # that fails to download stops activation); see TODO.md
       "tailscale-app"
