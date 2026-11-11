@@ -111,6 +111,7 @@ in
         "zen.theme.content-element-separation" = 0;
         "zen.view.compact.enable-at-startup" = true;
         "zen.welcome-screen.seen" = true;
+        "zen.workspaces.separate-essentials" = false;
 
         # navigation
         "browser.ctrlTab.sortByRecentlyUsed" = true;
