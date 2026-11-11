@@ -17,6 +17,9 @@ Amending unpushed commits is fine.
   `git log --oneline '@{upstream}..HEAD'`.
 - Group the changes by topic: one module, feature or fix per commit.
   A file can span topics; split it by hunk.
+  Docs travel with their change:
+  the AGENTS.md and TODO.md hunks that describe a change go in
+  that change's commit, not one of their own.
 - Propose the commit list
   (subjects in the repo's `area: summary` style, files and hunks for each)
   and wait for the user's OK.
