@@ -7,6 +7,10 @@ let
     installation_mode = "normal_installed";
     install_url = "https://addons.mozilla.org/firefox/downloads/latest/${slug}/latest.xpi";
   };
+  # Uninstalls the extension on every host and keeps Sync from restoring it.
+  blocked = {
+    installation_mode = "blocked";
+  };
 in
 {
   sharedPolicies = {
@@ -48,11 +52,8 @@ in
       "jid1-xUfzOsOFlzSOXg@jetpack" = amo "reddit-enhancement-suite";
       "{4c421bb7-c1de-4dc6-80c7-ce8625e34d24}" = amo "load-reddit-images-directly";
 
-      # twitter / bluesky
-      "{ef32ca60-1728-4011-a585-4de439fe7ba7}" = amo "better-twitter-extension";
+      # twitter
       "{5cce4ab5-3d47-41b9-af5e-8203eea05245}" = amo "control-panel-for-twitter";
-      "sky-follower-bridge@ryo.kawamata" = amo "sky-follower-bridge";
-      "jesse@adhdjesse.com" = amo "skylink-bluesky-did-detector";
 
       # steam / gaming
       "firefox-extension@steamdb.info" = amo "steam-database";
@@ -62,18 +63,16 @@ in
       # productivity & tools
       "firefox@tampermonkey.net" = amo "tampermonkey";
       "clipper@obsidian.md" = amo "web-clipper-obsidian";
-      "sabre@simplify.jobs" = amo "simplify-jobs";
+      "firefox@cardpointers.com" = amo "cardpointers-x";
       "{cb31ec5d-c49a-4e5a-b240-16c767444f62}" = amo "indie-wiki-buddy";
       "historia@eros.man" = amo "historia";
       "{799c0914-748b-41df-a25c-22d008f9e83f}" = amo "web-scrobbler";
 
       # dev tools
-      "@react-devtools" = amo "react-devtools";
       "{7962ff4a-5985-4cf2-9777-4bb642ad05b8}" = amo "svg-gobbler";
 
       # media
       "open_in_iina_firefox@iina.io" = amo "open-in-iina-x";
-      "audiocontextsuspender@h43z" = amo "audiocontext-suspender";
 
       # monitoring
       "{ef87d84c-2127-493f-b952-5b4e744245bc}" = amo "aw-watcher-web";
@@ -83,6 +82,18 @@ in
         installation_mode = "normal_installed";
         install_url = "https://download.zotero.org/connector/firefox/release/Zotero_Connector-5.0.195.xpi";
       };
+
+      # retired (2026-11-10)
+      "{ef32ca60-1728-4011-a585-4de439fe7ba7}" = blocked; # Better Twitter
+      "sky-follower-bridge@ryo.kawamata" = blocked;
+      "jesse@adhdjesse.com" = blocked; # SkyLink
+      "audiocontextsuspender@h43z" = blocked;
+      "sabre@simplify.jobs" = blocked;
+      "@react-devtools" = blocked;
+      "notes@mozilla.com" = blocked; # Notes by Firefox
+      "{3c078156-979c-498b-8990-85f7987dd929}" = blocked; # Sidebery
+      "ATBC@EasonWong" = blocked; # Adaptive Tab Bar Colour
+      "{a1f01957-5419-4d40-9937-bdf7bba038b4}" = blocked; # Chameleon Dynamic Theme
     };
   };
 }
