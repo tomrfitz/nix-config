@@ -10,6 +10,16 @@ let
   cfg = config.programs.zen-browser;
   profile = cfg.profiles.default;
   profilesIni = "${cfg.configPath}/profiles.ini";
+  # On its first launch Zen skips a profile that has never run (no
+  # compatibility.ini) and makes its own, unless installs.ini already gives
+  # this install the declared one. The section is Firefox's hash of the app's
+  # path, /Applications/Twilight.app.
+  installsIni = "${cfg.configPath}/installs.ini";
+  installsSeed = pkgs.writeText "zen-installs.ini" ''
+    [9EBD2AC824310766]
+    Default=Profiles/${profile.path}
+    Locked=1
+  '';
   # Zen re-adds its bundled search engines, visible, whenever it rewrites
   # search.json; declaring them hidden keeps the list to the four below.
   hiddenEngines =
@@ -531,6 +541,10 @@ in
       if [ -L "$target" ] || ! cmp -s "$generated" "$target"; then
         run rm -f "$target"
         run install -m 644 "$generated" "$target"
+      fi
+      installs=${lib.escapeShellArg installsIni}
+      if [ ! -e "$installs" ]; then
+        run install -m 644 ${installsSeed} "$installs"
       fi
     ''
   );
