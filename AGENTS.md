@@ -505,9 +505,13 @@ node of its own, `<host>-rex`, as the app has on each Mac.
   after the first switch `rex server status` prints a sign-in link,
   and the server keeps the login in its state directory.
   An untagged node admits only the account that enrolled it.
-  A tagged one has no owner
-  (`lenis-rex` carries `tag:server`),
-  so it would also need `tailscale.allowTailnetMembers`.
+  A tagged one has no owner and answers every caller 403
+  until the server runs with `tailscale.allowTailnetMembers`
+  (the Macs' app: Settings > Server > Tailscale),
+  which admits whoever the tailnet policy lets reach the node.
+  `lenis-rex` and `trfwsl-rex` carry `tag:server`:
+  the app's setting covers the first, `rex.nix` the second.
+  The server's log names the cause ("owner-only access admits nobody").
 - Clients add the host themselves:
   `rex hosts add <host> https://<host>-rex.<tailnet>.ts.net` for the CLI,
   and Add Remote Host… in the app, which doesn't read the CLI's list.
