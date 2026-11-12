@@ -48,12 +48,11 @@ unlocked lenis).
       if the new one comes up as `lenis-1`.
 - [ ] fortis's Rex host `lenis` still points at `trfmbp-rex…`,
       which no longer resolves; `lenis-rex.taila815b1.ts.net` works.
-- [ ] On battery lenis still sleeps after a minute
-      (`pmset -g custom`; nix-darwin's `systemsetup` sets AC only).
-      Draining to batt's limit counts as AC,
-      so this bites only when the power is really out.
-      The power-pull test decides: if lenis doesn't wake when power returns,
-      add `pmset -b sleep 0`.
+- [ ] `pmset -a sleep 0` on lenis (`headless.nix`), written 2026-11-11:
+      a power interruption answered the power-pull question,
+      lenis slept on battery and stayed asleep once power returned.
+      After lenis switches, `pmset -g custom` should show `sleep 0` under
+      Battery Power.
 - [ ] Screen Sharing over the tailnet is slow:
       the Macs reach each other only through DERP on eduroam
       (`tailscale ping` never goes direct).

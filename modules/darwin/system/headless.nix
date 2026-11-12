@@ -6,6 +6,11 @@
     sleep.display = 2;
     restartAfterFreeze = true;
   };
+  # sleep.computer reaches only the AC profile, and a headless Mac that sleeps
+  # once stays asleep; see AGENTS.md § Headless Macs
+  system.activationScripts.postActivation.text = ''
+    /usr/bin/pmset -a sleep 0
+  '';
 
   # Only what is used without a screen, in place of homebrew.nix's list: the
   # less a Mac with FileVault off and auto-login holds, the less a compromise

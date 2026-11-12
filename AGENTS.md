@@ -152,6 +152,14 @@ and `modules/darwin/home/headless.nix` in `flake.nix`:
   an app comes back by being named there, when missed.
   `EDITOR` is `emacsclient -t`.
 - It never sleeps and restarts after a freeze.
+  `power.sleep.computer` runs `systemsetup`,
+  which left the battery profile at one minute,
+  so `headless.nix` also runs `pmset -a sleep 0`:
+  lenis idle-slept during a power interruption and then stayed asleep on AC,
+  surfacing only in background wakes, until something declared user activity
+  (2026-11-11; `caffeinate -u -t 20` over SSH during one of those wakes gave the
+  full wake, as a keypress would).
+  Without AC it now runs until the battery is empty.
   This MacBook has no restart-after-power-failure setting
   (`pmset -g cap` lists no `autorestart`);
   an Apple silicon laptop starts when power is connected.
