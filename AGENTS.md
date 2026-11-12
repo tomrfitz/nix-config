@@ -31,7 +31,8 @@ Each Mac has one charge limiter (see Charge limiters).
 `trfnix` is a real NixOS install useful for prototyping NixOS service configs
 (and the only host that exercises the Linux desktop modules);
 it has been powered off since ~2026-03, so the daily pipeline only evaluates it.
-`trfwsl` runs NixOS-WSL with Tailscale, ollama,
+`trfwsl` runs NixOS-WSL with Tailscale, ollama, a Rex server
+(see Rex),
 Attic and the auto-update pipeline; its homelab is off until trflab
 (see Roadmap).
 
@@ -253,7 +254,7 @@ you must `git add` them before `just eval` or `just check` will work.
 Inputs: nixpkgs (unstable), nix-darwin, home-manager, nix-homebrew
 (Homebrew itself, pinned),
 emacs-overlay, paneru, zen-browser, nixos-wsl, sops-nix, treefmt-nix, git-hooks,
-nix-index-database, mattpocock-skills
+nix-index-database, rex, mattpocock-skills
 (pi skills).
 pi, noctalia and niri come from nixpkgs through home-manager and NixOS modules;
 Claude Code is configured by home-manager everywhere,
@@ -289,7 +290,7 @@ modules/
     system/        # homebrew.nix, settings.nix (system.defaults), security.nix, paneru.nix, batt.nix, headless.nix, auto-rebuild.nix
     home/          # zsh.nix, git.nix (1Password signing); per host in flake.nix: headless.nix
   nixos/           # Linux-only
-    system/        # desktop.nix, hardening.nix, homelab/, auto-update.nix, remote-build-cache.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh
+    system/        # desktop.nix, hardening.nix, homelab/, auto-update.nix, remote-build-cache.nix, wsl-gpu.nix, tailscale, 1Password GUI, openssh; per host in flake.nix: rex.nix
     home/          # desktop.nix (niri + noctalia theming)
 ```
 
@@ -312,6 +313,8 @@ modules/
   (no host runs it since 2026-10-01;
   trfwsl's last declaration is `git show 76e9d16:hosts/trfwsl/default.nix`)
 - WSL GPU / container runtime: `modules/nixos/system/wsl-gpu.nix`
+- Rex server on a Linux host: `modules/nixos/system/rex.nix`,
+  listed in the host's `extraModules` in `flake.nix`
 - Linux desktop/session behavior: `modules/nixos/home/desktop.nix`
 - Configure editors: Zed in `modules/shared/home/desktop.nix`,
   Helix in `modules/shared/home/editors.nix`,
@@ -483,6 +486,36 @@ Two mechanisms, split by trust model:
   sops-nix reads `/` in a key name as YAML nesting, so write nested maps,
   and quote every value (a number-like one, such as a Mullvad account number,
   otherwise parses as an integer).
+
+### Rex
+
+On the Macs the Rex Beta app, installed by hand,
+runs the server and bundles the `rex` CLI; nix installs neither.
+A Linux host that lists `modules/nixos/system/rex.nix` in `flake.nix` (`trfwsl`)
+runs a personal server from Rex's own flake (input `rex`, the preview channel
+the app follows): a systemd user service of the login user
+(`journalctl --user -u rex`), kept across logouts by lingering, with a tailnet
+node of its own, `<host>-rex`, as the app has on each Mac.
+
+- Personal mode is what upstream recommends for a single-user machine
+  ([server modes](https://www.superlogical.com/rex/docs/linux/server-modes)).
+  The flake's NixOS module runs the other two,
+  a shared server as a `rex` account and a root login server.
+- The node is enrolled by hand, once per host:
+  after the first switch `rex server status` prints a sign-in link,
+  and the server keeps the login in its state directory.
+  An untagged node admits only the account that enrolled it.
+  A tagged one has no owner
+  (`lenis-rex` carries `tag:server`),
+  so it would also need `tailscale.allowTailnetMembers`.
+- Clients add the host themselves:
+  `rex hosts add <host> https://<host>-rex.<tailnet>.ts.net` for the CLI,
+  and Add Remote Host… in the app, which doesn't read the CLI's list.
+- A switch never restarts the server, which would end every session:
+  after a lock bump moves Rex, `systemctl --user restart rex` picks it up.
+- The module's home-manager half is imported on every host (`mkHM`).
+  Its lingering warning prints at every eval of a host that runs the server;
+  `users.users.<user>.linger` in `rex.nix` already answers it.
 
 ### Config files
 

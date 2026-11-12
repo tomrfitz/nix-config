@@ -624,6 +624,14 @@ the standalone home-manager CLI dropped; niri went home-manager native.
 
 ### Phase 1 — NixOS-WSL (`trfwsl`) — remaining
 
+- [ ] Rex server on trfwsl (`modules/nixos/system/rex.nix`), written 2026-11-11,
+      not yet switched.
+      Built on trfwsl from the working tree without activating;
+      the binary runs there (`rex version`: 0.1.0-preview.16).
+      After the switch: open the sign-in link from `rex server status` to enroll
+      `trfwsl-rex`, add the host on fortis (AGENTS.md § Rex), and confirm the
+      server comes back by itself after a WSL restart (lingering, and the user
+      service's cgroup delegation, are untested on WSL).
 - [ ] Post-boot Tailscale race:
       tailscaled stayed dead after boot
       until `sudo tailscale down && sudo tailscale up`

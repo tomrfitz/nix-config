@@ -49,6 +49,13 @@
       inputs.nixpkgs.follows = "nixpkgs";
       inputs.nixpkgs-stable.follows = "nixpkgs"; # only upstream's hydraJobs use it
     };
+    # Rex's prebuilt flake, for the server on Linux hosts
+    # (modules/nixos/system/rex.nix). preview is the channel the Macs' Rex
+    # Beta app follows. https://www.superlogical.com/rex/docs/linux/installation
+    rex = {
+      url = "https://pkgs.superlogical.com/rex/nix/preview.tar.gz";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
     # Mattpocock's curated skill collection — consumed by pi via
     # modules/shared/home/pi.nix, which links only the skills its plugin
     # manifest promotes. Locked via flake.lock; the lock bump moves it.
@@ -73,6 +80,7 @@
       git-hooks,
       nix-index-database,
       emacs-overlay,
+      rex,
       mattpocock-skills,
     }:
     let
@@ -106,6 +114,7 @@
             users.${user}.imports = [
               zen-browser.homeModules.twilight
               nix-index-database.homeModules.nix-index
+              rex.homeModules.default
             ]
             ++ hmModules;
           };
@@ -234,7 +243,10 @@
           platform = "nixos";
           wsl = true;
           hostModule = ./hosts/trfwsl;
-          extraModules = [ nixos-wsl.nixosModules.wsl ];
+          extraModules = [
+            nixos-wsl.nixosModules.wsl
+            ./modules/nixos/system/rex.nix
+          ];
           hmModules = [
             ./modules/shared/home
           ];
