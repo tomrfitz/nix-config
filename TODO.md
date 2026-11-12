@@ -11,20 +11,13 @@ Why: while lenis's screen is locked, 1Password's agent refuses to sign
 and Touch ID sudo hangs (`nrs` run from fortis sat at `sudo` until someone
 unlocked lenis).
 
-- [ ] lenis's own key: written 2026-11-10, not
-      yet switched (`darwin/home/headless.nix`).
-      Signing with an on-disk key
-      and these settings was tested on locked lenis with a throwaway key
-      (`git verify-commit` passed).
-      After lenis switches: register `~/.ssh/id_ed25519_lenis.pub` at GitHub
-      (`gh ssh-key add --type signing`,
-      and `--type authentication` if lenis should push over ssh),
-      then check `ssh -T git@github.com` and a pushed commit showing Verified.
-      An authentication key reaches every repo of the account,
+- [ ] lenis's own key is registered at GitHub for signing and authentication
+      (2026-11-10; `ssh -T git@github.com` answers from lenis).
+      Still to see: a commit pushed from lenis showing Verified.
+      As an authentication key it reaches every repo of the account,
       nix-config's `main` included, which every host switches to as root;
       the narrower setup is signing only,
       with pushes over HTTPS on a fine-grained token limited to chosen repos.
-      lenis's `gh` token is invalid as of 2026-11-10.
 - [ ] By hand on lenis, done 2026-11-10: FileVault off, auto-login,
       Screen Sharing on.
       Not checkable without an admin prompt:
@@ -38,16 +31,6 @@ unlocked lenis).
 - [ ] Written 2026-11-10, not yet switched: sudo without Touch ID on lenis.
       After the switch, check that `sudo -v` from a Rex shell asks
       for the password.
-- [ ] Written 2026-11-10, not yet switched:
-      tailscaled as a daemon in place of the app on lenis.
-      Switch by hand, never at 06:30: the cask's uninstall needs sudo
-      (`pkgutil`, `/usr/local/bin/tailscale`).
-      Then reboot (Tailscale's docs, to clear the app's system extension),
-      `sudo tailscale up` over `lenis.local` or Rex,
-      and remove the old `lenis` node in the admin console
-      if the new one comes up as `lenis-1`.
-- [ ] fortis's Rex host `lenis` still points at `trfmbp-rex…`,
-      which no longer resolves; `lenis-rex.taila815b1.ts.net` works.
 - [ ] `pmset -a sleep 0` on lenis (`headless.nix`), written 2026-11-11:
       a power interruption answered the power-pull question,
       lenis slept on battery and stayed asleep once power returned.
@@ -56,7 +39,7 @@ unlocked lenis).
 - [ ] Screen Sharing over the tailnet is slow:
       the Macs reach each other only through DERP on eduroam
       (`tailscale ping` never goes direct).
-      `vnc://lenis.local` works on the same network; away from it,
+      `vnc://lenis.local` works on the same subnet; away from it,
       a direct path needs something else (a peer relay, or RustDesk's own).
 - [ ] Pull the power and confirm lenis boots,
       logs in and answers over Tailscale and Rex.
@@ -71,16 +54,41 @@ unlocked lenis).
       install Mullvad from a network that resolves `cdn.mullvad.net`
       (eduroam's resolvers time out on it, still so on 2026-11-10)
       and uncomment it in `homebrew.nix`.
-- [ ] Written 2026-11-10, not yet switched: fortis takes the whole profile again
-      (about 45 casks to download, ten App Store apps, paneru,
-      which asks for Accessibility on first run,
-      and the full `system.defaults`), and lenis shrinks to three casks.
-      Switch lenis by hand (`nrs` in a terminal, before 06:30):
-      brew removes about 45 casks there, several through sudo, Ollama,
-      Folding@home, Google Drive and Mullvad among them,
-      and their data stays in `~/Library`.
-      Afterwards check that a reboot of lenis ends at a locked screen
-      (`lock-at-login`) with Rex and Tailscale up.
+- [ ] fortis has the whole profile since 2026-11-10:
+      check that paneru got its Accessibility grant.
+- [ ] Leftovers of the removed casks on lenis (swept 2026-11-10).
+      A cask's removal deletes files but can leave services running from them:
+      Karabiner's kept trying to open `Karabiner-Core-Service.app`,
+      raising a "file not found" alert every ten seconds,
+      until its user agents were booted out and a reboot cleared its daemons.
+      Needing sudo: the root helpers of Macs Fan Control
+      (still started at boot),
+      DaisyDisk and Xcodes, Google's keystone agents in `/Library/LaunchAgents`,
+      the empty `Tailscale.app` and `SF Symbols.app` shells in `/Applications`
+      (a login item opens the first and fails at each login),
+      `/Library/Application Support/org.pqrs`
+      and dangling links in `/usr/local/bin`.
+      Needing System Settings: Karabiner's driver extension,
+      the Tailscale app's network extension and VPN entry (listed, not running).
+      Left alone: Microsoft's licensing helper
+      (no launchd job; it may matter for moving Office to fortis).
+- [ ] Moving lenis's state to fortis, started 2026-11-10.
+      Done: Stats' layout, ActivityWatch
+      (trfmbp's history merged into fortis's buckets up to fortis's first event;
+      the database from before is `sqlite.db.before-trfmbp-merge` beside it),
+      Zotero's settings and four plugins
+      (the library and its files had already synced).
+      `~/Projects` is copied too
+      (verified by a second dry run, 2026-11-11),
+      without 20 upstream clones
+      (`nixpkgs`, `zed`, `topgrade` among them),
+      `node_modules`, `.venv`, `target` and `__pycache__`.
+      Still only on lenis: `~/media` (231 GB, too slow over DERP), `~/Downloads`
+      (28 GB),
+      `~/backup`, `~/Calibre Library`, `~/booklore`, Stardew Valley saves
+      (`~/.config/StardewValley`), atuin's history, and the uv tools (`beets`,
+      `markitdown`, `rendercv`, `pptx2md`, `aw-client`), which belong in nix if
+      they are still wanted.
 - [ ] lenis keeps the data of the 46 casks its switch removes,
       for a move to fortis: no uninstall step
       or package receipt touches a data directory

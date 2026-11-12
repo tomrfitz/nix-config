@@ -214,6 +214,12 @@ the key is the one in `flake.nix`, served from `/etc/ssh`.
 Between the Macs Tailscale relays through DERP on eduroam,
 which is too slow for Screen Sharing:
 use `vnc://lenis.local` on the same network.
+`.local` needs both Macs on one subnet:
+across eduroam's subnets a connection opens and then carries no data
+(ssh times out at the banner exchange, port 5900 stays silent;
+seen 2026-11-10 with the firewall on and off).
+The application firewall lets sshd through:
+over the tailnet ssh reached both Macs with it on.
 
 The `justfile` is the agents' command surface for checks; it has no switch,
 rollback or lock-bump recipes.
