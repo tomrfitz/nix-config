@@ -181,6 +181,13 @@ and `modules/darwin/home/headless.nix` in `flake.nix`:
   A standing forward of fortis's agent was built and dropped (2026-11-10):
   once approved, anything running
   as the user on lenis could have used fortis's main key until 1Password locked.
+- It has `~/Documents/notes` through iCloud and `$NOTES`,
+  but not the notes repo step or the `notes-sync` agent
+  (`modules/darwin/home/headless.nix` turns both off):
+  from the 06:30 daemon, git's first read under `~/Documents` waited on macOS's
+  Documents-folder prompt and hung the switch for 13 hours (2026-11-11).
+  Activation that runs unattended must stay out of `~/Documents`,
+  `~/Desktop` and `~/Downloads`.
 - A launchd agent sleeps the display at login (`lock-at-login`),
   which locks the screen:
   auto-login would otherwise leave the desktop open

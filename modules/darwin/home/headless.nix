@@ -32,6 +32,12 @@ in
     settings.gpg.ssh.program = lib.mkForce "/usr/bin/ssh-keygen";
   };
 
+  # iCloud delivers ~/Documents/notes; the repo and its auto-commit belong to
+  # the Mac someone sits at (notes.nix). Unattended, the repo check waits on
+  # macOS's Documents-folder prompt and hangs the 06:30 switch.
+  home.activation.notes-repo = lib.mkForce (lib.hm.dag.entryAnywhere "");
+  launchd.agents.notes-sync.enable = lib.mkForce false;
+
   # No GUI editor here: a terminal frame on the Emacs daemon.
   home.sessionVariables.EDITOR = lib.mkForce "emacsclient -t";
 
