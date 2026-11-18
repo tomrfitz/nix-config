@@ -457,6 +457,13 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   Otherwise nothing pending.
   (kagi.nix was deleted in commit 3 on 2026-09-03; it lives in git history,
   and `programs.mcp` would be the way back.)
+- **Next switch with Zen quit** → check on fortis
+  that `~/Library/Application Support/Zen/Profiles/default/customKeys.json`
+  appears and Cmd+S toggles compact mode.
+  Since Zen 1.24b the declared `keyboardShortcuts` are merged into that file,
+  the module skips the write while Zen is running,
+  and on 2026-11-15 the profile had no such file:
+  the two declared shortcuts may never have applied on fortis.
 - **trflab comes online** → replace the hand-rolled update pipeline
   (bump PR → CI build → cache → `auto-update.sh` / `auto-rebuild.nix`)
   with the fewest tools that cover every stage, least glue between them:
