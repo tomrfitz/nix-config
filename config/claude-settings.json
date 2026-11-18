@@ -79,5 +79,17 @@
       "**Org-specific CLIs**: None configured — repo-local tooling observed in usage: nix, nixfmt, hm (home-manager), nd, emacsclient, tailscale, op (1Password CLI)",
       "routine under tomrfitz/ prefix: git and nix operations within ~/nix-config (and its declared remote) are routine for this user"
     ]
+  },
+  "extraKnownMarketplaces": {
+    "obsidian-skills": {
+      "source": {
+        "source": "github",
+        "repo": "obsidianmd/obsidian-skills"
+      },
+      "autoUpdate": true
+    }
+  },
+  "enabledPlugins": {
+    "obsidian@obsidian-skills": true
   }
 }
