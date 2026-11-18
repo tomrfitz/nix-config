@@ -631,16 +631,6 @@ the standalone home-manager CLI dropped; niri went home-manager native.
 
 ### Phase 1 — NixOS-WSL (`trfwsl`) — remaining
 
-- [ ] Rex server on trfwsl (`modules/nixos/system/rex.nix`),
-      switched and enrolled as `trfwsl-rex` 2026-11-11. fortis reached it
-      until the node was tagged `tag:server` that night;
-      since then every tailnet caller gets 403.
-      `allowTailnetMembers` is set in `rex.nix` (2026-11-12), not yet switched.
-      Left: switch, `systemctl --user restart rex`
-      (it ends the server's sessions),
-      then check `rex -S trfwsl whoami` from fortis.
-      The server came back by itself after the 2026-11-12 Windows restart
-      (lingering works), and fortis's CLI already lists the host.
 - [ ] Post-boot Tailscale race:
       tailscaled stayed dead after boot
       until `sudo tailscale down && sudo tailscale up`
