@@ -94,7 +94,7 @@ in
   # the agent also sets the variables again at each login.
   # REVISIT(upstream): go back to launchd.user.envVariables once nix-darwin
   # prefixes its setenv with `launchctl asuser`. No issue filed.
-  # ref: https://github.com/nix-darwin/nix-darwin/blob/master/modules/system/launchd.nix; checked: 2026-11-10
+  # ref: https://github.com/nix-darwin/nix-darwin/blob/master/modules/system/launchd.nix; checked: 2026-11-15
   launchd.user.agents.user-env.serviceConfig = {
     ProgramArguments = [
       "/bin/launchctl"
