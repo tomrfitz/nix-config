@@ -496,7 +496,7 @@ Two mechanisms, split by trust model:
 
 ### Rex
 
-On the Macs the Rex Beta app, installed by hand,
+On the Macs the Rex app, installed by hand,
 runs the server and bundles the `rex` CLI; nix installs neither.
 A Linux host that lists `modules/nixos/system/rex.nix` in `flake.nix` (`trfwsl`)
 runs a personal server from Rex's own flake (input `rex`, the preview channel

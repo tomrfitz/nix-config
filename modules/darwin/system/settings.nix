@@ -64,7 +64,7 @@ let
       { app = "/System/Applications/Mail.app"; }
       { app = "/Applications/Twilight.app"; }
       # Installed by hand from Rex's private beta; no cask or nix package yet.
-      { app = "/Applications/Rex Beta.app"; }
+      { app = "/Applications/Rex.app"; }
     ];
 
     # Hot corners
