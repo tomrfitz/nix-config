@@ -22,3 +22,8 @@ style = "consistent"
 
 [MD050]
 style = "consistent"
+
+# Four-space list nesting, as in every other format (dprint's indentWidth).
+[MD007]
+indent = 4
+style = "fixed"

@@ -4,8 +4,10 @@
 extends = "config/rumdl-floor.toml"
 
 [global]
-# Replaces the floor's list, minus MD013.
-disable = ["MD025", "MD033"]
+# Replaces the floor's list, minus MD013. MD007 (list indent) belongs to
+# dprint here: its markdown plugin aligns nested lists to the parent's text
+# with no option to change it, so the floor's fixed 4 would fight it.
+disable = ["MD007", "MD025", "MD033"]
 
 [MD013]
 line-length = 80
