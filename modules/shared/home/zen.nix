@@ -533,7 +533,7 @@ in
   # nix-wrapped Zen on Linux reads the link fine.
   # REVISIT(upstream): link it on darwin too once the module writes profiles.ini
   #   writable itself (open PR: https://github.com/0xc000022070/zen-browser-flake/pull/401).
-  #   ref: https://github.com/0xc000022070/zen-browser-flake/issues/285; checked: 2026-11-15
+  #   ref: https://github.com/0xc000022070/zen-browser-flake/issues/285; checked: 2026-11-19
   home.file.${profilesIni}.enable = !pkgs.stdenv.hostPlatform.isDarwin;
   home.activation.zenProfilesIni = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
     lib.hm.dag.entryAfter [ "linkGeneration" ] ''
