@@ -342,7 +342,10 @@ modules/
   the Zotero server, its CLI
   (both uvx-wrapped)
   and the Linux app in `modules/shared/home/zotero.nix`,
-  which also merges the server into the Claude desktop app's config on darwin.
+  which also merges the server into the Claude desktop app's config on darwin;
+  the Lunch Money server in `modules/shared/home/lunchmoney.nix`,
+  which only sessions started in `~/Documents/finance` load
+  (activation writes that folder's `.mcp.json` and `.claude/settings.json`).
   Nothing else is declared:
   the `claude.ai <name>` servers are the account's connectors,
   added and removed at claude.ai

@@ -11,6 +11,7 @@
     ./vesktop.nix
     ./obsidian.nix
     ./zotero.nix
+    ./lunchmoney.nix
   ];
 
   # ── GUI packages ──────────────────────────────────────────────────────
