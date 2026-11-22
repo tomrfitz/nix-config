@@ -86,8 +86,9 @@ let
     in
     ''
       merged=$(mktemp)
-      if [ -s "${f}" ]; then base="${f}"; else base=<(echo '{}'); fi
-      if ${lib.getExe pkgs.jq} -s '.[0] * .[1]' "$base" ${own} > "$merged"; then
+      # /dev/null slurps to nothing; a <(…) in an assignment is closed before jq reads it.
+      if [ -s "${f}" ]; then base="${f}"; else base=/dev/null; fi
+      if ${lib.getExe pkgs.jq} -s 'reduce .[] as $x ({}; . * $x)' "$base" ${own} > "$merged"; then
         cmp -s "$merged" "${f}" || run install -D -m 600 "$merged" "${f}"
       else
         echo "pi: could not merge the declared keys into ${f}" >&2
