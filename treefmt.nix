@@ -6,12 +6,9 @@
   settings.global.excludes = [ "config/skills/rex/SKILL.md" ];
 
   programs.nixfmt.enable = true;
-  # shfmt reads indent/simplify from config/editorconfig (root symlink), the
-  # same source Zed and the global dprint fallback use; flags would override it.
-  programs.shfmt = {
-    enable = true;
-    useEditorConfig = true;
-  };
+  # Without flags shfmt reads indent/simplify from config/editorconfig (root
+  # symlink), the same source Zed and the global dprint fallback use.
+  programs.shfmt.enable = true;
   programs.just.enable = true;
   programs.statix.enable = true;
   # Lint, not format: fails fmt-check on shellcheck warnings and errors.
