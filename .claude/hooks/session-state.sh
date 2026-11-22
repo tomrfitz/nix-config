@@ -52,5 +52,39 @@ if last=$(git log -1 --format='%ct %cs' origin/main -- flake.lock 2>/dev/null) &
     [ "$days" -ge 10 ] && pipeline+=", $days days ago as of the last fetch: stalled, since a bump PR opens twice a week"
 fi
 
+# The other active hosts follow main by themselves, and a dead daemon there makes
+# no noise (lenis sat 9 days behind, 2026-11). A commit that has been on main for
+# 36 hours has missed at least one 06:30 run (04:45 on trfwsl).
+others=()
+if [ -n "$upstream" ]; then
+    tmp=$(mktemp -d)
+    for h in fortis lenis trfwsl; do
+        [ "$h" = "$host" ] && continue
+        timeout 5 ssh -o BatchMode=yes -o ConnectTimeout=4 "$h" \
+            'darwin-version --configuration-revision 2>/dev/null || nixos-version --configuration-revision' \
+            >"$tmp/$h" 2>/dev/null &
+    done
+    wait
+    for f in "$tmp"/*; do
+        [ -e "$f" ] || continue
+        h=${f##*/} r=$(tr -d '[:space:]' <"$f")
+        r=${r%-dirty}
+        if [ -z "$r" ]; then
+            others+=("$h: unreachable over ssh")
+        elif [ "$r" = "$upstream" ]; then
+            others+=("$h runs ${r:0:7}, the upstream branch")
+        elif git merge-base --is-ancestor "$r" "$upstream" 2>/dev/null; then
+            oldest=$(git log --reverse --format=%ct "$r..$upstream" | head -n 1)
+            line="$h runs ${r:0:7}, $(git rev-list --count "$r..$upstream") commits behind"
+            [ $(($(date +%s) - oldest)) -ge 129600 ] && line+=": stalled, the oldest has waited over 36 hours"
+            others+=("$line")
+        else
+            others+=("$h runs ${r:0:7}, which is not on the upstream branch")
+        fi
+    done
+    rm -rf "$tmp"
+fi
+
 printf 'Repo and machine state at session start (.claude/hooks/session-state.sh):\n- %s\n- %s\n' "$repo" "$machine"
+if [ ${#others[@]} -gt 0 ]; then printf -- '- %s\n' "${others[@]}"; fi
 if [ -n "$pipeline" ]; then printf -- '- %s\n' "$pipeline"; fi
