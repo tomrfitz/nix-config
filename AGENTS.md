@@ -683,6 +683,12 @@ daily CI:      fail if flake.lock hasn't changed on main for 10 days (watchdog)
   or on the next wake if the Mac slept through it
   (a run lost to a shutdown is not retried;
   a run on an unchanged `main` makes no new generation).
+  Its plist runs `/etc/auto-rebuild`, never a store path:
+  activation unloads a daemon whose plist changed,
+  which kills the switch running that activation,
+  and the daemon is gone until an interactive switch
+  (lenis, 2026-11-13, when a bump moved nh).
+  After editing the daemon's `serviceConfig`, switch each Mac interactively.
   It has no Full Disk Access,
   so only interactive switches write the sandboxed apps' preferences
   (Safari, Mail; `settings.nix`), and the daemon logs a warning instead
@@ -693,9 +699,10 @@ daily CI:      fail if flake.lock hasn't changed on main for 10 days (watchdog)
 `journalctl -u auto-update`;
 `journalctl -u auto-update -o short-iso | grep '==>'` shows how far each run
 got.
-On the Mac, `/var/log/auto-rebuild.log` has ANSI codes
-(`sed 's/\x1b\[[0-9;]*m//g'`),
-and `launchctl print system/org.nixos.auto-rebuild` counts runs since boot only.
+On the Mac, each run in `/var/log/auto-rebuild.log` starts with a dated `==>`
+line, the log has ANSI codes (`sed 's/\x1b\[[0-9;]*m//g'`), and
+`launchctl print system/org.nixos.auto-rebuild` counts runs since boot only
+("Could not find service" means it is unloaded: see the plist note above).
 
 **Diagnose a build failure from the Mac:**
 `nix eval --raw --no-write-lock-file --override-input nixpkgs github:NixOS/nixpkgs/<rev> .#nixosConfigurations.trfwsl.config.system.build.toplevel.drvPath`,
