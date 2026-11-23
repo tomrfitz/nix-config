@@ -15,8 +15,22 @@
   pkgs,
   ...
 }:
+let
+  # Its default is $SHELL, zsh here (config/agents.md, Tools).
+  shellPath = "/run/current-system/sw/bin/bash";
+  yq = lib.getExe pkgs.yq-go;
+in
 lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
   home.packages = [ pkgs.omp ];
+
+  # config.yml is omp's own, so activation sets only this key, keeping comments.
+  home.activation.ompShell = lib.hm.dag.entryAfter [ "writeBoundary" ] ''
+    f=${config.home.homeDirectory}/.omp/agent/config.yml
+    if [ "$(${yq} '.shellPath' "$f" 2>/dev/null)" != ${shellPath} ]; then
+      [ -e "$f" ] || run install -D -m 600 /dev/null "$f"
+      run ${yq} -i '.shellPath = "${shellPath}"' "$f"
+    fi
+  '';
 
   home.file = {
     ".omp/agent/AGENTS.md".source = ../../../config/agents.md;

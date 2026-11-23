@@ -33,7 +33,8 @@ in
     # settings.json links out of the store into the working tree, not through
     # `settings`: Claude Code writes it at runtime (/effort, /model, permission
     # answers), which a read-only store file refuses with EACCES. Its edits land
-    # in the repo as a diff to keep or revert.
+    # in the repo as a diff to keep or revert. Its `env` points the Bash tool at
+    # nixpkgs' bash (config/agents.md, Tools).
     "${cfg.configDir}/settings.json".source = link "config/claude-settings.json";
     # Run by `statusLine` in settings.json.
     "${cfg.configDir}/statusline.sh".source = link "config/claude-statusline.sh";

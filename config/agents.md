@@ -58,6 +58,11 @@ be understandable and contributable by others.
 - The userland on `PATH` is GNU on every host, macOS included
   (`sed`, `grep`, `find`, `awk`, `tar`, coreutils):
   write `sed -i`, never BSD's `sed -i ''`
+- Claude Code, pi and omp run commands in nixpkgs' bash 5 from the system
+  profile (`/run/current-system/sw/bin/bash`), not macOS's `/bin/bash` 3.2 or
+  the user's zsh, which word-splits and globs differently.
+  A command sent over `ssh` runs in the remote login shell, zsh on every host:
+  quote globs and `?` there, and don't start a word with `=`
 - Trust tool output (LSPs, linters, formatters) over your own reasoning
   for syntax, style, and correctness —
   they encode more collective experience than any one agent has.

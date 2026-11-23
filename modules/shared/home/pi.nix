@@ -51,6 +51,8 @@ let
     defaultModel = "claude-opus-5-5";
     defaultThinkingLevel = "high";
     enableInstallTelemetry = false;
+    # Its default is /bin/bash, macOS's 3.2 (config/agents.md, Tools).
+    shellPath = "/run/current-system/sw/bin/bash";
     packages = map (p: "npm:${p}") piPackages;
     # Cheaper models for the roles that read a lot and decide little.
     subagents.agentOverrides = {

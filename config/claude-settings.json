@@ -1,6 +1,9 @@
 {
   "cleanupPeriodDays": 365,
   "syncClaudeAiPlugins": false,
+  "env": {
+    "CLAUDE_CODE_SHELL": "/run/current-system/sw/bin/bash"
+  },
   "permissions": {
     "allow": [
       "mcp__plugin_hm_zotero__zotero_get_*",

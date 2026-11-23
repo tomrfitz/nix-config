@@ -327,6 +327,9 @@ modules/
   omp in `omp.nix`; the Anthropic API key pi and omp read
   (Max's monthly API credits; 1Password, never exported)
   in `anthropic-api-key.nix`
+- Agents' shell (nixpkgs' bash, from the system profile):
+  `CLAUDE_CODE_SHELL` in `config/claude-settings.json`,
+  `shellPath` in `pi.nix` and `omp.nix`
 - Agent skills: for every project in `config/skills/`
   (linked into `~/.config/claude/skills/` by `claude-code.nix`,
   and as `~/.agents/skills`, which omp and pi read, by `default.nix`);
