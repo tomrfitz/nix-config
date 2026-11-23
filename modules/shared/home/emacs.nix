@@ -170,9 +170,18 @@ in
   launchd.agents.emacs.config.KeepAlive = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin (
     lib.mkForce true
   );
+  # COLORTERM, on both platforms, gives `emacsclient -t' frames 24-bit colour,
+  # so the theme matches the GUI's. Emacs reads it from the daemon's own
+  # environment, never the client's (src/term.c), and a terminal whose
+  # terminfo entry lacks Tc or RGB (Rex's xterm-256color) otherwise gets 256
+  # colours.
   launchd.agents.emacs.config.EnvironmentVariables = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     TERMINFO = "${config.xdg.dataHome}/terminfo";
+    COLORTERM = "truecolor";
   };
+  systemd.user.services.emacs.Service.Environment = lib.mkIf (!pkgs.stdenv.hostPlatform.isDarwin) [
+    "COLORTERM=truecolor"
+  ];
   launchd.agents.emacs-gui-env = lib.mkIf pkgs.stdenv.hostPlatform.isDarwin {
     enable = true;
     config = {
