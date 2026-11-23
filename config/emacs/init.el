@@ -175,22 +175,41 @@
 ;; emacs-plus patch, never in nixpkgs' NS build — so auto-dark polls via
 ;; in-process AppleScript (`ns-do-applescript', 5 s). It uses the hook
 ;; automatically if that patch is ever applied in emacs.nix.
-;; Its AppleScript detection needs an NS frame, which the daemon only has
-;; once a client opens one, so under the daemon it starts with that frame.
+;; Its AppleScript detection needs an NS frame ("Window system is not in use
+;; or not initialized" without one), which the daemon only has once a client
+;; opens one, so under the daemon it starts with that frame. Until then the
+;; theme comes from `defaults', at startup and again for each terminal frame
+;; (`emacsclient -t'), so a daemon that never gets an NS frame is themed but
+;; follows an appearance change only at its next frame. auto-dark's own
+;; fallback polls osascript, which asks for Automation access and would wait
+;; on a prompt nobody sees on a headless Mac.
+(defun tf/macos-dark-p ()
+    "Non-nil when macOS is in Dark appearance; needs no window system."
+    (eql 0 (call-process "/usr/bin/defaults" nil nil nil
+                         "read" "-g" "AppleInterfaceStyle")))
+
+(defun tf/theme-match-appearance ()
+    "Enable the Flexoki theme that matches the macOS appearance."
+    (let ((theme (if (tf/macos-dark-p) 'flexoki-dark 'flexoki-light)))
+        (unless (equal custom-enabled-themes (list theme))
+            (mapc #'disable-theme custom-enabled-themes)
+            (load-theme theme t))))
+
 (defun tf/auto-dark-start ()
-    "Enable `auto-dark-mode' once a graphical frame exists."
-    (when (display-graphic-p)
-        (remove-hook 'server-after-make-frame-hook #'tf/auto-dark-start)
-        (auto-dark-mode)))
+    "Enable `auto-dark-mode' in the first NS frame; theme by hand until then."
+    (if (display-graphic-p)
+        (progn
+            (remove-hook 'server-after-make-frame-hook #'tf/auto-dark-start)
+            (auto-dark-mode))
+        (tf/theme-match-appearance)))
 
 (use-package auto-dark
     :ensure t
     :if (eq system-type 'darwin)
     :custom (auto-dark-themes '((flexoki-dark) (flexoki-light)))
     :init
-    (if (daemonp)
-        (add-hook 'server-after-make-frame-hook #'tf/auto-dark-start)
-        (auto-dark-mode)))
+    (add-hook 'server-after-make-frame-hook #'tf/auto-dark-start)
+    (tf/auto-dark-start))
 
 ;; Linux: noctalia theme if generated (hosts with the noctalia shell),
 ;; flexoki-dark fallback elsewhere (e.g. trfwsl's headless daemon).
