@@ -63,9 +63,11 @@ Fix and restage until it passes.
   ask the user to unlock it; don't commit with `--no-gpg-sign`.
 - Before the first commit, back up the worktree
   (`rsync -a --exclude .git ./ <scratch>/tree/`).
-  After each commit, `rsync -nrc --exclude .git ./ <scratch>/tree/` must list
-  only files that commit changed: proof that the pre-commit hook's stash and
-  restore lost nothing.
+  After each commit,
+  `diff -rq --exclude .git --exclude .direnv --exclude .rumdl_cache . <scratch>/tree/`
+  must list only files the hook's formatter rewrote: proof that its stash and
+  restore lost nothing (`rsync -n` without `-v` prints nothing, so it proves
+  nothing).
 - Back to step 2 for the next topic.
   The last commit leaves the tree clean,
   apart from deliberately uncommitted files.
