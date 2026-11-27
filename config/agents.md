@@ -214,10 +214,12 @@ be understandable and contributable by others.
   (Claude Code and omp expand that import;
   other agents should read it at the start of a session).
   It stays out of repos because some are public.
+
 - Treat AGENTS.md, memory files,
   and project docs as imperfect but valuable persistence.
   Record only what would change a future decision; when an entry goes stale,
   correct or delete it rather than appending history, which git already keeps.
+
 - Put knowledge where every reader that needs it will look:
   repo rules in AGENTS.md, procedures in skills, open work in TODO.md,
   research in notes.
@@ -226,6 +228,7 @@ be understandable and contributable by others.
   which keeps the code easy to grep.
   Agent memory is the narrowest channel
   (one harness, one project), so it holds the least.
+
 - That rule binds every harness memory tool:
   Claude Code's auto-memory and subagent `memory:` directories,
   omp's `retain`/`learn`, pi-hermes-memory.
@@ -239,15 +242,19 @@ be understandable and contributable by others.
   (every harness reads them),
   not to a harness's own skill store;
   omp's `managed-skills` are drafts to promote there or delete.
+
 - Fix inaccurate docs you come across, after verifying the new fact.
   A change that encodes a decision
   (retiring a host, changing a status) is the user's call: raise it instead.
+
 - When the topic shifts or the session grows long
   (around 300k tokens),
   propose a handoff (`/handoff` where available) and a fresh session.
+
 - Distinguish facts (test status, file paths) from understanding
   (why a design decision was made, what the user's goals are)
   — both matter, but understanding is harder to capture and more valuable to try
+
 - The user's notes are org files in `$NOTES`
   (`~/Documents/notes`, also Emacs's `org-directory`).
   When producing research or notes for later use,
@@ -278,5 +285,6 @@ be understandable and contributable by others.
   Use org links (`[[file:other-note.org][Other note]]`).
   The Obsidian vault at `$OBSD` is a read-only archive of older notes:
   search it, don't write to it.
+
 - The user values long-term collaboration patterns over per-session efficiency —
   leave good context for next time

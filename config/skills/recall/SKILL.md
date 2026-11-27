@@ -17,10 +17,12 @@ Run the cheap sources first and stop once the question is answered.
    (`${CLAUDE_CONFIG_DIR:-$HOME/.claude}/projects/<cwd with / replaced by ->/memory/`;
    `~/.config/claude` here).
    In omp, also its `recall` tool (Mnemopi; project plus global bank).
+
 2. **Org notes.**
    `rg -n -i '<topic>' "${NOTES:-$HOME/Documents/notes}" -g '*.org'`.
    Older notes sit read-only in the Obsidian vault:
    `rg -l -i '<topic>' "$OBSD" --type md`.
+
 3. **Claude Code CLI prompt history**
    (every prompt typed in the CLI since 2026-01;
    the desktop app doesn't write it):
@@ -48,6 +50,7 @@ Run the cheap sources first and stop once the question is answered.
 
    A session's title is its last `custom-title` or `ai-title` record:
    `jq -r 'select(.type == "custom-title" or .type == "ai-title") | .customTitle // .aiTitle' <file> | tail -1`.
+
 5. **omp** (macOS).
    Prompt history, every prompt typed into omp, with full-text search:
 

@@ -27,6 +27,7 @@ Search it when recalling past research; never write to it.
 - One topic per file, plain kebab-case names: `attic-vs-harmonia.org`.
   No denote-style `YYYYMMDDTHHMMSS--title__tags.org` names;
   the few in the directory came from the user's own workflow.
+
 - A new file starts with:
 
   ```org
@@ -43,9 +44,11 @@ Search it when recalling past research; never write to it.
   so the user can grep their notes by source.
   Omit it on the user's own notes,
   and never add or remove it on an existing file.
+
 - Org markup, not Markdown: `* Heading`, `=code=`, `*bold*`,
   `#+begin_src` blocks, links as `[[file:other-note.org][Other note]]`
   or `[[https://example.com][label]]`.
+
 - No `TODO` keywords, deadlines or scheduled dates unless the user asks:
   they land in the agenda.
 
