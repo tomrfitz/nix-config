@@ -498,7 +498,8 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   colocate `config/` assets with their modules, devShell → `shell.nix`.
 - **When the agent harnesses are reviewed** → keep or cut pi and omp
   (opencode was dropped on 2026-11-06, unused for months; Hermes on 2026-10-22,
-  never used; its input and package are in `7ee3846`
+  never used; its input and package are in `9d3cf96`,
+  the parent of the removal `2c2a8cc`
   (`flake.nix`, `packages.nix`),
   the API-key wiring is in `~/Documents/notes/agent-harnesses.org`,
   and upstream now ships a home-manager module).
@@ -557,7 +558,7 @@ the standalone home-manager CLI dropped; niri went home-manager native.
   (often broken, still wanted),
   the guardrail prose (pi reads AGENTS.md without the hook).
 - **When macOS announces the Rosetta cutoff** → cask arch audit
-  (activitywatch is x86_64-only; native arm64 in its 0.14 betas).
+  (activitywatch is native arm64 since stable 0.14).
 - **When convenient** → `atuin login`
   (doctor flags a legacy Hub token);
   open asks: karabiner-elements
@@ -1084,9 +1085,9 @@ The remaining used strays are the Unmanaged list.
   (checked 2026-09-25),
   so prefix-dependent permission rules are safe;
   the zotero ones in `config/claude-settings.json` use it.
-- **activitywatch** — stable dmg is x86_64-only
-  (22 months since a stable release);
-  native arm64 in v0.14.0b4 prereleases — stable 0.14 ends the Rosetta caveat.
+- **activitywatch** — stable 0.14 is native arm64
+  (0.14.2 installed on fortis, checked 2026-11-23),
+  which ends the Rosetta caveat.
   Arch-audit method for other casks:
   `brew info --json=v2` arch data or `lipo -archs` on the installed app.
 - **Homelab** — Plex 2026 monetization
