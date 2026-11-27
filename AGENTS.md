@@ -336,10 +336,9 @@ modules/
   for this repo only in `.claude/skills/`. omp's global instructions come from
   the same `config/agents.md` (`omp.nix`); its memory settings (Mnemopi,
   auto-retain off) live in its own `~/.omp/agent/config.yml`
-- Claude Code plugins: `extraKnownMarketplaces`
-  and `enabledPlugins` in `config/claude-settings.json`
-  (Obsidian's obsidian-skills, auto-updating);
-  Claude Code only, so omp and pi don't see them
+- Claude Code plugins: `enabledPlugins` in `config/claude-settings.json`,
+  from Anthropic's built-in plugin directory
+  (Obsidian, Cloudflare); Claude Code only, so omp and pi don't see them
 - MCP servers: `programs.mcp`
   (Claude Code picks them up via `enableMcpIntegration`);
   the Zotero server, its CLI

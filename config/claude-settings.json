@@ -42,16 +42,8 @@
     "command": "${CLAUDE_CONFIG_DIR:-$HOME/.claude}/statusline.sh"
   },
   "enabledPlugins": {
-    "obsidian@obsidian-skills": true
-  },
-  "extraKnownMarketplaces": {
-    "obsidian-skills": {
-      "source": {
-        "source": "github",
-        "repo": "obsidianmd/obsidian-skills"
-      },
-      "autoUpdate": true
-    }
+    "obsidian@anthropic-plugin-directory": true,
+    "cloudflare@anthropic-plugin-directory": true
   },
   "effortLevel": "medium",
   "modelSettings": {
